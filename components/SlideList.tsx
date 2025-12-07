@@ -1,0 +1,45 @@
+import React from 'react';
+import { Presentation, Slide, Theme } from '../types';
+import { SlideCard } from './SlideCard';
+import { Grid3X3 } from 'lucide-react';
+import { SYSTEM_THEME } from '../lib/themes';
+
+interface SlideListProps {
+    presentation: Presentation;
+    activeSlideIndex: number;
+    setActiveSlideIndex: (index: number) => void;
+    onMoveSlide: (index: number, direction: 'up' | 'down') => void;
+    viewMode?: 'standard' | 'wabi-sabi';
+    activeWabiSabiLayout?: string;
+}
+
+export const SlideList: React.FC<SlideListProps> = ({ 
+    presentation, activeSlideIndex, setActiveSlideIndex, onMoveSlide,
+    viewMode, activeWabiSabiLayout
+}) => {
+    return (
+        <div className="flex flex-col flex-1 h-full min-h-0 overflow-hidden animate-in fade-in duration-500 bg-white">
+            <div className="h-full overflow-y-auto p-4 bg-white">
+                <div className="flex items-center justify-between mb-4 px-1 flex-none">
+                    <div className="flex items-center gap-2"><Grid3X3 className="w-4 h-4 text-zinc-500" strokeWidth={2.5} /><h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Deck Overview</h3></div>
+                </div>
+                {/* FORCE FLEX-COL for 1-wide layout */}
+                <div className="flex flex-col gap-4 pb-20">
+                    {presentation.slides.map((slide, idx) => (
+                        <SlideCard 
+                            key={slide.id} 
+                            slide={slide} 
+                            isActive={idx === activeSlideIndex} 
+                            onClick={() => setActiveSlideIndex(idx)} 
+                            theme={SYSTEM_THEME} 
+                            onMoveUp={idx > 0 ? () => onMoveSlide(idx, 'up') : undefined}
+                            onMoveDown={idx < presentation.slides.length - 1 ? () => onMoveSlide(idx, 'down') : undefined}
+                            viewMode={viewMode}
+                            activeWabiSabiLayout={activeWabiSabiLayout}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};

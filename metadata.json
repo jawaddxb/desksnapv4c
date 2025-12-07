@@ -1,0 +1,5 @@
+{
+  "name": "decksnap4",
+  "description": "An advanced agentic presentation generator that creates structured slide decks with high-fidelity, AI-generated imagery using the Gemini 3 Pro pipeline.",
+  "requestFramePermissions": []
+}
