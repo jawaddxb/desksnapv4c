@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Slide, Theme } from '../types';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
@@ -55,11 +56,11 @@ export const SplitLayout: React.FC<LayoutProps> = ({ slide, theme, children }) =
     const isOrganic = radiusVal > 8; 
 
     return (
-        <div className="flex flex-col md:flex-row w-full h-full min-h-full p-6 md:p-12 gap-8 md:gap-16">
-            <div className={`flex-1 flex flex-col justify-center relative z-20 ${isRightAligned ? 'md:order-2' : 'md:order-1'}`}>
+        <div className="flex flex-col md:flex-row w-full h-full p-6 md:p-8 gap-6 md:gap-12 overflow-hidden">
+            <div className={`flex-1 flex flex-col justify-center relative z-20 min-h-0 overflow-hidden shrink-0 ${isRightAligned ? 'md:order-2' : 'md:order-1'}`}>
                 {children}
             </div>
-            <div className={`md:w-1/2 relative h-64 md:h-full ${isRightAligned ? 'md:order-1' : 'md:order-2'}`}>
+            <div className={`md:w-1/2 relative h-64 md:h-full shrink-0 ${isRightAligned ? 'md:order-1' : 'md:order-2'}`}>
                 <ImageContainer 
                     slide={slide} 
                     theme={theme} 
@@ -77,7 +78,7 @@ export const FullBleedLayout: React.FC<LayoutProps> = ({ slide, theme, children 
     const isRight = slide.alignment === 'right';
 
     return (
-        <div className="relative w-full min-h-full group">
+        <div className="relative w-full h-full overflow-hidden group">
             <div className="absolute inset-0 z-0 scale-105 group-hover:scale-100 transition-transform duration-1000">
                 <ImageContainer slide={slide} theme={theme} />
             </div>
@@ -89,11 +90,14 @@ export const FullBleedLayout: React.FC<LayoutProps> = ({ slide, theme, children 
                         : `linear-gradient(to ${isRight ? 'left' : 'right'}, ${theme.colors.surface}F2 0%, ${theme.colors.surface}B3 50%, transparent 100%)`
                 }}
             />
+            {/* REMOVED max-w-2xl constraints to allow text to flow fully */}
             <div className={`
-                relative z-20 p-12 md:p-20 flex flex-col justify-center min-h-full
-                ${isCenter ? 'items-center text-center max-w-4xl mx-auto' : isRight ? 'items-end text-right ml-auto max-w-2xl' : 'items-start text-left max-w-2xl'}
+                relative z-20 p-8 md:p-12 flex flex-col justify-center h-full overflow-hidden min-h-0 shrink-0 w-full
+                ${isCenter ? 'items-center text-center mx-auto' : isRight ? 'items-end text-right ml-auto' : 'items-start text-left'}
             `}>
-                {children}
+                <div className={`w-full ${isCenter ? 'max-w-5xl' : 'max-w-[85%]'} flex flex-col h-full justify-center`}>
+                    {children}
+                </div>
             </div>
         </div>
     );
@@ -102,11 +106,11 @@ export const FullBleedLayout: React.FC<LayoutProps> = ({ slide, theme, children 
 // 3. STATEMENT LAYOUT
 export const StatementLayout: React.FC<LayoutProps> = ({ slide, theme, children }) => {
     return (
-        <div className="relative w-full min-h-full flex flex-col">
-            <div className="flex-[2] p-12 flex flex-col justify-center items-center text-center relative z-20 bg-opacity-50 min-h-[50vh]">
+        <div className="relative w-full h-full flex flex-col overflow-hidden">
+            <div className="flex-[2] p-8 md:p-12 flex flex-col justify-center items-center text-center relative z-20 bg-opacity-50 min-h-0 overflow-hidden shrink-0">
                  {children}
             </div>
-            <div className="flex-1 relative border-t-2 min-h-[30vh]" style={{ borderColor: theme.colors.border }}>
+            <div className="flex-1 relative border-t-2 min-h-[30%] shrink-0" style={{ borderColor: theme.colors.border }}>
                 <ImageContainer slide={slide} theme={theme} />
                 <div className="absolute inset-0 bg-gradient-to-t from-transparent to-black/5 pointer-events-none" />
             </div>
@@ -117,9 +121,9 @@ export const StatementLayout: React.FC<LayoutProps> = ({ slide, theme, children 
 // 4. GALLERY LAYOUT
 export const GalleryLayout: React.FC<LayoutProps> = ({ slide, theme, children }) => {
     return (
-        <div className="w-full h-full min-h-full p-4 md:p-8 flex flex-col gap-6">
+        <div className="w-full h-full p-4 md:p-6 flex flex-col gap-6 overflow-hidden">
             <div 
-                className="flex-[3] relative overflow-hidden shadow-inner min-h-[40vh]"
+                className="flex-[3] relative overflow-hidden shadow-inner min-h-[40%] shrink-0"
                 style={{ 
                     borderRadius: `calc(${theme.layout.radius} - 4px)`,
                     border: `${theme.layout.borderWidth} solid ${theme.colors.border}`
@@ -127,8 +131,69 @@ export const GalleryLayout: React.FC<LayoutProps> = ({ slide, theme, children })
             >
                 <ImageContainer slide={slide} theme={theme} />
             </div>
-            <div className="flex-1 flex items-center justify-between gap-12 px-4">
+            <div className="flex-1 min-h-0 flex items-center justify-between gap-12 px-2 overflow-hidden shrink-0">
                  {children}
+            </div>
+        </div>
+    );
+};
+
+// 5. CARD LAYOUT
+export const CardLayout: React.FC<LayoutProps> = ({ slide, theme, children }) => {
+    const isRight = slide.alignment === 'right';
+    const isCenter = slide.alignment === 'center';
+    
+    return (
+        <div className="relative w-full h-full flex items-center p-8 md:p-12 overflow-hidden">
+            <div className="absolute inset-0 z-0">
+                <ImageContainer slide={slide} theme={theme} />
+                <div className="absolute inset-0 bg-black/10" />
+            </div>
+            
+            <div 
+                className={`
+                    relative z-10 p-8 md:p-12 w-full max-w-2xl max-h-[90%] backdrop-blur-md shadow-2xl border flex flex-col justify-center overflow-hidden min-h-0 shrink-0
+                    ${isCenter ? 'mx-auto text-center' : isRight ? 'ml-auto text-left' : 'mr-auto text-left'}
+                `}
+                style={{ 
+                    backgroundColor: `${theme.colors.surface}E6`,
+                    borderRadius: theme.layout.radius,
+                    borderColor: theme.colors.border
+                }}
+            >
+                {children}
+            </div>
+        </div>
+    );
+};
+
+// 6. HORIZONTAL LAYOUT
+export const HorizontalLayout: React.FC<LayoutProps> = ({ slide, theme, children }) => {
+    return (
+        <div className="flex flex-col w-full h-full overflow-hidden">
+            <div className="h-[45%] relative border-b shrink-0" style={{ borderColor: theme.colors.border }}>
+                <ImageContainer slide={slide} theme={theme} />
+            </div>
+            <div className="h-[55%] p-8 md:p-12 flex flex-col justify-center relative z-10 min-h-0 overflow-hidden shrink-0" style={{ background: theme.colors.background }}>
+                 {children}
+            </div>
+        </div>
+    );
+};
+
+// 7. MAGAZINE LAYOUT
+export const MagazineLayout: React.FC<LayoutProps> = ({ slide, theme, children }) => {
+    const isRight = slide.alignment === 'right';
+    
+    return (
+        <div className="flex w-full h-full overflow-hidden">
+            <div className={`w-[35%] relative h-full shrink-0 ${isRight ? 'order-2' : 'order-1'}`}>
+                <ImageContainer slide={slide} theme={theme} />
+                <div className={`absolute top-0 bottom-0 w-px bg-white/20 z-10 ${isRight ? 'left-0' : 'right-0'}`} />
+            </div>
+            
+            <div className={`w-[65%] p-8 md:p-16 flex flex-col justify-center min-h-0 overflow-hidden shrink-0 ${isRight ? 'order-1' : 'order-2'}`}>
+                {children}
             </div>
         </div>
     );

@@ -6,7 +6,8 @@ import { ArchetypeProps } from './WabiSabiComponents';
 import { 
     EditorialArchetype, TypographicArchetype, ConstructivistArchetype, BauhausArchetype, 
     BrutalistArchetype, PostModernArchetype, SchematicArchetype, CinematicArchetype, 
-    CollageArchetype, ZineArchetype, SwissArchetype, CyberDeckArchetype, ReceiptArchetype 
+    CollageArchetype, ZineArchetype, SwissArchetype, CyberDeckArchetype, ReceiptArchetype,
+    Y2KArchetype, RisographArchetype, VaporwaveArchetype, SwissGridArchetype, NoirArchetype
 } from './WabiSabiArchetypes';
 
 interface WabiSabiStageProps {
@@ -32,6 +33,11 @@ const ARCHETYPE_RENDERERS: Record<string, React.FC<ArchetypeProps>> = {
     'PostModern': PostModernArchetype,
     'Schematic': SchematicArchetype,
     'Cinematic': CinematicArchetype,
+    'Y2K': Y2KArchetype,
+    'Risograph': RisographArchetype,
+    'Vaporwave': VaporwaveArchetype,
+    'SwissGrid': SwissGridArchetype,
+    'Noir': NoirArchetype
 };
 
 export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);

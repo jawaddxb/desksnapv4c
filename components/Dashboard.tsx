@@ -1,32 +1,63 @@
-import React from 'react';
+
+import React, { useRef, useState } from 'react';
 import { Presentation } from '../types';
 import { THEMES } from '../lib/themes';
 import { WabiSabiStage } from './WabiSabiStage';
-import { Plus, Trash2, Clock, Play } from 'lucide-react';
+import { Plus, Trash2, Clock, Play, Upload, BarChart2 } from 'lucide-react';
+import { AnalyticsModal } from './AnalyticsModal';
 
 interface DashboardProps {
     savedDecks: Presentation[];
     onLoad: (id: string) => void;
     onDelete: (id: string) => void;
     onCreateNew: () => void;
+    onImport: (file: File) => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ savedDecks, onLoad, onDelete, onCreateNew }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ savedDecks, onLoad, onDelete, onCreateNew, onImport }) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [analyticsDeck, setAnalyticsDeck] = useState<Presentation | null>(null);
+
+    const handleImportClick = () => fileInputRef.current?.click();
+    
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            onImport(file);
+            // Reset input
+            e.target.value = '';
+        }
+    };
+
     return (
         <div className="flex-1 h-full overflow-y-auto bg-zinc-50 p-8 md:p-12">
+            {analyticsDeck && (
+                <AnalyticsModal presentation={analyticsDeck} onClose={() => setAnalyticsDeck(null)} />
+            )}
+            
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-12">
                     <div>
                         <h1 className="text-3xl font-bold text-zinc-900 mb-2">My Decks</h1>
                         <p className="text-zinc-500">Manage your generated presentations</p>
                     </div>
-                    <button 
-                        onClick={onCreateNew}
-                        className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-xs transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
-                    >
-                        <Plus className="w-4 h-4" />
-                        New Deck
-                    </button>
+                    <div className="flex gap-3">
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
+                        <button 
+                            onClick={handleImportClick}
+                            className="flex items-center gap-2 bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-xs transition-all shadow-sm"
+                        >
+                            <Upload className="w-4 h-4" />
+                            Import
+                        </button>
+                        <button 
+                            onClick={onCreateNew}
+                            className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-xs transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                        >
+                            <Plus className="w-4 h-4" />
+                            New Deck
+                        </button>
+                    </div>
                 </div>
 
                 {savedDecks.length === 0 ? (
@@ -67,9 +98,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ savedDecks, onLoad, onDele
                                         <div className="flex justify-between items-start mb-2">
                                             <h3 className="font-bold text-lg text-zinc-900 line-clamp-1 group-hover:text-indigo-600 transition-colors cursor-pointer" onClick={() => onLoad(deck.id)}>{deck.topic}</h3>
                                         </div>
-                                        <div className="flex items-center gap-4 text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-auto">
-                                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(deck.lastModified).toLocaleDateString()}</span>
-                                            <span className="px-2 py-1 bg-zinc-100 rounded text-zinc-500">{deck.slides.length} Slides</span>
+                                        <div className="flex items-center justify-between mt-auto">
+                                            <div className="flex items-center gap-4 text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
+                                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(deck.lastModified).toLocaleDateString()}</span>
+                                                <span className="px-2 py-1 bg-zinc-100 rounded text-zinc-500">{deck.slides.length} Slides</span>
+                                            </div>
+                                            
+                                            {/* Analytics Button */}
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); setAnalyticsDeck(deck); }}
+                                                className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
+                                                title="View Analytics"
+                                            >
+                                                <BarChart2 className="w-4 h-4" />
+                                            </button>
                                         </div>
                                     </div>
 

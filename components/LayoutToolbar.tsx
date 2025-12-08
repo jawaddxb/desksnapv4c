@@ -4,7 +4,8 @@ import { Slide } from '../types';
 import { 
     Columns, Maximize2, Type, LayoutTemplate, 
     AlignLeft, AlignCenter, AlignRight, 
-    Type as TypeIcon, CaseSensitive, Check
+    Type as TypeIcon, CaseSensitive, Check,
+    Smartphone, Square, Rows
 } from 'lucide-react';
 
 interface LayoutToolbarProps {
@@ -72,6 +73,24 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSli
                         onClick={() => handleUpdate({ layoutType: 'split' })} 
                         icon={Columns} 
                         label="Split Layout" 
+                    />
+                    <Button 
+                        active={slide.layoutType === 'magazine'} 
+                        onClick={() => handleUpdate({ layoutType: 'magazine' })} 
+                        icon={Smartphone} 
+                        label="Magazine Column" 
+                    />
+                    <Button 
+                        active={slide.layoutType === 'horizontal'} 
+                        onClick={() => handleUpdate({ layoutType: 'horizontal' })} 
+                        icon={Rows} 
+                        label="Horizontal Split" 
+                    />
+                    <Button 
+                        active={slide.layoutType === 'card'} 
+                        onClick={() => handleUpdate({ layoutType: 'card' })} 
+                        icon={Square} 
+                        label="Floating Card" 
                     />
                     <Button 
                         active={slide.layoutType === 'full-bleed'} 

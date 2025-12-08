@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Message, MessageRole, GenerationMode } from './types';
@@ -26,10 +27,69 @@ export default function App() {
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
   const modalScrollRef = useRef<HTMLDivElement>(null);
 
+  // --- ANALYTICS STATE ---
+  const sessionStartTime = useRef<number>(0);
+  const slideEnterTime = useRef<number>(0);
+  const slideDurations = useRef<Record<string, number>>({});
+
   useEffect(() => {
     if (sidebarScrollRef.current) sidebarScrollRef.current.scrollTop = sidebarScrollRef.current.scrollHeight;
     if (modalScrollRef.current) modalScrollRef.current.scrollTop = modalScrollRef.current.scrollHeight;
   }, [messages, isChatOpen]);
+
+  // Analytics: Track Session Start/End
+  useEffect(() => {
+    if (isPresenting) {
+        // Start Session
+        sessionStartTime.current = Date.now();
+        slideEnterTime.current = Date.now();
+        slideDurations.current = {};
+    } else {
+        // End Session (if we were just presenting)
+        if (sessionStartTime.current > 0 && currentPresentation) {
+            // Capture final slide dwell time
+            const now = Date.now();
+            const lastSlideId = currentPresentation.slides[activeSlideIndex]?.id;
+            if (lastSlideId) {
+                const dwell = (now - slideEnterTime.current) / 1000;
+                slideDurations.current[lastSlideId] = (slideDurations.current[lastSlideId] || 0) + dwell;
+            }
+
+            // Save Session
+            const totalDuration = (now - sessionStartTime.current) / 1000;
+            actions.recordSession({
+                id: crypto.randomUUID(),
+                timestamp: sessionStartTime.current,
+                totalDuration: totalDuration,
+                slideDurations: slideDurations.current
+            });
+
+            // Reset
+            sessionStartTime.current = 0;
+            // NOTE: Auto-save in useDeck will handle persistence when state updates
+        }
+    }
+  }, [isPresenting]);
+
+  // Use a ref to track previous index for accurate analytics attribution
+  const prevSlideIndexRef = useRef(activeSlideIndex);
+  useEffect(() => {
+      if (isPresenting && currentPresentation) {
+          const now = Date.now();
+          const duration = (now - slideEnterTime.current) / 1000;
+          const prevSlideId = currentPresentation.slides[prevSlideIndexRef.current]?.id;
+          
+          if (prevSlideId) {
+              slideDurations.current[prevSlideId] = (slideDurations.current[prevSlideId] || 0) + duration;
+          }
+          
+          slideEnterTime.current = now;
+          prevSlideIndexRef.current = activeSlideIndex;
+      } else {
+          prevSlideIndexRef.current = activeSlideIndex;
+      }
+  }, [activeSlideIndex, isPresenting, currentPresentation]);
+
 
   // Keyboard Navigation for Presentation Mode
   useEffect(() => {
@@ -130,6 +190,7 @@ export default function App() {
                 onRegenerateAllImages={actions.regenerateAllImages} onRemixDeck={actions.remixDeck} setIsPresenting={setIsPresenting}
                 onSave={actions.saveDeck} onClose={actions.closeDeck}
                 onShuffleLayout={actions.shuffleLayoutVariants}
+                onExportDeck={actions.exportDeck}
                 saveStatus={saveStatus}
             />
         )}
@@ -182,6 +243,7 @@ export default function App() {
             onLoadDeck={actions.loadDeck}
             onDeleteDeck={actions.deleteDeck}
             onCreateDeck={handleCreateNew}
+            onImport={actions.importDeck}
         />
       </div>
     </div>

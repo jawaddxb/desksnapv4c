@@ -1,3 +1,4 @@
+
 import { Presentation, Theme, Slide } from '../types';
 
 declare const PptxGenJS: any;
@@ -13,6 +14,7 @@ const getFontSize = (type: 'heading' | 'body', layout: string, scale?: string) =
         if (scale === 'classic') return 44;
         if (layout === 'statement') return 56;
         if (layout === 'full-bleed') return 48;
+        if (layout === 'card') return 40;
         return 36;
     } else {
         if (scale === 'hero') return 24;
@@ -76,6 +78,71 @@ const layoutGenerators: Record<string, (pptSlide: any, slide: Slide, theme: Them
         pptSlide.addText(slide.title, { x: 0.5, y: 4.2, w: 3, h: 1.2, valign: 'top', ...commonTextProps(theme, slide, 'heading'), fontSize: 24 });
         pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
             x: 4, y: 4.2, w: 5.5, h: 1.2, valign: 'top', color: theme.colors.secondary 
+        });
+    },
+
+    'card': (pptSlide, slide, theme) => {
+        // Full screen background image
+        if (slide.imageUrl) pptSlide.addImage({ path: slide.imageUrl, x: 0, y: 0, w: '100%', h: '100%' });
+        
+        // Floating Card
+        const isCenter = slide.alignment === 'center';
+        const isRight = slide.alignment === 'right';
+        const cardX = isCenter ? 2 : isRight ? 5.5 : 0.5;
+        
+        // Card Background Shape
+        pptSlide.addShape('rect', { 
+            x: cardX, y: 1.5, w: 4.5, h: 4, 
+            fill: { color: theme.colors.surface, transparency: 10 },
+            line: { color: theme.colors.border, width: 1 }
+        });
+        
+        pptSlide.addText(slide.title, { 
+            x: cardX + 0.25, y: 1.75, w: 4, h: 1, 
+            ...commonTextProps(theme, slide, 'heading'), 
+            fontSize: 32, align: isCenter ? 'center' : 'left'
+        });
+        
+        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
+            x: cardX + 0.25, y: 2.75, w: 4, h: 2.5, 
+            align: isCenter ? 'center' : 'left'
+        });
+    },
+
+    'horizontal': (pptSlide, slide, theme) => {
+        // 50/50 Horizontal Split
+        if (slide.imageUrl) {
+            pptSlide.addImage({ path: slide.imageUrl, x: 0, y: 0, w: '100%', h: '45%', sizing: { type: 'cover', w: '100%', h: '45%' } });
+        }
+        pptSlide.addText(slide.title, { 
+            x: 0.5, y: 3.5, w: 9, h: 1, align: 'center',
+            ...commonTextProps(theme, slide, 'heading') 
+        });
+        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
+            x: 1, y: 4.5, w: 8, h: 2, align: 'center'
+        });
+    },
+
+    'magazine': (pptSlide, slide, theme) => {
+        const isRight = slide.alignment === 'right';
+        
+        // Image Column (35% width)
+        if (slide.imageUrl) {
+            pptSlide.addImage({ 
+                path: slide.imageUrl, 
+                x: isRight ? 6.5 : 0, y: 0, w: 3.5, h: '100%', 
+                sizing: { type: 'cover', w: 3.5, h: '100%' } 
+            });
+        }
+        
+        // Content Area (65% width)
+        const textX = isRight ? 0.5 : 4;
+        pptSlide.addText(slide.title, { 
+            x: textX, y: 1, w: 5.5, h: 1.5, valign: 'bottom',
+            ...commonTextProps(theme, slide, 'heading') 
+        });
+        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
+            x: textX, y: 2.5, w: 5.5, h: 4, valign: 'top' 
         });
     },
 

@@ -1,9 +1,13 @@
 
+
 import React from 'react';
 import { Slide, Theme, Presentation } from '../types';
 import { RotateCw, Wand2, Layers } from 'lucide-react';
 import { WabiSabiStage } from './WabiSabiStage';
-import { SplitLayout, FullBleedLayout, StatementLayout, GalleryLayout } from './StandardLayouts';
+import { 
+    SplitLayout, FullBleedLayout, StatementLayout, GalleryLayout,
+    CardLayout, HorizontalLayout, MagazineLayout
+} from './StandardLayouts';
 import { SlideContentEditor } from './SlideContentEditor';
 import { LayoutToolbar } from './LayoutToolbar';
 import { Dashboard } from './Dashboard';
@@ -22,6 +26,7 @@ interface MainStageProps {
   onLoadDeck?: (id: string) => void;
   onDeleteDeck?: (id: string) => void;
   onCreateDeck?: () => void;
+  onImport?: (file: File) => void;
 }
 
 export const MainStage: React.FC<MainStageProps> = ({ 
@@ -36,7 +41,8 @@ export const MainStage: React.FC<MainStageProps> = ({
     savedDecks = [],
     onLoadDeck,
     onDeleteDeck,
-    onCreateDeck
+    onCreateDeck,
+    onImport
 }) => {
   
   // 1. Dashboard (Empty State Replaced)
@@ -47,6 +53,7 @@ export const MainStage: React.FC<MainStageProps> = ({
             onLoad={onLoadDeck || (() => {})} 
             onDelete={onDeleteDeck || (() => {})}
             onCreateNew={onCreateDeck || (() => {})} 
+            onImport={onImport || (() => {})}
         />
     );
   }
@@ -70,7 +77,10 @@ export const MainStage: React.FC<MainStageProps> = ({
         'split': SplitLayout,
         'full-bleed': FullBleedLayout,
         'statement': StatementLayout,
-        'gallery': GalleryLayout
+        'gallery': GalleryLayout,
+        'card': CardLayout,
+        'horizontal': HorizontalLayout,
+        'magazine': MagazineLayout
     }[slide.layoutType] || SplitLayout;
 
     return (

@@ -1,4 +1,5 @@
 
+
 export interface Slide {
   id: string;
   title: string;
@@ -8,10 +9,17 @@ export interface Slide {
   imageUrl?: string;
   isImageLoading: boolean;
   // Layout Engine Properties
-  layoutType: 'split' | 'full-bleed' | 'statement' | 'gallery';
+  layoutType: 'split' | 'full-bleed' | 'statement' | 'gallery' | 'card' | 'horizontal' | 'magazine';
   alignment: 'left' | 'right' | 'center';
   fontScale?: 'auto' | 'compact' | 'hero' | 'classic' | 'modern';
   layoutVariant?: number; // Seed for generative layouts
+}
+
+export interface AnalyticsSession {
+  id: string;
+  timestamp: number;
+  totalDuration: number;
+  slideDurations: Record<string, number>; // slideId -> seconds
 }
 
 export interface Presentation {
@@ -22,6 +30,7 @@ export interface Presentation {
   themeId: string;
   slides: Slide[];
   wabiSabiLayout?: string;
+  analytics?: AnalyticsSession[];
 }
 
 export enum MessageRole {
@@ -46,7 +55,7 @@ export interface PresentationPlanResponse {
     bulletPoints: string[];
     speakerNotes: string;
     imageVisualDescription: string;
-    layoutType: 'split' | 'full-bleed' | 'statement' | 'gallery';
+    layoutType: 'split' | 'full-bleed' | 'statement' | 'gallery' | 'card' | 'horizontal' | 'magazine';
     alignment: 'left' | 'right' | 'center';
   }[];
 }

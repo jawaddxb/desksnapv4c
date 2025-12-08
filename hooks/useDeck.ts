@@ -1,10 +1,13 @@
+
+
+
 import { useState, useEffect, useRef } from 'react';
-import { Presentation, Slide, Theme, GenerationMode } from '../types';
+import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession } from '../types';
 import { generatePresentationPlan, generateSlideImage, refineImagePrompt, ensureApiKeySelection, RefinementFocus } from '../services/geminiService';
 import { THEMES, IMAGE_STYLES } from '../lib/themes';
 import { WABI_SABI_LAYOUT_NAMES } from '../components/WabiSabiStage';
 import { loadGoogleFont } from '../lib/fonts';
-import { getSavedDecks, saveDeckToStorage, deleteDeckFromStorage } from '../services/storageService';
+import { getSavedDecks, saveDeckToStorage, deleteDeckFromStorage, migrateLegacyData } from '../services/storageService';
 
 export const useDeck = () => {
   const [currentPresentation, setCurrentPresentation] = useState<Presentation | null>(null);
@@ -20,7 +23,11 @@ export const useDeck = () => {
 
   // Load decks on mount
   useEffect(() => {
-      refreshDeckList();
+      const init = async () => {
+          await migrateLegacyData(); // Try to recover old data first
+          await refreshDeckList();
+      };
+      init();
   }, []);
 
   const refreshDeckList = async () => {
@@ -81,7 +88,8 @@ export const useDeck = () => {
           visualStyle: plan.visualStyle,
           themeId: plan.themeId || 'neoBrutalist',
           slides: newSlides,
-          wabiSabiLayout: startLayout
+          wabiSabiLayout: startLayout,
+          analytics: []
       };
 
       setCurrentPresentation(newDeck);
@@ -141,6 +149,54 @@ export const useDeck = () => {
           setCurrentPresentation(null);
       }
   };
+
+  // --- IMPORT / EXPORT ---
+
+  const exportDeck = () => {
+    if (!currentPresentation) return;
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentPresentation, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `${currentPresentation.topic.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const importDeck = async (file: File) => {
+      try {
+          const text = await file.text();
+          const deck = JSON.parse(text) as Presentation;
+          
+          // Basic validation
+          if (!deck.id || !deck.slides) throw new Error("Invalid deck format");
+          
+          // Ensure ID is unique to avoid collision with existing decks if re-importing
+          deck.id = crypto.randomUUID();
+          deck.lastModified = Date.now();
+          if (!deck.analytics) deck.analytics = [];
+
+          await saveDeckToStorage(deck);
+          await refreshDeckList();
+          loadDeck(deck.id);
+      } catch (e) {
+          console.error("Import failed", e);
+          alert("Failed to import deck. Invalid file format.");
+      }
+  };
+
+  // --- ANALYTICS ---
+
+  const recordSession = (session: AnalyticsSession) => {
+      if (!currentPresentation) return;
+      setCurrentPresentation(prev => {
+          if (!prev) return null;
+          const updatedAnalytics = [...(prev.analytics || []), session];
+          return { ...prev, analytics: updatedAnalytics };
+      });
+  };
+
+  // --- GENERATION ---
 
   const generateAllImages = async (slides: Slide[], style: string) => {
     try { 
@@ -326,7 +382,10 @@ export const useDeck = () => {
           setWabiSabiLayout,
           cycleWabiSabiLayout,
           regenerateAllImages: regenerateAllImagesAction,
-          shuffleLayoutVariants
+          shuffleLayoutVariants,
+          importDeck,
+          exportDeck,
+          recordSession
       }
   };
 };

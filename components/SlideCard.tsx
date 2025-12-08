@@ -2,7 +2,10 @@
 import React from 'react';
 import { Slide, Theme } from '../types';
 import { ArrowUp, ArrowDown } from 'lucide-react';
-import { RenderMiniFullBleed, RenderMiniGallery, RenderMiniSplit, RenderMiniStatement } from './MiniSlidePreviews';
+import { 
+    RenderMiniFullBleed, RenderMiniGallery, RenderMiniSplit, RenderMiniStatement,
+    RenderMiniCard, RenderMiniHorizontal, RenderMiniMagazine 
+} from './MiniSlidePreviews';
 import { WabiSabiStage } from './WabiSabiStage';
 
 interface SlideCardProps {
@@ -41,6 +44,9 @@ export const SlideCard: React.FC<SlideCardProps> = ({
             case 'full-bleed': return <RenderMiniFullBleed slide={slide} theme={theme} />;
             case 'statement': return <RenderMiniStatement slide={slide} theme={theme} />;
             case 'gallery': return <RenderMiniGallery slide={slide} theme={theme} />;
+            case 'card': return <RenderMiniCard slide={slide} theme={theme} />;
+            case 'horizontal': return <RenderMiniHorizontal slide={slide} theme={theme} />;
+            case 'magazine': return <RenderMiniMagazine slide={slide} theme={theme} />;
             case 'split': default: return <RenderMiniSplit slide={slide} theme={theme} />;
         }
     };

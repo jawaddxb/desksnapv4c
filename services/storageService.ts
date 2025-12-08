@@ -1,3 +1,4 @@
+
 import { Presentation } from '../types';
 
 const DB_NAME = 'decksnap_db';
@@ -70,5 +71,40 @@ export const deleteDeckFromStorage = async (deckId: string): Promise<void> => {
         });
     } catch (e) {
         console.error("Failed to delete deck from DB", e);
+    }
+};
+
+// NEW: Recover lost data from localStorage
+export const migrateLegacyData = async (): Promise<void> => {
+    const LEGACY_KEY = 'decksnap_saved_decks'; // Checking common variations
+    const LEGACY_KEY_2 = 'decksnap_decks';
+    
+    let rawData = localStorage.getItem(LEGACY_KEY) || localStorage.getItem(LEGACY_KEY_2);
+    
+    if (!rawData) return;
+
+    try {
+        const decks = JSON.parse(rawData);
+        if (Array.isArray(decks) && decks.length > 0) {
+            console.log(`Migrating ${decks.length} legacy decks to IndexedDB...`);
+            const db = await openDB();
+            const transaction = db.transaction(STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            
+            for (const deck of decks) {
+                // Ensure ID exists
+                if (!deck.id) deck.id = crypto.randomUUID();
+                store.put(deck);
+            }
+            
+            // Clear legacy data after successful migration to prevent duplicates
+            transaction.oncomplete = () => {
+                localStorage.removeItem(LEGACY_KEY);
+                localStorage.removeItem(LEGACY_KEY_2);
+                console.log("Migration complete.");
+            };
+        }
+    } catch (e) {
+        console.error("Migration failed", e);
     }
 };

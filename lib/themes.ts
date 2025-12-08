@@ -9,7 +9,8 @@ export const LayoutLayer = {
   MEDIA: 20,          // Images, Videos
   CONTENT_BASE: 30,   // Standard content containers
   CONTENT_HERO: 40,   // Titles, Hero text (or overlapping content)
-  OVERLAY: 50,        // Badges, Floating tags
+  OVERLAY: 50,        // Badges, Floating tags, Atmospheric effects (Rain, Blinds, Bars)
+  CONTENT_TOP: 60,    // Critical text that must float above atmospheric effects (Noir, Cinematic)
   UI: 100             // Tooltips, drag handles (if any)
 };
 

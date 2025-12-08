@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Slide, Theme } from '../types';
 import { SmartText } from './SmartText';
@@ -26,46 +27,54 @@ export const DecorativeLabel = ({ text, className = "", style = {} }: { text: st
     </div>
 );
 
-// Wrapper that passes props to SmartText directly, ensuring robust text handling and Z-Index
-export const EditableTitle = ({ slide, theme, contrast, onUpdateSlide, className = "", style = {}, readOnly }: any) => (
+// Wrapper that passes props to SmartText directly
+export const EditableTitle = ({ slide, theme, contrast, onUpdateSlide, className = "", style = {}, readOnly, maxFontSize = 160, minFontSize = 24 }: any) => (
     <SmartText 
         value={slide.title} 
         onChange={(val) => onUpdateSlide?.({ title: val })} 
         readOnly={readOnly}
-        className={`font-bold break-words whitespace-pre-wrap relative ${className}`} 
+        autoFit={true}
+        maxFontSize={maxFontSize}
+        minFontSize={minFontSize}
+        className={`font-bold relative ${className}`} 
         style={{ 
             fontFamily: theme.fonts.heading, 
             color: contrast.text, 
-            zIndex: LayoutLayer.CONTENT_HERO, 
+            zIndex: style.zIndex || LayoutLayer.CONTENT_HERO, 
+            lineHeight: 1.1, // Tighter line height for better fitting
             ...style 
         }} 
     />
 );
 
 export const EditableContent = ({ slide, theme, contrast, onUpdateSlide, className = "", style = {}, bullet = true, readOnly }: any) => (
-    <ul className={`space-y-3 relative ${className}`} style={{ zIndex: LayoutLayer.CONTENT_BASE }}>
+    <div className={`space-y-2 relative flex flex-col min-h-0 ${className}`} style={{ zIndex: style.zIndex || LayoutLayer.CONTENT_BASE, ...style }}>
         {slide.content.map((item: string, i: number) => (
-            <li key={i} className="flex gap-3 group relative items-start">
+            <div key={i} className="flex gap-3 group relative items-start flex-1 min-h-0">
                 {bullet && <span className="mt-2.5 w-1 h-1 shrink-0 rounded-full opacity-60" style={{ backgroundColor: contrast.text }} />}
-                <SmartText 
-                    value={item} 
-                    onChange={(val) => { const newC = [...slide.content]; newC[i] = val; onUpdateSlide?.({ content: newC }); }} 
-                    readOnly={readOnly}
-                    className="w-full break-words whitespace-pre-wrap text-sm md:text-base lg:text-lg bg-transparent outline-none" 
-                    style={{ 
-                        fontFamily: theme.fonts.body, 
-                        color: contrast.text, 
-                        opacity: 0.85, 
-                        ...style 
-                    }} 
-                />
-            </li>
+                <div className="flex-1 h-full relative">
+                    <SmartText 
+                        value={item} 
+                        onChange={(val) => { const newC = [...slide.content]; newC[i] = val; onUpdateSlide?.({ content: newC }); }} 
+                        readOnly={readOnly}
+                        autoFit={true}
+                        maxFontSize={32}
+                        minFontSize={12}
+                        className="w-full bg-transparent outline-none" 
+                        style={{ 
+                            fontFamily: theme.fonts.body, 
+                            color: contrast.text, 
+                            opacity: 0.9,
+                            lineHeight: 1.3
+                        }} 
+                    />
+                </div>
+            </div>
         ))}
-    </ul>
+    </div>
 );
 
 // A reusable engine for the "Magazine" overlap look
-// Handles the Z-Index stacking and negative margins genericallly
 export const MagazineLayout = ({ 
     titleNode, 
     contentNode, 
@@ -80,25 +89,16 @@ export const MagazineLayout = ({
     className?: string
 }) => {
     return (
-        <div className={`flex flex-col ${alignRight ? 'items-end text-right' : 'items-start text-left'} ${className}`}>
-            {/* 
-               LAYER INVERSION: 
-               Title is CONTENT_BASE (30) so it sits 'behind' the content box.
-               This allows the massive title to act as texture/background.
-            */}
-            <div className="relative pointer-events-auto max-w-[95%]" style={{ zIndex: LayoutLayer.CONTENT_BASE }}>
+        <div className={`flex flex-col h-full ${alignRight ? 'items-end text-right' : 'items-start text-left'} ${className}`}>
+            <div className="relative pointer-events-auto w-full flex-1 min-h-0 mb-[-2rem] md:mb-[-4rem]" style={{ zIndex: LayoutLayer.CONTENT_BASE }}>
                 {titleNode}
             </div>
             
-            {/* 
-               Content Box is CONTENT_HERO (40) so it floats ON TOP of the title.
-               We use negative margins to pull it up into the title area.
-            */}
             <div 
                 className={`
                     relative flex flex-col md:flex-row gap-8 md:items-end max-w-4xl 
                     backdrop-blur-xl bg-white/10 p-6 rounded-lg border border-white/10 
-                    shadow-2xl -mt-8 md:-mt-16 pointer-events-auto
+                    shadow-2xl pointer-events-auto shrink-0 max-h-[50%] overflow-hidden
                     ${alignRight ? 'mr-4 md:mr-12 md:flex-row-reverse' : 'ml-4 md:ml-12'}
                 `}
                 style={{ zIndex: LayoutLayer.CONTENT_HERO }} 
@@ -106,8 +106,8 @@ export const MagazineLayout = ({
                 {contentNode}
                 {footerNode && (
                     <>
-                        <div className="hidden md:block w-px h-24 bg-white/20" />
-                        <div className="flex-1 opacity-80 text-xs leading-relaxed max-w-xs">
+                        <div className="hidden md:block w-px h-24 bg-white/20 shrink-0" />
+                        <div className="flex-1 opacity-80 text-xs leading-relaxed max-w-xs overflow-y-auto">
                             {footerNode}
                         </div>
                     </>

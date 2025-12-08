@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Presentation, Theme } from '../types';
 import { THEMES } from '../lib/themes';
 import { WABI_SABI_LAYOUT_NAMES } from './WabiSabiStage';
 import { CURATED_FONT_PAIRINGS } from '../lib/fonts';
-import { Component, Sparkles, Palette, ChevronDown, Check, Play, Download, Printer, Shuffle, LayoutTemplate, Type, Search, Home, Save, RefreshCw, Loader2, Cloud } from 'lucide-react';
+import { Component, Sparkles, Palette, ChevronDown, Check, Play, Download, Printer, Shuffle, LayoutTemplate, Type, Search, Home, Save, RefreshCw, Loader2, Cloud, Share2 } from 'lucide-react';
 import { generatePPT } from '../services/pptService';
 
 interface AppHeaderProps {
@@ -22,6 +23,7 @@ interface AppHeaderProps {
     onSave?: () => void;
     onClose?: () => void;
     onShuffleLayout?: () => void;
+    onExportDeck?: () => void;
     saveStatus?: 'idle' | 'saving' | 'saved';
 }
 
@@ -113,6 +115,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     onSave,
     onClose,
     onShuffleLayout,
+    onExportDeck,
     saveStatus = 'idle'
 }) => {
     const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
@@ -248,9 +251,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                         <div className="h-6 w-px bg-zinc-200 mx-2" />
                         
                         <div className="flex items-center gap-1">
-                            <button onClick={() => setIsPresenting(true)} className="p-2 hover:bg-zinc-200 text-zinc-600 rounded-md transition-colors"><Play className="w-5 h-5" /></button>
-                            <button onClick={handleExportPPT} className="p-2 hover:bg-zinc-200 text-zinc-600 rounded-md transition-colors"><Download className="w-5 h-5" /></button>
-                            <button onClick={() => window.print()} className="p-2 hover:bg-zinc-200 text-zinc-600 rounded-md transition-colors"><Printer className="w-5 h-5" /></button>
+                            <button onClick={() => setIsPresenting(true)} className="p-2 hover:bg-zinc-200 text-zinc-600 rounded-md transition-colors" title="Start Presentation (Rehearsal Mode)"><Play className="w-5 h-5" /></button>
+                            <button onClick={handleExportPPT} className="p-2 hover:bg-zinc-200 text-zinc-600 rounded-md transition-colors" title="Export PPTX"><Download className="w-5 h-5" /></button>
+                            <button onClick={onExportDeck} className="p-2 hover:bg-zinc-200 text-zinc-600 rounded-md transition-colors" title="Share Deck (JSON)"><Share2 className="w-5 h-5" /></button>
                         </div>
 
                         {/* Remix Button - Context Aware */}
