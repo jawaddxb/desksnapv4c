@@ -27,33 +27,36 @@ interface MainStageProps {
   onDeleteDeck?: (id: string) => void;
   onCreateDeck?: () => void;
   onImport?: (file: File) => void;
+  onIdeate?: () => void;
 }
 
-export const MainStage: React.FC<MainStageProps> = ({ 
-    slide, 
-    theme, 
+export const MainStage: React.FC<MainStageProps> = ({
+    slide,
+    theme,
     activeWabiSabiLayout,
-    onRegenerateSlide, 
-    onRegenerateAll, 
-    onUpdateSlide, 
-    printMode = false, 
+    onRegenerateSlide,
+    onRegenerateAll,
+    onUpdateSlide,
+    printMode = false,
     viewMode = 'standard',
     savedDecks = [],
     onLoadDeck,
     onDeleteDeck,
     onCreateDeck,
-    onImport
+    onImport,
+    onIdeate
 }) => {
   
   // 1. Dashboard (Empty State Replaced)
   if (!slide) {
     return (
-        <Dashboard 
-            savedDecks={savedDecks} 
-            onLoad={onLoadDeck || (() => {})} 
+        <Dashboard
+            savedDecks={savedDecks}
+            onLoad={onLoadDeck || (() => {})}
             onDelete={onDeleteDeck || (() => {})}
-            onCreateNew={onCreateDeck || (() => {})} 
+            onCreateNew={onCreateDeck || (() => {})}
             onImport={onImport || (() => {})}
+            onIdeate={onIdeate}
         />
     );
   }

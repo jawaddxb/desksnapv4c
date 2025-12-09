@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Presentation } from '../types';
 import { THEMES } from '../lib/themes';
 import { WabiSabiStage } from './WabiSabiStage';
-import { Plus, Trash2, Clock, Play, Upload, BarChart2 } from 'lucide-react';
+import { Plus, Trash2, Clock, Play, Upload, BarChart2, Lightbulb } from 'lucide-react';
 import { AnalyticsModal } from './AnalyticsModal';
 
 interface DashboardProps {
@@ -12,9 +12,10 @@ interface DashboardProps {
     onDelete: (id: string) => void;
     onCreateNew: () => void;
     onImport: (file: File) => void;
+    onIdeate?: () => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ savedDecks, onLoad, onDelete, onCreateNew, onImport }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ savedDecks, onLoad, onDelete, onCreateNew, onImport, onIdeate }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [analyticsDeck, setAnalyticsDeck] = useState<Presentation | null>(null);
 
@@ -43,14 +44,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ savedDecks, onLoad, onDele
                     </div>
                     <div className="flex gap-3">
                         <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
-                        <button 
+                        <button
                             onClick={handleImportClick}
                             className="flex items-center gap-2 bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-xs transition-all shadow-sm"
                         >
                             <Upload className="w-4 h-4" />
                             Import
                         </button>
-                        <button 
+                        {onIdeate && (
+                            <button
+                                onClick={onIdeate}
+                                className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-xs transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                            >
+                                <Lightbulb className="w-4 h-4" />
+                                Ideate
+                            </button>
+                        )}
+                        <button
                             onClick={onCreateNew}
                             className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-xs transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
                         >

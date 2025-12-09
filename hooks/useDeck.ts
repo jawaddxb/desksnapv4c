@@ -368,6 +368,73 @@ export const useDeck = () => {
     });
   };
 
+  // Create deck from ideation plan (used by IdeationCopilot)
+  const createDeckFromPlan = async (plan: {
+      topic: string;
+      slides: Array<{
+          title: string;
+          bulletPoints: string[];
+          speakerNotes: string;
+          imageVisualDescription: string;
+          layoutType: string;
+          alignment: string;
+      }>;
+      themeId: string;
+      visualStyle: string;
+  }): Promise<Slide[]> => {
+      setIsGenerating(true);
+      try {
+          const newSlides: Slide[] = plan.slides.map((s, i) => ({
+              id: `slide-${i}`,
+              title: s.title,
+              content: s.bulletPoints,
+              speakerNotes: s.speakerNotes,
+              imagePrompt: s.imageVisualDescription,
+              isImageLoading: true,
+              layoutType: s.layoutType as Slide['layoutType'],
+              alignment: s.alignment as Slide['alignment'],
+              fontScale: 'auto',
+              layoutVariant: Math.floor(Math.random() * 1000)
+          }));
+
+          // Set theme
+          if (plan.themeId && THEMES[plan.themeId]) {
+              setActiveTheme(THEMES[plan.themeId]);
+          } else {
+              setActiveTheme(THEMES.neoBrutalist);
+          }
+
+          // Set random wabi-sabi layout
+          const startLayout = WABI_SABI_LAYOUT_NAMES[Math.floor(Math.random() * WABI_SABI_LAYOUT_NAMES.length)];
+          setActiveWabiSabiLayout(startLayout);
+
+          const newDeck: Presentation = {
+              id: crypto.randomUUID(),
+              lastModified: Date.now(),
+              topic: plan.topic,
+              visualStyle: plan.visualStyle || THEMES[plan.themeId]?.imageStyle || 'Professional photography',
+              themeId: plan.themeId || 'neoBrutalist',
+              slides: newSlides,
+              wabiSabiLayout: startLayout,
+              analytics: []
+          };
+
+          setCurrentPresentation(newDeck);
+          setActiveSlideIndex(0);
+
+          // Initial Save
+          await saveDeckToStorage(newDeck);
+          refreshDeckList();
+
+          // Trigger background image generation
+          generateAllImages(newSlides, newDeck.visualStyle);
+
+          return newSlides;
+      } finally {
+          setIsGenerating(false);
+      }
+  };
+
   return {
       currentPresentation,
       savedDecks,
@@ -379,6 +446,7 @@ export const useDeck = () => {
       saveStatus,
       actions: {
           createDeck,
+          createDeckFromPlan,
           saveDeck,
           loadDeck,
           closeDeck,

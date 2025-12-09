@@ -1,9 +1,11 @@
 
 import { Presentation } from '../types';
+import { IdeationSession } from '../types/ideation';
 
 const DB_NAME = 'decksnap_db';
-const STORE_NAME = 'decks';
-const DB_VERSION = 1;
+const DECKS_STORE = 'decks';
+const IDEATION_STORE = 'ideation_sessions';
+const DB_VERSION = 2; // Incremented for new store
 
 // Helper to open the database
 const openDB = (): Promise<IDBDatabase> => {
@@ -15,19 +17,28 @@ const openDB = (): Promise<IDBDatabase> => {
 
         request.onupgradeneeded = (event) => {
             const db = (event.target as IDBOpenDBRequest).result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+
+            // Create decks store if not exists (v1)
+            if (!db.objectStoreNames.contains(DECKS_STORE)) {
+                db.createObjectStore(DECKS_STORE, { keyPath: 'id' });
+            }
+
+            // Create ideation sessions store (v2)
+            if (!db.objectStoreNames.contains(IDEATION_STORE)) {
+                db.createObjectStore(IDEATION_STORE, { keyPath: 'id' });
             }
         };
     });
 };
 
+// ============ DECK STORAGE ============
+
 export const getSavedDecks = async (): Promise<Presentation[]> => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(STORE_NAME, 'readonly');
-            const store = transaction.objectStore(STORE_NAME);
+            const transaction = db.transaction(DECKS_STORE, 'readonly');
+            const store = transaction.objectStore(DECKS_STORE);
             const request = store.getAll();
 
             request.onsuccess = () => {
@@ -46,8 +57,8 @@ export const saveDeckToStorage = async (deck: Presentation): Promise<void> => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(STORE_NAME, 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
+            const transaction = db.transaction(DECKS_STORE, 'readwrite');
+            const store = transaction.objectStore(DECKS_STORE);
             const request = store.put(deck);
 
             request.onsuccess = () => resolve();
@@ -62,8 +73,8 @@ export const deleteDeckFromStorage = async (deckId: string): Promise<void> => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(STORE_NAME, 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
+            const transaction = db.transaction(DECKS_STORE, 'readwrite');
+            const store = transaction.objectStore(DECKS_STORE);
             const request = store.delete(deckId);
 
             request.onsuccess = () => resolve();
@@ -71,6 +82,77 @@ export const deleteDeckFromStorage = async (deckId: string): Promise<void> => {
         });
     } catch (e) {
         console.error("Failed to delete deck from DB", e);
+    }
+};
+
+// ============ IDEATION SESSION STORAGE ============
+
+export const getIdeationSessions = async (): Promise<IdeationSession[]> => {
+    try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(IDEATION_STORE, 'readonly');
+            const store = transaction.objectStore(IDEATION_STORE);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const sessions = request.result as IdeationSession[];
+                resolve(sessions.sort((a, b) => b.lastModified - a.lastModified));
+            };
+            request.onerror = () => reject(request.error);
+        });
+    } catch (e) {
+        console.error("Failed to load ideation sessions from DB", e);
+        return [];
+    }
+};
+
+export const getIdeationSession = async (id: string): Promise<IdeationSession | null> => {
+    try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(IDEATION_STORE, 'readonly');
+            const store = transaction.objectStore(IDEATION_STORE);
+            const request = store.get(id);
+
+            request.onsuccess = () => resolve(request.result ?? null);
+            request.onerror = () => reject(request.error);
+        });
+    } catch (e) {
+        console.error("Failed to load ideation session from DB", e);
+        return null;
+    }
+};
+
+export const saveIdeationSession = async (session: IdeationSession): Promise<void> => {
+    try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(IDEATION_STORE, 'readwrite');
+            const store = transaction.objectStore(IDEATION_STORE);
+            const request = store.put({ ...session, lastModified: Date.now() });
+
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    } catch (e) {
+        console.error("Failed to save ideation session to DB", e);
+    }
+};
+
+export const deleteIdeationSession = async (sessionId: string): Promise<void> => {
+    try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(IDEATION_STORE, 'readwrite');
+            const store = transaction.objectStore(IDEATION_STORE);
+            const request = store.delete(sessionId);
+
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    } catch (e) {
+        console.error("Failed to delete ideation session from DB", e);
     }
 };
 

@@ -227,8 +227,8 @@ export const SmartText: React.FC<SmartTextProps> = ({
                         pointerEvents: 'none',
                         zIndex: -999,
                         whiteSpace: 'pre-wrap',
-                        overflowWrap: 'normal', 
-                        wordBreak: 'normal',
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word',
                         lineHeight: style?.lineHeight || '1.1',
                         padding: 0
                     }}
@@ -252,10 +252,10 @@ export const SmartText: React.FC<SmartTextProps> = ({
                     ...style,
                     fontSize: autoFit ? `${fontSize}px` : style?.fontSize,
                     lineHeight: style?.lineHeight || '1.1',
-                    overflowWrap: 'normal', 
-                    wordBreak: 'normal',
+                    overflowWrap: 'break-word',
+                    wordBreak: 'break-word',
                     whiteSpace: 'pre-wrap',
-                    overflow: 'hidden',
+                    overflow: overflowBehavior || 'hidden',
                     opacity: (autoFit && !isReady) ? 0 : 1,
                     transition: 'opacity 0.2s ease-in'
                 }}

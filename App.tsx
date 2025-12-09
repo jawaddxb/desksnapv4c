@@ -9,6 +9,7 @@ import { AppHeader } from './components/AppHeader';
 import { AppSidebar } from './components/AppSidebar';
 import { PrintView } from './components/PrintView';
 import { useDeck } from './hooks/useDeck';
+import { IdeationCopilot } from './components/ideation/IdeationCopilot';
 
 const INITIAL_MESSAGE: Message = { id: 'init', role: MessageRole.MODEL, text: "Ready to snap some slides together. What's the topic?", timestamp: Date.now() };
 
@@ -21,6 +22,7 @@ export default function App() {
   const [isPresenting, setIsPresenting] = useState(false);
   const [viewMode, setViewMode] = useState<'standard' | 'wabi-sabi'>('standard');
   const [showCreateChat, setShowCreateChat] = useState(false);
+  const [isIdeating, setIsIdeating] = useState(false);
   
   const { currentPresentation, savedDecks, activeSlideIndex, setActiveSlideIndex, isGenerating, activeTheme, activeWabiSabiLayout, saveStatus, actions } = useDeck();
   
@@ -145,6 +147,52 @@ export default function App() {
       setGenerationMode('balanced'); // Reset to default mode
   };
 
+  const handleIdeate = () => {
+      setIsIdeating(true);
+  };
+
+  const handleCloseIdeation = () => {
+      setIsIdeating(false);
+  };
+
+  const handleBuildDeckFromIdeation = async (deckPlan: {
+      topic: string;
+      slides: Array<{
+          title: string;
+          bulletPoints: string[];
+          speakerNotes: string;
+          imageVisualDescription: string;
+          layoutType: string;
+          alignment: string;
+      }>;
+      themeId: string;
+      visualStyle: string;
+  }) => {
+      setIsIdeating(false);
+      // Use the deck plan to create a presentation via existing flow
+      // Convert the plan to the format expected by createDeck
+      const topic = deckPlan.topic;
+      setMessages(prev => [...prev, { id: 'ideation-' + Date.now(), role: MessageRole.SYSTEM, text: `Building deck from ideation: "${topic}"...`, timestamp: Date.now() }]);
+
+      try {
+          await actions.createDeckFromPlan(deckPlan);
+          setMessages(prev => [...prev, { id: 'gen-' + Date.now(), role: MessageRole.MODEL, text: `Deck created from ideation: ${deckPlan.slides.length} slides. Rendering visuals...`, timestamp: Date.now() }]);
+      } catch (error) {
+          console.error('Error building deck from ideation:', error);
+          setMessages(prev => [...prev, { id: 'err-' + Date.now(), role: MessageRole.SYSTEM, text: 'Error building deck from ideation plan.', timestamp: Date.now() }]);
+      }
+  };
+
+  // Ideation Mode - Full screen copilot
+  if (isIdeating) {
+      return (
+          <IdeationCopilot
+              onClose={handleCloseIdeation}
+              onBuildDeck={handleBuildDeckFromIdeation}
+          />
+      );
+  }
+
   return (
     <>
     <div id="app-ui" className="flex h-screen w-full bg-zinc-50 overflow-hidden text-zinc-900 font-sans selection:bg-zinc-200 relative">
@@ -229,14 +277,14 @@ export default function App() {
         )}
 
         {/* MAIN STAGE / DASHBOARD */}
-        <MainStage 
-            slide={currentPresentation ? currentPresentation.slides[activeSlideIndex] : null} 
+        <MainStage
+            slide={currentPresentation ? currentPresentation.slides[activeSlideIndex] : null}
             theme={activeTheme}
             activeWabiSabiLayout={activeWabiSabiLayout}
-            onRegenerateSlide={actions.regenerateSlideImage} 
-            onRegenerateAll={actions.regenerateAllImages} 
-            onUpdateSlide={actions.updateSlide} 
-            viewMode={viewMode} 
+            onRegenerateSlide={actions.regenerateSlideImage}
+            onRegenerateAll={actions.regenerateAllImages}
+            onUpdateSlide={actions.updateSlide}
+            viewMode={viewMode}
             printMode={isPresenting}
             // Dashboard props
             savedDecks={savedDecks}
@@ -244,6 +292,7 @@ export default function App() {
             onDeleteDeck={actions.deleteDeck}
             onCreateDeck={handleCreateNew}
             onImport={actions.importDeck}
+            onIdeate={handleIdeate}
         />
       </div>
     </div>
