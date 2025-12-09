@@ -5,10 +5,14 @@ import { getThemeOptions, REFINEMENT_INSTRUCTIONS, SYSTEM_INSTRUCTION_VISUAL_DIR
 
 // Helper to ensure we have a valid key for High Quality image generation
 export const ensureApiKeySelection = async (): Promise<void> => {
-  if (window.aistudio && window.aistudio.hasSelectedApiKey && window.aistudio.openSelectKey) {
-    const hasKey = await window.aistudio.hasSelectedApiKey();
+  if (process.env.API_KEY) return;
+
+  // @ts-ignore - Handle potential window.aistudio check safely
+  const win = window as any;
+  if (typeof win !== 'undefined' && win.aistudio && win.aistudio.hasSelectedApiKey && win.aistudio.openSelectKey) {
+    const hasKey = await win.aistudio.hasSelectedApiKey();
     if (!hasKey) {
-      await window.aistudio.openSelectKey();
+      await win.aistudio.openSelectKey();
     }
   }
 };
@@ -20,8 +24,8 @@ export const refineImagePrompt = async (originalPrompt: string, focus: Refinemen
   const instruction = REFINEMENT_INSTRUCTIONS[focus];
 
   const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Act as a Prompt Engineer. Rewrite the following image prompt to satisfy the specific refinement goal.
+    model: "gemini-2.5-flash",
+    contents: `Act as a Prompt Engineer. Rewrite the following image prompt to satisfy the specific refinement goal.
       
       Original Prompt: "${originalPrompt}"
       
@@ -39,18 +43,18 @@ interface ImageStyleOverride {
 }
 
 export const generatePresentationPlan = async (
-    prompt: string, 
-    imageStyle?: ImageStyleOverride,
-    generationMode: GenerationMode = 'balanced'
+  prompt: string,
+  imageStyle?: ImageStyleOverride,
+  generationMode: GenerationMode = 'balanced'
 ): Promise<PresentationPlanResponse> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
+
   // Dynamic prompt construction
   const themeOptions = getThemeOptions();
   const modeInstruction = getGenerationModeInstruction(generationMode);
   const isAuto = !imageStyle || imageStyle.id === 'auto';
-  
-  const styleInstruction = isAuto 
+
+  const styleInstruction = isAuto
     ? `Review the selected theme and determine the best 'visualStyle' prompt that matches its Art Direction.`
     : `USER VISUAL OVERRIDE: The user has explicitly selected the image style: "${imageStyle.id}". CONSTRAINT: You MUST set the 'visualStyle' field in the JSON response to exactly this string: "${imageStyle.prompt}".`;
 
@@ -81,47 +85,47 @@ export const generatePresentationPlan = async (
 
   const text = response.text;
   if (!text) throw new Error("No plan generated");
-  
+
   // Robustness: Strip markdown code blocks if present
   const cleanJson = text.replace(/```json|```/g, '').trim();
-  
+
   return JSON.parse(cleanJson) as PresentationPlanResponse;
 };
 
 export const generateSlideImage = async (imagePrompt: string, style: string): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const enhancedPrompt = `${style} . SUBJECT: ${imagePrompt} . High quality, 8k, detailed, award winning.`;
-  
+
   console.log("Generating image with prompt:", enhancedPrompt);
 
   const strategies = [
-    { 
-        model: "gemini-3-pro-image-preview", 
-        label: "Pro High-Res",
-        config: { imageConfig: { aspectRatio: "16:9", imageSize: "1K" } } 
+    {
+      model: "gemini-3-pro-image-preview",
+      label: "Pro High-Res",
+      config: { imageConfig: { aspectRatio: "16:9", imageSize: "1K" } }
     },
-    { 
-        model: "gemini-2.5-flash-image", 
-        label: "Flash Standard",
-        config: { imageConfig: { aspectRatio: "16:9" } } 
+    {
+      model: "gemini-2.5-flash-image",
+      label: "Flash Standard",
+      config: { imageConfig: { aspectRatio: "16:9" } }
     }
   ];
 
   for (const strategy of strategies) {
     try {
-        const response = await ai.models.generateContent({
-            model: strategy.model,
-            contents: { parts: [{ text: enhancedPrompt }] },
-            config: strategy.config
-        });
+      const response = await ai.models.generateContent({
+        model: strategy.model,
+        contents: { parts: [{ text: enhancedPrompt }] },
+        config: strategy.config
+      });
 
-        for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData?.data) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
+      for (const part of response.candidates?.[0]?.content?.parts || []) {
+        if (part.inlineData?.data) {
+          return `data:image/png;base64,${part.inlineData.data}`;
         }
+      }
     } catch (error) {
-        console.warn(`Generation failed on ${strategy.model}`, error);
+      console.warn(`Generation failed on ${strategy.model}`, error);
     }
   }
 
