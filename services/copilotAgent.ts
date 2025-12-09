@@ -286,9 +286,8 @@ export async function convertSessionToDeckPlan(
 }> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-  // Build context from notes
+  // Build context from all notes
   const notesContext = session.notes
-    .filter(n => n.approved || n.type === 'user')
     .map(n => `[${n.column}] ${n.content}`)
     .join('\n');
 

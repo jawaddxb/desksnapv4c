@@ -128,37 +128,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
     }
   }, [handleSend]);
 
-  // Handle option click
-  const handleOptionClick = useCallback((option: string) => {
-    const lowerOption = option.toLowerCase();
-
-    // Special handling for voice brainstorm option
-    if (option.includes('🎤') || lowerOption.includes('verbally') || lowerOption.includes('explain verbally')) {
-      toggleVoiceRecording();
-      return;
-    }
-
-    // CRITICAL: Intercept build commands and call onBuildDeck directly
-    // This bypasses the AI loop entirely - fixes infinite loop bug
-    if (
-      lowerOption.includes('build the deck') ||
-      lowerOption.includes('build my deck') ||
-      lowerOption.includes('build with what we have') ||
-      lowerOption === 'start building' ||
-      lowerOption === 'build it' ||
-      lowerOption === 'build now'
-    ) {
-      if (onBuildDeck) {
-        onBuildDeck(); // Directly trigger deck building!
-        return;
-      }
-    }
-
-    // All other options go to AI as before
-    onSendMessage(option);
-  }, [onSendMessage, onBuildDeck, toggleVoiceRecording]);
-
-  // Toggle voice recording
+  // Toggle voice recording - MUST be defined before handleOptionClick
   const toggleVoiceRecording = useCallback(() => {
     if (isRecording) {
       // Stop recording
@@ -229,6 +199,36 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
       }, 1000);
     }
   }, [isRecording]);
+
+  // Handle option click - uses toggleVoiceRecording, so must come after it
+  const handleOptionClick = useCallback((option: string) => {
+    const lowerOption = option.toLowerCase();
+
+    // Special handling for voice brainstorm option
+    if (option.includes('🎤') || lowerOption.includes('verbally') || lowerOption.includes('explain verbally')) {
+      toggleVoiceRecording();
+      return;
+    }
+
+    // CRITICAL: Intercept build commands and call onBuildDeck directly
+    // This bypasses the AI loop entirely - fixes infinite loop bug
+    if (
+      lowerOption.includes('build the deck') ||
+      lowerOption.includes('build my deck') ||
+      lowerOption.includes('build with what we have') ||
+      lowerOption === 'start building' ||
+      lowerOption === 'build it' ||
+      lowerOption === 'build now'
+    ) {
+      if (onBuildDeck) {
+        onBuildDeck(); // Directly trigger deck building!
+        return;
+      }
+    }
+
+    // All other options go to AI as before
+    onSendMessage(option);
+  }, [onSendMessage, onBuildDeck, toggleVoiceRecording]);
 
   // Cleanup on unmount
   useEffect(() => {

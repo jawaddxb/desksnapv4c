@@ -735,10 +735,10 @@ export const KintsugiArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng,
                     <EditableTitle
                         slide={slide} theme={theme} contrast={{ text: '#e8e0d5' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                         className="text-5xl md:text-7xl mb-8 tracking-tight"
-                        style={{ fontFamily: '"Cormorant Garamond", serif', fontWeight: 500, lineHeight: '1.1' }}
+                        style={{ fontWeight: 500, lineHeight: '1.1' }}
                     />
                     <div className="border-l-2 pl-6" style={{ borderColor: goldColor }}>
-                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#a8a0a0' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg font-light" style={{ fontFamily: '"Inter", sans-serif' }} />
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#a8a0a0' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg font-light" />
                     </div>
                     <div className="mt-8 text-xs uppercase tracking-[0.3em] opacity-40" style={{ color: goldColor }}>
                         金継ぎ • Kintsugi
@@ -790,11 +790,11 @@ export const HyggeArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, on
                     <EditableTitle
                         slide={slide} theme={theme} contrast={{ text: '#4a4a4a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                         className="text-5xl md:text-7xl mb-8"
-                        style={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 500, lineHeight: '1.15' }}
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
                     />
 
                     <div className="p-6 rounded-2xl" style={{ background: creamColor, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#6b6b6b' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base" style={{ fontFamily: '"DM Sans", sans-serif' }} />
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#6b6b6b' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base" />
                     </div>
                 </div>
 
@@ -867,10 +867,10 @@ export const TerrazzoArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng,
                     <EditableTitle
                         slide={slide} theme={theme} contrast={{ text: '#2d2d2d' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                         className="text-5xl md:text-7xl mb-8 tracking-tight"
-                        style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, lineHeight: '1.05' }}
+                        style={{ fontWeight: 700, lineHeight: '1.05' }}
                     />
 
-                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }} />
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" />
 
                     <div className="mt-8 text-xs uppercase tracking-widest opacity-40" style={{ color: '#8a8a8a' }}>
                         Terrazzo • Milano
@@ -899,10 +899,10 @@ export const KinfolkArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, 
                         <EditableTitle
                             slide={slide} theme={theme} contrast={{ text: '#3d3d3d' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                             className="text-4xl md:text-5xl lg:text-6xl mb-8"
-                            style={{ fontFamily: '"Cormorant Garamond", serif', fontWeight: 400, lineHeight: '1.15' }}
+                            style={{ fontWeight: 400, lineHeight: '1.15' }}
                         />
 
-                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#7a7a7a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-sm max-w-xs" style={{ fontFamily: '"Inter", sans-serif', lineHeight: '1.7' }} bullet={false} />
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#7a7a7a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-sm max-w-xs" style={{ lineHeight: '1.7' }} bullet={false} />
                     </div>
 
                     <div className="w-1/5" />
@@ -961,10 +961,10 @@ export const MediterraneanArchetype: React.FC<ArchetypeProps> = ({ slide, theme,
                     <EditableTitle
                         slide={slide} theme={theme} contrast={{ text: '#2a2a2a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                         className="text-5xl md:text-7xl mb-8"
-                        style={{ fontFamily: '"Playfair Display", serif', fontWeight: 500, lineHeight: '1.1' }}
+                        style={{ fontWeight: 500, lineHeight: '1.1' }}
                     />
 
-                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ fontFamily: '"Inter", sans-serif' }} />
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" />
 
                     <div className="mt-10 flex gap-4">
                         <div className="w-8 h-8 rounded-full border-2" style={{ borderColor: azure }} />
@@ -1012,11 +1012,11 @@ export const SumieArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, on
                     <EditableTitle
                         slide={slide} theme={theme} contrast={{ text: '#1a1a1a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                         className="text-6xl md:text-8xl mb-12"
-                        style={{ fontFamily: '"Noto Serif", serif', fontWeight: 700, lineHeight: '1.0' }}
+                        style={{ fontWeight: 700, lineHeight: '1.0' }}
                     />
 
                     <div className="max-w-md">
-                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#4a4a4a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ fontFamily: '"Noto Sans", sans-serif', lineHeight: '1.8' }} bullet={false} />
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#4a4a4a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.8' }} bullet={false} />
                     </div>
                 </div>
             </div>
@@ -1058,12 +1058,12 @@ export const MonolithArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng,
                 <EditableTitle
                     slide={slide} theme={theme} contrast={{ text: textColor }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                     className="text-6xl md:text-8xl lg:text-9xl uppercase mb-12 tracking-tighter"
-                    style={{ fontFamily: '"Bebas Neue", sans-serif', fontWeight: 400, lineHeight: '0.9' }}
+                    style={{ fontWeight: 400, lineHeight: '0.9' }}
                 />
 
                 <div className="w-full h-px mb-8" style={{ background: textColor, opacity: 0.2 }} />
 
-                <EditableContent slide={slide} theme={theme} contrast={{ text: textColor }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-sm uppercase tracking-widest opacity-60" style={{ fontFamily: '"Inter", sans-serif' }} bullet={false} />
+                <EditableContent slide={slide} theme={theme} contrast={{ text: textColor }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-sm uppercase tracking-widest opacity-60" bullet={false} />
             </div>
         </div>
     );
@@ -1119,10 +1119,10 @@ export const HerbariumArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng
                     <EditableTitle
                         slide={slide} theme={theme} contrast={{ text: '#3d3d3d' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                         className="text-4xl md:text-5xl mb-6"
-                        style={{ fontFamily: '"Caveat", cursive', fontWeight: 400, lineHeight: '1.2' }}
+                        style={{ fontWeight: 400, lineHeight: '1.2' }}
                     />
 
-                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-sm font-mono" style={{ fontFamily: '"Space Mono", monospace' }} />
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-sm font-mono" />
 
                     <div className="mt-8 flex items-center gap-4 text-xs font-mono" style={{ color: '#8a8a8a' }}>
                         <span>Date: {dateStr}</span>
@@ -1172,10 +1172,10 @@ export const CoastalArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, 
                     <EditableTitle
                         slide={slide} theme={theme} contrast={{ text: isDark ? saltWhite : '#2d3a3a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                         className="text-5xl md:text-7xl mb-8 tracking-wide"
-                        style={{ fontFamily: '"Inter", sans-serif', fontWeight: 300, lineHeight: '1.15', letterSpacing: '0.02em' }}
+                        style={{ fontWeight: 300, lineHeight: '1.15', letterSpacing: '0.02em' }}
                     />
 
-                    <EditableContent slide={slide} theme={theme} contrast={{ text: isDark ? '#a8b5b5' : '#5a6a6a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ fontFamily: '"Inter", sans-serif', letterSpacing: '0.01em' }} />
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: isDark ? '#a8b5b5' : '#5a6a6a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ letterSpacing: '0.01em' }} />
                 </div>
 
                 {/* Image with Vignette */}
@@ -1248,7 +1248,7 @@ export const AtelierArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, 
                     <EditableTitle
                         slide={slide} theme={theme} contrast={{ text: '#2d2d2d' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
                         className="text-5xl md:text-6xl mb-8"
-                        style={{ fontFamily: '"Libre Baskerville", serif', fontWeight: 400, lineHeight: '1.2' }}
+                        style={{ fontWeight: 400, lineHeight: '1.2' }}
                     />
 
                     <div className="w-48 h-1 mb-8 opacity-60" style={{
@@ -1257,7 +1257,7 @@ export const AtelierArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, 
                         transform: 'rotate(-1deg)'
                     }} />
 
-                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base" style={{ fontFamily: '"Caveat", cursive', fontSize: '20px' }} />
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base" style={{ fontSize: '20px' }} />
                 </div>
             </div>
         </div>

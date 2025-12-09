@@ -326,7 +326,7 @@ export function useIdeation(): UseIdeationReturn {
           type: 'ai',
           color: color ?? 'blue',
           parentId,
-          approved: false, // AI notes need approval
+          approved: true, // AI notes are ready to use
         });
         return { success: true, noteId };
       }

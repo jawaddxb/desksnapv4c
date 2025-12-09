@@ -15,7 +15,6 @@ interface StickyNoteProps {
   onSelect?: () => void;
   onUpdate?: (updates: Partial<IdeaNote>) => void;
   onDelete?: () => void;
-  onApprove?: () => void;
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: (e: React.DragEvent) => void;
 }
@@ -35,7 +34,6 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
   onSelect,
   onUpdate,
   onDelete,
-  onApprove,
   onDragStart,
   onDragEnd,
 }) => {
@@ -114,30 +112,6 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
       {note.type !== 'user' && (
         <div className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center text-gray-600">
           <TypeIcon />
-        </div>
-      )}
-
-      {/* Approval indicator for AI notes */}
-      {!note.approved && note.type === 'ai' && (
-        <div className="absolute -top-2 -right-2 flex gap-1">
-          <button
-            onClick={(e) => { e.stopPropagation(); onApprove?.(); }}
-            className="w-5 h-5 rounded-full bg-green-500 text-white shadow flex items-center justify-center hover:bg-green-600 transition-colors"
-            title="Approve"
-          >
-            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-            </svg>
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onDelete?.(); }}
-            className="w-5 h-5 rounded-full bg-red-500 text-white shadow flex items-center justify-center hover:bg-red-600 transition-colors"
-            title="Reject"
-          >
-            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </svg>
-          </button>
         </div>
       )}
 

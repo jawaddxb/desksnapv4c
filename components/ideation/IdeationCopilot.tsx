@@ -87,15 +87,14 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     if (!ideation.session) return;
 
     const { notes, stage } = ideation.session;
-    const approvedNotes = notes.filter(n => n.approved || n.type === 'user');
     const columnsWithNotes = new Set(notes.map(n => n.column)).size;
 
     // Advance from discover to expand after 2+ notes
-    if (stage === 'discover' && approvedNotes.length >= 2) {
+    if (stage === 'discover' && notes.length >= 2) {
       ideation.setStage('expand');
     }
     // Advance from expand to structure after 5+ notes in 3+ columns
-    else if (stage === 'expand' && approvedNotes.length >= 5 && columnsWithNotes >= 3) {
+    else if (stage === 'expand' && notes.length >= 5 && columnsWithNotes >= 3) {
       ideation.setStage('structure');
     }
   }, [ideation]);

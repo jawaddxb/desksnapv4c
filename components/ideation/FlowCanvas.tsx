@@ -18,7 +18,6 @@ interface FlowCanvasProps {
   onSelectNote?: (noteId: string | null) => void;
   onUpdateNote?: (noteId: string, updates: Partial<IdeaNote>) => void;
   onDeleteNote?: (noteId: string) => void;
-  onApproveNote?: (noteId: string) => void;
   onMoveNote?: (noteId: string, column: number, row: number) => void;
   onAddNote?: (column: number) => void;
 }
@@ -37,7 +36,6 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   onSelectNote,
   onUpdateNote,
   onDeleteNote,
-  onApproveNote,
   onMoveNote,
   onAddNote,
 }) => {
@@ -190,7 +188,6 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                     onSelect={() => onSelectNote?.(note.id)}
                     onUpdate={(updates) => onUpdateNote?.(note.id, updates)}
                     onDelete={() => onDeleteNote?.(note.id)}
-                    onApprove={() => onApproveNote?.(note.id)}
                     onDragStart={handleDragStart(note.id)}
                     onDragEnd={handleDragEnd}
                   />

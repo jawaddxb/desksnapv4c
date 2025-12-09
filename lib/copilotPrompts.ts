@@ -121,7 +121,7 @@ export function buildSessionContext(session: IdeationSession): string {
   const notesByColumn = COLUMNS.map((col, idx) => {
     const notes = session.notes.filter(n => n.column === idx);
     if (notes.length === 0) return null;
-    return `**${col}** (${notes.length} notes):\n${notes.map(n => `  - [${n.id}] ${n.content.slice(0, 60)}${n.content.length > 60 ? '...' : ''} (${n.approved ? '✓' : 'pending'})`).join('\n')}`;
+    return `**${col}** (${notes.length} notes):\n${notes.map(n => `  - [${n.id}] ${n.content.slice(0, 60)}${n.content.length > 60 ? '...' : ''}`).join('\n')}`;
   }).filter(Boolean);
 
   const context = [
