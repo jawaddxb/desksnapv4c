@@ -4,6 +4,7 @@ import { Slide, Theme } from '../types';
 import { SmartText } from './SmartText';
 import { LayoutLayer } from '../lib/themes';
 import { PRNG } from '../lib/utils';
+import { TextRole, TextRoleConfig, getTextConfigWithOverrides } from '../lib/wabiSabiText';
 
 export interface ArchetypeProps {
     slide: Slide;
@@ -27,52 +28,95 @@ export const DecorativeLabel = ({ text, className = "", style = {} }: { text: st
     </div>
 );
 
-// Wrapper that passes props to SmartText directly
-export const EditableTitle = ({ slide, theme, contrast, onUpdateSlide, className = "", style = {}, readOnly, maxFontSize = 160, minFontSize = 24 }: any) => (
-    <SmartText 
-        value={slide.title} 
-        onChange={(val) => onUpdateSlide?.({ title: val })} 
-        readOnly={readOnly}
-        autoFit={true}
-        maxFontSize={maxFontSize}
-        minFontSize={minFontSize}
-        className={`font-bold relative ${className}`} 
-        style={{ 
-            fontFamily: theme.fonts.heading, 
-            color: contrast.text, 
-            zIndex: style.zIndex || LayoutLayer.CONTENT_HERO, 
-            lineHeight: 1.1, // Tighter line height for better fitting
-            ...style 
-        }} 
-    />
-);
+// Unified EditableTitle using role-based config from WabiSabi text engine
+export const EditableTitle = ({
+    slide, theme, contrast, onUpdateSlide,
+    className = "", style = {}, readOnly,
+    role = 'headline' as TextRole,  // Semantic role
+    overrides,  // Per-archetype customization
+}: any) => {
+    const config = getTextConfigWithOverrides(role, overrides);
 
-export const EditableContent = ({ slide, theme, contrast, onUpdateSlide, className = "", style = {}, bullet = true, readOnly }: any) => (
-    <div className={`space-y-2 relative flex flex-col min-h-0 ${className}`} style={{ zIndex: style.zIndex || LayoutLayer.CONTENT_BASE, ...style }}>
-        {slide.content.map((item: string, i: number) => (
-            <div key={i} className="flex gap-3 group relative items-start flex-1 min-h-0">
-                {bullet && <span className="mt-2.5 w-1 h-1 shrink-0 rounded-full opacity-60" style={{ backgroundColor: contrast.text }} />}
-                <div className="flex-1 h-full relative">
-                    <SmartText 
-                        value={item} 
-                        onChange={(val) => { const newC = [...slide.content]; newC[i] = val; onUpdateSlide?.({ content: newC }); }} 
-                        readOnly={readOnly}
-                        autoFit={true}
-                        maxFontSize={32}
-                        minFontSize={12}
-                        className="w-full bg-transparent outline-none" 
-                        style={{ 
-                            fontFamily: theme.fonts.body, 
-                            color: contrast.text, 
-                            opacity: 0.9,
-                            lineHeight: 1.3
-                        }} 
-                    />
+    return (
+        <SmartText
+            value={slide.title}
+            onChange={(val) => onUpdateSlide?.({ title: val })}
+            readOnly={readOnly}
+            autoFit={true}
+            maxFontSize={config.maxFontSize}
+            minFontSize={config.minFontSize}
+            minContainerHeight={config.minContainerHeight}
+            minContainerWidth={config.minContainerWidth}
+            overflowBehavior={config.overflow}
+            className={`font-bold relative ${className}`}
+            style={{
+                fontFamily: theme.fonts.heading,
+                color: contrast.text,
+                zIndex: style.zIndex || LayoutLayer.CONTENT_HERO,
+                lineHeight: config.lineHeight,
+                ...style
+            }}
+        />
+    );
+};
+
+// Unified EditableContent with guaranteed visibility from WabiSabi text engine
+export const EditableContent = ({
+    slide, theme, contrast, onUpdateSlide,
+    className = "", style = {}, bullet = true, readOnly,
+    role = 'body' as TextRole,
+}: any) => {
+    const config = getTextConfigWithOverrides(role);
+
+    return (
+        <div
+            className={`space-y-2 relative flex flex-col ${className}`}
+            style={{
+                zIndex: style.zIndex || LayoutLayer.CONTENT_BASE,
+                minHeight: `${slide.content.length * (config.minContainerHeight + 8)}px`, // Guarantee space
+                ...style
+            }}
+        >
+            {slide.content.map((item: string, i: number) => (
+                <div
+                    key={i}
+                    className="flex gap-3 group relative items-start"
+                    style={{ minHeight: `${config.minContainerHeight}px` }}  // Per-item minimum
+                >
+                    {bullet && (
+                        <span
+                            className="mt-2.5 w-1 h-1 shrink-0 rounded-full opacity-60"
+                            style={{ backgroundColor: contrast.text }}
+                        />
+                    )}
+                    <div className="flex-1 relative" style={{ minHeight: `${config.minContainerHeight}px` }}>
+                        <SmartText
+                            value={item}
+                            onChange={(val) => {
+                                const newC = [...slide.content];
+                                newC[i] = val;
+                                onUpdateSlide?.({ content: newC });
+                            }}
+                            readOnly={readOnly}
+                            autoFit={true}
+                            maxFontSize={config.maxFontSize}
+                            minFontSize={config.minFontSize}
+                            minContainerHeight={config.minContainerHeight}
+                            overflowBehavior={config.overflow}
+                            className="w-full bg-transparent outline-none"
+                            style={{
+                                fontFamily: theme.fonts.body,
+                                color: contrast.text,
+                                opacity: 0.9,
+                                lineHeight: config.lineHeight
+                            }}
+                        />
+                    </div>
                 </div>
-            </div>
-        ))}
-    </div>
-);
+            ))}
+        </div>
+    );
+};
 
 // A reusable engine for the "Magazine" overlap look
 export const MagazineLayout = ({ 

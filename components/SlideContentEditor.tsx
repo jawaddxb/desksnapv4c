@@ -2,6 +2,7 @@
 import React from 'react';
 import { Slide, Theme } from '../types';
 import { SmartText } from './SmartText';
+import { TEXT_PRESETS } from '../lib/textPresets';
 
 interface SlideContentEditorProps {
     slide: Slide;
@@ -25,10 +26,9 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
         onUpdateSlide({ content: newContent });
     };
 
-    // AESTHETIC TUNING: Massive limits to ensure text takes available space
-    // We let the container height dictate the actual size via autoFit
-    const MAX_TITLE_SIZE = 350;
-    const MAX_BODY_SIZE = 64;
+    // Use standardized text presets for consistent sizing
+    const MAX_TITLE_SIZE = TEXT_PRESETS.title.maxFontSize;
+    const MAX_BODY_SIZE = TEXT_PRESETS.body.maxFontSize;
 
     // Gallery Render
     if (isGallery) {

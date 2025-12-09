@@ -111,9 +111,9 @@ export const ConstructivistArchetype: React.FC<ArchetypeProps> = ({ slide, theme
                 <div className="w-24 h-24 mb-6 rounded-full mix-blend-multiply opacity-90 animate-pulse pointer-events-auto" style={{ backgroundColor: primaryColor }} />
                 
                 <div className="pointer-events-auto bg-transparent">
-                    <EditableTitle 
-                        slide={slide} theme={theme} contrast={contrast} onUpdateSlide={onUpdateSlide} readOnly={readOnly} 
-                        className="text-6xl md:text-8xl font-black uppercase mb-8 mix-blend-hard-light"
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={contrast} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-6xl md:text-8xl font-black uppercase mb-8"
                         style={{ lineHeight: '0.9' }}
                     />
                     <div className="border-l-4 pl-6 backdrop-blur-sm bg-white/30 p-4 rounded-r-lg" style={{ borderColor: contrast.text }}>
@@ -530,13 +530,13 @@ export const RisographArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng
 
                  <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
                      <div className="w-12 h-12 rounded-full border-4 mb-6 border-blue-600/80 mix-blend-multiply" />
-                     <EditableTitle 
+                     <EditableTitle
                          slide={slide} theme={theme} contrast={{text: '#111'}} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
-                         className="text-6xl md:text-8xl font-black uppercase mb-6 tracking-tighter mix-blend-multiply opacity-90"
+                         className="text-6xl md:text-8xl font-black uppercase mb-6 tracking-tighter opacity-90"
                          style={{ color: '#111', lineHeight: '0.9' }}
                      />
-                     <div className="p-6 border-l-4 border-pink-500/60 bg-white/50 backdrop-blur-sm mix-blend-multiply">
-                        <EditableContent slide={slide} theme={theme} contrast={{text: '#222'}} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="font-bold text-lg mix-blend-multiply" />
+                     <div className="p-6 border-l-4 border-pink-500/60 bg-white/50 backdrop-blur-sm">
+                        <EditableContent slide={slide} theme={theme} contrast={{text: '#222'}} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="font-bold text-lg" />
                      </div>
                  </div>
              </div>

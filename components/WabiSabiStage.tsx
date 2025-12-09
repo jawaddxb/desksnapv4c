@@ -3,6 +3,7 @@ import React from 'react';
 import { Slide, Theme } from '../types';
 import { PRNG } from '../lib/utils';
 import { ArchetypeProps } from './WabiSabiComponents';
+import { ensureContrast } from '../lib/contrast';
 import { 
     EditorialArchetype, TypographicArchetype, ConstructivistArchetype, BauhausArchetype, 
     BrutalistArchetype, PostModernArchetype, SchematicArchetype, CinematicArchetype, 
@@ -47,7 +48,8 @@ export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);
 export const WabiSabiStage: React.FC<WabiSabiStageProps> = ({ slide, theme, onUpdateSlide, printMode, layoutStyle }) => {
     // Idempotent RNG: Fixed seed per slide ID guarantees same random layout on every render frame
     // This stops the "dancing layout" issue completely.
-    const seed = slide.layoutVariant || slide.id.charCodeAt(0);
+    // Handle both numeric seeds and string variants
+    const seed = typeof slide.layoutVariant === 'number' ? slide.layoutVariant : slide.id.charCodeAt(0);
     const rng = new PRNG(seed.toString());
 
     const archetype = layoutStyle && ARCHETYPE_RENDERERS[layoutStyle] ? layoutStyle : 'Editorial';
@@ -66,14 +68,18 @@ export const WabiSabiStage: React.FC<WabiSabiStageProps> = ({ slide, theme, onUp
     if (archetype === 'CyberDeck') Object.assign(contrast, { bg: '#050505', text: '#22d3ee', accent: '#22d3ee', border: '#164e63', mode: 'terminal' });
     if (archetype === 'Receipt') Object.assign(contrast, { bg: '#ffffff', text: '#18181b', accent: '#000000', border: '#e4e4e7', mode: 'paper' });
     if (archetype === 'Schematic' && theme.colors.background === '#ffffff') Object.assign(contrast, { bg: '#f0f9ff', text: '#0033cc', mode: 'blueprint' });
-    if (archetype === 'Typographic' && rng.next() > 0.5) {
-         // Randomly invert Typographic slides for visual variety
+
+    // Typographic inversion: controlled by slide setting instead of random
+    if (archetype === 'Typographic' && slide.layoutVariant === 'inverted') {
          const temp = contrast.bg;
          contrast.bg = contrast.text;
          contrast.text = temp;
     }
 
+    // Apply WCAG contrast safety - ensures text is always readable
+    const safeContrast = ensureContrast(contrast);
+
     const Renderer = ARCHETYPE_RENDERERS[archetype] || SwissArchetype;
 
-    return <Renderer slide={slide} theme={theme} contrast={contrast} rng={rng} onUpdateSlide={onUpdateSlide} readOnly={printMode} />;
+    return <Renderer slide={slide} theme={theme} contrast={safeContrast} rng={rng} onUpdateSlide={onUpdateSlide} readOnly={printMode} />;
 };

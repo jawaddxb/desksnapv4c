@@ -10,19 +10,26 @@ interface SmartTextProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaE
     autoFit?: boolean;
     maxFontSize?: number;
     minFontSize?: number;
+    // Container enforcement for WabiSabi
+    minContainerHeight?: number;  // Enforce minimum height on wrapper
+    minContainerWidth?: number;   // Enforce minimum width on wrapper
+    overflowBehavior?: 'visible' | 'hidden' | 'clip';
 }
 
-export const SmartText: React.FC<SmartTextProps> = ({ 
-    value, 
-    onChange, 
-    className = "", 
-    style, 
+export const SmartText: React.FC<SmartTextProps> = ({
+    value,
+    onChange,
+    className = "",
+    style,
     minRows = 1,
     readOnly,
     autoFit = false,
     maxFontSize = 350, // Defaults generous
     minFontSize = 16,
-    ...props 
+    minContainerHeight,
+    minContainerWidth,
+    overflowBehavior,
+    ...props
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const ghostRef = useRef<HTMLDivElement>(null);
@@ -52,21 +59,37 @@ export const SmartText: React.FC<SmartTextProps> = ({
         const wrapper = wrapperRef.current;
         const ghost = ghostRef.current;
 
-        // 1. GET CONSTRAINTS
-        const { width: wrapperWidth, height: wrapperHeight } = wrapper.getBoundingClientRect();
-        if (wrapperWidth === 0 || wrapperHeight === 0) return;
+        // 1. ENFORCE MINIMUM CONTAINER DIMENSIONS (WabiSabi text engine)
+        if (minContainerHeight && minContainerHeight > 0) {
+            wrapper.style.minHeight = `${minContainerHeight}px`;
+        }
+        if (minContainerWidth && minContainerWidth > 0) {
+            wrapper.style.minWidth = `${minContainerWidth}px`;
+        }
+        if (overflowBehavior) {
+            wrapper.style.overflow = overflowBehavior;
+        }
 
-        // 2. SETUP GHOST
+        // 2. GET CONSTRAINTS (now includes enforced minimums)
+        const { width: wrapperWidth, height: wrapperHeight } = wrapper.getBoundingClientRect();
+        if (wrapperWidth === 0 || wrapperHeight === 0) {
+            // Fallback to minimum size to prevent permanent invisibility
+            setFontSize(safeMin);
+            setIsReady(true);
+            return;
+        }
+
+        // 3. SETUP GHOST
         ghost.style.fontSize = `${safeMax}px`;
 
-        // 3. BINARY SEARCH
+        // 4. BINARY SEARCH
         let low = safeMin;
         let high = safeMax;
         let optimal = safeMin;
 
-        // Safety buffer: Minimal buffer
-        const H_BUFFER = 0; 
-        const W_BUFFER = 0; 
+        // Minimal buffer for sub-pixel rendering only - WabiSabi prioritizes IMPACT over fitting
+        const H_BUFFER = 1;
+        const W_BUFFER = 1; 
 
         while (low <= high) {
             const mid = Math.floor((low + high) / 2);
@@ -88,7 +111,7 @@ export const SmartText: React.FC<SmartTextProps> = ({
 
         setFontSize(optimal);
         setIsReady(true);
-    }, [value, autoFit, safeMax, safeMin, fontFamily, fontWeight, lineHeight, letterSpacing]);
+    }, [value, autoFit, safeMax, safeMin, fontFamily, fontWeight, lineHeight, letterSpacing, minContainerHeight, minContainerWidth, overflowBehavior]);
 
     // --- PASS 2: REALITY CHECK (Validation) ---
     useLayoutEffect(() => {
@@ -107,8 +130,8 @@ export const SmartText: React.FC<SmartTextProps> = ({
 
         if (checkOverflow() && fontSize > safeMin) {
             let currentSize = fontSize;
-            // Cap iterations
-            for (let i = 0; i < 5; i++) {
+            // Cap iterations - balanced for correction without over-shrinking
+            for (let i = 0; i < 8; i++) {
                 if (currentSize <= safeMin) break;
                 currentSize -= 1;
                 el.style.fontSize = `${currentSize}px`;
@@ -135,7 +158,8 @@ export const SmartText: React.FC<SmartTextProps> = ({
             // Only trigger on real changes
             if (dw > 2 || dh > 2) {
                 prevDims.current = { w: width, h: height };
-                setTimeout(() => calculateFit(), 20);
+                // Simple debounce - single calculation
+                setTimeout(() => calculateFit(), 50);
             }
         });
 

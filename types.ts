@@ -13,7 +13,7 @@ export interface Slide {
   layoutType: 'split' | 'full-bleed' | 'statement' | 'gallery' | 'card' | 'horizontal' | 'magazine';
   alignment: 'left' | 'right' | 'center';
   fontScale?: 'auto' | 'compact' | 'hero' | 'classic' | 'modern';
-  layoutVariant?: number; // Seed for generative layouts
+  layoutVariant?: number | 'default' | 'inverted'; // Seed for generative layouts or variant name
 }
 
 export interface AnalyticsSession {
