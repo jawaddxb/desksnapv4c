@@ -5,9 +5,16 @@ import { GenerationMode } from '../types';
 
 // --- HELPERS ---
 
-export const getThemeOptions = () => Object.values(THEMES)
-    .map(t => `- ID: "${t.id}" | Name: ${t.name} | Style Description: ${t.description}`)
-    .join('\n');
+// Memoized theme options to avoid recalculating on every generation
+let cachedThemeOptions: string | null = null;
+export const getThemeOptions = () => {
+    if (!cachedThemeOptions) {
+        cachedThemeOptions = Object.values(THEMES)
+            .map(t => `- ID: "${t.id}" | Name: ${t.name} | Style Description: ${t.description}`)
+            .join('\n');
+    }
+    return cachedThemeOptions;
+};
 
 export const getGenerationModeInstruction = (mode: GenerationMode) => {
   switch(mode) {
@@ -53,7 +60,14 @@ The user is VERY sensitive to the "Subject Matter".
 
 Step 4: ASSIGN ORGANIC LAYOUTS
 For each slide, choose the layout that fits the CONTENT TYPE and EMOTIONAL BEAT.
-Layout Options: 'split', 'full-bleed', 'statement', 'gallery'.
+Layout Options: 'split', 'full-bleed', 'statement', 'gallery', 'card', 'horizontal', 'magazine'.
+- split: Classic two-column (text + image side by side)
+- full-bleed: Full-screen image with text overlay
+- statement: Hero text above smaller image
+- gallery: Image-dominant with metadata
+- card: Centered card with backdrop image
+- horizontal: Stacked (image top, text bottom)
+- magazine: Asymmetric editorial layout
 *Rhythm Rule*: Do NOT use the same layout 3 times in a row.
 
 Step 5: CONSTRUCT SLIDES
@@ -87,10 +101,10 @@ export const PRESENTATION_SCHEMA = {
             bulletPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
             speakerNotes: { type: Type.STRING },
             imageVisualDescription: { type: Type.STRING, description: "A comma-separated complex image prompt describing the SUBJECT only" },
-            layoutType: { 
-                type: Type.STRING, 
-                enum: ['split', 'full-bleed', 'statement', 'gallery'],
-                description: "The structural layout of the slide" 
+            layoutType: {
+                type: Type.STRING,
+                enum: ['split', 'full-bleed', 'statement', 'gallery', 'card', 'horizontal', 'magazine'],
+                description: "The structural layout of the slide"
             },
             alignment: { 
                 type: Type.STRING, 

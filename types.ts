@@ -7,6 +7,7 @@ export interface Slide {
   speakerNotes: string;
   imagePrompt: string;
   imageUrl?: string;
+  imageError?: string; // Error message if image generation failed
   isImageLoading: boolean;
   // Layout Engine Properties
   layoutType: 'split' | 'full-bleed' | 'statement' | 'gallery' | 'card' | 'horizontal' | 'magazine';

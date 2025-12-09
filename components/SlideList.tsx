@@ -23,8 +23,8 @@ export const SlideList: React.FC<SlideListProps> = ({
                 <div className="flex items-center justify-between mb-4 px-1 flex-none">
                     <div className="flex items-center gap-2"><Grid3X3 className="w-4 h-4 text-zinc-500" strokeWidth={2.5} /><h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Deck Overview</h3></div>
                 </div>
-                {/* FORCE FLEX-COL for 1-wide layout */}
-                <div className="flex flex-col gap-4 pb-20">
+                {/* Compact grid layout for smaller thumbnails */}
+                <div className="flex flex-wrap gap-2 pb-20">
                     {presentation.slides.map((slide, idx) => (
                         <SlideCard 
                             key={slide.id} 

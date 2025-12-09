@@ -199,12 +199,23 @@ export const useDeck = () => {
   // --- GENERATION ---
 
   const generateAllImages = async (slides: Slide[], style: string) => {
-    try { 
-        await ensureApiKeySelection(); 
-        for (const [index, slide] of slides.entries()) {
-            await new Promise(r => setTimeout(r, 1000)); // Rate limit buffer
-            await generateSingleImage(index, slide.imagePrompt, style, slides);
-        }
+    try {
+        await ensureApiKeySelection();
+        const CONCURRENCY = 3; // Process 3 images at a time
+        const queue = slides.map((slide, index) => ({ index, prompt: slide.imagePrompt }));
+
+        const processQueue = async () => {
+            while (queue.length > 0) {
+                const batch = queue.splice(0, CONCURRENCY);
+                await Promise.allSettled(
+                    batch.map(async ({ index, prompt }) => {
+                        await generateSingleImage(index, prompt, style, slides);
+                    })
+                );
+            }
+        };
+
+        await processQueue();
     } catch (e) { console.error("Batch generation error", e); }
   };
 
@@ -212,7 +223,7 @@ export const useDeck = () => {
       setCurrentPresentation(prev => {
         if (!prev) return null;
         const updatedSlides = [...prev.slides];
-        if (updatedSlides[index]) updatedSlides[index] = { ...updatedSlides[index], isImageLoading: true };
+        if (updatedSlides[index]) updatedSlides[index] = { ...updatedSlides[index], isImageLoading: true, imageError: undefined };
         return { ...prev, slides: updatedSlides };
       });
 
@@ -220,18 +231,17 @@ export const useDeck = () => {
           const url = await generateSlideImage(prompt, style);
           setCurrentPresentation(prev => {
             if (!prev) return null;
-            const slidesRef = currentSlidesOverride || prev.slides; 
             const updatedSlides = [...prev.slides];
-            if (updatedSlides[index]) updatedSlides[index] = { ...updatedSlides[index], imageUrl: url, isImageLoading: false };
-            const nextState = { ...prev, slides: updatedSlides };
-            return nextState;
+            if (updatedSlides[index]) updatedSlides[index] = { ...updatedSlides[index], imageUrl: url, isImageLoading: false, imageError: undefined };
+            return { ...prev, slides: updatedSlides };
           });
       } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : 'Image generation failed';
           console.warn("Image generation failed", err);
           setCurrentPresentation(prev => {
              if (!prev) return null;
              const updatedSlides = [...prev.slides];
-             if (updatedSlides[index]) updatedSlides[index] = { ...updatedSlides[index], isImageLoading: false };
+             if (updatedSlides[index]) updatedSlides[index] = { ...updatedSlides[index], isImageLoading: false, imageError: errorMessage };
              return { ...prev, slides: updatedSlides };
           });
       }
