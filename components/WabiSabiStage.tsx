@@ -4,11 +4,14 @@ import { Slide, Theme } from '../types';
 import { PRNG } from '../lib/utils';
 import { ArchetypeProps } from './WabiSabiComponents';
 import { ensureContrast } from '../lib/contrast';
-import { 
-    EditorialArchetype, TypographicArchetype, ConstructivistArchetype, BauhausArchetype, 
-    BrutalistArchetype, PostModernArchetype, SchematicArchetype, CinematicArchetype, 
+import {
+    EditorialArchetype, TypographicArchetype, ConstructivistArchetype, BauhausArchetype,
+    BrutalistArchetype, PostModernArchetype, SchematicArchetype, CinematicArchetype,
     CollageArchetype, ZineArchetype, SwissArchetype, CyberDeckArchetype, ReceiptArchetype,
-    Y2KArchetype, RisographArchetype, VaporwaveArchetype, SwissGridArchetype, NoirArchetype
+    Y2KArchetype, RisographArchetype, VaporwaveArchetype, SwissGridArchetype, NoirArchetype,
+    // New Wabi Sabi Archetypes
+    KintsugiArchetype, HyggeArchetype, TerrazzoArchetype, KinfolkArchetype, MediterraneanArchetype,
+    SumieArchetype, MonolithArchetype, HerbariumArchetype, CoastalArchetype, AtelierArchetype
 } from './WabiSabiArchetypes';
 
 interface WabiSabiStageProps {
@@ -38,7 +41,18 @@ const ARCHETYPE_RENDERERS: Record<string, React.FC<ArchetypeProps>> = {
     'Risograph': RisographArchetype,
     'Vaporwave': VaporwaveArchetype,
     'SwissGrid': SwissGridArchetype,
-    'Noir': NoirArchetype
+    'Noir': NoirArchetype,
+    // New Wabi Sabi Archetypes
+    'Kintsugi': KintsugiArchetype,
+    'Hygge': HyggeArchetype,
+    'Terrazzo': TerrazzoArchetype,
+    'Kinfolk': KinfolkArchetype,
+    'Mediterranean': MediterraneanArchetype,
+    'Sumi-e': SumieArchetype,
+    'Monolith': MonolithArchetype,
+    'Herbarium': HerbariumArchetype,
+    'Coastal': CoastalArchetype,
+    'Atelier': AtelierArchetype
 };
 
 export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);

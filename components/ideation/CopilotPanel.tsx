@@ -29,6 +29,49 @@ const STAGE_INFO: Record<IdeationStage, { label: string; color: string }> = {
   ready: { label: 'Ready to Build', color: 'bg-purple-100 text-purple-700' },
 };
 
+// TypeScript types for Web Speech API
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+  isFinal: boolean;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: Event) => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
+
 export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   messages,
   stage,
@@ -38,8 +81,12 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   onBuildDeck,
 }) => {
   const [input, setInput] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -56,8 +103,21 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
     const trimmed = input.trim();
     if (!trimmed || isThinking) return;
 
+    // CRITICAL: Stop voice recognition BEFORE clearing input
+    // Otherwise onresult may re-set the input after we clear it
+    if (recognitionRef.current) {
+      recognitionRef.current.abort(); // Use abort() for immediate halt
+      recognitionRef.current = null;
+    }
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
+    setIsRecording(false);
+    setRecordingTime(0);
+
     onSendMessage(trimmed);
-    setInput('');
+    setInput(''); // Now this will actually stick
   }, [input, isThinking, onSendMessage]);
 
   // Handle key press
@@ -70,8 +130,124 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
 
   // Handle option click
   const handleOptionClick = useCallback((option: string) => {
+    const lowerOption = option.toLowerCase();
+
+    // Special handling for voice brainstorm option
+    if (option.includes('🎤') || lowerOption.includes('verbally') || lowerOption.includes('explain verbally')) {
+      toggleVoiceRecording();
+      return;
+    }
+
+    // CRITICAL: Intercept build commands and call onBuildDeck directly
+    // This bypasses the AI loop entirely - fixes infinite loop bug
+    if (
+      lowerOption.includes('build the deck') ||
+      lowerOption.includes('build my deck') ||
+      lowerOption.includes('build with what we have') ||
+      lowerOption === 'start building' ||
+      lowerOption === 'build it' ||
+      lowerOption === 'build now'
+    ) {
+      if (onBuildDeck) {
+        onBuildDeck(); // Directly trigger deck building!
+        return;
+      }
+    }
+
+    // All other options go to AI as before
     onSendMessage(option);
-  }, [onSendMessage]);
+  }, [onSendMessage, onBuildDeck, toggleVoiceRecording]);
+
+  // Toggle voice recording
+  const toggleVoiceRecording = useCallback(() => {
+    if (isRecording) {
+      // Stop recording
+      recognitionRef.current?.stop();
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+      setIsRecording(false);
+      setRecordingTime(0);
+    } else {
+      // Check for browser support
+      const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognitionAPI) {
+        alert('Voice input is not supported in this browser. Please use Chrome, Edge, or Safari.');
+        return;
+      }
+
+      // Start recording
+      const recognition = new SpeechRecognitionAPI();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      let finalTranscript = '';
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        // Show interim results in the input field
+        setInput(finalTranscript + interimTranscript);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+        if (recordingTimerRef.current) {
+          clearInterval(recordingTimerRef.current);
+          recordingTimerRef.current = null;
+        }
+        setRecordingTime(0);
+        // Focus the input so user can review/edit
+        inputRef.current?.focus();
+      };
+
+      recognition.onerror = () => {
+        setIsRecording(false);
+        if (recordingTimerRef.current) {
+          clearInterval(recordingTimerRef.current);
+          recordingTimerRef.current = null;
+        }
+        setRecordingTime(0);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsRecording(true);
+
+      // Start timer
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime(t => t + 1);
+      }, 1000);
+    }
+  }, [isRecording]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Format recording time
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const stageInfo = STAGE_INFO[stage];
 
@@ -111,16 +287,47 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Welcome message if no messages */}
-        {messages.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+        {/* Welcome message with starter pills */}
+        {messages.length === 0 && !isThinking && (
+          <div className="text-center py-6">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
               <svg className="w-8 h-8 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
               </svg>
             </div>
-            <p className="font-medium text-gray-700">Start your ideation session</p>
-            <p className="text-sm mt-1">Tell me about the presentation you want to create</p>
+            <p className="font-semibold text-gray-800 mb-1">What would you like to present about?</p>
+            <p className="text-sm text-gray-500 mb-5">Choose a starting point, type, or talk about your idea</p>
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {[
+                "A product or service",
+                "A business pitch",
+                "An educational topic",
+                "A creative project"
+              ].map((option, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => onSendMessage(option)}
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm
+                             text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700
+                             transition-all shadow-sm hover:shadow"
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            {/* Voice brainstorm option */}
+            <button
+              onClick={toggleVoiceRecording}
+              className="mt-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white
+                         rounded-full text-sm font-medium hover:opacity-90 transition-all shadow-md
+                         flex items-center gap-2 mx-auto"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+              Talk about my idea
+            </button>
+            <p className="text-xs text-gray-400 mt-3">Speak for 1-2 minutes and I'll extract the key points</p>
           </div>
         )}
 
@@ -188,9 +395,41 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Recording indicator */}
+      {isRecording && (
+        <div className="px-4 py-2 bg-red-50 border-t border-red-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+            <span className="text-sm text-red-600 font-medium">Recording... {formatTime(recordingTime)}</span>
+          </div>
+          <button
+            onClick={toggleVoiceRecording}
+            className="text-sm text-red-600 hover:text-red-700 font-medium"
+          >
+            Stop & Review
+          </button>
+        </div>
+      )}
+
       {/* Input area */}
       <div className="p-4 border-t border-gray-200 bg-gray-50">
         <div className="flex items-end gap-2">
+          {/* Microphone button */}
+          <button
+            onClick={toggleVoiceRecording}
+            disabled={isThinking}
+            className={`p-3 rounded-xl transition-all ${
+              isRecording
+                ? 'bg-red-500 text-white animate-pulse'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            title={isRecording ? 'Stop recording' : 'Start voice input'}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+          </button>
+
           <div className="flex-1 relative">
             <textarea
               ref={inputRef}
@@ -198,15 +437,19 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={
-                stage === 'discover'
+                isRecording
+                  ? "Speak now... your words will appear here"
+                  : stage === 'discover'
                   ? "What's your presentation about?"
                   : "Share your thoughts or ask a question..."
               }
               disabled={isThinking}
               rows={1}
-              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl
+              className={`w-full px-4 py-3 bg-white border rounded-xl
                          resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                         disabled:opacity-50 disabled:cursor-not-allowed"
+                         disabled:opacity-50 disabled:cursor-not-allowed ${
+                           isRecording ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                         }`}
               style={{ minHeight: '48px', maxHeight: '120px' }}
             />
           </div>
@@ -222,7 +465,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
           </button>
         </div>
         <p className="text-xs text-gray-400 mt-2 text-center">
-          Press Enter to send, Shift+Enter for new line
+          {isRecording ? 'Click the mic again to stop, then edit or send' : 'Press Enter to send, Shift+Enter for new line, or use the mic'}
         </p>
       </div>
     </div>

@@ -162,10 +162,61 @@ export async function runAgentLoop(
     responseText = "I encountered an issue processing your request. Let me try a different approach - could you tell me more about what you'd like to create?";
   }
 
+  // CRITICAL: If AI didn't call ask_user, inject a fallback question
+  // This prevents the conversation from stalling
+  if (!askUserQuestion) {
+    askUserQuestion = generateFallbackQuestion(session.stage, session.notes.length, toolCalls.length > 0);
+  }
+
   return {
     text: responseText,
     toolCalls,
     askUserQuestion,
+  };
+}
+
+/**
+ * Generate a contextual fallback question when AI doesn't provide one
+ * Ensures the conversation always has a next step
+ */
+function generateFallbackQuestion(
+  stage: string,
+  noteCount: number,
+  hadToolCalls: boolean
+): { question: string; options: string[] } {
+  // If we just did some work (tool calls), offer to continue or build
+  if (hadToolCalls) {
+    if (noteCount >= 4) {
+      return {
+        question: "I've made some updates. What would you like to do next?",
+        options: ["Build the deck now!", "Add more content", "Research more facts", "Let me review"]
+      };
+    }
+    return {
+      question: "Got it! How should we continue?",
+      options: ["Keep going", "Add more ideas", "Research the topic", "Build with what we have"]
+    };
+  }
+
+  // Based on stage and progress
+  if (noteCount === 0) {
+    return {
+      question: "Let's explore your idea. How would you like to start?",
+      options: ["Tell me more details", "🎤 Let me explain verbally", "Just create a draft", "Research my topic first"]
+    };
+  }
+
+  if (noteCount < 4) {
+    return {
+      question: "We're making progress! What's next?",
+      options: ["Add more ideas", "Research some facts", "Build with what we have", "Change direction"]
+    };
+  }
+
+  // Ready to build
+  return {
+    question: "Your deck is taking shape! Ready to build?",
+    options: ["Build the deck now!", "Add more content", "Reorganize notes", "Research more"]
   };
 }
 

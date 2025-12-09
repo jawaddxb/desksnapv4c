@@ -209,7 +209,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             isThinking={isThinking}
             askUserQuestion={askUserQuestion}
             onSendMessage={handleSendMessage}
-            onBuildDeck={ideation.stage === 'ready' ? handleBuildDeck : undefined}
+            onBuildDeck={handleBuildDeck} // Always available - user explicitly asks to build
           />
         </div>
       </div>
