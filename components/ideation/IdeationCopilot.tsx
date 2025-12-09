@@ -135,10 +135,6 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     }
   }, [ideation, selectedNoteId]);
 
-  const handleApproveNote = useCallback((noteId: string) => {
-    ideation.approveNote(noteId);
-  }, [ideation]);
-
   const handleMoveNote = useCallback((noteId: string, column: number, row: number) => {
     ideation.moveNote(noteId, column, row);
   }, [ideation]);
@@ -194,7 +190,6 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             onSelectNote={setSelectedNoteId}
             onUpdateNote={handleUpdateNote}
             onDeleteNote={handleDeleteNote}
-            onApproveNote={handleApproveNote}
             onMoveNote={handleMoveNote}
             onAddNote={handleAddNote}
           />
