@@ -11,8 +11,13 @@ interface LayoutProps {
 }
 
 export const ImageContainer = ({ slide, theme, className = "", style = {} }: { slide: Slide, theme: Theme, className?: string, style?: React.CSSProperties }) => {
+    // Image style overrides
+    const imageStyles = slide.imageStyles;
+    const opacity = imageStyles?.opacity ?? 1;
+    const objectFit = imageStyles?.objectFit ?? 'cover';
+
     return (
-        <div 
+        <div
             className={`relative overflow-hidden w-full h-full bg-zinc-100 ${className}`}
             style={style}
         >
@@ -25,22 +30,26 @@ export const ImageContainer = ({ slide, theme, className = "", style = {} }: { s
                     <div className="text-[10px] font-bold uppercase tracking-widest opacity-50" style={{ color: theme.colors.text }}>Generative Fill</div>
                  </div>
             ) : slide.imageUrl ? (
-                <img 
-                    src={slide.imageUrl} 
-                    alt="Slide visual" 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out hover:scale-105"
+                <img
+                    src={slide.imageUrl}
+                    alt="Slide visual"
+                    className="absolute inset-0 w-full h-full transition-transform duration-1000 ease-out hover:scale-105"
+                    style={{
+                        objectFit,
+                        opacity,
+                    }}
                 />
             ) : (
-                <div 
+                <div
                     className="absolute inset-0 flex items-center justify-center"
                     style={{ background: theme.colors.surface, opacity: 0.1 }}
                 >
                     <ImageIcon className="w-12 h-12" />
                 </div>
             )}
-            
+
              {theme.colors.backgroundPattern && !slide.isImageLoading && (
-                <div 
+                <div
                     className="absolute inset-0 pointer-events-none opacity-20 mix-blend-overlay"
                     style={{ backgroundImage: theme.colors.backgroundPattern }}
                 />

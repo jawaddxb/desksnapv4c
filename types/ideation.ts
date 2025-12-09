@@ -69,7 +69,7 @@ export interface IdeationSession {
 /**
  * Stages of the ideation process (for copilot guidance)
  */
-export type IdeationStage = 'discover' | 'expand' | 'structure' | 'ready';
+export type IdeationStage = 'discover' | 'expand' | 'structure' | 'ready' | 'review';
 
 /**
  * Response from the agentic copilot

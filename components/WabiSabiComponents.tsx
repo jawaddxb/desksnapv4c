@@ -32,6 +32,7 @@ export const DecorativeLabel = ({ text, className = "", style = {} }: { text: st
  * EditableTitle - Content-First Title Component
  *
  * Renders title at a preferred font size. Container expands to fit.
+ * Supports style overrides from slide.textStyles.title
  */
 export const EditableTitle = ({
     slide, theme, contrast, onUpdateSlide,
@@ -40,14 +41,18 @@ export const EditableTitle = ({
     overrides,
 }: any) => {
     const config = getTextConfigWithOverrides(role, overrides);
+    const titleStyle = slide.textStyles?.title;
 
     return (
         <SmartText
             value={slide.title}
             onChange={(val) => onUpdateSlide?.({ title: val })}
             readOnly={readOnly}
-            fontSize={config.preferredFontSize}
+            fontSize={slide.titleFontSize ?? config.preferredFontSize}
             lineHeight={config.lineHeight}
+            fontWeight={titleStyle?.fontWeight}
+            fontStyle={titleStyle?.fontStyle}
+            textAlign={titleStyle?.textAlign}
             className={`font-bold relative ${className}`}
             style={{
                 fontFamily: theme.fonts.heading,
@@ -63,6 +68,7 @@ export const EditableTitle = ({
  * EditableContent - Content-First Body Text Component
  *
  * Renders content items at preferred font size. Container expands to fit.
+ * Supports style overrides from slide.textStyles.content
  */
 export const EditableContent = ({
     slide, theme, contrast, onUpdateSlide,
@@ -70,6 +76,7 @@ export const EditableContent = ({
     role = 'body' as TextRole,
 }: any) => {
     const config = getTextConfigWithOverrides(role);
+    const contentStyle = slide.textStyles?.content;
 
     return (
         <div
@@ -99,8 +106,11 @@ export const EditableContent = ({
                                 onUpdateSlide?.({ content: newC });
                             }}
                             readOnly={readOnly}
-                            fontSize={config.preferredFontSize}
+                            fontSize={slide.contentFontSize ?? config.preferredFontSize}
                             lineHeight={config.lineHeight}
+                            fontWeight={contentStyle?.fontWeight}
+                            fontStyle={contentStyle?.fontStyle}
+                            textAlign={contentStyle?.textAlign}
                             className="w-full bg-transparent outline-none"
                             style={{
                                 fontFamily: theme.fonts.body,

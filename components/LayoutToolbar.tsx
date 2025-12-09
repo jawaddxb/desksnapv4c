@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { Slide } from '../types';
-import { 
-    Columns, Maximize2, Type, LayoutTemplate, 
-    AlignLeft, AlignCenter, AlignRight, 
+import { Slide, TextStyleOverride } from '../types';
+import {
+    Columns, Maximize2, Type, LayoutTemplate,
+    AlignLeft, AlignCenter, AlignRight,
     Type as TypeIcon, CaseSensitive, Check,
-    Smartphone, Square, Rows
+    Smartphone, Square, Rows,
+    Bold, Italic, Plus, Minus, Image as ImageIcon
 } from 'lucide-react';
 
 interface LayoutToolbarProps {
@@ -18,6 +19,58 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSli
 
     const handleUpdate = (updates: Partial<Slide>) => {
         onUpdateSlide(updates);
+    };
+
+    // Text style helpers
+    const titleStyle = slide.textStyles?.title;
+    const contentStyle = slide.textStyles?.content;
+    const isBold = (titleStyle?.fontWeight ?? 400) >= 700;
+    const isItalic = titleStyle?.fontStyle === 'italic';
+
+    const toggleBold = () => {
+        const newWeight = isBold ? 400 : 700;
+        handleUpdate({
+            textStyles: {
+                ...slide.textStyles,
+                title: { ...titleStyle, fontWeight: newWeight },
+                content: { ...contentStyle, fontWeight: newWeight },
+            }
+        });
+    };
+
+    const toggleItalic = () => {
+        const newStyle = isItalic ? 'normal' : 'italic';
+        handleUpdate({
+            textStyles: {
+                ...slide.textStyles,
+                title: { ...titleStyle, fontStyle: newStyle },
+                content: { ...contentStyle, fontStyle: newStyle },
+            }
+        });
+    };
+
+    // Font size helpers (±8px increments)
+    const currentTitleSize = slide.titleFontSize ?? 64;
+    const currentContentSize = slide.contentFontSize ?? 20;
+
+    const adjustFontSize = (delta: number) => {
+        handleUpdate({
+            titleFontSize: Math.max(24, Math.min(120, currentTitleSize + delta)),
+            contentFontSize: Math.max(12, Math.min(48, currentContentSize + (delta / 2))),
+        });
+    };
+
+    // Image opacity helper
+    const currentOpacity = slide.imageStyles?.opacity ?? 1;
+
+    const adjustOpacity = (delta: number) => {
+        const newOpacity = Math.max(0.1, Math.min(1, currentOpacity + delta));
+        handleUpdate({
+            imageStyles: {
+                ...slide.imageStyles,
+                opacity: Math.round(newOpacity * 10) / 10, // Round to 1 decimal
+            }
+        });
     };
 
     const Button = ({ 
@@ -140,25 +193,79 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSli
 
                 {/* TYPOGRAPHY GROUP */}
                 <div className="flex gap-1">
-                    <Button 
-                        active={slide.fontScale === 'compact'} 
-                        onClick={() => handleUpdate({ fontScale: 'compact' })} 
+                    <Button
+                        active={slide.fontScale === 'compact'}
+                        onClick={() => handleUpdate({ fontScale: 'compact' })}
                         text="S"
-                        label="Compact Text" 
+                        label="Compact Text"
                     />
-                    <Button 
-                        active={!slide.fontScale || slide.fontScale === 'auto'} 
-                        onClick={() => handleUpdate({ fontScale: 'auto' })} 
+                    <Button
+                        active={!slide.fontScale || slide.fontScale === 'auto'}
+                        onClick={() => handleUpdate({ fontScale: 'auto' })}
                         text="M"
-                        label="Auto Scale" 
+                        label="Auto Scale"
                     />
-                    <Button 
-                        active={slide.fontScale === 'hero'} 
-                        onClick={() => handleUpdate({ fontScale: 'hero' })} 
+                    <Button
+                        active={slide.fontScale === 'hero'}
+                        onClick={() => handleUpdate({ fontScale: 'hero' })}
                         text="L"
-                        label="Hero Text" 
+                        label="Hero Text"
                     />
                 </div>
+
+                <Divider />
+
+                {/* TEXT STYLE GROUP */}
+                <div className="flex gap-1">
+                    <Button
+                        active={isBold}
+                        onClick={toggleBold}
+                        icon={Bold}
+                        label="Bold"
+                    />
+                    <Button
+                        active={isItalic}
+                        onClick={toggleItalic}
+                        icon={Italic}
+                        label="Italic"
+                    />
+                    <Button
+                        active={false}
+                        onClick={() => adjustFontSize(8)}
+                        icon={Plus}
+                        label="Increase Font Size"
+                    />
+                    <Button
+                        active={false}
+                        onClick={() => adjustFontSize(-8)}
+                        icon={Minus}
+                        label="Decrease Font Size"
+                    />
+                </div>
+
+                <Divider />
+
+                {/* IMAGE OPACITY GROUP */}
+                {slide.imageUrl && (
+                    <div className="flex gap-1 items-center">
+                        <ImageIcon className="w-3.5 h-3.5 text-zinc-400 mx-1" />
+                        <Button
+                            active={false}
+                            onClick={() => adjustOpacity(-0.1)}
+                            icon={Minus}
+                            label="Decrease Image Opacity"
+                        />
+                        <span className="text-[10px] font-medium text-zinc-500 w-8 text-center">
+                            {Math.round(currentOpacity * 100)}%
+                        </span>
+                        <Button
+                            active={false}
+                            onClick={() => adjustOpacity(0.1)}
+                            icon={Plus}
+                            label="Increase Image Opacity"
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Dynamic Label Tag */}

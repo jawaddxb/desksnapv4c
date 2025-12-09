@@ -9,6 +9,10 @@ interface SmartTextProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaE
     // Content-first: explicit font size, no auto-fitting
     fontSize?: number;
     lineHeight?: number;
+    // Style overrides
+    fontWeight?: number;
+    fontStyle?: 'normal' | 'italic';
+    textAlign?: 'left' | 'center' | 'right';
 }
 
 /**
@@ -28,6 +32,9 @@ export const SmartText: React.FC<SmartTextProps> = ({
     readOnly,
     fontSize,
     lineHeight = 1.1,
+    fontWeight,
+    fontStyle,
+    textAlign,
     ...props
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -57,6 +64,9 @@ export const SmartText: React.FC<SmartTextProps> = ({
                 ...style,
                 fontSize: fontSize ? `${fontSize}px` : style?.fontSize,
                 lineHeight,
+                fontWeight: fontWeight ?? style?.fontWeight,
+                fontStyle: fontStyle ?? style?.fontStyle,
+                textAlign: textAlign ?? style?.textAlign,
                 overflow: 'visible',
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'normal',

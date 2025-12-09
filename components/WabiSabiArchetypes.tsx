@@ -1263,3 +1263,424 @@ export const AtelierArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, 
         </div>
     );
 };
+
+// ============================================================================
+// CORPORATE PITCH DECK ARCHETYPES
+// Professional presentation layouts inspired by top pitch decks
+// ============================================================================
+
+// 1. VENTURE - VC Pitch Minimalism (Sequoia/YC inspired)
+export const VentureArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const accentColor = rng.pick(['#1e40af', '#059669', '#7c3aed']);
+    const isImageLeft = rng.next() > 0.5;
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: '#ffffff' }}>
+            {/* Subtle accent dot */}
+            <div className="absolute top-12 right-12 w-3 h-3 rounded-full" style={{ background: accentColor, zIndex: LayoutLayer.DECORATION }} />
+
+            <div className={`w-full h-full p-16 md:p-24 flex ${isImageLeft ? 'flex-row' : 'flex-row-reverse'} gap-20 items-center`}>
+                {/* Image - Clean presentation */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="w-full aspect-[4/3] overflow-hidden rounded-lg shadow-lg">
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content - Extreme minimalism */}
+                <div className="w-3/5 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-12 h-1 mb-8" style={{ background: accentColor }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: '#111827' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-7xl lg:text-8xl mb-10"
+                        style={{ fontWeight: 700, lineHeight: '1.0', letterSpacing: '-0.02em' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#4b5563' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-xl max-w-xl" style={{ lineHeight: '1.6' }} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 2. KEYNOTE - Apple-Style Product Reveal
+export const KeynoteArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    return (
+        <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center" style={{ background: '#000000' }}>
+            {/* Spotlight gradient */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+                zIndex: LayoutLayer.BACKGROUND,
+                background: 'radial-gradient(ellipse 80% 50% at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 60%)'
+            }} />
+
+            {/* Content - Centered hero */}
+            <div className="w-full max-w-5xl px-12 flex flex-col items-center text-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                <EditableTitle
+                    slide={slide} theme={theme} contrast={{ text: '#ffffff' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                    className="text-5xl md:text-7xl lg:text-8xl mb-8"
+                    style={{ fontWeight: 300, lineHeight: '1.1', letterSpacing: '-0.02em' }}
+                />
+
+                <EditableContent slide={slide} theme={theme} contrast={{ text: '#a1a1aa' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-xl md:text-2xl max-w-2xl mb-16" style={{ lineHeight: '1.5' }} bullet={false} />
+            </div>
+
+            {/* Image - Hero product */}
+            <div className="w-full max-w-3xl px-12 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                <div className="w-full aspect-[16/9] overflow-hidden rounded-xl" style={{
+                    boxShadow: '0 0 80px rgba(255,255,255,0.1), 0 20px 60px rgba(0,0,0,0.5)'
+                }}>
+                    <ImageContainer slide={slide} theme={theme} />
+                </div>
+            </div>
+
+            {/* Floating accent */}
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full opacity-40" style={{ background: 'linear-gradient(90deg, transparent, #ffffff, transparent)' }} />
+        </div>
+    );
+};
+
+// 3. GRADIENT - Modern SaaS Aesthetic
+export const GradientArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const gradients = [
+        'linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)',
+        'linear-gradient(135deg, #ec4899 0%, #f97316 100%)',
+        'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+        'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)'
+    ];
+    const gradient = rng.pick(gradients);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: gradient }}>
+            {/* Noise texture overlay */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                zIndex: LayoutLayer.BACKGROUND,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E")`
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex gap-16 items-center">
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: '#ffffff' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-7xl mb-8"
+                        style={{ fontWeight: 700, lineHeight: '1.05' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: 'rgba(255,255,255,0.85)' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.7' }} />
+                </div>
+
+                {/* Image - Glassmorphism card */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="w-full aspect-square overflow-hidden rounded-3xl" style={{
+                        background: 'rgba(255,255,255,0.1)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        padding: '16px'
+                    }}>
+                        <div className="w-full h-full rounded-2xl overflow-hidden">
+                            <ImageContainer slide={slide} theme={theme} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 4. SIGNAL - Enterprise Fintech
+export const SignalArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const emerald = '#10b981';
+    const amber = '#f59e0b';
+    const isGrowth = rng.next() > 0.5;
+    const accentColor = isGrowth ? emerald : amber;
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: '#0f172a' }}>
+            {/* Grid pattern */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
+                zIndex: LayoutLayer.BACKGROUND,
+                backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+                backgroundSize: '40px 40px'
+            }} />
+
+            {/* Top border accent */}
+            <div className="absolute top-0 left-0 w-full h-1" style={{ background: accentColor, zIndex: LayoutLayer.DECORATION }} />
+
+            <div className="w-full h-full p-12 md:p-16 flex gap-12">
+                {/* Left - Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-2 h-2 rounded-full" style={{ background: accentColor }} />
+                        <span className="text-xs uppercase tracking-[0.2em]" style={{ color: '#64748b' }}>Signal</span>
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: '#f8fafc' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl mb-8"
+                        style={{ fontWeight: 600, lineHeight: '1.1' }}
+                    />
+
+                    <div className="border-l-2 pl-6" style={{ borderColor: accentColor }}>
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#94a3b8' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base" style={{ lineHeight: '1.7' }} />
+                    </div>
+                </div>
+
+                {/* Right - Image with data overlay */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="w-full aspect-[4/3] relative overflow-hidden rounded-lg" style={{ border: '1px solid #1e293b' }}>
+                        <ImageContainer slide={slide} theme={theme} className="saturate-75" />
+                        <div className="absolute bottom-0 left-0 right-0 p-4" style={{ background: 'linear-gradient(transparent, rgba(15,23,42,0.9))' }}>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-2 rounded-full" style={{ background: accentColor }} />
+                                <span className="text-xs" style={{ color: '#64748b' }}>Live Data</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 5. METRIC - Numbers-First Hero
+export const MetricArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const metricValue = rng.pick(['$2.4M', '147%', '10K+', '99.9%', '3.2x']);
+    const metricLabel = rng.pick(['Revenue', 'Growth', 'Users', 'Uptime', 'ROI']);
+    const accentColor = '#22c55e';
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: '#fafafa' }}>
+            {/* Subtle grid */}
+            <div className="absolute inset-0 opacity-30 pointer-events-none" style={{
+                zIndex: LayoutLayer.BACKGROUND,
+                backgroundImage: `linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px)`,
+                backgroundSize: '60px 60px'
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex gap-16 items-center">
+                {/* Hero metric */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <span className="text-sm uppercase tracking-[0.2em] mb-4" style={{ color: '#6b7280' }}>{metricLabel}</span>
+                    <div className="text-8xl md:text-9xl lg:text-[160px] mb-8" style={{ color: '#111827', fontWeight: 800, lineHeight: '0.9', letterSpacing: '-0.03em' }}>
+                        {metricValue}
+                    </div>
+                    <div className="flex items-center gap-2 mb-8">
+                        <div className="w-3 h-3 rounded-full" style={{ background: accentColor }} />
+                        <span className="text-sm" style={{ color: accentColor }}>+24% this quarter</span>
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: '#374151' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-2xl md:text-3xl mb-4"
+                        style={{ fontWeight: 500, lineHeight: '1.3' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#6b7280' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base max-w-md" style={{ lineHeight: '1.6' }} />
+                </div>
+
+                {/* Image */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="w-full aspect-square overflow-hidden rounded-2xl shadow-xl">
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 6. NARRATIVE - Magazine Editorial
+export const NarrativeArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const isImageLeft = rng.next() > 0.5;
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: '#fdfbf8' }}>
+            <div className={`w-full h-full flex ${isImageLeft ? 'flex-row' : 'flex-row-reverse'}`}>
+                {/* Image - Full bleed */}
+                <div className="w-1/2 h-full relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <ImageContainer slide={slide} theme={theme} />
+                </div>
+
+                {/* Content - Editorial layout */}
+                <div className="w-1/2 h-full p-12 md:p-16 lg:p-20 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-full h-px mb-8" style={{ background: '#e5e1d8' }} />
+
+                    <span className="text-[10px] uppercase tracking-[0.3em] mb-6" style={{ color: '#9ca3af' }}>Feature Story</span>
+
+                    <div className="flex">
+                        <div className="w-1 mr-6" style={{ background: '#d4d0c8' }} />
+                        <EditableTitle
+                            slide={slide} theme={theme} contrast={{ text: '#1f2937' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                            className="text-4xl md:text-5xl lg:text-6xl mb-8"
+                            style={{ fontWeight: 400, lineHeight: '1.15' }}
+                        />
+                    </div>
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#6b7280' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base max-w-sm" style={{ lineHeight: '1.8' }} />
+
+                    <div className="w-full h-px mt-12" style={{ background: '#e5e1d8' }} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 7. BEACON - Bold Statement Slides
+export const BeaconArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const schemes = [
+        { bg: '#2563eb', text: '#ffffff' },
+        { bg: '#000000', text: '#ffffff' },
+        { bg: '#ffffff', text: '#000000' },
+        { bg: '#7c3aed', text: '#ffffff' },
+        { bg: '#dc2626', text: '#ffffff' }
+    ];
+    const scheme = rng.pick(schemes);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden flex items-center justify-center" style={{ background: scheme.bg }}>
+            {/* Single geometric accent */}
+            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full opacity-40" style={{ background: scheme.text, zIndex: LayoutLayer.DECORATION }} />
+
+            {/* Content - Centered statement */}
+            <div className="w-full max-w-5xl px-12 md:px-20 text-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                <EditableTitle
+                    slide={slide} theme={theme} contrast={{ text: scheme.text }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                    className="text-5xl md:text-7xl lg:text-8xl"
+                    style={{ fontWeight: 700, lineHeight: '1.1' }}
+                />
+
+                <div className="mt-12 opacity-60">
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: scheme.text }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-xl" style={{ lineHeight: '1.5' }} bullet={false} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 8. SLIDE - Classic Pitch Deck (Airbnb/LinkedIn style)
+export const SlideArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const accentColor = rng.pick(['#2563eb', '#dc2626', '#059669', '#7c3aed']);
+    const isImageRight = rng.next() > 0.5;
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: '#ffffff' }}>
+            <div className={`w-full h-full p-12 md:p-16 flex ${isImageRight ? 'flex-row' : 'flex-row-reverse'} gap-12 items-center`}>
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: '#374151' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-4xl md:text-5xl lg:text-6xl mb-8"
+                        style={{ fontWeight: 600, lineHeight: '1.15' }}
+                    />
+
+                    <div className="space-y-3">
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#6b7280' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.7' }} />
+                    </div>
+
+                    <div className="mt-8 flex items-center gap-3">
+                        <div className="px-4 py-2 rounded-full text-sm" style={{ background: `${accentColor}15`, color: accentColor }}>
+                            Key Insight
+                        </div>
+                    </div>
+                </div>
+
+                {/* Image */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="w-full aspect-[4/3] overflow-hidden rounded-xl shadow-lg">
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 9. CANVAS - Creative Agency
+export const CanvasArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const accentColor = rng.pick(['#f97316', '#ec4899', '#8b5cf6', '#06b6d4']);
+    const rotation = rng.range(-2, 2);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: '#f5f5f4' }}>
+            {/* Background accent shape */}
+            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full opacity-20" style={{ background: accentColor, zIndex: LayoutLayer.DECORATION }} />
+
+            <div className="w-full h-full p-12 md:p-16 flex gap-12 items-center">
+                {/* Image - Artistic presentation */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4 rounded-2xl" style={{ background: accentColor, opacity: 0.1, transform: `rotate(${rotation}deg)` }} />
+                    <div className="relative w-full aspect-[4/5] overflow-hidden rounded-xl shadow-2xl" style={{ transform: `rotate(${rotation}deg)` }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                    <div className="absolute -bottom-4 -right-4 w-16 h-16 rounded-xl" style={{ background: accentColor, opacity: 0.8, zIndex: LayoutLayer.DECORATION }} />
+                </div>
+
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-8 h-2 mb-8 rounded-full" style={{ background: accentColor }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: '#1f2937' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl mb-8"
+                        style={{ fontWeight: 700, lineHeight: '1.1' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#6b7280' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.7' }} />
+
+                    <div className="mt-8 flex gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ background: accentColor }} />
+                        <div className="w-3 h-3 rounded-full" style={{ background: accentColor, opacity: 0.5 }} />
+                        <div className="w-3 h-3 rounded-full" style={{ background: accentColor, opacity: 0.25 }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 10. DECK - Boardroom Classic (McKinsey/BCG style)
+export const DeckArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const navy = '#1e3a5f';
+    const slideNumber = rng.range(1, 24).toFixed(0);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden flex flex-col" style={{ background: '#ffffff' }}>
+            {/* Header bar */}
+            <div className="w-full px-12 py-4 border-b flex items-center justify-between" style={{ borderColor: '#e5e7eb', zIndex: LayoutLayer.OVERLAY }}>
+                <span className="text-xs uppercase tracking-[0.15em]" style={{ color: '#9ca3af' }}>Confidential</span>
+                <span className="text-xs" style={{ color: '#9ca3af' }}>Page {slideNumber}</span>
+            </div>
+
+            {/* Main content */}
+            <div className="flex-1 p-12 md:p-16 flex gap-12">
+                {/* Left - Content */}
+                <div className="w-1/2 flex flex-col" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: navy }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-3xl md:text-4xl mb-8"
+                        style={{ fontWeight: 600, lineHeight: '1.25' }}
+                    />
+
+                    <div className="flex-1">
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#4b5563' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base" style={{ lineHeight: '1.7' }} />
+                    </div>
+
+                    <div className="mt-auto pt-8 border-t" style={{ borderColor: '#e5e7eb' }}>
+                        <span className="text-xs uppercase tracking-[0.1em]" style={{ color: '#9ca3af' }}>Source: Internal Analysis</span>
+                    </div>
+                </div>
+
+                {/* Right - Image */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="w-full h-full overflow-hidden rounded-lg" style={{ border: '1px solid #e5e7eb' }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Footer bar */}
+            <div className="w-full h-1" style={{ background: navy }} />
+        </div>
+    );
+};

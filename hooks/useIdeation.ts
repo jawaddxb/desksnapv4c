@@ -61,6 +61,9 @@ export interface UseIdeationReturn {
   // Stage operations
   setStage: (stage: IdeationStage) => void;
 
+  // Topic operations
+  updateTopic: (topic: string) => void;
+
   // Tool executor (for agentic loop)
   executeToolCall: (tool: string, args: Record<string, unknown>) => Promise<unknown>;
 }
@@ -305,6 +308,15 @@ export function useIdeation(): UseIdeationReturn {
     });
   }, []);
 
+  // ============ TOPIC OPERATIONS ============
+
+  const updateTopic = useCallback((topic: string) => {
+    setSession(prev => {
+      if (!prev) return null;
+      return { ...prev, topic, lastModified: Date.now() };
+    });
+  }, []);
+
   // ============ TOOL EXECUTOR ============
 
   const executeToolCall = useCallback(async (
@@ -312,6 +324,12 @@ export function useIdeation(): UseIdeationReturn {
     args: Record<string, unknown>
   ): Promise<unknown> => {
     switch (tool) {
+      case 'set_topic': {
+        const { topic } = args as { topic: string };
+        updateTopic(topic);
+        return { success: true, topic };
+      }
+
       case 'create_note': {
         const { content, column, parentId, color } = args as {
           content: string;
@@ -400,7 +418,7 @@ export function useIdeation(): UseIdeationReturn {
         console.warn(`Unknown tool: ${tool}`);
         return { success: false, error: `Unknown tool: ${tool}` };
     }
-  }, [addNote, updateNote, deleteNote, connectNotes, moveNote, addMessage, setStage]);
+  }, [addNote, updateNote, deleteNote, connectNotes, moveNote, addMessage, setStage, updateTopic]);
 
   // ============ RETURN ============
 
@@ -438,6 +456,9 @@ export function useIdeation(): UseIdeationReturn {
 
     // Stage operations
     setStage,
+
+    // Topic operations
+    updateTopic,
 
     // Tool executor
     executeToolCall,

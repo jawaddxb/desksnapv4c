@@ -9,9 +9,12 @@ import {
     BrutalistArchetype, PostModernArchetype, SchematicArchetype, CinematicArchetype,
     CollageArchetype, ZineArchetype, SwissArchetype, CyberDeckArchetype, ReceiptArchetype,
     Y2KArchetype, RisographArchetype, VaporwaveArchetype, SwissGridArchetype, NoirArchetype,
-    // New Wabi Sabi Archetypes
+    // Wabi Sabi Archetypes
     KintsugiArchetype, HyggeArchetype, TerrazzoArchetype, KinfolkArchetype, MediterraneanArchetype,
-    SumieArchetype, MonolithArchetype, HerbariumArchetype, CoastalArchetype, AtelierArchetype
+    SumieArchetype, MonolithArchetype, HerbariumArchetype, CoastalArchetype, AtelierArchetype,
+    // Corporate Pitch Deck Archetypes
+    VentureArchetype, KeynoteArchetype, GradientArchetype, SignalArchetype, MetricArchetype,
+    NarrativeArchetype, BeaconArchetype, SlideArchetype, CanvasArchetype, DeckArchetype
 } from './WabiSabiArchetypes';
 
 interface WabiSabiStageProps {
@@ -42,7 +45,7 @@ const ARCHETYPE_RENDERERS: Record<string, React.FC<ArchetypeProps>> = {
     'Vaporwave': VaporwaveArchetype,
     'SwissGrid': SwissGridArchetype,
     'Noir': NoirArchetype,
-    // New Wabi Sabi Archetypes
+    // Wabi Sabi Archetypes
     'Kintsugi': KintsugiArchetype,
     'Hygge': HyggeArchetype,
     'Terrazzo': TerrazzoArchetype,
@@ -52,7 +55,18 @@ const ARCHETYPE_RENDERERS: Record<string, React.FC<ArchetypeProps>> = {
     'Monolith': MonolithArchetype,
     'Herbarium': HerbariumArchetype,
     'Coastal': CoastalArchetype,
-    'Atelier': AtelierArchetype
+    'Atelier': AtelierArchetype,
+    // Corporate Pitch Deck Archetypes
+    'Venture': VentureArchetype,
+    'Keynote': KeynoteArchetype,
+    'Gradient': GradientArchetype,
+    'Signal': SignalArchetype,
+    'Metric': MetricArchetype,
+    'Narrative': NarrativeArchetype,
+    'Beacon': BeaconArchetype,
+    'Slide': SlideArchetype,
+    'Canvas': CanvasArchetype,
+    'Deck': DeckArchetype
 };
 
 export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);

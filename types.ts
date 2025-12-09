@@ -1,5 +1,17 @@
 
 
+// Style override types for editing
+export interface TextStyleOverride {
+  fontWeight?: number;
+  fontStyle?: 'normal' | 'italic';
+  textAlign?: 'left' | 'center' | 'right';
+}
+
+export interface ImageStyleOverride {
+  opacity?: number;
+  objectFit?: 'cover' | 'contain' | 'fill';
+}
+
 export interface Slide {
   id: string;
   title: string;
@@ -14,6 +26,14 @@ export interface Slide {
   alignment: 'left' | 'right' | 'center';
   fontScale?: 'auto' | 'compact' | 'hero' | 'classic' | 'modern';
   layoutVariant?: number | 'default' | 'inverted'; // Seed for generative layouts or variant name
+  // Style overrides (optional - layouts use defaults if undefined)
+  titleFontSize?: number;
+  contentFontSize?: number;
+  textStyles?: {
+    title?: TextStyleOverride;
+    content?: TextStyleOverride;
+  };
+  imageStyles?: ImageStyleOverride;
 }
 
 export interface AnalyticsSession {

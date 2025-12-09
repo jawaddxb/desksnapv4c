@@ -22,6 +22,10 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
     const isCenter = slide.alignment === 'center';
     const isRight = slide.alignment === 'right';
 
+    // Style overrides from slide data
+    const titleStyle = slide.textStyles?.title;
+    const contentStyle = slide.textStyles?.content;
+
     const updateTitle = (newTitle: string) => onUpdateSlide?.({ title: newTitle });
     const updateContent = (index: number, newText: string) => {
         if (!onUpdateSlide) return;
@@ -39,8 +43,11 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                         value={slide.title}
                         onChange={updateTitle}
                         readOnly={printMode}
-                        fontSize={72}
+                        fontSize={slide.titleFontSize ?? 72}
                         lineHeight={0.95}
+                        fontWeight={titleStyle?.fontWeight}
+                        fontStyle={titleStyle?.fontStyle}
+                        textAlign={titleStyle?.textAlign}
                         className="font-bold bg-transparent outline-none p-0"
                         style={{
                             fontFamily: theme.fonts.heading,
@@ -56,8 +63,11 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                                 value={point}
                                 onChange={(val) => updateContent(idx, val)}
                                 readOnly={printMode}
-                                fontSize={24}
+                                fontSize={slide.contentFontSize ?? 24}
                                 lineHeight={1.2}
+                                fontWeight={contentStyle?.fontWeight}
+                                fontStyle={contentStyle?.fontStyle}
+                                textAlign={contentStyle?.textAlign}
                                 className="font-medium opacity-90 bg-transparent outline-none p-0"
                                 style={{ fontFamily: theme.fonts.body, color: theme.colors.secondary }}
                             />
@@ -69,6 +79,10 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
     }
 
     // Standard Render (Split, Full-Bleed, Statement)
+    // Calculate default font sizes based on layout
+    const defaultTitleSize = isStatement ? 80 : 64;
+    const defaultContentSize = isStatement ? 24 : 20;
+
     return (
         <div className={`w-full h-full flex flex-col ${isStatement || (isFullBleed && isCenter) ? 'items-center' : ''}`}>
 
@@ -78,14 +92,16 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                     value={slide.title}
                     onChange={updateTitle}
                     readOnly={printMode}
-                    fontSize={isStatement ? 80 : 64}
+                    fontSize={slide.titleFontSize ?? defaultTitleSize}
                     lineHeight={0.9}
+                    fontWeight={titleStyle?.fontWeight ?? (parseInt(theme.layout.headingWeight) || undefined)}
+                    fontStyle={titleStyle?.fontStyle}
+                    textAlign={titleStyle?.textAlign}
                     className={`p-0 ${isFullBleed ? 'drop-shadow-lg' : ''} ${isStatement || (isFullBleed && isCenter) ? 'text-center' : ''} ${(isFullBleed && isRight) ? 'text-right' : ''}`}
                     style={{
                         fontFamily: theme.fonts.heading,
                         color: theme.colors.text,
                         textTransform: theme.layout.headingTransform as any,
-                        fontWeight: theme.layout.headingWeight,
                         textShadow: isFullBleed && theme.id !== 'neoBrutalist' ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
                     }}
                 />
@@ -109,8 +125,11 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                                 value={point}
                                 onChange={(val) => updateContent(idx, val)}
                                 readOnly={printMode}
-                                fontSize={isStatement ? 24 : 20}
+                                fontSize={slide.contentFontSize ?? defaultContentSize}
                                 lineHeight={1.15}
+                                fontWeight={contentStyle?.fontWeight}
+                                fontStyle={contentStyle?.fontStyle}
+                                textAlign={contentStyle?.textAlign}
                                 className={`bg-transparent outline-none w-full p-0 ${isStatement ? 'text-center' : ''}`}
                                 style={{
                                     fontFamily: theme.fonts.body,

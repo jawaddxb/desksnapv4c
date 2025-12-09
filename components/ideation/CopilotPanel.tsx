@@ -19,6 +19,7 @@ interface CopilotPanelProps {
   } | null;
   onSendMessage: (message: string) => void;
   onBuildDeck?: () => void;
+  onConfirmBuild?: () => void;
 }
 
 // Stage descriptions
@@ -27,6 +28,7 @@ const STAGE_INFO: Record<IdeationStage, { label: string; color: string }> = {
   expand: { label: 'Expanding', color: 'bg-blue-100 text-blue-700' },
   structure: { label: 'Structuring', color: 'bg-green-100 text-green-700' },
   ready: { label: 'Ready to Build', color: 'bg-purple-100 text-purple-700' },
+  review: { label: 'Review & Build', color: 'bg-emerald-100 text-emerald-700' },
 };
 
 // TypeScript types for Web Speech API
@@ -79,6 +81,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   askUserQuestion,
   onSendMessage,
   onBuildDeck,
+  onConfirmBuild,
 }) => {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -281,6 +284,21 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
             </svg>
             Build Deck
+          </button>
+        )}
+
+        {/* Confirm & Build button (in review stage) */}
+        {stage === 'review' && onConfirmBuild && (
+          <button
+            onClick={onConfirmBuild}
+            className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white
+                       rounded-lg font-medium text-sm hover:opacity-90 transition-opacity
+                       flex items-center gap-2 animate-pulse"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            Confirm & Build
           </button>
         )}
       </div>

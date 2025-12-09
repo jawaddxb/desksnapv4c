@@ -7,6 +7,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { MessageRole } from '../../types';
+import { COLUMNS } from '../../types/ideation';
 import { useIdeation } from '../../hooks/useIdeation';
 import { runAgentLoop, convertSessionToDeckPlan, AgentResponse } from '../../services/copilotAgent';
 import { FlowCanvas } from './FlowCanvas';
@@ -99,8 +100,27 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     }
   }, [ideation]);
 
-  // Handle building the deck
-  const handleBuildDeck = useCallback(async () => {
+  // Handle request to build deck - shows review stage first
+  const handleBuildDeck = useCallback(() => {
+    if (!ideation.session) return;
+
+    // Go to review stage instead of building immediately
+    ideation.setStage('review');
+
+    // Show summary message
+    const noteCount = ideation.session.notes.length;
+    const columnNames = [...new Set(ideation.session.notes.map(n => COLUMNS[n.column]))];
+
+    ideation.addMessage(
+      MessageRole.MODEL,
+      `Here's your presentation plan for "${ideation.session.topic}":\n\n` +
+      `${noteCount} ideas across: ${columnNames.join(', ')}\n\n` +
+      `Review the canvas on the left, make any edits you'd like, then click "Confirm & Build" when you're ready!`
+    );
+  }, [ideation]);
+
+  // Handle confirming the build - actually creates the deck
+  const handleConfirmBuild = useCallback(async () => {
     if (!ideation.session || !onBuildDeck) return;
 
     setIsThinking(true);
@@ -111,7 +131,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
       console.error('Deck conversion error:', error);
       ideation.addMessage(
         MessageRole.MODEL,
-        "I had trouble creating the deck plan. Let me try again - could you confirm which notes should be included?"
+        "I had trouble creating the deck. Please try again or check your notes."
       );
     } finally {
       setIsThinking(false);
@@ -203,7 +223,8 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             isThinking={isThinking}
             askUserQuestion={askUserQuestion}
             onSendMessage={handleSendMessage}
-            onBuildDeck={handleBuildDeck} // Always available - user explicitly asks to build
+            onBuildDeck={handleBuildDeck}
+            onConfirmBuild={handleConfirmBuild}
           />
         </div>
       </div>

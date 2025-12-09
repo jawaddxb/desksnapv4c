@@ -12,6 +12,20 @@ import { FunctionDeclaration, Type } from '@google/genai';
  */
 export const COPILOT_TOOLS: FunctionDeclaration[] = [
   {
+    name: 'set_topic',
+    description: 'Set the presentation topic based on user input. Call this IMMEDIATELY when the user describes what their presentation is about.',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        topic: {
+          type: Type.STRING,
+          description: 'A clear, concise version of the presentation topic (e.g., "Pet Birthday Party Business in Dubai")',
+        },
+      },
+      required: ['topic'],
+    },
+  },
+  {
     name: 'create_note',
     description: 'Create a new sticky note on the ideation canvas. Use this to add ideas, research findings, or suggestions to the flowchart.',
     parameters: {
@@ -195,6 +209,7 @@ export function getToolByName(name: string): FunctionDeclaration | undefined {
  * Tool names for type safety
  */
 export type CopilotToolName =
+  | 'set_topic'
   | 'create_note'
   | 'update_note'
   | 'delete_note'
