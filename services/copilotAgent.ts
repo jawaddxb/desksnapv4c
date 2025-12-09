@@ -74,11 +74,11 @@ export async function runAgentLoop(
   try {
     // Call Gemini with tool definitions
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash',
       contents,
-      systemInstruction: systemPrompt,
-      tools: [{ functionDeclarations: COPILOT_TOOLS }],
       config: {
+        systemInstruction: systemPrompt,
+        tools: [{ functionDeclarations: COPILOT_TOOLS }],
         toolConfig: {
           functionCallingConfig: {
             mode: 'AUTO', // Let the model decide when to use tools

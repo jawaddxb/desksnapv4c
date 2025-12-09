@@ -405,11 +405,13 @@ export const CyberDeckArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng
                     {slide.content.map((item: string, i: number) => (
                         <div key={i} className="text-sm md:text-base text-cyan-100/80 font-mono flex gap-3">
                             <span className="text-cyan-600">0{i+1}</span>
-                            <SmartText 
-                                value={item} 
-                                onChange={(val) => { const newC = [...slide.content]; newC[i] = val; onUpdateSlide?.({ content: newC }); }} 
+                            <SmartText
+                                value={item}
+                                onChange={(val) => { const newC = [...slide.content]; newC[i] = val; onUpdateSlide?.({ content: newC }); }}
                                 readOnly={readOnly}
-                                className="bg-transparent outline-none w-full" 
+                                fontSize={16}
+                                lineHeight={1.4}
+                                className="bg-transparent outline-none w-full"
                             />
                         </div>
                     ))}
@@ -445,11 +447,13 @@ export const ReceiptArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, 
             <div className="space-y-4 mb-8 font-mono text-sm">
                 {slide.content.map((item: string, i: number) => (
                     <div key={i} className="flex justify-between items-start border-b border-zinc-100 pb-2">
-                        <SmartText 
-                            value={item} 
-                            onChange={(val) => { const newC = [...slide.content]; newC[i] = val; onUpdateSlide?.({ content: newC }); }} 
+                        <SmartText
+                            value={item}
+                            onChange={(val) => { const newC = [...slide.content]; newC[i] = val; onUpdateSlide?.({ content: newC }); }}
                             readOnly={readOnly}
-                            className="w-3/4 bg-transparent outline-none resize-none overflow-hidden" 
+                            fontSize={14}
+                            lineHeight={1.3}
+                            className="w-3/4 bg-transparent outline-none resize-none"
                         />
                         <span className="w-1/4 text-right font-bold text-zinc-400">{(rng.next() * 100).toFixed(2)}</span>
                     </div>

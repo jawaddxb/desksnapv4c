@@ -149,9 +149,10 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
             onChange={handleContentChange}
             onBlur={handleBlur}
             autoFocus
+            fontSize={14}
+            lineHeight={1.4}
             className="text-sm text-gray-800 leading-snug"
             style={{ fontFamily: 'system-ui' }}
-            autoFit={false}
           />
         ) : (
           <p className="text-sm text-gray-800 leading-snug whitespace-pre-wrap break-words">
