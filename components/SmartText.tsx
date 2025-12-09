@@ -14,6 +14,11 @@ interface SmartTextProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaE
     minContainerHeight?: number;  // Enforce minimum height on wrapper
     minContainerWidth?: number;   // Enforce minimum width on wrapper
     overflowBehavior?: 'visible' | 'hidden' | 'clip';
+    // Fit strategy: how binary search constrains text
+    // 'fit-both': Fit within both width AND height (default)
+    // 'width-only': Only constrain by width, let height overflow (for headlines)
+    // 'height-only': Only constrain by height, let width overflow
+    fitStrategy?: 'fit-both' | 'width-only' | 'height-only';
 }
 
 export const SmartText: React.FC<SmartTextProps> = ({
@@ -29,6 +34,7 @@ export const SmartText: React.FC<SmartTextProps> = ({
     minContainerHeight,
     minContainerWidth,
     overflowBehavior,
+    fitStrategy = 'fit-both',
     ...props
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -82,26 +88,39 @@ export const SmartText: React.FC<SmartTextProps> = ({
         // 3. SETUP GHOST
         ghost.style.fontSize = `${safeMax}px`;
 
-        // 4. BINARY SEARCH
+        // 4. BINARY SEARCH with strategy-aware fitting
         let low = safeMin;
         let high = safeMax;
         let optimal = safeMin;
 
-        // Minimal buffer for sub-pixel rendering only - WabiSabi prioritizes IMPACT over fitting
+        // Minimal buffer for sub-pixel rendering only
         const H_BUFFER = 1;
-        const W_BUFFER = 1; 
+        const W_BUFFER = 1;
 
         while (low <= high) {
             const mid = Math.floor((low + high) / 2);
             ghost.style.fontSize = `${mid}px`;
-            
+
             const ghostW = ghost.scrollWidth;
-            const ghostH = ghost.scrollHeight; 
+            const ghostH = ghost.scrollHeight;
 
             const fitsWidth = ghostW <= (wrapperWidth - W_BUFFER);
             const fitsHeight = ghostH <= (wrapperHeight - H_BUFFER);
 
-            if (fitsWidth && fitsHeight) {
+            // Strategy-aware fit check:
+            // 'width-only': Headlines only constrain by width, height can overflow
+            // 'height-only': Only constrain by height
+            // 'fit-both': Must fit both (default)
+            let fits: boolean;
+            if (fitStrategy === 'width-only') {
+                fits = fitsWidth;  // Ignore height - headlines will be HUGE
+            } else if (fitStrategy === 'height-only') {
+                fits = fitsHeight;
+            } else {
+                fits = fitsWidth && fitsHeight;
+            }
+
+            if (fits) {
                 optimal = mid;
                 low = mid + 1;
             } else {
@@ -111,26 +130,31 @@ export const SmartText: React.FC<SmartTextProps> = ({
 
         setFontSize(optimal);
         setIsReady(true);
-    }, [value, autoFit, safeMax, safeMin, fontFamily, fontWeight, lineHeight, letterSpacing, minContainerHeight, minContainerWidth, overflowBehavior]);
+    }, [value, autoFit, safeMax, safeMin, fontFamily, fontWeight, lineHeight, letterSpacing, minContainerHeight, minContainerWidth, overflowBehavior, fitStrategy]);
 
     // --- PASS 2: REALITY CHECK (Validation) ---
+    // Respects fitStrategy - only checks overflow for constrained dimensions
     useLayoutEffect(() => {
         if (!autoFit || !textareaRef.current) return;
-        
+
         const el = textareaRef.current;
-        
+
         const checkOverflow = () => {
-             // RELAXED TOLERANCE:
-             // Allow 2px of overflow before panicking. This handles sub-pixel rendering and 
-             // browser zoom levels much better than strict equality.
-             const overflowY = el.scrollHeight > (el.clientHeight + 2);
-             const overflowX = el.scrollWidth > (el.clientWidth + 2);
-             return overflowY || overflowX;
+            // RELAXED TOLERANCE: Allow 2px for sub-pixel rendering
+            const overflowY = el.scrollHeight > (el.clientHeight + 2);
+            const overflowX = el.scrollWidth > (el.clientWidth + 2);
+
+            // Strategy-aware overflow check
+            if (fitStrategy === 'width-only') {
+                return overflowX;  // Only care about width overflow
+            } else if (fitStrategy === 'height-only') {
+                return overflowY;  // Only care about height overflow
+            }
+            return overflowY || overflowX;  // Default: both
         };
 
         if (checkOverflow() && fontSize > safeMin) {
             let currentSize = fontSize;
-            // Cap iterations - balanced for correction without over-shrinking
             for (let i = 0; i < 8; i++) {
                 if (currentSize <= safeMin) break;
                 currentSize -= 1;
@@ -141,7 +165,7 @@ export const SmartText: React.FC<SmartTextProps> = ({
                 }
             }
         }
-    }, [fontSize, value, autoFit, safeMin, fontFamily, fontWeight, lineHeight]);
+    }, [fontSize, value, autoFit, safeMin, fontFamily, fontWeight, lineHeight, fitStrategy]);
 
     // --- RESIZE OBSERVER ---
     useEffect(() => {
@@ -186,7 +210,7 @@ export const SmartText: React.FC<SmartTextProps> = ({
     return (
         <div 
             ref={wrapperRef} 
-            className={`w-full ${autoFit ? 'h-full relative overflow-hidden' : ''}`}
+            className={`w-full ${autoFit ? 'h-full relative' : ''}`}
         >
             {autoFit && (
                 <div 

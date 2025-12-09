@@ -48,6 +48,7 @@ export const EditableTitle = ({
             minContainerHeight={config.minContainerHeight}
             minContainerWidth={config.minContainerWidth}
             overflowBehavior={config.overflow}
+            fitStrategy={config.fitStrategy}
             className={`font-bold relative ${className}`}
             style={{
                 fontFamily: theme.fonts.heading,
@@ -103,6 +104,7 @@ export const EditableContent = ({
                             minFontSize={config.minFontSize}
                             minContainerHeight={config.minContainerHeight}
                             overflowBehavior={config.overflow}
+                            fitStrategy={config.fitStrategy}
                             className="w-full bg-transparent outline-none"
                             style={{
                                 fontFamily: theme.fonts.body,
@@ -138,14 +140,14 @@ export const MagazineLayout = ({
                 {titleNode}
             </div>
             
-            <div 
+            <div
                 className={`
-                    relative flex flex-col md:flex-row gap-8 md:items-end max-w-4xl 
-                    backdrop-blur-xl bg-white/10 p-6 rounded-lg border border-white/10 
-                    shadow-2xl pointer-events-auto shrink-0 max-h-[50%] overflow-hidden
+                    relative flex flex-col md:flex-row gap-8 md:items-end max-w-4xl
+                    backdrop-blur-xl bg-white/10 p-6 rounded-lg border border-white/10
+                    shadow-2xl pointer-events-auto shrink-0 overflow-visible
                     ${alignRight ? 'mr-4 md:mr-12 md:flex-row-reverse' : 'ml-4 md:ml-12'}
                 `}
-                style={{ zIndex: LayoutLayer.CONTENT_HERO }} 
+                style={{ zIndex: LayoutLayer.CONTENT_HERO }}
             >
                 {contentNode}
                 {footerNode && (

@@ -9,6 +9,8 @@
 
 export type TextRole = 'headline' | 'subhead' | 'body' | 'caption';
 
+export type FitStrategy = 'fit-both' | 'width-only' | 'height-only';
+
 export interface TextRoleConfig {
     minFontSize: number;        // Floor - never shrink below this
     maxFontSize: number;        // Ceiling - start binary search here
@@ -16,40 +18,45 @@ export interface TextRoleConfig {
     minContainerWidth: number;  // Guarantee this horizontal space
     lineHeight: number;         // For consistent spacing
     overflow: 'visible' | 'hidden' | 'clip';
+    fitStrategy: FitStrategy;   // How binary search constrains: width-only ignores height
 }
 
 /**
  * Role-based text configuration
  *
- * Headlines: Large floor (64px), visible overflow - IMPACT over fitting
- * Subhead: Medium floor (40px), visible overflow
- * Body: Lower floor (16px), can shrink more but guaranteed minimum space
- * Caption: Smallest floor (12px), hidden overflow
+ * All roles use fit-both strategy with tuned min/max values:
+ * - Headlines: 48-100px (impactful but readable)
+ * - Subhead: 32-72px
+ * - Body: 16-32px
+ * - Caption: 12-24px
  */
 export const WABI_SABI_TEXT: Record<TextRole, TextRoleConfig> = {
     headline: {
-        minFontSize: 64,         // Large floor - headlines stay impactful
-        maxFontSize: 200,        // Can be huge if space allows
-        minContainerHeight: 80,  // Guarantees headline visibility
+        minFontSize: 48,          // Impact floor - won't shrink below this
+        maxFontSize: 100,         // Reasonable ceiling - readable even at max
+        minContainerHeight: 80,
         minContainerWidth: 200,
-        lineHeight: 1.0,
-        overflow: 'visible'      // Never hide headline text
+        lineHeight: 0.95,         // Tighter for impact
+        overflow: 'visible',      // Edge cases overflow gracefully
+        fitStrategy: 'fit-both'   // Balanced scaling
     },
     subhead: {
-        minFontSize: 40,
-        maxFontSize: 100,
-        minContainerHeight: 60,
+        minFontSize: 32,
+        maxFontSize: 72,
+        minContainerHeight: 50,
         minContainerWidth: 150,
         lineHeight: 1.1,
-        overflow: 'visible'
+        overflow: 'visible',
+        fitStrategy: 'fit-both'
     },
     body: {
-        minFontSize: 16,         // Body CAN shrink more
-        maxFontSize: 36,
-        minContainerHeight: 30,  // But guaranteed to show
+        minFontSize: 16,
+        maxFontSize: 32,
+        minContainerHeight: 35,
         minContainerWidth: 100,
         lineHeight: 1.4,
-        overflow: 'hidden'
+        overflow: 'visible',      // Never clip body text
+        fitStrategy: 'fit-both'
     },
     caption: {
         minFontSize: 12,
@@ -57,7 +64,8 @@ export const WABI_SABI_TEXT: Record<TextRole, TextRoleConfig> = {
         minContainerHeight: 20,
         minContainerWidth: 80,
         lineHeight: 1.3,
-        overflow: 'hidden'
+        overflow: 'visible',
+        fitStrategy: 'fit-both'
     }
 };
 
@@ -92,5 +100,6 @@ export function getTextConfigWithOverrides(
         minContainerWidth: overrides?.minContainerWidth ?? base.minContainerWidth,
         lineHeight: overrides?.lineHeight ?? base.lineHeight,
         overflow: overrides?.overflow ?? base.overflow,
+        fitStrategy: overrides?.fitStrategy ?? base.fitStrategy,
     };
 }
