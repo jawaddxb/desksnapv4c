@@ -1,22 +1,35 @@
 
 import React, { useState } from 'react';
-import { Slide, TextStyleOverride } from '../types';
+import { Slide, TextStyleOverride, ToneType, ContentRefinementType, ImageStylePreset } from '../types';
 import {
     Columns, Maximize2, Type, LayoutTemplate,
     AlignLeft, AlignCenter, AlignRight,
     Type as TypeIcon, CaseSensitive, Check,
     Smartphone, Square, Rows,
-    Bold, Italic, Plus, Minus, Image as ImageIcon
+    Bold, Italic, Plus, Minus, Image as ImageIcon,
+    Sparkles, MessageSquare, Wand2, ChevronRight, ChevronLeft, Loader2
 } from 'lucide-react';
 
 interface LayoutToolbarProps {
     slide: Slide;
     onUpdateSlide: (updates: Partial<Slide>) => void;
     mode?: 'standard' | 'wabi-sabi';
+    onRefineContent?: (type: 'tone' | 'content', subType: string) => Promise<void>;
+    onEnhanceImage?: (preset: ImageStylePreset) => Promise<void>;
+    isRefining?: boolean;
 }
 
-export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSlide, mode = 'standard' }) => {
+export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
+    slide,
+    onUpdateSlide,
+    mode = 'standard',
+    onRefineContent,
+    onEnhanceImage,
+    isRefining = false
+}) => {
     const [activeLabel, setActiveLabel] = useState<string>(mode === 'wabi-sabi' ? "Text Styling" : "Layout Designer");
+    const [isAIMenuOpen, setIsAIMenuOpen] = useState(false);
+    const [activeAISubmenu, setActiveAISubmenu] = useState<'tone' | 'content' | 'visual' | null>(null);
     const isWabiSabi = mode === 'wabi-sabi';
 
     const handleUpdate = (updates: Partial<Slide>) => {
@@ -114,6 +127,34 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSli
     );
 
     const Divider = () => <div className="w-px h-6 bg-zinc-200 mx-1" />;
+
+    const FilterSlider = ({
+        label,
+        value,
+        min,
+        max,
+        onChange
+    }: {
+        label: string;
+        value: number;
+        min: number;
+        max: number;
+        onChange: (v: number) => void;
+    }) => (
+        <div className="flex items-center gap-2">
+            <span className="text-[10px] text-zinc-500 w-16">{label}</span>
+            <input
+                type="range"
+                min={min}
+                max={max}
+                step={0.05}
+                value={value}
+                onChange={(e) => onChange(parseFloat(e.target.value))}
+                className="flex-1 h-1 bg-zinc-200 rounded-full appearance-none cursor-pointer accent-zinc-900"
+            />
+            <span className="text-[10px] text-zinc-400 w-8 text-right">{Math.round(value * 100)}%</span>
+        </div>
+    );
 
     return (
         // Z-Index boosted to 200 to sit above Content Layers
@@ -271,6 +312,153 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSli
                             label="Increase Image Opacity"
                         />
                     </div>
+                )}
+
+                {/* AI REFINEMENT MENU */}
+                {(onRefineContent || onEnhanceImage) && (
+                    <>
+                        <Divider />
+                        <div className="relative">
+                            <Button
+                                active={isAIMenuOpen}
+                                onClick={() => { setIsAIMenuOpen(!isAIMenuOpen); setActiveAISubmenu(null); }}
+                                icon={Sparkles}
+                                label="AI Refinement"
+                            />
+
+                            {/* Dropdown Menu */}
+                            {isAIMenuOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-[199]" onClick={() => { setIsAIMenuOpen(false); setActiveAISubmenu(null); }} />
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 bg-white border border-zinc-200 shadow-2xl rounded-xl overflow-hidden z-[201] animate-in fade-in zoom-in-95 duration-200 origin-bottom">
+
+                                        {/* Loading Overlay */}
+                                        {isRefining && (
+                                            <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10 rounded-xl">
+                                                <Loader2 className="w-5 h-5 animate-spin text-zinc-400" />
+                                            </div>
+                                        )}
+
+                                        {/* Main Menu */}
+                                        {!activeAISubmenu && (
+                                            <div className="p-2">
+                                                <button onClick={() => setActiveAISubmenu('tone')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-50 transition-colors">
+                                                    <MessageSquare className="w-4 h-4 text-zinc-400" />
+                                                    <div className="text-left flex-1">
+                                                        <div className="text-xs font-bold text-zinc-900">Adjust Tone</div>
+                                                        <div className="text-[10px] text-zinc-400">Professional, Casual, Executive...</div>
+                                                    </div>
+                                                    <ChevronRight className="w-3 h-3 text-zinc-300" />
+                                                </button>
+                                                <button onClick={() => setActiveAISubmenu('content')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-50 transition-colors">
+                                                    <Wand2 className="w-4 h-4 text-zinc-400" />
+                                                    <div className="text-left flex-1">
+                                                        <div className="text-xs font-bold text-zinc-900">Refine Content</div>
+                                                        <div className="text-[10px] text-zinc-400">Expand, Simplify, Clarify...</div>
+                                                    </div>
+                                                    <ChevronRight className="w-3 h-3 text-zinc-300" />
+                                                </button>
+                                                {slide.imageUrl && (
+                                                    <button onClick={() => setActiveAISubmenu('visual')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-50 transition-colors">
+                                                        <ImageIcon className="w-4 h-4 text-zinc-400" />
+                                                        <div className="text-left flex-1">
+                                                            <div className="text-xs font-bold text-zinc-900">Enhance Visual</div>
+                                                            <div className="text-[10px] text-zinc-400">Filters & Style Presets</div>
+                                                        </div>
+                                                        <ChevronRight className="w-3 h-3 text-zinc-300" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Tone Submenu */}
+                                        {activeAISubmenu === 'tone' && (
+                                            <div className="p-2">
+                                                <button onClick={() => setActiveAISubmenu(null)} className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-600">
+                                                    <ChevronLeft className="w-3 h-3" /> Back
+                                                </button>
+                                                {(['professional', 'casual', 'technical', 'persuasive', 'executive'] as ToneType[]).map(tone => (
+                                                    <button
+                                                        key={tone}
+                                                        onClick={() => { onRefineContent?.('tone', tone); setIsAIMenuOpen(false); setActiveAISubmenu(null); }}
+                                                        className="w-full px-3 py-2 text-left text-xs font-medium text-zinc-700 rounded-lg hover:bg-zinc-50 capitalize"
+                                                    >
+                                                        {tone}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Content Submenu */}
+                                        {activeAISubmenu === 'content' && (
+                                            <div className="p-2">
+                                                <button onClick={() => setActiveAISubmenu(null)} className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-600">
+                                                    <ChevronLeft className="w-3 h-3" /> Back
+                                                </button>
+                                                {(['expand', 'simplify', 'clarify', 'storytelling'] as ContentRefinementType[]).map(type => (
+                                                    <button
+                                                        key={type}
+                                                        onClick={() => { onRefineContent?.('content', type); setIsAIMenuOpen(false); setActiveAISubmenu(null); }}
+                                                        className="w-full px-3 py-2 text-left text-xs font-medium text-zinc-700 rounded-lg hover:bg-zinc-50 capitalize"
+                                                    >
+                                                        {type === 'storytelling' ? 'Add Storytelling' : type.charAt(0).toUpperCase() + type.slice(1)}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Visual Submenu */}
+                                        {activeAISubmenu === 'visual' && (
+                                            <div className="p-2">
+                                                <button onClick={() => setActiveAISubmenu(null)} className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-600">
+                                                    <ChevronLeft className="w-3 h-3" /> Back
+                                                </button>
+
+                                                {/* CSS Filter Sliders */}
+                                                <div className="px-3 py-2 space-y-3 border-b border-zinc-100 mb-2">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Filters</label>
+                                                    <FilterSlider
+                                                        label="Brightness"
+                                                        value={slide.imageStyles?.brightness ?? 1}
+                                                        min={0.5}
+                                                        max={1.5}
+                                                        onChange={(v) => handleUpdate({ imageStyles: { ...slide.imageStyles, brightness: v } })}
+                                                    />
+                                                    <FilterSlider
+                                                        label="Contrast"
+                                                        value={slide.imageStyles?.contrast ?? 1}
+                                                        min={0.5}
+                                                        max={1.5}
+                                                        onChange={(v) => handleUpdate({ imageStyles: { ...slide.imageStyles, contrast: v } })}
+                                                    />
+                                                    <FilterSlider
+                                                        label="Saturation"
+                                                        value={slide.imageStyles?.saturation ?? 1}
+                                                        min={0}
+                                                        max={2}
+                                                        onChange={(v) => handleUpdate({ imageStyles: { ...slide.imageStyles, saturation: v } })}
+                                                    />
+                                                </div>
+
+                                                {/* AI Style Presets */}
+                                                <label className="px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-400 block mb-2">AI Style Presets</label>
+                                                {(['vivid', 'muted', 'high-contrast', 'soft'] as ImageStylePreset[]).map(preset => (
+                                                    <button
+                                                        key={preset}
+                                                        onClick={() => { onEnhanceImage?.(preset); setIsAIMenuOpen(false); setActiveAISubmenu(null); }}
+                                                        className="w-full px-3 py-2 text-left text-xs font-medium text-zinc-700 rounded-lg hover:bg-zinc-50 capitalize flex items-center gap-2"
+                                                    >
+                                                        <Sparkles className="w-3 h-3 text-purple-400" />
+                                                        {preset.replace('-', ' ')}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
 

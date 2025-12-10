@@ -3,6 +3,10 @@
  *
  * Runs the agentic loop where the LLM decides what tools to call
  * to help the user build their ideation canvas.
+ *
+ * MULTI-TURN ARCHITECTURE:
+ * This loop continues calling Gemini until the AI is done making decisions.
+ * Tool results are fed back so the AI can see research results and create notes.
  */
 
 import { GoogleGenAI, Content, Part, FunctionCall } from '@google/genai';
@@ -38,7 +42,12 @@ export interface ProcessedToolCall {
 export type ToolExecutor = (tool: string, args: Record<string, unknown>) => Promise<unknown>;
 
 /**
- * Run the agentic loop
+ * Run the agentic loop with multi-turn continuation
+ *
+ * This loop continues calling Gemini until:
+ * 1. The AI returns only text (no more tool calls)
+ * 2. The AI calls ask_user (waits for user input)
+ * 3. Max iterations reached (safety limit)
  *
  * @param userMessage - The user's message
  * @param session - Current ideation session state
@@ -51,6 +60,7 @@ export async function runAgentLoop(
   executeTool: ToolExecutor
 ): Promise<AgentResponse> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const MAX_ITERATIONS = 10;
 
   // Build conversation history for Gemini
   const contents: Content[] = session.messages.map(msg => ({
@@ -67,110 +77,200 @@ export async function runAgentLoop(
   // Build the system prompt with current context
   const systemPrompt = buildFullPrompt(session);
 
-  const toolCalls: ProcessedToolCall[] = [];
+  const allToolCalls: ProcessedToolCall[] = [];
   let responseText = '';
   let askUserQuestion: AgentResponse['askUserQuestion'] | undefined;
+  let continueLoop = true;
+  let iterations = 0;
 
   try {
-    // Call Gemini with tool definitions
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents,
-      config: {
-        systemInstruction: systemPrompt,
-        tools: [{ functionDeclarations: COPILOT_TOOLS }],
-        toolConfig: {
-          functionCallingConfig: {
-            mode: 'AUTO', // Let the model decide when to use tools
+    while (continueLoop && iterations < MAX_ITERATIONS) {
+      iterations++;
+      console.log(`[AgentLoop] Iteration ${iterations}/${MAX_ITERATIONS}`);
+
+      // Call Gemini with tool definitions
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.0-flash',
+        contents,
+        config: {
+          systemInstruction: systemPrompt,
+          tools: [{ functionDeclarations: COPILOT_TOOLS }],
+          toolConfig: {
+            functionCallingConfig: {
+              mode: 'AUTO',
+            },
           },
         },
-      },
-    });
+      });
 
-    // Process the response
-    const candidate = response.candidates?.[0];
-    if (!candidate?.content?.parts) {
-      throw new Error('No response from model');
-    }
-
-    // Process each part of the response
-    for (const part of candidate.content.parts) {
-      // Handle text response
-      if (part.text) {
-        responseText += part.text;
+      // Process the response
+      const candidate = response.candidates?.[0];
+      if (!candidate?.content?.parts) {
+        throw new Error('No response from model');
       }
 
-      // Handle function calls
-      if (part.functionCall) {
+      const parts = candidate.content.parts;
+      const functionCallParts = parts.filter(p => p.functionCall);
+      const textParts = parts.filter(p => p.text);
+
+      // Extract any text from this turn
+      for (const part of textParts) {
+        if (part.text) {
+          responseText += part.text;
+        }
+      }
+
+      // If no function calls, the AI is done
+      if (functionCallParts.length === 0) {
+        console.log('[AgentLoop] No more function calls - AI is done');
+        continueLoop = false;
+        break;
+      }
+
+      console.log(`[AgentLoop] Processing ${functionCallParts.length} function calls`);
+
+      // Process function calls
+      const turnToolCalls: ProcessedToolCall[] = [];
+      const functionResponses: Part[] = [];
+      let hitAskUser = false;
+
+      for (const part of functionCallParts) {
         const funcCall = part.functionCall as FunctionCall;
         const toolName = funcCall.name;
         const toolArgs = (funcCall.args || {}) as Record<string, unknown>;
 
-        // Special handling for ask_user - don't execute, just capture
+        console.log(`[AgentLoop] Executing tool: ${toolName}`, toolArgs);
+
+        // Special handling for ask_user - stop the loop and wait for user
         if (toolName === 'ask_user') {
           askUserQuestion = {
             question: toolArgs.question as string,
             options: toolArgs.options as string[] | undefined,
           };
-          toolCalls.push({
+          turnToolCalls.push({
             name: toolName,
             args: toolArgs,
             result: { type: 'ask_user', captured: true },
           });
+          hitAskUser = true;
+          continueLoop = false;
+          // Don't break yet - process remaining function calls in this turn
+          continue;
         }
-        // Special handling for research - needs async web search
-        else if (toolName === 'research') {
-          const researchResult = await performResearch(
+
+        // Special handling for research - perform web search
+        let result: unknown;
+        if (toolName === 'research') {
+          const researchResults = await performResearch(
             toolArgs.query as string,
             toolArgs.purpose as string
           );
-          const result = await executeTool(toolName, {
-            ...toolArgs,
-            results: researchResult,
-          });
-          toolCalls.push({ name: toolName, args: toolArgs, result });
+          result = {
+            success: true,
+            query: toolArgs.query,
+            findings: researchResults.map(r => ({
+              title: r.title,
+              snippet: r.snippet,
+              relevance: r.relevance,
+            })),
+          };
+          // Also call the executor to record the research
+          await executeTool(toolName, { ...toolArgs, results: researchResults });
+        } else {
+          // Execute other tools normally
+          result = await executeTool(toolName, toolArgs);
         }
-        // Execute other tools normally
-        else {
-          const result = await executeTool(toolName, toolArgs);
-          toolCalls.push({ name: toolName, args: toolArgs, result });
-        }
+
+        turnToolCalls.push({ name: toolName, args: toolArgs, result });
+
+        // Build function response for Gemini
+        functionResponses.push({
+          functionResponse: {
+            name: toolName,
+            response: result as object,
+          },
+        } as Part);
+      }
+
+      allToolCalls.push(...turnToolCalls);
+
+      // If we hit ask_user, stop the loop
+      if (hitAskUser) {
+        console.log('[AgentLoop] Hit ask_user - stopping loop');
+        break;
+      }
+
+      // Add the model's response (with function calls) to conversation history
+      contents.push({
+        role: 'model',
+        parts: parts,
+      });
+
+      // Add tool results back to conversation so Gemini can continue
+      if (functionResponses.length > 0) {
+        contents.push({
+          role: 'user',
+          parts: functionResponses,
+        });
+        console.log('[AgentLoop] Fed tool results back to Gemini, continuing...');
       }
     }
 
-    // If there's no text but there were tool calls, generate a follow-up
-    if (!responseText && toolCalls.length > 0 && !askUserQuestion) {
-      // Generate a summary of what was done
-      const toolSummaries = toolCalls.map(tc => {
-        switch (tc.name) {
-          case 'create_note':
-            return `Added a note: "${(tc.args.content as string).slice(0, 50)}..."`;
-          case 'research':
-            return `Researched: ${tc.args.query}`;
-          case 'suggest_structure':
-            return `Suggested structure: ${(tc.args.structure as string[]).join(' → ')}`;
-          case 'mark_ready':
-            return `Marked the deck plan as ready`;
-          default:
-            return `Performed ${tc.name}`;
-        }
-      });
-      responseText = toolSummaries.join('\n\n');
+    if (iterations >= MAX_ITERATIONS) {
+      console.warn('[AgentLoop] Hit max iterations - forcing stop');
+    }
+
+    console.log(`[AgentLoop] Complete. Total tool calls: ${allToolCalls.length}`);
+
+    // If there's no text but there were tool calls, generate a summary
+    if (!responseText && allToolCalls.length > 0 && !askUserQuestion) {
+      const toolSummaries = allToolCalls
+        .filter(tc => tc.name !== 'ask_user')
+        .map(tc => {
+          switch (tc.name) {
+            case 'set_topic':
+              return `Set topic to: "${tc.args.topic}"`;
+            case 'create_note':
+              return `Created note: "${(tc.args.content as string).slice(0, 40)}..."`;
+            case 'research':
+              return `Researched: ${tc.args.query}`;
+            case 'update_note':
+              return `Updated note`;
+            case 'delete_note':
+              return `Deleted note`;
+            case 'connect_notes':
+              return `Connected notes`;
+            case 'move_note':
+              return `Moved note`;
+            case 'suggest_structure':
+              return `Suggested structure`;
+            case 'mark_ready':
+              return `Marked deck as ready`;
+            default:
+              return `Performed ${tc.name}`;
+          }
+        });
+
+      if (toolSummaries.length > 0) {
+        responseText = `Here's what I did:\n\n${toolSummaries.join('\n')}`;
+      }
     }
   } catch (error) {
-    console.error('Agent loop error:', error);
+    console.error('[AgentLoop] Error:', error);
     responseText = "I encountered an issue processing your request. Let me try a different approach - could you tell me more about what you'd like to create?";
   }
 
   // CRITICAL: If AI didn't call ask_user, inject a fallback question
-  // This prevents the conversation from stalling
   if (!askUserQuestion) {
-    askUserQuestion = generateFallbackQuestion(session.stage, session.notes.length, toolCalls.length > 0);
+    // Count notes created in this run
+    const notesCreated = allToolCalls.filter(tc => tc.name === 'create_note').length;
+    const totalNotes = session.notes.length + notesCreated;
+    askUserQuestion = generateFallbackQuestion(session.stage, totalNotes, allToolCalls.length > 0);
   }
 
   return {
     text: responseText,
-    toolCalls,
+    toolCalls: allToolCalls,
     askUserQuestion,
   };
 }
@@ -188,7 +288,7 @@ function generateFallbackQuestion(
   if (hadToolCalls) {
     if (noteCount >= 4) {
       return {
-        question: "I've made some updates. What would you like to do next?",
+        question: "Got it! How should we continue?",
         options: ["Build the deck now!", "Add more content", "Research more facts", "Let me review"]
       };
     }
@@ -202,7 +302,7 @@ function generateFallbackQuestion(
   if (noteCount === 0) {
     return {
       question: "Let's explore your idea. How would you like to start?",
-      options: ["Tell me more details", "🎤 Let me explain verbally", "Just create a draft", "Research my topic first"]
+      options: ["Tell me more details", "Just create a draft", "Research my topic first"]
     };
   }
 
@@ -259,9 +359,10 @@ Be factual and cite real or realistic sources. Return ONLY valid JSON array.`,
     if (!text) return [];
 
     const results = JSON.parse(text) as ResearchResult[];
+    console.log(`[Research] Found ${results.length} results for: ${query}`);
     return results;
   } catch (error) {
-    console.error('Research error:', error);
+    console.error('[Research] Error:', error);
     return [];
   }
 }

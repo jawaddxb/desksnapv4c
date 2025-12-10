@@ -1,10 +1,10 @@
 
 
 import React from 'react';
-import { Slide, Theme, Presentation } from '../types';
+import { Slide, Theme, Presentation, ImageStylePreset } from '../types';
 import { RotateCw, Wand2, Layers } from 'lucide-react';
 import { WabiSabiStage } from './WabiSabiStage';
-import { 
+import {
     SplitLayout, FullBleedLayout, StatementLayout, GalleryLayout,
     CardLayout, HorizontalLayout, MagazineLayout
 } from './StandardLayouts';
@@ -21,6 +21,10 @@ interface MainStageProps {
   onUpdateSlide?: (updates: Partial<Slide>) => void;
   printMode?: boolean;
   viewMode?: 'standard' | 'wabi-sabi';
+  // AI Refinement Props
+  onRefineContent?: (type: 'tone' | 'content', subType: string) => Promise<void>;
+  onEnhanceImage?: (preset: ImageStylePreset) => Promise<void>;
+  isRefining?: boolean;
   // Dashboard Props
   savedDecks?: Presentation[];
   onLoadDeck?: (id: string) => void;
@@ -39,6 +43,9 @@ export const MainStage: React.FC<MainStageProps> = ({
     onUpdateSlide,
     printMode = false,
     viewMode = 'standard',
+    onRefineContent,
+    onEnhanceImage,
+    isRefining = false,
     savedDecks = [],
     onLoadDeck,
     onDeleteDeck,
@@ -102,7 +109,13 @@ export const MainStage: React.FC<MainStageProps> = ({
 
         {/* Floating Toolbar (Only visible in Standard edit mode) */}
         {!printMode && onUpdateSlide && viewMode === 'standard' && (
-            <LayoutToolbar slide={slide} onUpdateSlide={onUpdateSlide} />
+            <LayoutToolbar
+                slide={slide}
+                onUpdateSlide={onUpdateSlide}
+                onRefineContent={onRefineContent}
+                onEnhanceImage={onEnhanceImage}
+                isRefining={isRefining}
+            />
         )}
 
         {/* Action Buttons (Only visible in edit mode) */}

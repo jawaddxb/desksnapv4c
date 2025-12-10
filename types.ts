@@ -10,7 +10,15 @@ export interface TextStyleOverride {
 export interface ImageStyleOverride {
   opacity?: number;
   objectFit?: 'cover' | 'contain' | 'fill';
+  brightness?: number;   // 0.5-1.5, default 1
+  contrast?: number;     // 0.5-1.5, default 1
+  saturation?: number;   // 0-2, default 1
 }
+
+// AI Refinement types
+export type ToneType = 'professional' | 'casual' | 'technical' | 'persuasive' | 'executive';
+export type ContentRefinementType = 'expand' | 'simplify' | 'clarify' | 'storytelling';
+export type ImageStylePreset = 'vivid' | 'muted' | 'high-contrast' | 'soft';
 
 export interface Slide {
   id: string;

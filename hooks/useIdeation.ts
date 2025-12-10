@@ -409,9 +409,35 @@ export function useIdeation(): UseIdeationReturn {
       }
 
       case 'research': {
-        // Research is handled by the agent service
-        // This just acknowledges the request
-        return { type: 'research', ...args };
+        // Research results are passed in by the agent service
+        const { query, results } = args as {
+          query: string;
+          results?: Array<{
+            title: string;
+            snippet: string;
+            url?: string;
+            relevance?: string;
+          }>;
+        };
+
+        // Create notes from research findings if results provided
+        if (results && results.length > 0) {
+          for (const result of results.slice(0, 3)) {
+            addNote(result.snippet, 3, { // Column 3 = Proof
+              type: 'research',
+              color: 'green',
+              sourceUrl: result.url,
+              sourceTitle: result.title,
+              approved: true,
+            });
+          }
+        }
+
+        return {
+          success: true,
+          query,
+          resultsCount: results?.length ?? 0,
+        };
       }
 
       default:

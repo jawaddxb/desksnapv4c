@@ -1,0 +1,202 @@
+import React from 'react';
+import { Check } from 'lucide-react';
+import { ArchetypeInfo } from '../lib/archetypeCategories';
+
+interface ArchetypeCardProps {
+  archetype: ArchetypeInfo;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+export const ArchetypeCard: React.FC<ArchetypeCardProps> = ({
+  archetype,
+  isActive,
+  onClick
+}) => {
+  const [color1, color2] = archetype.previewColors;
+
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        relative group flex flex-col items-center justify-center
+        w-full aspect-square rounded-xl transition-all duration-200 overflow-hidden
+        ${isActive
+          ? 'ring-2 ring-zinc-900 ring-offset-2'
+          : 'hover:scale-105 hover:shadow-lg'}
+      `}
+      title={archetype.description}
+    >
+      {/* Mini Slide Thumbnail Preview */}
+      <div
+        className="absolute inset-0 flex flex-col"
+        style={{
+          background: `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`
+        }}
+      >
+        {/* Mini slide content simulation */}
+        <div className="flex-1 p-2 flex flex-col justify-center">
+          {/* Title bar placeholder */}
+          <div
+            className="h-1.5 w-3/4 rounded-full mb-1.5 opacity-80"
+            style={{
+              backgroundColor: getContrastColor(color1)
+            }}
+          />
+          {/* Content lines placeholder */}
+          <div
+            className="h-1 w-full rounded-full mb-1 opacity-40"
+            style={{
+              backgroundColor: getContrastColor(color1)
+            }}
+          />
+          <div
+            className="h-1 w-2/3 rounded-full opacity-40"
+            style={{
+              backgroundColor: getContrastColor(color1)
+            }}
+          />
+        </div>
+
+        {/* Decorative element based on archetype style */}
+        <ArchetypeDecoration archetypeId={archetype.id} color1={color1} color2={color2} />
+      </div>
+
+      {/* Label overlay */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2 pt-4">
+        <span className="text-[9px] font-bold uppercase tracking-wider text-white truncate block text-center drop-shadow-sm">
+          {archetype.name}
+        </span>
+      </div>
+
+      {/* Active checkmark */}
+      {isActive && (
+        <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-zinc-900 text-white rounded-full flex items-center justify-center shadow-lg">
+          <Check className="w-3 h-3" strokeWidth={3} />
+        </div>
+      )}
+
+      {/* Hover overlay */}
+      <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
+    </button>
+  );
+};
+
+// Helper to get contrasting text color
+function getContrastColor(bgColor: string): string {
+  // Simple check - if it starts with a dark hex or contains dark keywords
+  if (bgColor.includes('rgba')) return '#ffffff';
+  if (bgColor.startsWith('#')) {
+    const hex = bgColor.slice(1);
+    if (hex.length >= 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.5 ? '#18181b' : '#ffffff';
+    }
+  }
+  return '#ffffff';
+}
+
+// Decorative elements that hint at the archetype style
+const ArchetypeDecoration: React.FC<{ archetypeId: string; color1: string; color2: string }> = ({
+  archetypeId,
+  color1,
+  color2
+}) => {
+  const contrastColor = getContrastColor(color1);
+
+  // Different decorations for different archetype styles
+  switch (archetypeId) {
+    case 'Bauhaus':
+    case 'Constructivist':
+      return (
+        <div className="absolute bottom-2 right-2 w-4 h-4 rounded-full opacity-60" style={{ backgroundColor: contrastColor }} />
+      );
+
+    case 'Swiss':
+    case 'SwissGrid':
+    case 'Neue':
+      return (
+        <div className="absolute inset-2 border opacity-20" style={{ borderColor: contrastColor }} />
+      );
+
+    case 'Bento':
+      return (
+        <div className="absolute bottom-2 right-2 grid grid-cols-2 gap-0.5 opacity-40">
+          <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: contrastColor }} />
+          <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: contrastColor }} />
+          <div className="w-2 h-4 rounded-sm col-span-2" style={{ backgroundColor: contrastColor }} />
+        </div>
+      );
+
+    case 'Terminal':
+    case 'CyberDeck':
+      return (
+        <div className="absolute bottom-2 left-2 text-[6px] font-mono opacity-60" style={{ color: contrastColor }}>
+          {'> _'}
+        </div>
+      );
+
+    case 'Neon':
+    case 'Aurora':
+    case 'Hologram':
+      return (
+        <div
+          className="absolute bottom-0 left-0 right-0 h-6 opacity-50"
+          style={{
+            background: `linear-gradient(90deg, ${color1}, ${color2}, ${color1})`
+          }}
+        />
+      );
+
+    case 'Kintsugi':
+      return (
+        <div className="absolute bottom-3 right-3">
+          <div className="w-3 h-px rotate-45 opacity-80" style={{ backgroundColor: '#d4af37' }} />
+        </div>
+      );
+
+    case 'Cinematic':
+    case 'Noir':
+      return (
+        <>
+          <div className="absolute top-0 left-0 right-0 h-2 bg-black opacity-80" />
+          <div className="absolute bottom-6 left-0 right-0 h-2 bg-black opacity-80" />
+        </>
+      );
+
+    case 'Memphis':
+    case 'Pop':
+      return (
+        <div className="absolute top-2 right-2 flex gap-0.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+          <div className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+        </div>
+      );
+
+    case 'Circuit':
+      return (
+        <div className="absolute bottom-2 right-2 opacity-40">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M0 8h6M10 8h6M8 0v6M8 10v6" stroke={contrastColor} strokeWidth="0.5" />
+            <circle cx="8" cy="8" r="2" stroke={contrastColor} strokeWidth="0.5" fill="none" />
+          </svg>
+        </div>
+      );
+
+    case 'Schematic':
+      return (
+        <div className="absolute bottom-2 right-2 opacity-40">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="1" width="14" height="14" stroke={contrastColor} strokeWidth="0.5" strokeDasharray="2 1" fill="none" />
+          </svg>
+        </div>
+      );
+
+    default:
+      return null;
+  }
+};

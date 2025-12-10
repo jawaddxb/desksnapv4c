@@ -3862,3 +3862,2089 @@ export const ViennaArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, o
         </div>
     );
 };
+
+// ============================================================================
+// CULTURAL HERITAGE ARCHETYPES (8 archetypes)
+// ============================================================================
+
+// 1. MUGHAL - Indian royal court aesthetic with jewel tones and jali patterns
+export const MughalArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const mughal = {
+        emerald: '#046307',
+        ruby: '#9b1b30',
+        gold: '#d4af37',
+        ivory: '#fffff0',
+        sapphire: '#0f52ba'
+    };
+    const accentColor = rng.pick([mughal.emerald, mughal.ruby, mughal.sapphire]);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: mughal.ivory }}>
+            {/* Jali (lattice) pattern overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-5 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="jali" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                        <path d="M30 0 L60 30 L30 60 L0 30 Z" fill="none" stroke={mughal.gold} strokeWidth="1" />
+                        <circle cx="30" cy="30" r="8" fill="none" stroke={mughal.gold} strokeWidth="1" />
+                        <circle cx="30" cy="30" r="4" fill={mughal.gold} />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#jali)" />
+            </svg>
+
+            {/* Gold filigree border */}
+            <div className="absolute inset-6 border-2 pointer-events-none" style={{ borderColor: mughal.gold, zIndex: LayoutLayer.DECORATION }}>
+                <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4" style={{ borderColor: accentColor }} />
+                <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4" style={{ borderColor: accentColor }} />
+                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4" style={{ borderColor: accentColor }} />
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4" style={{ borderColor: accentColor }} />
+            </div>
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Arch-framed image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="relative w-full aspect-[3/4] overflow-hidden" style={{
+                        borderRadius: '50% 50% 0 0 / 30% 30% 0 0',
+                        border: `4px solid ${mughal.gold}`,
+                        boxShadow: `0 0 0 2px ${accentColor}, 0 8px 32px rgba(0,0,0,0.2)`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                    {/* Paisley decoration */}
+                    <svg className="absolute -bottom-4 -right-4 w-16 h-16" viewBox="0 0 100 100" style={{ zIndex: LayoutLayer.OVERLAY }}>
+                        <path d="M50 10 C80 10, 90 50, 50 90 C10 50, 20 10, 50 10" fill={mughal.gold} opacity="0.8" />
+                        <circle cx="50" cy="50" r="15" fill={accentColor} />
+                    </svg>
+                </div>
+
+                {/* Content */}
+                <div className="w-3/5 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-3 h-3 rotate-45" style={{ background: mughal.gold }} />
+                        <div className="w-3 h-3 rotate-45" style={{ background: accentColor }} />
+                        <div className="w-3 h-3 rotate-45" style={{ background: mughal.gold }} />
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: '#1a1a1a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 600, lineHeight: '1.1' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#3a3a3a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    <div className="flex items-center gap-3 mt-8">
+                        <div className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${mughal.gold}, transparent)` }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 2. ANKARA - West African wax print textile with bold geometric patterns
+export const AnkaraArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const ankara = {
+        orange: '#ff6b35',
+        yellow: '#f7c531',
+        blue: '#004e89',
+        green: '#2e7d32',
+        red: '#c62828',
+        black: '#1a1a1a'
+    };
+    const primary = rng.pick([ankara.orange, ankara.blue, ankara.green]);
+    const secondary = rng.pick([ankara.yellow, ankara.red]);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: ankara.black }}>
+            {/* Bold geometric pattern background */}
+            <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="ankara-pattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                        <circle cx="40" cy="40" r="35" fill="none" stroke={primary} strokeWidth="4" />
+                        <circle cx="40" cy="40" r="25" fill="none" stroke={secondary} strokeWidth="3" />
+                        <circle cx="40" cy="40" r="15" fill={primary} />
+                        <rect x="0" y="38" width="80" height="4" fill={secondary} />
+                        <rect x="38" y="0" width="4" height="80" fill={secondary} />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#ankara-pattern)" />
+            </svg>
+
+            {/* Vibrant accent bars */}
+            <div className="absolute left-0 top-0 w-3 h-full" style={{ background: primary, zIndex: LayoutLayer.DECORATION }} />
+            <div className="absolute right-0 top-0 w-3 h-full" style={{ background: secondary, zIndex: LayoutLayer.DECORATION }} />
+
+            <div className="w-full h-full p-10 md:p-16 flex flex-col justify-center">
+                {/* Top color band */}
+                <div className="flex gap-2 mb-8" style={{ zIndex: LayoutLayer.DECORATION }}>
+                    <div className="h-2 flex-1" style={{ background: primary }} />
+                    <div className="h-2 w-16" style={{ background: secondary }} />
+                    <div className="h-2 flex-1" style={{ background: primary }} />
+                </div>
+
+                <div className="flex items-center gap-10">
+                    {/* Circular image with patterned border */}
+                    <div className="w-1/3 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                        <div className="absolute -inset-3 rounded-full" style={{
+                            background: `conic-gradient(from 0deg, ${primary}, ${secondary}, ${primary}, ${secondary}, ${primary})`,
+                            opacity: 0.8
+                        }} />
+                        <div className="relative w-full aspect-square rounded-full overflow-hidden" style={{
+                            border: `6px solid ${ankara.black}`
+                        }}>
+                            <ImageContainer slide={slide} theme={theme} />
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                        <EditableTitle
+                            slide={slide} theme={theme} contrast={{ text: '#ffffff' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                            className="text-5xl md:text-6xl lg:text-7xl mb-6 uppercase tracking-wide"
+                            style={{ fontWeight: 900, lineHeight: '1.0', textShadow: `3px 3px 0 ${primary}` }}
+                        />
+
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: '#e0e0e0' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.8' }} />
+                    </div>
+                </div>
+
+                {/* Bottom color band */}
+                <div className="flex gap-2 mt-8" style={{ zIndex: LayoutLayer.DECORATION }}>
+                    <div className="h-2 w-24" style={{ background: secondary }} />
+                    <div className="h-2 flex-1" style={{ background: primary }} />
+                    <div className="h-2 w-24" style={{ background: secondary }} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 3. TALAVERA - Mexican ceramic tile aesthetic with cobalt blue and terracotta
+export const TalaveraArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const talavera = {
+        cobalt: '#0047ab',
+        terracotta: '#e2725b',
+        yellow: '#ffd700',
+        cream: '#faf6e9',
+        green: '#228b22'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: talavera.cream }}>
+            {/* Tile pattern border */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="talavera-tile" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+                        <rect width="50" height="50" fill={talavera.cream} />
+                        <circle cx="25" cy="25" r="20" fill="none" stroke={talavera.cobalt} strokeWidth="2" />
+                        <path d="M25 5 L25 15 M25 35 L25 45 M5 25 L15 25 M35 25 L45 25" stroke={talavera.terracotta} strokeWidth="2" />
+                        <circle cx="25" cy="25" r="8" fill={talavera.cobalt} />
+                        <circle cx="25" cy="25" r="4" fill={talavera.yellow} />
+                    </pattern>
+                </defs>
+                <rect x="0" y="0" width="100%" height="40" fill="url(#talavera-tile)" opacity="0.4" />
+                <rect x="0" y="calc(100% - 40px)" width="100%" height="40" fill="url(#talavera-tile)" opacity="0.4" />
+            </svg>
+
+            {/* Hand-painted style border */}
+            <div className="absolute inset-8 border-4 pointer-events-none" style={{
+                borderColor: talavera.cobalt,
+                borderStyle: 'double',
+                zIndex: LayoutLayer.DECORATION
+            }}>
+                {/* Corner florals */}
+                {['-top-3 -left-3', '-top-3 -right-3', '-bottom-3 -left-3', '-bottom-3 -right-3'].map((pos, i) => (
+                    <div key={i} className={`absolute ${pos} w-6 h-6 rounded-full`} style={{ background: talavera.terracotta, border: `2px solid ${talavera.cobalt}` }} />
+                ))}
+            </div>
+
+            <div className="w-full h-full p-16 md:p-24 flex items-center gap-12">
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Decorative header line */}
+                    <div className="flex items-center gap-2 mb-6">
+                        <div className="w-4 h-4 rotate-45" style={{ background: talavera.terracotta }} />
+                        <div className="h-1 flex-1" style={{ background: talavera.cobalt }} />
+                        <div className="w-4 h-4 rotate-45" style={{ background: talavera.terracotta }} />
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: talavera.cobalt }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 700, lineHeight: '1.1' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#4a4a4a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.8' }} />
+
+                    {/* Decorative footer */}
+                    <div className="flex items-center gap-2 mt-8">
+                        <div className="w-3 h-3 rounded-full" style={{ background: talavera.yellow }} />
+                        <div className="w-3 h-3 rounded-full" style={{ background: talavera.cobalt }} />
+                        <div className="w-3 h-3 rounded-full" style={{ background: talavera.terracotta }} />
+                    </div>
+                </div>
+
+                {/* Scalloped frame image */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4 rounded-lg" style={{
+                        background: talavera.cobalt,
+                        clipPath: 'polygon(5% 0%, 10% 5%, 15% 0%, 20% 5%, 25% 0%, 30% 5%, 35% 0%, 40% 5%, 45% 0%, 50% 5%, 55% 0%, 60% 5%, 65% 0%, 70% 5%, 75% 0%, 80% 5%, 85% 0%, 90% 5%, 95% 0%, 100% 5%, 100% 95%, 95% 100%, 90% 95%, 85% 100%, 80% 95%, 75% 100%, 70% 95%, 65% 100%, 60% 95%, 55% 100%, 50% 95%, 45% 100%, 40% 95%, 35% 100%, 30% 95%, 25% 100%, 20% 95%, 15% 100%, 10% 95%, 5% 100%, 0% 95%, 0% 5%)'
+                    }} />
+                    <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg" style={{
+                        border: `3px solid ${talavera.terracotta}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 4. PERSIAN - Iranian carpet/miniature painting aesthetic with arabesque patterns
+export const PersianArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const persian = {
+        burgundy: '#722f37',
+        gold: '#d4af37',
+        turquoise: '#30d5c8',
+        cream: '#f5f0e1',
+        navy: '#1a2744'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: persian.burgundy }}>
+            {/* Arabesque pattern overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="arabesque" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <path d="M50 0 Q75 25 50 50 Q25 75 50 100 M50 0 Q25 25 50 50 Q75 75 50 100" fill="none" stroke={persian.gold} strokeWidth="1" />
+                        <circle cx="50" cy="50" r="10" fill="none" stroke={persian.gold} strokeWidth="1" />
+                        <path d="M0 50 Q25 25 50 50 Q25 75 0 50 M100 50 Q75 25 50 50 Q75 75 100 50" fill="none" stroke={persian.gold} strokeWidth="1" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#arabesque)" />
+            </svg>
+
+            {/* Multi-layer border frame */}
+            <div className="absolute inset-4 border pointer-events-none" style={{ borderColor: persian.gold, zIndex: LayoutLayer.DECORATION }} />
+            <div className="absolute inset-8 border-2 pointer-events-none" style={{ borderColor: persian.turquoise, zIndex: LayoutLayer.DECORATION }} />
+            <div className="absolute inset-10 border pointer-events-none" style={{ borderColor: persian.gold, zIndex: LayoutLayer.DECORATION }} />
+
+            <div className="w-full h-full p-16 md:p-24 flex flex-col items-center justify-center">
+                {/* Medallion center composition */}
+                <div className="relative w-full max-w-4xl flex items-center gap-12">
+                    {/* Central medallion image */}
+                    <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                        <div className="absolute -inset-6" style={{
+                            background: `radial-gradient(ellipse at center, ${persian.gold} 0%, transparent 70%)`,
+                            opacity: 0.3
+                        }} />
+                        <div className="relative w-full aspect-square overflow-hidden" style={{
+                            borderRadius: '50%',
+                            border: `6px solid ${persian.gold}`,
+                            boxShadow: `0 0 0 3px ${persian.turquoise}, 0 0 0 6px ${persian.gold}`
+                        }}>
+                            <ImageContainer slide={slide} theme={theme} />
+                        </div>
+                    </div>
+
+                    {/* Content panel */}
+                    <div className="flex-1 p-8 relative" style={{
+                        background: persian.cream,
+                        borderRadius: '4px',
+                        border: `2px solid ${persian.gold}`,
+                        zIndex: LayoutLayer.CONTENT_HERO
+                    }}>
+                        <div className="absolute top-2 left-2 right-2 h-px" style={{ background: persian.turquoise }} />
+
+                        <EditableTitle
+                            slide={slide} theme={theme} contrast={{ text: persian.burgundy }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                            className="text-4xl md:text-5xl lg:text-6xl mb-6"
+                            style={{ fontWeight: 600, lineHeight: '1.15' }}
+                        />
+
+                        <EditableContent slide={slide} theme={theme} contrast={{ text: persian.navy }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base" style={{ lineHeight: '1.9' }} />
+
+                        <div className="absolute bottom-2 left-2 right-2 h-px" style={{ background: persian.turquoise }} />
+                    </div>
+                </div>
+
+                {/* Bottom ornament */}
+                <div className="flex items-center gap-4 mt-8" style={{ zIndex: LayoutLayer.DECORATION }}>
+                    <div className="w-16 h-px" style={{ background: persian.gold }} />
+                    <div className="w-4 h-4 rotate-45" style={{ background: persian.turquoise }} />
+                    <div className="w-16 h-px" style={{ background: persian.gold }} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 5. BATIK - Indonesian wax-resist textile with indigo and cream
+export const BatikArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const batik = {
+        indigo: '#1a237e',
+        brown: '#5d4037',
+        cream: '#faf8f0',
+        tan: '#d7ccc8'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: batik.cream }}>
+            {/* Crackle texture overlay */}
+            <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
+                zIndex: LayoutLayer.DECORATION,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 50 Q25 48 50 52 T100 48 T150 55 T200 50' stroke='%231a237e' fill='none' stroke-width='0.5'/%3E%3Cpath d='M0 100 Q30 95 60 105 T120 98 T180 102 T200 100' stroke='%231a237e' fill='none' stroke-width='0.5'/%3E%3Cpath d='M0 150 Q20 148 40 152 T80 147 T120 153 T160 149 T200 151' stroke='%231a237e' fill='none' stroke-width='0.5'/%3E%3C/svg%3E")`,
+                backgroundSize: '200px 200px'
+            }} />
+
+            {/* Organic flowing pattern */}
+            <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="batik-flow" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+                        <path d="M60 10 Q90 30 60 60 Q30 90 60 110" fill="none" stroke={batik.indigo} strokeWidth="2" />
+                        <path d="M10 60 Q30 30 60 60 Q90 90 110 60" fill="none" stroke={batik.brown} strokeWidth="2" />
+                        <circle cx="60" cy="60" r="8" fill="none" stroke={batik.indigo} strokeWidth="1.5" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#batik-flow)" />
+            </svg>
+
+            {/* Wax drip edge effect - left side */}
+            <div className="absolute left-0 top-0 w-4 h-full" style={{
+                zIndex: LayoutLayer.DECORATION,
+                background: batik.indigo,
+                clipPath: 'polygon(0% 0%, 100% 0%, 100% 3%, 80% 5%, 100% 8%, 70% 12%, 100% 15%, 90% 20%, 100% 25%, 60% 30%, 100% 35%, 80% 40%, 100% 45%, 70% 50%, 100% 55%, 90% 60%, 100% 65%, 60% 70%, 100% 75%, 80% 80%, 100% 85%, 70% 90%, 100% 95%, 80% 100%, 0% 100%)'
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 pl-16 flex items-center gap-12">
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-20 h-1 mb-6" style={{ background: batik.indigo }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: batik.indigo }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: batik.brown }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    <div className="flex gap-2 mt-8">
+                        <div className="w-2 h-2 rounded-full" style={{ background: batik.indigo }} />
+                        <div className="w-2 h-2 rounded-full" style={{ background: batik.brown }} />
+                        <div className="w-2 h-2 rounded-full" style={{ background: batik.indigo }} />
+                    </div>
+                </div>
+
+                {/* Organic shape image */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="relative w-full aspect-[4/5] overflow-hidden" style={{
+                        borderRadius: '60% 40% 50% 50% / 50% 50% 50% 50%',
+                        border: `4px solid ${batik.indigo}`,
+                        boxShadow: `8px 8px 0 ${batik.tan}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 6. CELTIC - Irish knotwork illumination with green and gold
+export const CelticArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const celtic = {
+        green: '#006400',
+        gold: '#d4af37',
+        cream: '#f5f0dc',
+        brown: '#654321'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: celtic.cream }}>
+            {/* Interlaced knot border pattern */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="celtic-knot" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                        <path d="M30 0 Q45 15 30 30 Q15 45 30 60" fill="none" stroke={celtic.green} strokeWidth="3" />
+                        <path d="M0 30 Q15 15 30 30 Q45 45 60 30" fill="none" stroke={celtic.green} strokeWidth="3" />
+                        <circle cx="30" cy="30" r="5" fill={celtic.gold} />
+                    </pattern>
+                </defs>
+                {/* Top and bottom borders */}
+                <rect x="0" y="0" width="100%" height="30" fill="url(#celtic-knot)" opacity="0.3" />
+                <rect x="0" y="calc(100% - 30px)" width="100%" height="30" fill="url(#celtic-knot)" opacity="0.3" />
+            </svg>
+
+            {/* Manuscript page border */}
+            <div className="absolute inset-6 border-4 pointer-events-none" style={{
+                borderColor: celtic.green,
+                borderStyle: 'double',
+                zIndex: LayoutLayer.DECORATION
+            }}>
+                {/* Corner knots */}
+                {['-top-4 -left-4', '-top-4 -right-4', '-bottom-4 -left-4', '-bottom-4 -right-4'].map((pos, i) => (
+                    <div key={i} className={`absolute ${pos} w-8 h-8 rounded-full border-4`} style={{
+                        borderColor: celtic.gold,
+                        background: celtic.green
+                    }} />
+                ))}
+            </div>
+
+            <div className="w-full h-full p-16 md:p-24 flex items-center gap-16">
+                {/* Illuminated initial / Image */}
+                <div className="w-1/3 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4 border-4" style={{
+                        borderColor: celtic.gold,
+                        background: `linear-gradient(135deg, ${celtic.gold}22, transparent)`
+                    }} />
+                    <div className="relative w-full aspect-square overflow-hidden" style={{
+                        border: `3px solid ${celtic.green}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                    {/* Decorative corner spirals */}
+                    <svg className="absolute -bottom-6 -right-6 w-12 h-12" viewBox="0 0 50 50" style={{ zIndex: LayoutLayer.OVERLAY }}>
+                        <path d="M25 25 Q35 25 35 35 Q35 45 25 45 Q15 45 15 35 Q15 25 25 25" fill="none" stroke={celtic.gold} strokeWidth="3" />
+                    </svg>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Uncial-style decorative header */}
+                    <div className="flex items-center gap-4 mb-8">
+                        <svg className="w-8 h-8" viewBox="0 0 40 40">
+                            <circle cx="20" cy="20" r="15" fill="none" stroke={celtic.green} strokeWidth="2" />
+                            <circle cx="20" cy="20" r="8" fill={celtic.gold} />
+                        </svg>
+                        <div className="flex-1 h-1" style={{ background: celtic.green }} />
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: celtic.green }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 600, lineHeight: '1.1' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: celtic.brown }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '2' }} />
+
+                    {/* Footer ornament */}
+                    <div className="flex items-center gap-4 mt-8">
+                        <div className="flex-1 h-1" style={{ background: celtic.green }} />
+                        <div className="w-4 h-4 rotate-45" style={{ background: celtic.gold }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 7. AZTEC - Mesoamerican geometric with step-fret patterns
+export const AztecArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const aztec = {
+        turquoise: '#00ced1',
+        gold: '#d4af37',
+        terracotta: '#cd5c5c',
+        black: '#1a1a1a',
+        stone: '#a0896c'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: aztec.stone }}>
+            {/* Step-fret pattern border */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="step-fret" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M0 20 L10 20 L10 10 L20 10 L20 0 L30 0 L30 10 L40 10 L40 20 L30 20 L30 30 L20 30 L20 40 L10 40 L10 30 L0 30 Z"
+                              fill="none" stroke={aztec.black} strokeWidth="2" />
+                    </pattern>
+                </defs>
+                <rect x="0" y="0" width="100%" height="50" fill="url(#step-fret)" opacity="0.2" />
+                <rect x="0" y="calc(100% - 50px)" width="100%" height="50" fill="url(#step-fret)" opacity="0.2" />
+            </svg>
+
+            {/* Bold geometric accents */}
+            <div className="absolute top-0 left-0 w-full h-2" style={{ background: aztec.turquoise, zIndex: LayoutLayer.DECORATION }} />
+            <div className="absolute bottom-0 left-0 w-full h-2" style={{ background: aztec.gold, zIndex: LayoutLayer.DECORATION }} />
+
+            {/* Sun stone inspired circle decoration */}
+            <div className="absolute top-1/2 right-8 -translate-y-1/2 w-48 h-48 opacity-10 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke={aztec.gold} strokeWidth="4" />
+                    <circle cx="50" cy="50" r="35" fill="none" stroke={aztec.turquoise} strokeWidth="3" />
+                    <circle cx="50" cy="50" r="25" fill="none" stroke={aztec.terracotta} strokeWidth="2" />
+                    {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                        <line key={i} x1="50" y1="5" x2="50" y2="20" stroke={aztec.gold} strokeWidth="3"
+                              transform={`rotate(${angle} 50 50)`} />
+                    ))}
+                </svg>
+            </div>
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Content */}
+                <div className="w-3/5 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Angular header decoration */}
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-6 h-6" style={{
+                            background: aztec.turquoise,
+                            clipPath: 'polygon(0% 50%, 50% 0%, 100% 50%, 50% 100%)'
+                        }} />
+                        <div className="w-6 h-6" style={{
+                            background: aztec.gold,
+                            clipPath: 'polygon(0% 50%, 50% 0%, 100% 50%, 50% 100%)'
+                        }} />
+                        <div className="flex-1 h-2" style={{
+                            background: `linear-gradient(to right, ${aztec.turquoise}, ${aztec.gold})`
+                        }} />
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: aztec.black }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8 uppercase tracking-wider"
+                        style={{ fontWeight: 900, lineHeight: '1.0' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#3a3a3a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.8' }} />
+
+                    {/* Step pattern footer */}
+                    <div className="flex gap-1 mt-8">
+                        {[1, 2, 3, 4, 5, 4, 3, 2, 1].map((h, i) => (
+                            <div key={i} className="w-4" style={{
+                                height: `${h * 8}px`,
+                                background: i % 2 === 0 ? aztec.turquoise : aztec.gold
+                            }} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Stepped frame image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-2" style={{
+                        background: aztec.black,
+                        clipPath: 'polygon(5% 0%, 95% 0%, 100% 5%, 100% 95%, 95% 100%, 5% 100%, 0% 95%, 0% 5%)'
+                    }} />
+                    <div className="relative w-full aspect-square overflow-hidden" style={{
+                        clipPath: 'polygon(5% 0%, 95% 0%, 100% 5%, 100% 95%, 95% 100%, 5% 100%, 0% 95%, 0% 5%)'
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                    {/* Corner accents */}
+                    <div className="absolute -top-4 -left-4 w-8 h-8" style={{ background: aztec.turquoise }} />
+                    <div className="absolute -bottom-4 -right-4 w-8 h-8" style={{ background: aztec.gold }} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 8. ABORIGINAL - Australian dot painting with ochre tones and concentric circles
+export const AboriginalArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const aboriginal = {
+        ochre: '#cc7722',
+        terracotta: '#8b4513',
+        white: '#f5f5dc',
+        black: '#1a1a1a',
+        red: '#8b0000'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: aboriginal.terracotta }}>
+            {/* Dot pattern overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="dot-paint" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+                        <circle cx="5" cy="5" r="2" fill={aboriginal.white} />
+                        <circle cx="15" cy="5" r="2" fill={aboriginal.ochre} />
+                        <circle cx="25" cy="5" r="2" fill={aboriginal.white} />
+                        <circle cx="10" cy="15" r="2" fill={aboriginal.ochre} />
+                        <circle cx="20" cy="15" r="2" fill={aboriginal.white} />
+                        <circle cx="5" cy="25" r="2" fill={aboriginal.white} />
+                        <circle cx="15" cy="25" r="2" fill={aboriginal.ochre} />
+                        <circle cx="25" cy="25" r="2" fill={aboriginal.white} />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#dot-paint)" />
+            </svg>
+
+            {/* Concentric circle motifs */}
+            <svg className="absolute top-1/2 left-8 -translate-y-1/2 w-32 h-32 opacity-30 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                {[40, 32, 24, 16, 8].map((r, i) => (
+                    <circle key={i} cx="64" cy="64" r={r} fill="none"
+                            stroke={i % 2 === 0 ? aboriginal.white : aboriginal.ochre} strokeWidth="3" />
+                ))}
+            </svg>
+
+            <svg className="absolute bottom-12 right-12 w-24 h-24 opacity-25 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                {[30, 22, 14, 6].map((r, i) => (
+                    <circle key={i} cx="48" cy="48" r={r} fill="none"
+                            stroke={i % 2 === 0 ? aboriginal.ochre : aboriginal.white} strokeWidth="2" />
+                ))}
+            </svg>
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Circular image with dot border */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <svg className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)]">
+                        {[...Array(24)].map((_, i) => {
+                            const angle = (i / 24) * 2 * Math.PI;
+                            const x = 50 + 48 * Math.cos(angle);
+                            const y = 50 + 48 * Math.sin(angle);
+                            return <circle key={i} cx={`${x}%`} cy={`${y}%`} r="4"
+                                          fill={i % 2 === 0 ? aboriginal.ochre : aboriginal.white} />;
+                        })}
+                    </svg>
+                    <div className="relative w-full aspect-square rounded-full overflow-hidden" style={{
+                        border: `6px solid ${aboriginal.black}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Dot line header */}
+                    <div className="flex gap-2 mb-8">
+                        {[...Array(12)].map((_, i) => (
+                            <div key={i} className="w-3 h-3 rounded-full"
+                                 style={{ background: i % 2 === 0 ? aboriginal.white : aboriginal.ochre }} />
+                        ))}
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: aboriginal.white }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 700, lineHeight: '1.1' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#e8e8e8' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Dot line footer */}
+                    <div className="flex gap-2 mt-8">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="w-2 h-2 rounded-full"
+                                 style={{ background: i % 3 === 0 ? aboriginal.red : aboriginal.ochre }} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================================
+// HISTORICAL PERIOD ARCHETYPES (6 archetypes)
+// ============================================================================
+
+// 9. VICTORIAN - 19th century ornate elegance
+export const VictorianArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const victorian = {
+        burgundy: '#722f37',
+        forest: '#228b22',
+        gold: '#d4af37',
+        cream: '#f5f5dc',
+        black: '#1a1a1a'
+    };
+    const accent = rng.pick([victorian.burgundy, victorian.forest]);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: victorian.cream }}>
+            {/* Ornate frame borders */}
+            <div className="absolute inset-4 border-2 pointer-events-none" style={{ borderColor: victorian.gold, zIndex: LayoutLayer.DECORATION }}>
+                {/* Ornate corner decorations */}
+                {[
+                    { pos: 'top-0 left-0', transform: '' },
+                    { pos: 'top-0 right-0', transform: 'scale(-1, 1)' },
+                    { pos: 'bottom-0 left-0', transform: 'scale(1, -1)' },
+                    { pos: 'bottom-0 right-0', transform: 'scale(-1, -1)' }
+                ].map((corner, i) => (
+                    <svg key={i} className={`absolute ${corner.pos} w-16 h-16`} viewBox="0 0 50 50" style={{ transform: corner.transform }}>
+                        <path d="M0 0 L50 0 L50 5 L5 5 L5 50 L0 50 Z" fill={victorian.gold} />
+                        <path d="M10 0 Q10 10 0 10" fill="none" stroke={accent} strokeWidth="2" />
+                        <circle cx="15" cy="15" r="4" fill={accent} />
+                    </svg>
+                ))}
+            </div>
+
+            {/* Inner decorative border */}
+            <div className="absolute inset-10 border pointer-events-none" style={{ borderColor: accent, borderStyle: 'double', zIndex: LayoutLayer.DECORATION }} />
+
+            <div className="w-full h-full p-20 md:p-28 flex items-center gap-16">
+                {/* Engraved-style framed image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-6 border-8" style={{
+                        borderColor: victorian.gold,
+                        background: `linear-gradient(135deg, ${victorian.gold} 0%, #e8d48a 30%, ${victorian.gold} 70%, #b8960f 100%)`
+                    }}>
+                        <div className="absolute inset-2 border" style={{ borderColor: accent }} />
+                    </div>
+                    <div className="relative w-full aspect-[3/4] overflow-hidden" style={{
+                        border: `4px solid ${victorian.black}`,
+                        filter: 'sepia(20%)'
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Decorative header */}
+                    <div className="flex items-center gap-4 mb-8">
+                        <svg className="w-12 h-6" viewBox="0 0 60 30">
+                            <path d="M0 15 Q15 0 30 15 Q45 30 60 15" fill="none" stroke={victorian.gold} strokeWidth="2" />
+                            <circle cx="30" cy="15" r="4" fill={accent} />
+                        </svg>
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: victorian.black }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 400, lineHeight: '1.15', fontStyle: 'italic' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#3a3a3a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '2' }} />
+
+                    {/* Decorative footer flourish */}
+                    <svg className="w-32 h-8 mt-8" viewBox="0 0 120 30">
+                        <path d="M0 15 Q30 0 60 15 Q90 30 120 15" fill="none" stroke={victorian.gold} strokeWidth="1.5" />
+                        <path d="M40 15 Q60 5 80 15" fill="none" stroke={accent} strokeWidth="2" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 10. DISCO - 1970s glam and sparkle
+export const DiscoArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const disco = {
+        gold: '#ffd700',
+        silver: '#c0c0c0',
+        purple: '#8b008b',
+        pink: '#ff1493',
+        black: '#0a0a0a'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: disco.black }}>
+            {/* Mirror ball reflection pattern */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                {[...Array(20)].map((_, i) => {
+                    const x = rng.range(0, 100);
+                    const y = rng.range(0, 100);
+                    const size = rng.range(2, 8);
+                    return (
+                        <div key={i} className="absolute rounded-full animate-pulse"
+                             style={{
+                                 left: `${x}%`,
+                                 top: `${y}%`,
+                                 width: `${size}px`,
+                                 height: `${size}px`,
+                                 background: rng.pick([disco.gold, disco.silver, disco.pink]),
+                                 animationDelay: `${rng.range(0, 2)}s`
+                             }} />
+                    );
+                })}
+            </div>
+
+            {/* Starburst light rays */}
+            <svg className="absolute inset-0 w-full h-full opacity-15 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <radialGradient id="disco-ray" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stopColor={disco.gold} stopOpacity="1" />
+                        <stop offset="100%" stopColor={disco.gold} stopOpacity="0" />
+                    </radialGradient>
+                </defs>
+                {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => (
+                    <line key={i} x1="50%" y1="50%" x2={`${50 + 50 * Math.cos(angle * Math.PI / 180)}%`} y2={`${50 + 50 * Math.sin(angle * Math.PI / 180)}%`}
+                          stroke="url(#disco-ray)" strokeWidth="3" />
+                ))}
+            </svg>
+
+            {/* Metallic gradient overlay */}
+            <div className="absolute top-0 left-0 w-full h-2" style={{
+                background: `linear-gradient(to right, ${disco.gold}, ${disco.silver}, ${disco.pink}, ${disco.purple}, ${disco.gold})`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+            <div className="absolute bottom-0 left-0 w-full h-2" style={{
+                background: `linear-gradient(to right, ${disco.purple}, ${disco.pink}, ${disco.silver}, ${disco.gold}, ${disco.purple})`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Disco ball image frame */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4 rounded-full" style={{
+                        background: `conic-gradient(from 0deg, ${disco.gold}, ${disco.silver}, ${disco.pink}, ${disco.purple}, ${disco.gold})`,
+                        opacity: 0.8
+                    }} />
+                    <div className="relative w-full aspect-square rounded-full overflow-hidden" style={{
+                        border: `4px solid ${disco.silver}`,
+                        boxShadow: `0 0 30px ${disco.gold}40, 0 0 60px ${disco.pink}20`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: disco.gold }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-8xl mb-8 uppercase tracking-widest"
+                        style={{
+                            fontWeight: 900,
+                            lineHeight: '1.0',
+                            background: `linear-gradient(135deg, ${disco.gold}, ${disco.silver}, ${disco.pink})`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#e0e0e0' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.8' }} />
+
+                    {/* Sparkle decoration */}
+                    <div className="flex gap-4 mt-8">
+                        {[disco.gold, disco.silver, disco.pink, disco.purple].map((color, i) => (
+                            <div key={i} className="w-3 h-3 rotate-45" style={{ background: color }} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 11. GRUNGE - 1990s alternative aesthetic
+export const GrungeArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const grunge = {
+        mustard: '#c9a227',
+        brown: '#5d4037',
+        gray: '#757575',
+        black: '#1a1a1a',
+        cream: '#e8e4d9'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: grunge.cream }}>
+            {/* Distressed texture overlay */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
+                zIndex: LayoutLayer.DECORATION,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='10' y='10' width='5' height='3' fill='%23000' opacity='0.3'/%3E%3Crect x='50' y='30' width='8' height='2' fill='%23000' opacity='0.2'/%3E%3Crect x='70' y='60' width='4' height='4' fill='%23000' opacity='0.25'/%3E%3Crect x='20' y='80' width='6' height='2' fill='%23000' opacity='0.15'/%3E%3C/svg%3E")`,
+                backgroundSize: '100px 100px'
+            }} />
+
+            {/* Torn paper edge effect - top */}
+            <div className="absolute top-0 left-0 w-full h-8" style={{
+                zIndex: LayoutLayer.DECORATION,
+                background: grunge.brown,
+                clipPath: 'polygon(0% 0%, 3% 100%, 8% 50%, 12% 100%, 18% 60%, 22% 100%, 28% 40%, 33% 100%, 38% 70%, 45% 100%, 50% 50%, 55% 100%, 62% 60%, 68% 100%, 75% 40%, 80% 100%, 85% 70%, 92% 100%, 95% 50%, 100% 100%, 100% 0%)'
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 pt-16 flex items-center gap-12">
+                {/* Photocopied-style image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-1 bg-black opacity-80" style={{ transform: 'rotate(-2deg)' }} />
+                    <div className="relative w-full aspect-[4/5] overflow-hidden" style={{
+                        border: `3px solid ${grunge.black}`,
+                        filter: 'contrast(1.2) grayscale(30%)',
+                        transform: 'rotate(1deg)'
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                    {/* Tape pieces */}
+                    <div className="absolute -top-3 left-1/4 w-16 h-6 rotate-12" style={{ background: `${grunge.mustard}90` }} />
+                    <div className="absolute -bottom-2 right-1/4 w-12 h-5 -rotate-6" style={{ background: `${grunge.cream}90` }} />
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-24 h-1 mb-6" style={{ background: grunge.mustard }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: grunge.black }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8 uppercase"
+                        style={{ fontWeight: 900, lineHeight: '0.95', letterSpacing: '-0.02em' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: grunge.brown }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.7' }} />
+
+                    {/* X marks */}
+                    <div className="flex gap-4 mt-8">
+                        {[...Array(3)].map((_, i) => (
+                            <span key={i} className="text-3xl font-black" style={{ color: grunge.mustard }}>×</span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 12. ATOMIC - 1950s Space Age optimism
+export const AtomicArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const atomic = {
+        turquoise: '#40e0d0',
+        coral: '#ff7f50',
+        chartreuse: '#7fff00',
+        white: '#ffffff',
+        black: '#1a1a1a'
+    };
+    const accent = rng.pick([atomic.turquoise, atomic.coral, atomic.chartreuse]);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: atomic.white }}>
+            {/* Atomic starburst shapes */}
+            <svg className="absolute top-8 right-8 w-32 h-32 opacity-20 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                {[0, 45, 90, 135].map((angle, i) => (
+                    <ellipse key={i} cx="64" cy="64" rx="60" ry="8" fill={accent}
+                             transform={`rotate(${angle} 64 64)`} />
+                ))}
+                <circle cx="64" cy="64" r="12" fill={atomic.black} />
+            </svg>
+
+            {/* Boomerang curves */}
+            <svg className="absolute bottom-12 left-8 w-48 h-24 opacity-15 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <path d="M0 60 Q60 0 120 30 Q180 60 240 20" fill="none" stroke={atomic.coral} strokeWidth="4" />
+                <path d="M0 80 Q60 20 120 50 Q180 80 240 40" fill="none" stroke={atomic.turquoise} strokeWidth="3" />
+            </svg>
+
+            {/* Googie-style accent bar */}
+            <div className="absolute top-0 left-0 w-full h-3" style={{
+                background: `linear-gradient(to right, ${atomic.turquoise}, ${atomic.coral}, ${atomic.chartreuse})`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-16">
+                {/* Content */}
+                <div className="w-3/5 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Atomic orbital header */}
+                    <svg className="w-16 h-16 mb-6" viewBox="0 0 64 64">
+                        {[0, 60, 120].map((angle, i) => (
+                            <ellipse key={i} cx="32" cy="32" rx="28" ry="10" fill="none" stroke={accent} strokeWidth="2"
+                                     transform={`rotate(${angle} 32 32)`} />
+                        ))}
+                        <circle cx="32" cy="32" r="6" fill={atomic.black} />
+                    </svg>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: atomic.black }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8 uppercase tracking-wider"
+                        style={{ fontWeight: 800, lineHeight: '1.0' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#4a4a4a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.8' }} />
+
+                    {/* Color dots */}
+                    <div className="flex gap-3 mt-8">
+                        <div className="w-4 h-4 rounded-full" style={{ background: atomic.turquoise }} />
+                        <div className="w-4 h-4 rounded-full" style={{ background: atomic.coral }} />
+                        <div className="w-4 h-4 rounded-full" style={{ background: atomic.chartreuse }} />
+                    </div>
+                </div>
+
+                {/* Kidney-shaped image frame */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-3" style={{
+                        background: accent,
+                        borderRadius: '60% 40% 50% 50% / 50% 60% 40% 50%'
+                    }} />
+                    <div className="relative w-full aspect-square overflow-hidden" style={{
+                        borderRadius: '55% 45% 50% 50% / 50% 55% 45% 50%',
+                        border: `4px solid ${atomic.white}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 13. NOUVEAU - Art Nouveau organic curves
+export const NouveauArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const nouveau = {
+        sage: '#9dc183',
+        mauve: '#e0b0ff',
+        gold: '#d4af37',
+        cream: '#faf8f0',
+        brown: '#5d4037'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: nouveau.cream }}>
+            {/* Flowing organic line borders */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <linearGradient id="nouveau-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={nouveau.sage} />
+                        <stop offset="100%" stopColor={nouveau.mauve} />
+                    </linearGradient>
+                </defs>
+                {/* Top whiplash curve */}
+                <path d="M0 40 Q100 10, 200 50 T400 30 T600 60 T800 20 T1000 50 T1200 30"
+                      fill="none" stroke="url(#nouveau-grad)" strokeWidth="3" opacity="0.4" />
+                {/* Bottom whiplash curve */}
+                <path d="M0 calc(100% - 40) Q100 calc(100% - 70), 200 calc(100% - 30) T400 calc(100% - 50) T600 calc(100% - 20)"
+                      fill="none" stroke="url(#nouveau-grad)" strokeWidth="3" opacity="0.4" />
+                {/* Vertical side flourish */}
+                <path d="M30 100 Q10 200, 30 300 Q50 400, 30 500" fill="none" stroke={nouveau.gold} strokeWidth="2" opacity="0.3" />
+            </svg>
+
+            {/* Decorative corner flourishes */}
+            <svg className="absolute top-4 left-4 w-24 h-24 opacity-50" viewBox="0 0 100 100" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <path d="M10 90 Q10 50, 30 30 Q50 10, 90 10" fill="none" stroke={nouveau.sage} strokeWidth="3" />
+                <circle cx="90" cy="10" r="5" fill={nouveau.gold} />
+            </svg>
+            <svg className="absolute bottom-4 right-4 w-24 h-24 opacity-50 rotate-180" viewBox="0 0 100 100" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <path d="M10 90 Q10 50, 30 30 Q50 10, 90 10" fill="none" stroke={nouveau.mauve} strokeWidth="3" />
+                <circle cx="90" cy="10" r="5" fill={nouveau.gold} />
+            </svg>
+
+            <div className="w-full h-full p-16 md:p-24 flex items-center gap-16">
+                {/* Mucha-style framed image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <svg className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)]" viewBox="0 0 120 150">
+                        {/* Organic frame */}
+                        <path d="M10 20 Q0 75, 10 130 Q60 145, 110 130 Q120 75, 110 20 Q60 5, 10 20"
+                              fill="none" stroke={nouveau.gold} strokeWidth="3" />
+                        <path d="M15 25 Q5 75, 15 125 Q60 138, 105 125 Q115 75, 105 25 Q60 12, 15 25"
+                              fill="none" stroke={nouveau.sage} strokeWidth="2" />
+                    </svg>
+                    <div className="relative w-full aspect-[3/4] overflow-hidden" style={{
+                        borderRadius: '20% 20% 30% 30% / 5% 5% 10% 10%',
+                        border: `2px solid ${nouveau.gold}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Flowing header decoration */}
+                    <svg className="w-32 h-8 mb-6" viewBox="0 0 120 30">
+                        <path d="M0 15 Q30 5, 60 15 Q90 25, 120 15" fill="none" stroke={nouveau.gold} strokeWidth="2" />
+                        <circle cx="60" cy="15" r="4" fill={nouveau.mauve} />
+                    </svg>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: nouveau.brown }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 400, lineHeight: '1.15', fontStyle: 'italic' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5a5a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '2' }} />
+
+                    {/* Flowing footer */}
+                    <svg className="w-48 h-12 mt-8" viewBox="0 0 180 40">
+                        <path d="M0 20 Q45 5, 90 20 Q135 35, 180 20" fill="none" stroke={nouveau.sage} strokeWidth="2" />
+                        <path d="M30 20 Q90 10, 150 20" fill="none" stroke={nouveau.mauve} strokeWidth="1.5" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 14. TUDOR - English Renaissance heraldic
+export const TudorArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const tudor = {
+        red: '#8b0000',
+        navy: '#000080',
+        gold: '#d4af37',
+        cream: '#f5f0dc',
+        black: '#1a1a1a'
+    };
+    const primary = rng.pick([tudor.red, tudor.navy]);
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: tudor.cream }}>
+            {/* Heraldic pattern border */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="tudor-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <rect width="20" height="20" fill={primary} opacity="0.1" />
+                        <rect x="20" y="20" width="20" height="20" fill={primary} opacity="0.1" />
+                    </pattern>
+                </defs>
+                <rect x="0" y="0" width="100%" height="30" fill="url(#tudor-pattern)" />
+                <rect x="0" y="calc(100% - 30px)" width="100%" height="30" fill="url(#tudor-pattern)" />
+            </svg>
+
+            {/* Ornate border frame */}
+            <div className="absolute inset-6 border-4 pointer-events-none" style={{
+                borderColor: tudor.gold,
+                zIndex: LayoutLayer.DECORATION
+            }}>
+                {/* Shield corners */}
+                {['-top-4 -left-4', '-top-4 -right-4', '-bottom-4 -left-4', '-bottom-4 -right-4'].map((pos, i) => (
+                    <svg key={i} className={`absolute ${pos} w-8 h-10`} viewBox="0 0 30 40">
+                        <path d="M15 0 L30 10 L30 25 L15 40 L0 25 L0 10 Z" fill={primary} stroke={tudor.gold} strokeWidth="2" />
+                    </svg>
+                ))}
+            </div>
+
+            <div className="w-full h-full p-16 md:p-24 flex items-center gap-12">
+                {/* Shield-framed image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4" style={{
+                        background: tudor.gold,
+                        clipPath: 'polygon(50% 0%, 100% 15%, 100% 70%, 50% 100%, 0% 70%, 0% 15%)'
+                    }}>
+                        <div className="absolute inset-2" style={{
+                            background: primary,
+                            clipPath: 'polygon(50% 0%, 100% 15%, 100% 70%, 50% 100%, 0% 70%, 0% 15%)'
+                        }} />
+                    </div>
+                    <div className="relative w-full aspect-[3/4] overflow-hidden" style={{
+                        clipPath: 'polygon(50% 2%, 98% 16%, 98% 68%, 50% 98%, 2% 68%, 2% 16%)'
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Crown decoration */}
+                    <svg className="w-16 h-12 mb-6" viewBox="0 0 60 40">
+                        <path d="M5 35 L10 15 L20 25 L30 10 L40 25 L50 15 L55 35 Z" fill={tudor.gold} />
+                        <circle cx="30" cy="10" r="4" fill={primary} />
+                    </svg>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: tudor.black }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8 uppercase"
+                        style={{ fontWeight: 900, lineHeight: '1.0', letterSpacing: '0.05em' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#3a3a3a' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Heraldic footer */}
+                    <div className="flex items-center gap-4 mt-8">
+                        <div className="w-6 h-6" style={{ background: primary }} />
+                        <div className="w-6 h-6" style={{ background: tudor.gold }} />
+                        <div className="flex-1 h-1" style={{ background: tudor.gold }} />
+                        <div className="w-6 h-6" style={{ background: tudor.gold }} />
+                        <div className="w-6 h-6" style={{ background: primary }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================================
+// ARTISANAL CRAFT ARCHETYPES (6 archetypes)
+// ============================================================================
+
+// 15. INDIGO - Shibori dye craft
+export const IndigoArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const indigo = {
+        deep: '#1a237e',
+        medium: '#3949ab',
+        light: '#7986cb',
+        white: '#fafafa',
+        cream: '#f5f5f0'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: indigo.cream }}>
+            {/* Tie-dye pattern overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="shibori" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                        <circle cx="40" cy="40" r="35" fill="none" stroke={indigo.deep} strokeWidth="2" strokeDasharray="5 3" />
+                        <circle cx="40" cy="40" r="25" fill="none" stroke={indigo.medium} strokeWidth="1.5" strokeDasharray="3 5" />
+                        <circle cx="40" cy="40" r="15" fill={indigo.light} opacity="0.3" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#shibori)" />
+            </svg>
+
+            {/* Organic dye bleed edges */}
+            <div className="absolute top-0 left-0 w-full h-4" style={{
+                background: `linear-gradient(to bottom, ${indigo.deep}, transparent)`,
+                opacity: 0.3,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+            <div className="absolute bottom-0 left-0 w-full h-4" style={{
+                background: `linear-gradient(to top, ${indigo.deep}, transparent)`,
+                opacity: 0.3,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Fabric-like image container */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-3" style={{
+                        background: indigo.deep,
+                        borderRadius: '45% 55% 50% 50% / 55% 45% 55% 45%'
+                    }} />
+                    <div className="relative w-full aspect-square overflow-hidden" style={{
+                        borderRadius: '40% 60% 50% 50% / 50% 50% 50% 50%',
+                        border: `3px solid ${indigo.white}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-16 h-1 mb-6" style={{ background: indigo.deep }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: indigo.deep }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: indigo.medium }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Dye gradient dots */}
+                    <div className="flex gap-2 mt-8">
+                        {[indigo.deep, indigo.medium, indigo.light, indigo.medium, indigo.deep].map((color, i) => (
+                            <div key={i} className="w-3 h-3 rounded-full" style={{ background: color }} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 16. COPPER - Oxidized metalwork
+export const CopperArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const copper = {
+        base: '#b87333',
+        verdigris: '#4a9c8c',
+        patina: '#6b8e7d',
+        dark: '#2d1810',
+        light: '#d4a574'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{
+            background: `linear-gradient(135deg, ${copper.base} 0%, ${copper.light} 50%, ${copper.base} 100%)`
+        }}>
+            {/* Metal texture grain overlay */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                zIndex: LayoutLayer.DECORATION,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='0' y1='0' x2='100' y2='100' stroke='%23000' stroke-width='0.5' opacity='0.2'/%3E%3Cline x1='20' y1='0' x2='120' y2='100' stroke='%23000' stroke-width='0.3' opacity='0.15'/%3E%3Cline x1='40' y1='0' x2='140' y2='100' stroke='%23000' stroke-width='0.4' opacity='0.1'/%3E%3C/svg%3E")`,
+                backgroundSize: '30px 30px'
+            }} />
+
+            {/* Oxidation gradient effects */}
+            <div className="absolute top-0 right-0 w-1/3 h-full opacity-40 pointer-events-none" style={{
+                background: `radial-gradient(ellipse at top right, ${copper.verdigris} 0%, transparent 70%)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+            <div className="absolute bottom-0 left-0 w-1/4 h-1/2 opacity-30 pointer-events-none" style={{
+                background: `radial-gradient(ellipse at bottom left, ${copper.patina} 0%, transparent 60%)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-20 h-1 mb-6" style={{ background: copper.verdigris }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: copper.dark }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 600, lineHeight: '1.1' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#3a2a20' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Hammered surface hints */}
+                    <div className="flex gap-3 mt-8">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="w-4 h-4 rounded-full" style={{
+                                background: `radial-gradient(circle at 30% 30%, ${copper.light}, ${copper.base})`
+                            }} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Circular hammered frame */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4 rounded-full" style={{
+                        background: `conic-gradient(from 0deg, ${copper.base}, ${copper.light}, ${copper.base}, ${copper.verdigris}, ${copper.base})`,
+                        boxShadow: 'inset 0 0 20px rgba(0,0,0,0.3)'
+                    }} />
+                    <div className="relative w-full aspect-square rounded-full overflow-hidden" style={{
+                        border: `4px solid ${copper.dark}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 17. RAKU - Japanese pottery glaze
+export const RakuArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const raku = {
+        copper: '#8b4513',
+        black: '#1a1a1a',
+        cream: '#f5f0e1',
+        gold: '#c9a227',
+        gray: '#6b6b6b'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: raku.cream }}>
+            {/* Crackle glaze pattern */}
+            <svg className="absolute inset-0 w-full h-full opacity-15 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="crackle" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <path d="M20 0 L25 30 L50 35 L45 60 L70 65 L60 100" fill="none" stroke={raku.black} strokeWidth="0.5" />
+                        <path d="M0 50 L30 55 L35 80 L60 75 L65 100" fill="none" stroke={raku.black} strokeWidth="0.5" />
+                        <path d="M80 0 L75 25 L100 30" fill="none" stroke={raku.black} strokeWidth="0.5" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#crackle)" />
+            </svg>
+
+            {/* Kiln fire marks */}
+            <div className="absolute bottom-0 left-1/4 w-1/2 h-32 opacity-10 pointer-events-none" style={{
+                background: `radial-gradient(ellipse at bottom, ${raku.copper} 0%, transparent 70%)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Organic form image container */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-2" style={{
+                        background: raku.black,
+                        borderRadius: '40% 60% 55% 45% / 60% 40% 60% 40%'
+                    }} />
+                    <div className="relative w-full aspect-[4/5] overflow-hidden" style={{
+                        borderRadius: '35% 65% 50% 50% / 55% 45% 55% 45%',
+                        border: `3px solid ${raku.gold}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="flex gap-2 mb-6">
+                        <div className="w-8 h-1" style={{ background: raku.copper }} />
+                        <div className="w-4 h-1" style={{ background: raku.gold }} />
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: raku.black }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 400, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: raku.gray }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '2' }} />
+
+                    {/* Glaze drip accent */}
+                    <svg className="w-8 h-16 mt-8" viewBox="0 0 30 60">
+                        <path d="M15 0 Q20 20 15 40 Q10 50 15 60" fill="none" stroke={raku.copper} strokeWidth="3" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 18. WEAVE - Textile loom patterns
+export const WeaveArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const weave = {
+        natural: '#d4c4a8',
+        brown: '#8b7355',
+        cream: '#f5f0e6',
+        dark: '#4a3c2a',
+        accent: '#a0522d'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: weave.cream }}>
+            {/* Woven grid texture overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="woven" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <rect x="0" y="0" width="10" height="10" fill={weave.natural} />
+                        <rect x="10" y="10" width="10" height="10" fill={weave.natural} />
+                        <rect x="0" y="10" width="10" height="10" fill={weave.brown} opacity="0.5" />
+                        <rect x="10" y="0" width="10" height="10" fill={weave.brown} opacity="0.5" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#woven)" />
+            </svg>
+
+            {/* Warp/weft line accents */}
+            <div className="absolute left-0 top-0 w-1 h-full" style={{
+                background: `repeating-linear-gradient(to bottom, ${weave.brown} 0px, ${weave.brown} 10px, transparent 10px, transparent 20px)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+            <div className="absolute right-0 top-0 w-1 h-full" style={{
+                background: `repeating-linear-gradient(to bottom, ${weave.accent} 0px, ${weave.accent} 10px, transparent 10px, transparent 20px)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-16">
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    {/* Woven header decoration */}
+                    <div className="flex gap-1 mb-6">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="w-2 h-6" style={{
+                                background: i % 2 === 0 ? weave.brown : weave.accent
+                            }} />
+                        ))}
+                    </div>
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: weave.dark }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: weave.brown }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Fringe decoration */}
+                    <div className="flex gap-2 mt-8">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="w-1 h-8" style={{
+                                background: weave.brown,
+                                opacity: 0.5 + (i % 2) * 0.3
+                            }} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Fabric-framed image */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4 border-8" style={{
+                        borderColor: weave.natural,
+                        background: weave.brown
+                    }}>
+                        <div className="absolute inset-2 border-4" style={{ borderColor: weave.accent }} />
+                    </div>
+                    <div className="relative w-full aspect-[4/3] overflow-hidden">
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 19. CERAMIC - Hand-thrown pottery
+export const CeramicArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const ceramic = {
+        glaze: '#7eb8da',
+        clay: '#c9b8a5',
+        speckle: '#8b7355',
+        white: '#fafafa',
+        dark: '#3a3530'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: ceramic.clay }}>
+            {/* Speckled stoneware texture */}
+            <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                {[...Array(50)].map((_, i) => {
+                    const x = rng.range(0, 100);
+                    const y = rng.range(0, 100);
+                    const size = rng.range(1, 3);
+                    return (
+                        <div key={i} className="absolute rounded-full"
+                             style={{
+                                 left: `${x}%`,
+                                 top: `${y}%`,
+                                 width: `${size}px`,
+                                 height: `${size}px`,
+                                 background: ceramic.speckle
+                             }} />
+                    );
+                })}
+            </div>
+
+            {/* Glaze drip effect - top */}
+            <div className="absolute top-0 left-0 w-full h-24" style={{
+                background: ceramic.glaze,
+                clipPath: 'polygon(0% 0%, 100% 0%, 100% 50%, 95% 60%, 90% 55%, 85% 70%, 80% 50%, 75% 65%, 70% 55%, 65% 75%, 60% 50%, 55% 60%, 50% 80%, 45% 55%, 40% 70%, 35% 50%, 30% 65%, 25% 55%, 20% 75%, 15% 50%, 10% 60%, 5% 55%, 0% 70%)',
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 pt-28 flex items-center gap-12">
+                {/* Rounded pottery-shaped image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-3" style={{
+                        background: ceramic.glaze,
+                        borderRadius: '50% 50% 45% 45% / 40% 40% 60% 60%'
+                    }} />
+                    <div className="relative w-full aspect-[4/5] overflow-hidden" style={{
+                        borderRadius: '48% 52% 42% 42% / 38% 38% 62% 62%',
+                        border: `3px solid ${ceramic.white}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                    {/* Rim highlight */}
+                    <div className="absolute -top-1 left-1/4 w-1/2 h-2 rounded-full" style={{
+                        background: `linear-gradient(to right, transparent, ${ceramic.white}50, transparent)`
+                    }} />
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-16 h-2 rounded-full mb-6" style={{ background: ceramic.glaze }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: ceramic.dark }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#5a5550' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Kiln variation marks */}
+                    <div className="flex gap-3 mt-8">
+                        {[ceramic.glaze, ceramic.speckle, ceramic.glaze].map((color, i) => (
+                            <div key={i} className="w-4 h-4 rounded-full" style={{ background: color }} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 20. PATINA - Aged brass/bronze
+export const PatinaArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const patina = {
+        brass: '#b5a642',
+        tarnish: '#6b5b3a',
+        verdigris: '#4a7c6c',
+        dark: '#2a2520',
+        cream: '#f0ebe0'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{
+            background: `linear-gradient(145deg, ${patina.brass} 0%, ${patina.tarnish} 50%, ${patina.brass} 100%)`
+        }}>
+            {/* Oxidation pattern overlay */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                zIndex: LayoutLayer.DECORATION,
+                background: `radial-gradient(ellipse at 20% 30%, ${patina.verdigris} 0%, transparent 40%), radial-gradient(ellipse at 80% 70%, ${patina.verdigris} 0%, transparent 35%)`
+            }} />
+
+            {/* Vintage wear aesthetic edges */}
+            <div className="absolute inset-4 border-2 pointer-events-none" style={{
+                borderColor: patina.dark,
+                opacity: 0.3,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Aged frame image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4" style={{
+                        background: `linear-gradient(135deg, ${patina.brass} 0%, ${patina.tarnish} 40%, ${patina.verdigris} 70%, ${patina.brass} 100%)`,
+                        boxShadow: 'inset 0 0 30px rgba(0,0,0,0.4)'
+                    }} />
+                    <div className="relative w-full aspect-[3/4] overflow-hidden" style={{
+                        border: `4px solid ${patina.dark}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content on aged panel */}
+                <div className="flex-1 p-8 relative" style={{
+                    background: patina.cream,
+                    border: `2px solid ${patina.tarnish}`,
+                    zIndex: LayoutLayer.CONTENT_HERO
+                }}>
+                    {/* Worn corner accents */}
+                    <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2" style={{ borderColor: patina.brass }} />
+                    <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2" style={{ borderColor: patina.brass }} />
+                    <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2" style={{ borderColor: patina.brass }} />
+                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2" style={{ borderColor: patina.brass }} />
+
+                    <div className="w-16 h-1 mb-6" style={{ background: patina.verdigris }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: patina.dark }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-4xl md:text-5xl lg:text-6xl mb-6"
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: patina.tarnish }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-base" style={{ lineHeight: '1.9' }} />
+
+                    <div className="flex gap-2 mt-6">
+                        <div className="w-3 h-3 rounded-full" style={{ background: patina.brass }} />
+                        <div className="w-3 h-3 rounded-full" style={{ background: patina.verdigris }} />
+                        <div className="w-3 h-3 rounded-full" style={{ background: patina.tarnish }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================================
+// ATMOSPHERIC/MOOD ARCHETYPES (6 archetypes)
+// ============================================================================
+
+// 21. DUSK - Golden hour twilight
+export const DuskArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const dusk = {
+        amber: '#ff8c00',
+        purple: '#4b0082',
+        blue: '#191970',
+        gold: '#ffd700',
+        cream: '#fff8e7'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{
+            background: `linear-gradient(to bottom, ${dusk.amber} 0%, ${dusk.purple} 50%, ${dusk.blue} 100%)`
+        }}>
+            {/* Sun ray light beams */}
+            <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <radialGradient id="sun-glow" cx="50%" cy="30%" r="50%">
+                        <stop offset="0%" stopColor={dusk.gold} stopOpacity="0.8" />
+                        <stop offset="100%" stopColor={dusk.gold} stopOpacity="0" />
+                    </radialGradient>
+                </defs>
+                <ellipse cx="50%" cy="30%" rx="30%" ry="20%" fill="url(#sun-glow)" />
+                {[...Array(8)].map((_, i) => {
+                    const angle = (i / 8) * Math.PI;
+                    return (
+                        <line key={i} x1="50%" y1="30%" x2={`${50 + 50 * Math.cos(angle)}%`} y2={`${30 + 40 * Math.sin(angle)}%`}
+                              stroke={dusk.gold} strokeWidth="2" opacity="0.3" />
+                    );
+                })}
+            </svg>
+
+            {/* Silhouette horizon */}
+            <div className="absolute bottom-0 left-0 w-full h-24 opacity-30 pointer-events-none" style={{
+                background: dusk.blue,
+                clipPath: 'polygon(0% 60%, 10% 50%, 20% 65%, 30% 45%, 40% 55%, 50% 40%, 60% 55%, 70% 45%, 80% 60%, 90% 50%, 100% 55%, 100% 100%, 0% 100%)',
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Warm glowing image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-4 rounded-full opacity-50" style={{
+                        background: `radial-gradient(circle, ${dusk.gold} 0%, transparent 70%)`
+                    }} />
+                    <div className="relative w-full aspect-square rounded-full overflow-hidden" style={{
+                        border: `4px solid ${dusk.gold}40`,
+                        boxShadow: `0 0 40px ${dusk.gold}40`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-20 h-1 mb-6" style={{ background: dusk.gold }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: dusk.cream }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#e8e0d0' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Warm-to-cool transition dots */}
+                    <div className="flex gap-2 mt-8">
+                        {[dusk.gold, dusk.amber, dusk.purple, dusk.blue].map((color, i) => (
+                            <div key={i} className="w-3 h-3 rounded-full" style={{ background: color }} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 22. MONSOON - Tropical rain atmosphere
+export const MonsoonArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const monsoon = {
+        teal: '#006666',
+        gray: '#708090',
+        silver: '#c0c0c0',
+        dark: '#2f4f4f',
+        white: '#f8f8f8'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: monsoon.dark }}>
+            {/* Rain streak overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="rain" x="0" y="0" width="20" height="100" patternUnits="userSpaceOnUse">
+                        <line x1="10" y1="0" x2="10" y2="30" stroke={monsoon.silver} strokeWidth="1" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#rain)" />
+            </svg>
+
+            {/* Mist/fog layer effects */}
+            <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-30 pointer-events-none" style={{
+                background: `linear-gradient(to top, ${monsoon.gray} 0%, transparent 100%)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+            <div className="absolute top-1/4 left-0 w-full h-32 opacity-10 pointer-events-none" style={{
+                background: monsoon.silver,
+                filter: 'blur(30px)',
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-16 h-1 mb-6" style={{ background: monsoon.teal }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: monsoon.white }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: monsoon.silver }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Rain drop accents */}
+                    <div className="flex gap-3 mt-8">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="w-2 h-4 rounded-full" style={{
+                                background: monsoon.silver,
+                                opacity: 0.3 + i * 0.2
+                            }} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Misty framed image */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute inset-0 opacity-20" style={{
+                        background: monsoon.gray,
+                        filter: 'blur(20px)'
+                    }} />
+                    <div className="relative w-full aspect-[4/3] overflow-hidden" style={{
+                        border: `2px solid ${monsoon.silver}40`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/10 pointer-events-none" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 23. TUNDRA - Arctic frozen landscape
+export const TundraArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const tundra = {
+        ice: '#e0f7fa',
+        blue: '#b3e5fc',
+        white: '#ffffff',
+        gray: '#b0bec5',
+        dark: '#37474f'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: tundra.ice }}>
+            {/* Crystalline frost patterns */}
+            <svg className="absolute inset-0 w-full h-full opacity-15 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="frost" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                        <path d="M30 0 L30 60 M0 30 L60 30 M10 10 L50 50 M50 10 L10 50" fill="none" stroke={tundra.blue} strokeWidth="1" />
+                        <circle cx="30" cy="30" r="3" fill={tundra.blue} />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#frost)" />
+            </svg>
+
+            {/* Aurora subtle hints */}
+            <div className="absolute top-0 left-0 w-full h-1/3 opacity-10 pointer-events-none" style={{
+                background: `linear-gradient(to bottom, #7fffd4 0%, #00ced1 30%, transparent 100%)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            {/* Cold minimal stark lines */}
+            <div className="absolute top-8 left-8 right-8 h-px" style={{ background: tundra.gray, zIndex: LayoutLayer.DECORATION }} />
+            <div className="absolute bottom-8 left-8 right-8 h-px" style={{ background: tundra.gray, zIndex: LayoutLayer.DECORATION }} />
+
+            <div className="w-full h-full p-16 md:p-24 flex items-center gap-16">
+                {/* Ice crystal framed image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-2" style={{
+                        background: tundra.white,
+                        clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'
+                    }} />
+                    <div className="relative w-full aspect-square overflow-hidden" style={{
+                        clipPath: 'polygon(50% 2%, 98% 26%, 98% 74%, 50% 98%, 2% 74%, 2% 26%)'
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-16 h-px mb-8" style={{ background: tundra.dark }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: tundra.dark }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8 uppercase tracking-wider"
+                        style={{ fontWeight: 300, lineHeight: '1.2' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: tundra.gray }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '2' }} />
+
+                    {/* Crystal dots */}
+                    <div className="flex gap-3 mt-8">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="w-2 h-2 rotate-45" style={{ background: tundra.blue }} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 24. SAVANNA - African golden grassland
+export const SavannaArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const savanna = {
+        gold: '#d4a03a',
+        sienna: '#a0522d',
+        brown: '#5d4037',
+        cream: '#f5e6c8',
+        dark: '#2d1b0e'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{
+            background: `linear-gradient(to bottom, ${savanna.cream} 0%, ${savanna.gold} 100%)`
+        }}>
+            {/* Tall grass silhouette overlay */}
+            <div className="absolute bottom-0 left-0 w-full h-32 opacity-30 pointer-events-none" style={{
+                zIndex: LayoutLayer.DECORATION
+            }}>
+                <svg className="w-full h-full" viewBox="0 0 800 100" preserveAspectRatio="none">
+                    {[...Array(40)].map((_, i) => {
+                        const x = i * 20 + rng.range(-5, 5);
+                        const height = rng.range(60, 95);
+                        const curve = rng.range(-10, 10);
+                        return (
+                            <path key={i} d={`M${x} 100 Q${x + curve} ${100 - height/2} ${x + curve/2} ${100 - height}`}
+                                  fill="none" stroke={savanna.brown} strokeWidth="2" />
+                        );
+                    })}
+                </svg>
+            </div>
+
+            {/* Warm sun glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 opacity-30 pointer-events-none" style={{
+                background: `radial-gradient(circle, ${savanna.gold} 0%, transparent 70%)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            {/* Horizon line */}
+            <div className="absolute top-2/3 left-0 w-full h-px" style={{ background: savanna.sienna, opacity: 0.3, zIndex: LayoutLayer.DECORATION }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-20 h-1 mb-6" style={{ background: savanna.sienna }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: savanna.dark }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 600, lineHeight: '1.1' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: savanna.brown }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Earth tone dots */}
+                    <div className="flex gap-2 mt-8">
+                        {[savanna.gold, savanna.sienna, savanna.brown].map((color, i) => (
+                            <div key={i} className="w-4 h-4 rounded-full" style={{ background: color }} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Sunset-framed image */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-3 rounded-lg" style={{
+                        background: `linear-gradient(135deg, ${savanna.gold} 0%, ${savanna.sienna} 100%)`
+                    }} />
+                    <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg" style={{
+                        border: `3px solid ${savanna.cream}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 25. VOLCANO - Molten earth energy
+export const VolcanoArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const volcano = {
+        black: '#0a0a0a',
+        red: '#8b0000',
+        orange: '#ff4500',
+        amber: '#ff8c00',
+        dark: '#1a1a1a'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{ background: volcano.black }}>
+            {/* Lava crack pattern overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <linearGradient id="lava-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={volcano.red} />
+                        <stop offset="50%" stopColor={volcano.orange} />
+                        <stop offset="100%" stopColor={volcano.amber} />
+                    </linearGradient>
+                </defs>
+                <path d="M0 200 Q50 180, 100 200 T200 180 T300 200 L300 250 L0 250 Z" fill="url(#lava-glow)" opacity="0.5" />
+                <path d="M400 100 Q450 80, 500 100 T600 80 L600 150 L400 150 Z" fill="url(#lava-glow)" opacity="0.4" />
+            </svg>
+
+            {/* Ember glow effects */}
+            <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-40 pointer-events-none" style={{
+                background: `linear-gradient(to top, ${volcano.red} 0%, transparent 100%)`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            {/* Primal energy lines */}
+            <div className="absolute top-0 left-0 w-full h-1" style={{ background: volcano.red, zIndex: LayoutLayer.DECORATION }} />
+            <div className="absolute bottom-0 left-0 w-full h-1" style={{ background: volcano.orange, zIndex: LayoutLayer.DECORATION }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Molten framed image */}
+                <div className="w-2/5 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-2" style={{
+                        background: `linear-gradient(135deg, ${volcano.red} 0%, ${volcano.orange} 50%, ${volcano.amber} 100%)`,
+                        boxShadow: `0 0 30px ${volcano.red}`
+                    }} />
+                    <div className="relative w-full aspect-square overflow-hidden" style={{
+                        border: `3px solid ${volcano.black}`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-20 h-1 mb-6" style={{ background: volcano.orange }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: volcano.amber }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8 uppercase tracking-wider"
+                        style={{ fontWeight: 900, lineHeight: '1.0' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#c0c0c0' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.8' }} />
+
+                    {/* Heat gradient dots */}
+                    <div className="flex gap-2 mt-8">
+                        {[volcano.amber, volcano.orange, volcano.red, volcano.red].map((color, i) => (
+                            <div key={i} className="w-3 h-3 rounded-full" style={{ background: color }} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 26. REEF - Underwater coral world
+export const ReefArchetype: React.FC<ArchetypeProps> = ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
+    const reef = {
+        coral: '#ff6b6b',
+        turquoise: '#20b2aa',
+        purple: '#9370db',
+        gold: '#ffd700',
+        deep: '#1a3a4a'
+    };
+
+    return (
+        <div className="w-full h-full relative overflow-hidden" style={{
+            background: `linear-gradient(to bottom, ${reef.turquoise} 0%, ${reef.deep} 100%)`
+        }}>
+            {/* Organic coral shapes */}
+            <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <path d="M50 400 Q80 350, 70 300 Q60 250, 90 200 Q100 150, 80 100" fill="none" stroke={reef.coral} strokeWidth="8" strokeLinecap="round" />
+                <path d="M700 400 Q680 350, 720 300 Q740 250, 710 200" fill="none" stroke={reef.purple} strokeWidth="6" strokeLinecap="round" />
+                <circle cx="100" cy="300" r="20" fill={reef.coral} opacity="0.3" />
+                <circle cx="150" cy="280" r="15" fill={reef.coral} opacity="0.4" />
+            </svg>
+
+            {/* Light caustic patterns */}
+            <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" style={{ zIndex: LayoutLayer.DECORATION }}>
+                <defs>
+                    <pattern id="caustic" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <ellipse cx="30" cy="30" rx="25" ry="15" fill="none" stroke={reef.gold} strokeWidth="1" />
+                        <ellipse cx="70" cy="70" rx="20" ry="12" fill="none" stroke={reef.gold} strokeWidth="1" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#caustic)" />
+            </svg>
+
+            {/* Bioluminescent hints */}
+            <div className="absolute bottom-1/4 right-1/4 w-4 h-4 rounded-full opacity-50" style={{
+                background: reef.gold,
+                boxShadow: `0 0 20px ${reef.gold}`,
+                zIndex: LayoutLayer.DECORATION
+            }} />
+
+            <div className="w-full h-full p-12 md:p-20 flex items-center gap-12">
+                {/* Content */}
+                <div className="w-1/2 flex flex-col justify-center" style={{ zIndex: LayoutLayer.CONTENT_HERO }}>
+                    <div className="w-16 h-1 mb-6" style={{ background: reef.coral }} />
+
+                    <EditableTitle
+                        slide={slide} theme={theme} contrast={{ text: '#ffffff' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                        className="text-5xl md:text-6xl lg:text-7xl mb-8"
+                        style={{ fontWeight: 500, lineHeight: '1.15' }}
+                    />
+
+                    <EditableContent slide={slide} theme={theme} contrast={{ text: '#b0e0e6' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="text-lg" style={{ lineHeight: '1.9' }} />
+
+                    {/* Coral color dots */}
+                    <div className="flex gap-2 mt-8">
+                        {[reef.coral, reef.turquoise, reef.purple, reef.gold].map((color, i) => (
+                            <div key={i} className="w-3 h-3 rounded-full" style={{ background: color }} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Organic coral-shaped frame */}
+                <div className="w-1/2 relative" style={{ zIndex: LayoutLayer.MEDIA }}>
+                    <div className="absolute -inset-3" style={{
+                        background: reef.coral,
+                        borderRadius: '60% 40% 55% 45% / 55% 60% 40% 45%',
+                        opacity: 0.8
+                    }} />
+                    <div className="relative w-full aspect-square overflow-hidden" style={{
+                        borderRadius: '55% 45% 50% 50% / 50% 55% 45% 50%',
+                        border: `3px solid ${reef.gold}40`
+                    }}>
+                        <ImageContainer slide={slide} theme={theme} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};

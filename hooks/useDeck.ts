@@ -2,8 +2,17 @@
 
 
 import { useState, useEffect, useRef } from 'react';
-import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession } from '../types';
-import { generatePresentationPlan, generateSlideImage, refineImagePrompt, ensureApiKeySelection, RefinementFocus } from '../services/geminiService';
+import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession, ToneType, ContentRefinementType, ImageStylePreset } from '../types';
+import {
+    generatePresentationPlan,
+    generateSlideImage,
+    refineImagePrompt,
+    ensureApiKeySelection,
+    RefinementFocus,
+    refineSlideContent as refineSlideContentApi,
+    refineSlideContentByType,
+    enhanceImagePrompt
+} from '../services/geminiService';
 import { THEMES, IMAGE_STYLES } from '../lib/themes';
 import { WABI_SABI_LAYOUT_NAMES } from '../components/WabiSabiStage';
 import { loadGoogleFont } from '../lib/fonts';
@@ -14,10 +23,11 @@ export const useDeck = () => {
   const [savedDecks, setSavedDecks] = useState<Presentation[]>([]);
   const [activeSlideIndex, setActiveSlideIndex] = useState<number>(0);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRefining, setIsRefining] = useState(false);
   const [activeTheme, setActiveTheme] = useState<Theme>(THEMES.neoBrutalist);
   const [activeWabiSabiLayout, setActiveWabiSabiLayout] = useState<string>('Editorial');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-  
+
   // Track previous presentation state to detect changes for auto-save
   const prevPresentationRef = useRef<string | null>(null);
 
@@ -368,6 +378,70 @@ export const useDeck = () => {
     });
   };
 
+  // --- AI REFINEMENT ACTIONS ---
+
+  const refineSlideContent = async (type: 'tone' | 'content', subType: string) => {
+      if (!currentPresentation) return;
+      const slide = currentPresentation.slides[activeSlideIndex];
+      if (!slide) return;
+
+      setIsRefining(true);
+      try {
+          let result: { title: string; content: string[] };
+
+          if (type === 'tone') {
+              result = await refineSlideContentApi(slide.title, slide.content, subType as ToneType);
+          } else {
+              result = await refineSlideContentByType(slide.title, slide.content, subType as ContentRefinementType);
+          }
+
+          setCurrentPresentation(prev => {
+              if (!prev) return null;
+              const newSlides = [...prev.slides];
+              newSlides[activeSlideIndex] = {
+                  ...newSlides[activeSlideIndex],
+                  title: result.title,
+                  content: result.content
+              };
+              return { ...prev, slides: newSlides };
+          });
+      } catch (e) {
+          console.error('Content refinement failed', e);
+      } finally {
+          setIsRefining(false);
+      }
+  };
+
+  const enhanceSlideImage = async (preset: ImageStylePreset) => {
+      if (!currentPresentation) return;
+      const slide = currentPresentation.slides[activeSlideIndex];
+      if (!slide || !slide.imagePrompt) return;
+
+      setIsRefining(true);
+      try {
+          // Get enhanced prompt
+          const newPrompt = await enhanceImagePrompt(slide.imagePrompt, preset);
+
+          // Update prompt
+          setCurrentPresentation(prev => {
+              if (!prev) return null;
+              const newSlides = [...prev.slides];
+              newSlides[activeSlideIndex] = {
+                  ...newSlides[activeSlideIndex],
+                  imagePrompt: newPrompt
+              };
+              return { ...prev, slides: newSlides };
+          });
+
+          // Regenerate image with new prompt
+          await generateSingleImage(activeSlideIndex, newPrompt, currentPresentation.visualStyle);
+      } catch (e) {
+          console.error('Image enhancement failed', e);
+      } finally {
+          setIsRefining(false);
+      }
+  };
+
   // Create deck from ideation plan (used by IdeationCopilot)
   const createDeckFromPlan = async (plan: {
       topic: string;
@@ -441,6 +515,7 @@ export const useDeck = () => {
       activeSlideIndex,
       setActiveSlideIndex,
       isGenerating,
+      isRefining,
       activeTheme,
       activeWabiSabiLayout,
       saveStatus,
@@ -463,7 +538,9 @@ export const useDeck = () => {
           shuffleLayoutVariants,
           importDeck,
           exportDeck,
-          recordSession
+          recordSession,
+          refineSlideContent,
+          enhanceSlideImage
       }
   };
 };

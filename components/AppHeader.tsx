@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { Presentation, Theme } from '../types';
 import { THEMES } from '../lib/themes';
-import { WABI_SABI_LAYOUT_NAMES } from './WabiSabiStage';
 import { CURATED_FONT_PAIRINGS } from '../lib/fonts';
-import { Component, Sparkles, Palette, ChevronDown, Check, Play, Download, Printer, Shuffle, LayoutTemplate, Type, Search, Home, Save, RefreshCw, Loader2, Cloud, Share2 } from 'lucide-react';
+import { Sparkles, Palette, ChevronDown, Check, Play, Download, Shuffle, LayoutTemplate, Type, Search, Home, RefreshCw, Loader2, Cloud, Share2 } from 'lucide-react';
 import { generatePPT } from '../services/pptService';
+import { ModeSwitcher } from './ModeSwitcher';
+import { ArchetypePicker } from './ArchetypePicker';
 
 interface AppHeaderProps {
     currentPresentation: Presentation | null;
@@ -168,54 +169,41 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                          <div className="h-6 w-px bg-zinc-200 mx-2" />
 
                         {/* View Mode Switcher */}
-                        <div className="flex items-center bg-zinc-100 p-1 rounded-lg border border-zinc-200 mr-2">
-                            <button onClick={() => setViewMode('standard')} className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all ${viewMode === 'standard' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-900'}`}><Component className="w-3.5 h-3.5" /> Structure</button>
-                            <button onClick={() => setViewMode('wabi-sabi')} className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all ${viewMode === 'wabi-sabi' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900'}`}><Sparkles className="w-3.5 h-3.5" /> Wabi-Sabi</button>
-                        </div>
-                        
-                        {/* Wabi-Sabi Layout Selector */}
+                        <ModeSwitcher viewMode={viewMode} setViewMode={setViewMode} />
+
+                        {/* Organic Mode Archetype Selector */}
                         {viewMode === 'wabi-sabi' && (
-                             <div className="flex items-center gap-1">
+                             <div className="flex items-center gap-1 ml-2">
                                 <div className="relative">
                                     <button onClick={() => setIsLayoutMenuOpen(!isLayoutMenuOpen)} className="flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white text-xs font-bold uppercase tracking-widest border border-zinc-900 hover:bg-zinc-800 transition-all rounded-md shadow-sm">
                                         <LayoutTemplate className="w-4 h-4" strokeWidth={2.5} />
                                         <span className="hidden md:inline">{activeWabiSabiLayout}</span>
                                         <ChevronDown className="w-3 h-3 ml-1" />
                                     </button>
-                                    {isLayoutMenuOpen && (
-                                        <>
-                                        <div className="fixed inset-0 z-40" onClick={() => setIsLayoutMenuOpen(false)} />
-                                        <div className="absolute top-full right-0 mt-4 w-56 bg-white border border-zinc-200 shadow-xl rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-                                            <div className="p-2 flex flex-col gap-1 max-h-[60vh] overflow-y-auto">
-                                                {WABI_SABI_LAYOUT_NAMES.map(layout => (
-                                                    <button key={layout} onClick={() => { onSetWabiSabiLayout(layout); setIsLayoutMenuOpen(false); }} className={`px-3 py-2 text-left text-xs font-bold uppercase tracking-widest rounded-md transition-colors ${activeWabiSabiLayout === layout ? 'bg-zinc-100 text-zinc-900' : 'hover:bg-zinc-50 text-zinc-500'}`}>
-                                                        {layout}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        </>
-                                    )}
+                                    <ArchetypePicker
+                                        isOpen={isLayoutMenuOpen}
+                                        onClose={() => setIsLayoutMenuOpen(false)}
+                                        activeArchetype={activeWabiSabiLayout}
+                                        onSelect={onSetWabiSabiLayout}
+                                        onShuffle={onShuffleLayout || (() => {})}
+                                    />
                                 </div>
-                                <button onClick={onShuffleLayout} className="p-2 hover:bg-zinc-100 text-zinc-600 rounded-md transition-colors border border-transparent hover:border-zinc-200" title="Re-roll Layouts">
-                                    <RefreshCw className="w-4 h-4" />
-                                </button>
                              </div>
                         )}
 
-                         {/* Typography Selector (Visible in Wabi-Sabi) */}
-                         {viewMode === 'wabi-sabi' && onApplyTypography && (
+                         {/* Typography Selector (Visible in both modes) */}
+                         {onApplyTypography && (
                              <div className="relative">
                                 <button onClick={() => setIsFontMenuOpen(!isFontMenuOpen)} className="flex items-center gap-2 px-4 py-2 bg-white text-zinc-900 text-xs font-bold uppercase tracking-widest border border-zinc-200 hover:border-zinc-400 transition-all rounded-md">
                                     <Type className="w-4 h-4" strokeWidth={2.5} />
                                     <span className="hidden md:inline">Type</span>
                                     <ChevronDown className="w-3 h-3 ml-1" />
                                 </button>
-                                <FontMenu 
-                                    isOpen={isFontMenuOpen} 
-                                    onClose={() => setIsFontMenuOpen(false)} 
-                                    activeTheme={activeTheme} 
-                                    onApply={(h, b) => { onApplyTypography(h, b); setIsFontMenuOpen(false); }} 
+                                <FontMenu
+                                    isOpen={isFontMenuOpen}
+                                    onClose={() => setIsFontMenuOpen(false)}
+                                    activeTheme={activeTheme}
+                                    onApply={(h, b) => { onApplyTypography(h, b); setIsFontMenuOpen(false); }}
                                 />
                              </div>
                          )}

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Slide, Theme } from '../types';
+import { Slide, Theme, ImageStyleOverride } from '../types';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
 
 interface LayoutProps {
@@ -10,11 +10,30 @@ interface LayoutProps {
     printMode?: boolean;
 }
 
+// CSS Filter helper for visual enhancement
+const getImageFilterStyle = (imageStyles?: ImageStyleOverride): React.CSSProperties => {
+    if (!imageStyles) return {};
+
+    const filters: string[] = [];
+    if (imageStyles.brightness !== undefined && imageStyles.brightness !== 1) {
+        filters.push(`brightness(${imageStyles.brightness})`);
+    }
+    if (imageStyles.contrast !== undefined && imageStyles.contrast !== 1) {
+        filters.push(`contrast(${imageStyles.contrast})`);
+    }
+    if (imageStyles.saturation !== undefined && imageStyles.saturation !== 1) {
+        filters.push(`saturate(${imageStyles.saturation})`);
+    }
+
+    return filters.length > 0 ? { filter: filters.join(' ') } : {};
+};
+
 export const ImageContainer = ({ slide, theme, className = "", style = {} }: { slide: Slide, theme: Theme, className?: string, style?: React.CSSProperties }) => {
     // Image style overrides
     const imageStyles = slide.imageStyles;
     const opacity = imageStyles?.opacity ?? 1;
     const objectFit = imageStyles?.objectFit ?? 'cover';
+    const filterStyle = getImageFilterStyle(imageStyles);
 
     return (
         <div
@@ -37,6 +56,7 @@ export const ImageContainer = ({ slide, theme, className = "", style = {} }: { s
                     style={{
                         objectFit,
                         opacity,
+                        ...filterStyle,
                     }}
                 />
             ) : (

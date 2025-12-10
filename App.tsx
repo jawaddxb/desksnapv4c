@@ -24,7 +24,7 @@ export default function App() {
   const [showCreateChat, setShowCreateChat] = useState(false);
   const [isIdeating, setIsIdeating] = useState(false);
   
-  const { currentPresentation, savedDecks, activeSlideIndex, setActiveSlideIndex, isGenerating, activeTheme, activeWabiSabiLayout, saveStatus, actions } = useDeck();
+  const { currentPresentation, savedDecks, activeSlideIndex, setActiveSlideIndex, isGenerating, isRefining, activeTheme, activeWabiSabiLayout, saveStatus, actions } = useDeck();
   
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
   const modalScrollRef = useRef<HTMLDivElement>(null);
@@ -286,6 +286,10 @@ export default function App() {
             onUpdateSlide={actions.updateSlide}
             viewMode={viewMode}
             printMode={isPresenting}
+            // AI Refinement props
+            onRefineContent={actions.refineSlideContent}
+            onEnhanceImage={actions.enhanceSlideImage}
+            isRefining={isRefining}
             // Dashboard props
             savedDecks={savedDecks}
             onLoadDeck={actions.loadDeck}
