@@ -12,7 +12,7 @@ import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession } from '..
 import { generatePresentationPlan, ensureApiKeySelection } from '../services/geminiService';
 import { THEMES, IMAGE_STYLES } from '../lib/themes';
 import { WABI_SABI_LAYOUT_NAMES } from '../components/WabiSabiStage';
-import { loadGoogleFont } from '../lib/fonts';
+import { loadGoogleFont, loadThemeFonts } from '../lib/fonts';
 import { getSavedDecks, saveDeckToStorage, deleteDeckFromStorage, migrateLegacyData } from '../services/storageService';
 import { useAutoSave } from './useAutoSave';
 import {
@@ -193,11 +193,14 @@ export const useDeck = () => {
     setCurrentPresentation(updatedDeck);
   };
 
-  const loadDeck = (id: string) => {
+  const loadDeck = async (id: string) => {
     const deck = savedDecks.find(d => d.id === id);
     if (deck) {
+      const theme = THEMES[deck.themeId] || THEMES.neoBrutalist;
+      // Load theme fonts before displaying
+      await loadThemeFonts(theme);
       setCurrentPresentation(deck);
-      setActiveTheme(THEMES[deck.themeId] || THEMES.neoBrutalist);
+      setActiveTheme(theme);
       setActiveWabiSabiLayout(deck.wabiSabiLayout || 'Editorial');
       setActiveSlideIndex(0);
       resetTracking(deck);
@@ -251,9 +254,11 @@ export const useDeck = () => {
 
   // ============ Theme & Layout ============
 
-  const applyTheme = (themeId: string) => {
+  const applyTheme = async (themeId: string) => {
     const newTheme = THEMES[themeId];
     if (newTheme) {
+      // Load theme fonts before applying
+      await loadThemeFonts(newTheme);
       setActiveTheme(newTheme);
       if (currentPresentation) {
         setCurrentPresentation({

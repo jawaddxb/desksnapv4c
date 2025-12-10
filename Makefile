@@ -1,4 +1,4 @@
-.PHONY: help install dev up down logs clean lint format test migrate db-reset
+.PHONY: help install dev up down logs clean lint format test migrate db-reset infra-up infra-down
 
 # Default target
 help:
@@ -9,10 +9,12 @@ help:
 	@echo "  make setup      - Initial setup (copy .env, install deps)"
 	@echo ""
 	@echo "Development:"
-	@echo "  make dev        - Start all services with Docker Compose"
-	@echo "  make up         - Start services in background"
-	@echo "  make down       - Stop all services"
-	@echo "  make restart    - Restart all services"
+	@echo "  make dev        - Start API, Worker, and Frontend (kills existing first)"
+	@echo "  make infra-up   - Start postgres + redis in Docker"
+	@echo "  make infra-down - Stop postgres + redis"
+	@echo "  make up         - Start all services in Docker (background)"
+	@echo "  make down       - Stop all Docker services"
+	@echo "  make restart    - Restart all Docker services"
 	@echo "  make logs       - View logs from all services"
 	@echo "  make logs-api   - View API logs only"
 	@echo "  make logs-worker - View worker logs only"
@@ -56,11 +58,30 @@ setup:
 
 # Development commands
 dev:
-	@echo "Starting DeckSnap in development mode..."
-	docker-compose up
+	@echo "Killing existing processes on ports 8000, 3000..."
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+	@echo "Killing existing Celery workers..."
+	@pkill -f "celery.*worker" 2>/dev/null || true
+	@sleep 1
+	@echo "Starting API (8000), Worker, and Frontend (3000)..."
+	poetry run honcho start -f Procfile.dev
+
+# Infrastructure commands (Docker services)
+infra-up:
+	@echo "Starting infrastructure services (postgres, redis)..."
+	@docker-compose up -d postgres redis
+	@echo "Waiting for services to be healthy..."
+	@sleep 3
+	@echo "✅ Infrastructure ready on postgres:5433, redis:6381"
+
+infra-down:
+	@echo "Stopping infrastructure services..."
+	@docker-compose stop postgres redis
+	@echo "✅ Infrastructure stopped"
 
 up:
-	@echo "Starting services in background..."
+	@echo "Starting all services in background (Docker)..."
 	docker-compose up -d
 	@echo "✅ Services started. Run 'make logs' to view logs"
 

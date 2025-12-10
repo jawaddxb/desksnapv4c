@@ -1,7 +1,6 @@
-
 import { Presentation, Theme, Slide } from '../types';
 
-declare const PptxGenJS: any;
+type PptxGenJSType = typeof import('pptxgenjs').default;
 
 // --- HELPERS ---
 
@@ -160,7 +159,8 @@ const layoutGenerators: Record<string, (pptSlide: any, slide: Slide, theme: Them
 // --- MAIN EXPORT ---
 
 export const generatePPT = async (presentation: Presentation, theme: Theme) => {
-  if (typeof PptxGenJS === 'undefined') { console.error('PptxGenJS not loaded'); return; }
+  // Dynamic import - only loads when export is triggered
+  const PptxGenJS = (await import('pptxgenjs')).default;
 
   const pres = new PptxGenJS();
   pres.title = presentation.topic;

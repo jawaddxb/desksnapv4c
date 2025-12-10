@@ -12,12 +12,14 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialMode?: 'login' | 'register';
+  onSuccess?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   initialMode = 'login',
+  onSuccess,
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [email, setEmail] = useState('');
@@ -41,11 +43,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       } else {
         await actions.register({ email, password, name: name || undefined });
       }
-      // Success - close modal and reset form
-      onClose();
+      // Success - close modal, reset form, and trigger success callback
       setEmail('');
       setPassword('');
       setName('');
+      onClose();
+      onSuccess?.();
     } catch {
       // Error is already set in AuthContext, no need to duplicate
     } finally {

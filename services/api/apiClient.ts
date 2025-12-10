@@ -106,7 +106,15 @@ export const apiRequest = async <T>(
 
     try {
       const errorData = await response.json();
-      detail = errorData.detail || errorData.message || detail;
+      // Handle validation errors with detailed field messages
+      if (errorData.error_code === 'VALIDATION_ERROR' && errorData.details?.errors) {
+        const fieldErrors = errorData.details.errors
+          .map((e: { field: string; message: string }) => e.message)
+          .join('. ');
+        detail = fieldErrors || errorData.message || detail;
+      } else {
+        detail = errorData.detail || errorData.message || detail;
+      }
       errorCode = errorData.error_code;
       errorId = errorData.error_id;
     } catch {

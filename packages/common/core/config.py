@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     api_port: int = Field(default=8000, description="API port")
     api_workers: int = Field(default=1, description="Number of uvicorn workers")
     cors_origins: list[str] = Field(
-        default=["http://localhost:3000", "http://localhost:5173"],
+        default=["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:5173"],
         description="Allowed CORS origins",
     )
 

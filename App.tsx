@@ -1,11 +1,12 @@
 /**
  * App Component
  *
- * Main application shell that orchestrates the presentation editor.
- * Uses focused hooks for analytics, keyboard navigation, and chat.
+ * Main application shell with routing.
+ * Handles authentication modal state and routes to landing/app.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GenerationMode } from './types';
 import { IMAGE_STYLES } from './lib/themes';
@@ -21,6 +22,18 @@ import { useChat } from './hooks/useChat';
 import { IdeationCopilot } from './components/ideation/IdeationCopilot';
 import { AuthProvider } from './contexts/AuthContext';
 import { AuthModal } from './components/auth';
+import { preloadCommonFonts } from './lib/fonts';
+import { ProtectedRoute } from './components/routing';
+import { LandingPage } from './components/landing';
+import {
+  FeaturesPage,
+  PricingPage,
+  AboutPage,
+  ThemesGalleryPage,
+  SolutionsPage,
+} from './components/pages';
+
+// ============ Protected App Content ============
 
 function AppContent() {
   // UI State
@@ -32,7 +45,6 @@ function AppContent() {
   const [viewMode, setViewMode] = useState<'standard' | 'wabi-sabi'>('standard');
   const [showCreateChat, setShowCreateChat] = useState(false);
   const [isIdeating, setIsIdeating] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Main deck hook
   const {
@@ -76,6 +88,11 @@ function AppContent() {
     setActiveSlideIndex,
     onExitPresentation: useCallback(() => setIsPresenting(false), []),
   });
+
+  // Preload common fonts in the background after initial render
+  useEffect(() => {
+    preloadCommonFonts();
+  }, []);
 
   // ============ Handlers ============
 
@@ -237,7 +254,6 @@ function AppContent() {
               onShuffleLayout={actions.shuffleLayoutVariants}
               onExportDeck={actions.exportDeck}
               saveStatus={saveStatus}
-              onLoginClick={() => setShowAuthModal(true)}
             />
           )}
 
@@ -308,21 +324,96 @@ function AppContent() {
         activeWabiSabiLayout={activeWabiSabiLayout}
         viewMode={viewMode}
       />
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
     </>
   );
 }
 
-// Main App wrapped with AuthProvider
+// ============ Main App with Routing ============
+
 export default function App() {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleOpenAuth = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    // Redirect to app after successful auth
+    const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/app';
+    navigate(from, { replace: true });
+  };
+
   return (
     <AuthProvider>
-      <AppContent />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage onAuth={handleOpenAuth} />} />
+        <Route path="/features" element={<FeaturesPage onAuth={handleOpenAuth} />} />
+        <Route path="/pricing" element={<PricingPage onAuth={handleOpenAuth} />} />
+        <Route path="/about" element={<AboutPage onAuth={handleOpenAuth} />} />
+        <Route path="/themes" element={<ThemesGalleryPage onAuth={handleOpenAuth} />} />
+        <Route path="/solutions/:solutionId" element={<SolutionsPage onAuth={handleOpenAuth} />} />
+
+        {/* Auth Routes (trigger modal) */}
+        <Route
+          path="/login"
+          element={
+            <AuthModalTrigger mode="login" onAuth={handleOpenAuth}>
+              <LandingPage onAuth={handleOpenAuth} />
+            </AuthModalTrigger>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <AuthModalTrigger mode="register" onAuth={handleOpenAuth}>
+              <LandingPage onAuth={handleOpenAuth} />
+            </AuthModalTrigger>
+          }
+        />
+
+        {/* Protected Routes */}
+        <Route
+          path="/app"
+          element={
+            <ProtectedRoute>
+              <AppContent />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallback - redirect to home */}
+        <Route path="*" element={<LandingPage onAuth={handleOpenAuth} />} />
+      </Routes>
+
+      {/* Global Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode={authMode}
+        onSuccess={handleAuthSuccess}
+      />
     </AuthProvider>
   );
+}
+
+// ============ Helper Components ============
+
+interface AuthModalTriggerProps {
+  mode: 'login' | 'register';
+  onAuth: (mode: 'login' | 'register') => void;
+  children: React.ReactNode;
+}
+
+function AuthModalTrigger({ mode, onAuth, children }: AuthModalTriggerProps) {
+  React.useEffect(() => {
+    onAuth(mode);
+  }, [mode, onAuth]);
+
+  return <>{children}</>;
 }

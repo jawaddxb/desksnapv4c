@@ -1,4 +1,3 @@
-
 export interface FontPair {
   id: string;
   name: string;
@@ -7,17 +6,73 @@ export interface FontPair {
   description: string;
 }
 
+// Cache of loaded fonts (pre-populate with fonts loaded in index.html)
+const loadedFonts = new Set<string>(['DM Sans', 'Space Grotesk']);
+
+// Extract font name from CSS font-family string (e.g., "'Playfair Display', serif" -> "Playfair Display")
+export const extractFontName = (fontFamily: string): string => {
+  return fontFamily.split(',')[0].replace(/['"]/g, '').trim();
+};
+
 // Helper to dynamically load a Google Font into the document head
-export const loadGoogleFont = (fontName: string) => {
-  if (!fontName) return;
+export const loadGoogleFont = (fontName: string): Promise<void> => {
+  if (!fontName) return Promise.resolve();
+
+  // Already loaded
+  if (loadedFonts.has(fontName)) {
+    return Promise.resolve();
+  }
+
   const linkId = `font-${fontName.replace(/\s+/g, '-').toLowerCase()}`;
-  
-  if (!document.getElementById(linkId)) {
+
+  // Already has link element
+  if (document.getElementById(linkId)) {
+    loadedFonts.add(fontName);
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
     const link = document.createElement('link');
     link.id = linkId;
-    link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/\s+/g, '+')}:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap`;
+    link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/\s+/g, '+')}:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap`;
     link.rel = 'stylesheet';
+    link.onload = () => {
+      loadedFonts.add(fontName);
+      resolve();
+    };
+    link.onerror = () => resolve(); // Don't block on font errors
     document.head.appendChild(link);
+  });
+};
+
+// Load all fonts for a theme
+export const loadThemeFonts = async (theme: { fonts: { heading: string; body: string } }): Promise<void> => {
+  const headingFont = extractFontName(theme.fonts.heading);
+  const bodyFont = extractFontName(theme.fonts.body);
+
+  await Promise.all([
+    loadGoogleFont(headingFont),
+    loadGoogleFont(bodyFont),
+  ]);
+};
+
+// Preload common theme fonts in the background (call after initial render)
+export const preloadCommonFonts = (): void => {
+  const commonFonts = [
+    'Inter', 'Oswald', 'Space Mono', 'Playfair Display', 'Lato',
+    'Montserrat', 'Poppins', 'Open Sans', 'Roboto'
+  ];
+
+  // Use requestIdleCallback for non-blocking preload
+  if ('requestIdleCallback' in window) {
+    (window as Window & { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(() => {
+      commonFonts.forEach(font => loadGoogleFont(font));
+    });
+  } else {
+    // Fallback for Safari
+    setTimeout(() => {
+      commonFonts.forEach(font => loadGoogleFont(font));
+    }, 2000);
   }
 };
 
