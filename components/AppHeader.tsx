@@ -7,6 +7,7 @@ import { Sparkles, Palette, ChevronDown, Check, Play, Download, Shuffle, LayoutT
 import { generatePPT } from '../services/pptService';
 import { ModeSwitcher } from './ModeSwitcher';
 import { ArchetypePicker } from './ArchetypePicker';
+import { UserMenu } from './auth';
 
 interface AppHeaderProps {
     currentPresentation: Presentation | null;
@@ -26,6 +27,7 @@ interface AppHeaderProps {
     onShuffleLayout?: () => void;
     onExportDeck?: () => void;
     saveStatus?: 'idle' | 'saving' | 'saved';
+    onLoginClick?: () => void;
 }
 
 // Helper component for Font Menu
@@ -117,7 +119,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     onClose,
     onShuffleLayout,
     onExportDeck,
-    saveStatus = 'idle'
+    saveStatus = 'idle',
+    onLoginClick
 }) => {
     const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
     const [isLayoutMenuOpen, setIsLayoutMenuOpen] = useState(false);
@@ -251,6 +254,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                         </button>
                     </>
                 )}
+
+                {/* User Menu - Always visible */}
+                <div className="h-6 w-px bg-zinc-200 mx-2" />
+                <UserMenu onLoginClick={onLoginClick || (() => {})} />
             </div>
         </header>
     );

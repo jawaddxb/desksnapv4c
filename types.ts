@@ -54,6 +54,9 @@ export interface Slide {
   imageUrl?: string;
   imageError?: string; // Error message if image generation failed
   isImageLoading: boolean;
+  // Async image generation tracking
+  imageTaskId?: string; // Celery task ID if generation in progress
+  imageStorageKey?: string; // Storage provider key (S3 path, etc.)
   // Layout Engine Properties
   layoutType: LayoutType;
   alignment: Alignment;

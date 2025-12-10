@@ -5,7 +5,7 @@
  * Handles CRUD operations, auto-save, and tool execution for the agentic copilot.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Message, MessageRole } from '../types';
 import {
   IdeationSession,
@@ -25,6 +25,7 @@ import {
   saveIdeationSession,
   deleteIdeationSession,
 } from '../services/storageService';
+import { useAutoSave } from './useAutoSave';
 
 export interface UseIdeationReturn {
   // State
@@ -81,65 +82,52 @@ export function useIdeation(): UseIdeationReturn {
   const [session, setSession] = useState<IdeationSession | null>(null);
   const [savedSessions, setSavedSessions] = useState<IdeationSession[]>([]);
   const [isThinking, setIsThinking] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
-  // Track previous session state for auto-save change detection
-  const prevSessionRef = useRef<string | null>(null);
+  // Refresh session list callback (memoized to avoid useAutoSave re-renders)
+  const refreshSessionList = useCallback(async () => {
+    const sessions = await getIdeationSessions();
+    setSavedSessions(sessions);
+  }, []);
+
+  // Auto-save using the reusable hook
+  const { saveStatus, resetTracking, forceSave } = useAutoSave({
+    data: session,
+    onSave: saveIdeationSession,
+    onSaveComplete: refreshSessionList,
+  });
 
   // Load sessions on mount
   useEffect(() => {
     refreshSessionList();
-  }, []);
-
-  // Auto-save with 2s debounce
-  useEffect(() => {
-    if (!session) return;
-
-    const currentString = JSON.stringify(session);
-    if (prevSessionRef.current !== currentString) {
-      setSaveStatus('saving');
-      const timer = setTimeout(async () => {
-        await saveIdeationSession(session);
-        setSaveStatus('saved');
-        refreshSessionList();
-        setTimeout(() => setSaveStatus('idle'), 2000);
-      }, 2000);
-
-      prevSessionRef.current = currentString;
-      return () => clearTimeout(timer);
-    }
-  }, [session]);
+  }, [refreshSessionList]);
 
   // ============ SESSION OPERATIONS ============
-
-  const refreshSessionList = async () => {
-    const sessions = await getIdeationSessions();
-    setSavedSessions(sessions);
-  };
 
   const startSession = (topic: string) => {
     const newSession = createSession(topic);
     setSession(newSession);
-    prevSessionRef.current = JSON.stringify(newSession);
-
-    // Save immediately
-    saveIdeationSession(newSession).then(refreshSessionList);
+    // Save immediately and reset tracking
+    saveIdeationSession(newSession).then(() => {
+      resetTracking(newSession);
+      refreshSessionList();
+    });
   };
 
   const loadSession = async (id: string) => {
     const loaded = await getIdeationSession(id);
     if (loaded) {
       setSession(loaded);
-      prevSessionRef.current = JSON.stringify(loaded);
+      // Reset tracking to prevent immediate save on load
+      resetTracking(loaded);
     }
   };
 
   const closeSession = async () => {
     if (session) {
-      await saveIdeationSession(session);
+      await forceSave();
     }
     setSession(null);
-    prevSessionRef.current = null;
+    resetTracking(null);
     refreshSessionList();
   };
 
@@ -147,7 +135,7 @@ export function useIdeation(): UseIdeationReturn {
     await deleteIdeationSession(id);
     if (session?.id === id) {
       setSession(null);
-      prevSessionRef.current = null;
+      resetTracking(null);
     }
     refreshSessionList();
   };

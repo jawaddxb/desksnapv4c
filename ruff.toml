@@ -1,0 +1,93 @@
+# Ruff configuration for DeckSnap backend
+# Following KISS, SOLID, DRY principles
+
+# Target Python 3.11+
+target-version = "py311"
+
+# Max line length
+line-length = 100
+
+# Enable auto-fixing
+fix = true
+
+# Directories to exclude
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "*.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "dist",
+    "build",
+    "node_modules",
+    "infra/alembic/versions",  # Generated migration files
+]
+
+[lint]
+# Enable rule sets (following reference architecture)
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort (import sorting)
+    "N",     # pep8-naming
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "SIM",   # flake8-simplify (KISS principle)
+    "RET",   # flake8-return
+    "ARG",   # flake8-unused-arguments
+]
+
+# Ignore specific rules
+ignore = [
+    "E501",   # Line too long (handled by line-length)
+    "B008",   # Do not perform function calls in argument defaults (FastAPI Depends)
+    "N805",   # First argument should be named 'self' (pydantic validators)
+    "UP007",  # Use X | Y for type annotations (not available in Python 3.9)
+]
+
+# Allow unused variables when prefixed with underscore
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[lint.per-file-ignores]
+# Tests can have unused imports, assertions, etc.
+"tests/**/*.py" = ["ARG", "F841"]
+# __init__.py files can have unused imports (re-exports)
+"__init__.py" = ["F401"]
+# Alembic migration files
+"infra/alembic/versions/*.py" = ["E501", "F401"]
+
+[lint.isort]
+# Import sorting configuration (DRY principle - consistent imports)
+known-first-party = ["packages", "apps"]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+[lint.mccabe]
+# Complexity threshold (KISS principle - keep functions simple)
+max-complexity = 10
+
+[format]
+# Use double quotes for strings
+quote-style = "double"
+
+# Use spaces for indentation
+indent-style = "space"
+
+# Number of spaces per indentation level
+indent-width = 4
+
+# Respect magic trailing comma
+skip-magic-trailing-comma = false
+
+# Line ending style
+line-ending = "auto"

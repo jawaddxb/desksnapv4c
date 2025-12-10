@@ -1,7 +1,7 @@
-
-import { GoogleGenAI } from "@google/genai";
 import { PresentationPlanResponse, GenerationMode, ToneType, ContentRefinementType, ImageStylePreset } from "../types";
 import { getThemeOptions, REFINEMENT_INSTRUCTIONS, SYSTEM_INSTRUCTION_VISUAL_DIRECTOR, PRESENTATION_SCHEMA, getGenerationModeInstruction } from "../lib/prompts";
+import { getAIClient } from "./aiClient";
+import { parseAIJsonResponse } from "./ai/parseJson";
 
 // Helper to ensure we have a valid key for High Quality image generation
 export const ensureApiKeySelection = async (): Promise<void> => {
@@ -20,7 +20,7 @@ export const ensureApiKeySelection = async (): Promise<void> => {
 export type RefinementFocus = keyof typeof REFINEMENT_INSTRUCTIONS;
 
 export const refineImagePrompt = async (originalPrompt: string, focus: RefinementFocus = 'general'): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
   const instruction = REFINEMENT_INSTRUCTIONS[focus];
 
   const response = await ai.models.generateContent({
@@ -67,7 +67,7 @@ export const refineSlideContent = async (
   content: string[],
   tone: ToneType
 ): Promise<{ title: string; content: string[] }> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
   const instruction = TONE_INSTRUCTIONS[tone];
 
   const response = await ai.models.generateContent({
@@ -90,9 +90,7 @@ Keep the same number of bullets. Do not add markdown or explanations.`,
     }
   });
 
-  const text = response.text?.trim() || '';
-  const cleanJson = text.replace(/```json|```/g, '').trim();
-  return JSON.parse(cleanJson);
+  return parseAIJsonResponse<{ title: string; content: string[] }>(response.text);
 };
 
 export const refineSlideContentByType = async (
@@ -100,7 +98,7 @@ export const refineSlideContentByType = async (
   content: string[],
   refinementType: ContentRefinementType
 ): Promise<{ title: string; content: string[] }> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
   const instruction = CONTENT_REFINEMENT_INSTRUCTIONS[refinementType];
 
   const response = await ai.models.generateContent({
@@ -123,16 +121,14 @@ You may adjust the number of bullets if the refinement requires it (e.g., expand
     }
   });
 
-  const text = response.text?.trim() || '';
-  const cleanJson = text.replace(/```json|```/g, '').trim();
-  return JSON.parse(cleanJson);
+  return parseAIJsonResponse<{ title: string; content: string[] }>(response.text);
 };
 
 export const enhanceImagePrompt = async (
   originalPrompt: string,
   stylePreset: ImageStylePreset
 ): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
   const instruction = IMAGE_STYLE_INSTRUCTIONS[stylePreset];
 
   const response = await ai.models.generateContent({
@@ -162,7 +158,7 @@ export const generatePresentationPlan = async (
   imageStyle?: ImageStyleOverride,
   generationMode: GenerationMode = 'balanced'
 ): Promise<PresentationPlanResponse> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
 
   // Dynamic prompt construction
   const themeOptions = getThemeOptions();
@@ -198,17 +194,11 @@ export const generatePresentationPlan = async (
     }
   });
 
-  const text = response.text;
-  if (!text) throw new Error("No plan generated");
-
-  // Robustness: Strip markdown code blocks if present
-  const cleanJson = text.replace(/```json|```/g, '').trim();
-
-  return JSON.parse(cleanJson) as PresentationPlanResponse;
+  return parseAIJsonResponse<PresentationPlanResponse>(response.text);
 };
 
 export const generateSlideImage = async (imagePrompt: string, style: string): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
   const enhancedPrompt = `${style} . SUBJECT: ${imagePrompt} . High quality, 8k, detailed, award winning.`;
 
   console.log("Generating image with prompt:", enhancedPrompt);

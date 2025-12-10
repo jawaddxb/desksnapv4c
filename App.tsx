@@ -1,7 +1,13 @@
+/**
+ * App Component
+ *
+ * Main application shell that orchestrates the presentation editor.
+ * Uses focused hooks for analytics, keyboard navigation, and chat.
+ */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Message, MessageRole, GenerationMode } from './types';
+import { GenerationMode } from './types';
 import { IMAGE_STYLES } from './lib/themes';
 import { MainStage } from './components/MainStage';
 import { ChatInterface } from './components/ChatInterface';
@@ -9,12 +15,15 @@ import { AppHeader } from './components/AppHeader';
 import { AppSidebar } from './components/AppSidebar';
 import { PrintView } from './components/PrintView';
 import { useDeck } from './hooks/useDeck';
+import { useAnalytics } from './hooks/useAnalytics';
+import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
+import { useChat } from './hooks/useChat';
 import { IdeationCopilot } from './components/ideation/IdeationCopilot';
+import { AuthProvider } from './contexts/AuthContext';
+import { AuthModal } from './components/auth';
 
-const INITIAL_MESSAGE: Message = { id: 'init', role: MessageRole.MODEL, text: "Ready to snap some slides together. What's the topic?", timestamp: Date.now() };
-
-export default function App() {
-  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
+function AppContent() {
+  // UI State
   const [inputValue, setInputValue] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [selectedImageStyle, setSelectedImageStyle] = useState(IMAGE_STYLES[0]);
@@ -23,261 +32,255 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'standard' | 'wabi-sabi'>('standard');
   const [showCreateChat, setShowCreateChat] = useState(false);
   const [isIdeating, setIsIdeating] = useState(false);
-  
-  const { currentPresentation, savedDecks, activeSlideIndex, setActiveSlideIndex, isGenerating, isRefining, activeTheme, activeWabiSabiLayout, saveStatus, actions } = useDeck();
-  
-  const sidebarScrollRef = useRef<HTMLDivElement>(null);
-  const modalScrollRef = useRef<HTMLDivElement>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // --- ANALYTICS STATE ---
-  const sessionStartTime = useRef<number>(0);
-  const slideEnterTime = useRef<number>(0);
-  const slideDurations = useRef<Record<string, number>>({});
+  // Main deck hook
+  const {
+    currentPresentation,
+    savedDecks,
+    activeSlideIndex,
+    setActiveSlideIndex,
+    isGenerating,
+    isRefining,
+    activeTheme,
+    activeWabiSabiLayout,
+    saveStatus,
+    actions,
+  } = useDeck();
 
-  useEffect(() => {
-    if (sidebarScrollRef.current) sidebarScrollRef.current.scrollTop = sidebarScrollRef.current.scrollHeight;
-    if (modalScrollRef.current) modalScrollRef.current.scrollTop = modalScrollRef.current.scrollHeight;
-  }, [messages, isChatOpen]);
+  // Chat hook
+  const {
+    messages,
+    addMessage,
+    resetMessages,
+    createSystemMessage,
+    createModelMessage,
+    createUserMessage,
+    sidebarScrollRef,
+    modalScrollRef,
+  } = useChat({ isChatOpen: isChatOpen || showCreateChat });
 
-  // Analytics: Track Session Start/End
-  useEffect(() => {
-    if (isPresenting) {
-        // Start Session
-        sessionStartTime.current = Date.now();
-        slideEnterTime.current = Date.now();
-        slideDurations.current = {};
-    } else {
-        // End Session (if we were just presenting)
-        if (sessionStartTime.current > 0 && currentPresentation) {
-            // Capture final slide dwell time
-            const now = Date.now();
-            const lastSlideId = currentPresentation.slides[activeSlideIndex]?.id;
-            if (lastSlideId) {
-                const dwell = (now - slideEnterTime.current) / 1000;
-                slideDurations.current[lastSlideId] = (slideDurations.current[lastSlideId] || 0) + dwell;
-            }
+  // Analytics hook
+  useAnalytics({
+    isPresenting,
+    presentation: currentPresentation,
+    activeSlideIndex,
+    onRecordSession: actions.recordSession,
+  });
 
-            // Save Session
-            const totalDuration = (now - sessionStartTime.current) / 1000;
-            actions.recordSession({
-                id: crypto.randomUUID(),
-                timestamp: sessionStartTime.current,
-                totalDuration: totalDuration,
-                slideDurations: slideDurations.current
-            });
+  // Keyboard navigation hook
+  const { goToNextSlide, goToPreviousSlide } = useKeyboardNavigation({
+    isPresenting,
+    presentation: currentPresentation,
+    activeSlideIndex,
+    setActiveSlideIndex,
+    onExitPresentation: useCallback(() => setIsPresenting(false), []),
+  });
 
-            // Reset
-            sessionStartTime.current = 0;
-            // NOTE: Auto-save in useDeck will handle persistence when state updates
-        }
-    }
-  }, [isPresenting]);
-
-  // Use a ref to track previous index for accurate analytics attribution
-  const prevSlideIndexRef = useRef(activeSlideIndex);
-  useEffect(() => {
-      if (isPresenting && currentPresentation) {
-          const now = Date.now();
-          const duration = (now - slideEnterTime.current) / 1000;
-          const prevSlideId = currentPresentation.slides[prevSlideIndexRef.current]?.id;
-          
-          if (prevSlideId) {
-              slideDurations.current[prevSlideId] = (slideDurations.current[prevSlideId] || 0) + duration;
-          }
-          
-          slideEnterTime.current = now;
-          prevSlideIndexRef.current = activeSlideIndex;
-      } else {
-          prevSlideIndexRef.current = activeSlideIndex;
-      }
-  }, [activeSlideIndex, isPresenting, currentPresentation]);
-
-
-  // Keyboard Navigation for Presentation Mode
-  useEffect(() => {
-    if (!isPresenting || !currentPresentation) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
-        if (activeSlideIndex < currentPresentation.slides.length - 1) {
-          setActiveSlideIndex(activeSlideIndex + 1);
-        }
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        if (activeSlideIndex > 0) {
-          setActiveSlideIndex(activeSlideIndex - 1);
-        }
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        setIsPresenting(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPresenting, activeSlideIndex, currentPresentation, setActiveSlideIndex]);
+  // ============ Handlers ============
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isGenerating) return;
 
-    const userMsg: Message = { id: Date.now().toString(), role: MessageRole.USER, text: inputValue, timestamp: Date.now() };
-    setMessages(prev => [...prev, userMsg]);
+    addMessage(createUserMessage(inputValue));
     setInputValue('');
 
     try {
-      setMessages(prev => [...prev, { id: 'sys-' + Date.now(), role: MessageRole.SYSTEM, text: 'Constructing Layout & Selecting Theme...', timestamp: Date.now() }]);
-      
-      const newSlides = await actions.createDeck(userMsg.text, selectedImageStyle, generationMode);
-      
-      setMessages(prev => [...prev, { id: 'gen-' + Date.now(), role: MessageRole.MODEL, text: `Blueprint ready: ${newSlides.length} slides. Rendering visuals...`, timestamp: Date.now() }]);
-      setIsChatOpen(false);
-      setShowCreateChat(false); // Close the creation modal if open
+      addMessage(createSystemMessage('Constructing Layout & Selecting Theme...'));
 
+      const newSlides = await actions.createDeck(inputValue, selectedImageStyle, generationMode);
+
+      addMessage(createModelMessage(`Blueprint ready: ${newSlides.length} slides. Rendering visuals...`));
+      setIsChatOpen(false);
+      setShowCreateChat(false);
     } catch (error) {
       console.error(error);
-      setMessages(prev => [...prev, { id: 'err-' + Date.now(), role: MessageRole.SYSTEM, text: 'System Error. Check credentials.', timestamp: Date.now() }]);
+      addMessage(createSystemMessage('System Error. Check credentials.'));
     }
   };
 
   const handleCreateNew = () => {
-      // Open the creation flow (which is the chat interface in modal mode initially)
-      setShowCreateChat(true);
-      setMessages([INITIAL_MESSAGE]); // Reset chat for new flow
-      setGenerationMode('balanced'); // Reset to default mode
+    setShowCreateChat(true);
+    resetMessages();
+    setGenerationMode('balanced');
   };
 
   const handleIdeate = () => {
-      setIsIdeating(true);
+    setIsIdeating(true);
   };
 
   const handleCloseIdeation = () => {
-      setIsIdeating(false);
+    setIsIdeating(false);
   };
 
   const handleBuildDeckFromIdeation = async (deckPlan: {
-      topic: string;
-      slides: Array<{
-          title: string;
-          bulletPoints: string[];
-          speakerNotes: string;
-          imageVisualDescription: string;
-          layoutType: string;
-          alignment: string;
-      }>;
-      themeId: string;
-      visualStyle: string;
+    topic: string;
+    slides: Array<{
+      title: string;
+      bulletPoints: string[];
+      speakerNotes: string;
+      imageVisualDescription: string;
+      layoutType: string;
+      alignment: string;
+    }>;
+    themeId: string;
+    visualStyle: string;
   }) => {
-      setIsIdeating(false);
-      // Use the deck plan to create a presentation via existing flow
-      // Convert the plan to the format expected by createDeck
-      const topic = deckPlan.topic;
-      setMessages(prev => [...prev, { id: 'ideation-' + Date.now(), role: MessageRole.SYSTEM, text: `Building deck from ideation: "${topic}"...`, timestamp: Date.now() }]);
+    setIsIdeating(false);
+    const topic = deckPlan.topic;
+    addMessage(createSystemMessage(`Building deck from ideation: "${topic}"...`));
 
-      try {
-          await actions.createDeckFromPlan(deckPlan);
-          setMessages(prev => [...prev, { id: 'gen-' + Date.now(), role: MessageRole.MODEL, text: `Deck created from ideation: ${deckPlan.slides.length} slides. Rendering visuals...`, timestamp: Date.now() }]);
-      } catch (error) {
-          console.error('Error building deck from ideation:', error);
-          setMessages(prev => [...prev, { id: 'err-' + Date.now(), role: MessageRole.SYSTEM, text: 'Error building deck from ideation plan.', timestamp: Date.now() }]);
-      }
+    try {
+      await actions.createDeckFromPlan(deckPlan);
+      addMessage(createModelMessage(`Deck created from ideation: ${deckPlan.slides.length} slides. Rendering visuals...`));
+    } catch (error) {
+      console.error('Error building deck from ideation:', error);
+      addMessage(createSystemMessage('Error building deck from ideation plan.'));
+    }
   };
+
+  // ============ Render ============
 
   // Ideation Mode - Full screen copilot
   if (isIdeating) {
-      return (
-          <IdeationCopilot
-              onClose={handleCloseIdeation}
-              onBuildDeck={handleBuildDeckFromIdeation}
-          />
-      );
+    return (
+      <IdeationCopilot
+        onClose={handleCloseIdeation}
+        onBuildDeck={handleBuildDeckFromIdeation}
+      />
+    );
   }
 
   return (
     <>
-    <div id="app-ui" className="flex h-screen w-full bg-zinc-50 overflow-hidden text-zinc-900 font-sans selection:bg-zinc-200 relative">
-      
-      {/* FLOATING CHAT MODAL (Used for creating new decks from Dashboard OR editing existing) */}
-      {(currentPresentation || showCreateChat) && (
-          <div className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-lg h-[650px] bg-white rounded-xl shadow-2xl border-2 border-zinc-900 z-[1000] flex flex-col overflow-hidden transition-all duration-300 origin-center ${(isChatOpen || showCreateChat) ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}>
-            <ChatInterface 
-                mode="modal" messages={messages} isGenerating={isGenerating} currentPresentation={currentPresentation}
-                isChatOpen={isChatOpen || showCreateChat} setIsChatOpen={(v) => { setIsChatOpen(v); if(!v) setShowCreateChat(false); }} inputValue={inputValue} setInputValue={setInputValue}
-                handleSendMessage={handleSendMessage} selectedImageStyle={selectedImageStyle} setSelectedImageStyle={setSelectedImageStyle}
-                generationMode={generationMode} setGenerationMode={setGenerationMode}
-                scrollRef={modalScrollRef}
+      <div
+        id="app-ui"
+        className="flex h-screen w-full bg-zinc-50 overflow-hidden text-zinc-900 font-sans selection:bg-zinc-200 relative"
+      >
+        {/* FLOATING CHAT MODAL */}
+        {(currentPresentation || showCreateChat) && (
+          <div
+            className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-lg h-[650px] bg-white rounded-xl shadow-2xl border-2 border-zinc-900 z-[1000] flex flex-col overflow-hidden transition-all duration-300 origin-center ${
+              isChatOpen || showCreateChat
+                ? 'opacity-100 scale-100 pointer-events-auto'
+                : 'opacity-0 scale-95 pointer-events-none'
+            }`}
+          >
+            <ChatInterface
+              mode="modal"
+              messages={messages}
+              isGenerating={isGenerating}
+              currentPresentation={currentPresentation}
+              isChatOpen={isChatOpen || showCreateChat}
+              setIsChatOpen={(v) => {
+                setIsChatOpen(v);
+                if (!v) setShowCreateChat(false);
+              }}
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              handleSendMessage={handleSendMessage}
+              selectedImageStyle={selectedImageStyle}
+              setSelectedImageStyle={setSelectedImageStyle}
+              generationMode={generationMode}
+              setGenerationMode={setGenerationMode}
+              scrollRef={modalScrollRef}
             />
           </div>
-      )}
+        )}
 
-      {/* LEFT SIDEBAR (Only visible when editing a deck) */}
-      {!isPresenting && currentPresentation && (
-        <AppSidebar 
-            currentPresentation={currentPresentation} messages={messages} isGenerating={isGenerating} isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen}
-            inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={handleSendMessage}
-            selectedImageStyle={selectedImageStyle} setSelectedImageStyle={setSelectedImageStyle}
-            generationMode={generationMode} setGenerationMode={setGenerationMode}
-            activeSlideIndex={activeSlideIndex} setActiveSlideIndex={setActiveSlideIndex} onMoveSlide={actions.moveSlide}
+        {/* LEFT SIDEBAR */}
+        {!isPresenting && currentPresentation && (
+          <AppSidebar
+            currentPresentation={currentPresentation}
+            messages={messages}
+            isGenerating={isGenerating}
+            isChatOpen={isChatOpen}
+            setIsChatOpen={setIsChatOpen}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            handleSendMessage={handleSendMessage}
+            selectedImageStyle={selectedImageStyle}
+            setSelectedImageStyle={setSelectedImageStyle}
+            generationMode={generationMode}
+            setGenerationMode={setGenerationMode}
+            activeSlideIndex={activeSlideIndex}
+            setActiveSlideIndex={setActiveSlideIndex}
+            onMoveSlide={actions.moveSlide}
             scrollRef={sidebarScrollRef}
             viewMode={viewMode}
             activeWabiSabiLayout={activeWabiSabiLayout}
-        />
-      )}
+          />
+        )}
 
-      {/* MAIN STAGE AREA */}
-      <div className="flex-1 bg-zinc-100 flex flex-col relative overflow-hidden min-w-0" style={{ backgroundColor: currentPresentation ? activeTheme.colors.background : '#fafafa' }}>
-        
-        {/* HEADER */}
-        {!isPresenting && (
-            <AppHeader 
-                currentPresentation={currentPresentation} activeTheme={activeTheme} activeWabiSabiLayout={activeWabiSabiLayout}
-                viewMode={viewMode} setViewMode={setViewMode}
-                onApplyTheme={actions.applyTheme} 
-                onApplyTypography={actions.applyTypography}
-                onSetWabiSabiLayout={actions.setWabiSabiLayout} onCycleWabiSabiLayout={actions.cycleWabiSabiLayout}
-                onRegenerateAllImages={actions.regenerateAllImages} onRemixDeck={actions.remixDeck} setIsPresenting={setIsPresenting}
-                onSave={actions.saveDeck} onClose={actions.closeDeck}
-                onShuffleLayout={actions.shuffleLayoutVariants}
-                onExportDeck={actions.exportDeck}
-                saveStatus={saveStatus}
+        {/* MAIN STAGE AREA */}
+        <div
+          className="flex-1 bg-zinc-100 flex flex-col relative overflow-hidden min-w-0"
+          style={{ backgroundColor: currentPresentation ? activeTheme.colors.background : '#fafafa' }}
+        >
+          {/* HEADER */}
+          {!isPresenting && (
+            <AppHeader
+              currentPresentation={currentPresentation}
+              activeTheme={activeTheme}
+              activeWabiSabiLayout={activeWabiSabiLayout}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              onApplyTheme={actions.applyTheme}
+              onApplyTypography={actions.applyTypography}
+              onSetWabiSabiLayout={actions.setWabiSabiLayout}
+              onCycleWabiSabiLayout={actions.cycleWabiSabiLayout}
+              onRegenerateAllImages={actions.regenerateAllImages}
+              onRemixDeck={actions.remixDeck}
+              setIsPresenting={setIsPresenting}
+              onSave={actions.saveDeck}
+              onClose={actions.closeDeck}
+              onShuffleLayout={actions.shuffleLayoutVariants}
+              onExportDeck={actions.exportDeck}
+              saveStatus={saveStatus}
+              onLoginClick={() => setShowAuthModal(true)}
             />
-        )}
-        
-        {/* PRESENTATION OVERLAYS (Navigation & Close) */}
-        {isPresenting && currentPresentation && (
+          )}
+
+          {/* PRESENTATION OVERLAYS */}
+          {isPresenting && currentPresentation && (
             <>
-                {/* Close Button */}
-                <button onClick={() => setIsPresenting(false)} className="absolute top-6 right-6 z-[1000] p-3 bg-black/50 hover:bg-black/80 text-white rounded-full backdrop-blur-md transition-all cursor-pointer shadow-lg hover:scale-105"><X className="w-6 h-6" /></button>
-                
-                {/* Prev Slide */}
-                {activeSlideIndex > 0 && (
-                    <button 
-                        onClick={() => setActiveSlideIndex(activeSlideIndex - 1)}
-                        className="absolute left-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/10 hover:bg-black/50 text-white/50 hover:text-white rounded-full backdrop-blur-sm transition-all cursor-pointer hover:scale-110"
-                    >
-                        <ChevronLeft className="w-10 h-10" strokeWidth={1.5} />
-                    </button>
-                )}
+              {/* Close Button */}
+              <button
+                onClick={() => setIsPresenting(false)}
+                className="absolute top-6 right-6 z-[1000] p-3 bg-black/50 hover:bg-black/80 text-white rounded-full backdrop-blur-md transition-all cursor-pointer shadow-lg hover:scale-105"
+              >
+                <X className="w-6 h-6" />
+              </button>
 
-                {/* Next Slide */}
-                {activeSlideIndex < currentPresentation.slides.length - 1 && (
-                    <button 
-                        onClick={() => setActiveSlideIndex(activeSlideIndex + 1)}
-                        className="absolute right-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/10 hover:bg-black/50 text-white/50 hover:text-white rounded-full backdrop-blur-sm transition-all cursor-pointer hover:scale-110"
-                    >
-                        <ChevronRight className="w-10 h-10" strokeWidth={1.5} />
-                    </button>
-                )}
-                
-                {/* Slide Counter */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] px-4 py-1.5 bg-black/50 backdrop-blur-md rounded-full text-white/80 text-[10px] font-bold uppercase tracking-widest pointer-events-none">
-                    {activeSlideIndex + 1} / {currentPresentation.slides.length}
-                </div>
+              {/* Prev Slide */}
+              {activeSlideIndex > 0 && (
+                <button
+                  onClick={goToPreviousSlide}
+                  className="absolute left-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/10 hover:bg-black/50 text-white/50 hover:text-white rounded-full backdrop-blur-sm transition-all cursor-pointer hover:scale-110"
+                >
+                  <ChevronLeft className="w-10 h-10" strokeWidth={1.5} />
+                </button>
+              )}
+
+              {/* Next Slide */}
+              {activeSlideIndex < currentPresentation.slides.length - 1 && (
+                <button
+                  onClick={goToNextSlide}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/10 hover:bg-black/50 text-white/50 hover:text-white rounded-full backdrop-blur-sm transition-all cursor-pointer hover:scale-110"
+                >
+                  <ChevronRight className="w-10 h-10" strokeWidth={1.5} />
+                </button>
+              )}
+
+              {/* Slide Counter */}
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] px-4 py-1.5 bg-black/50 backdrop-blur-md rounded-full text-white/80 text-[10px] font-bold uppercase tracking-widest pointer-events-none">
+                {activeSlideIndex + 1} / {currentPresentation.slides.length}
+              </div>
             </>
-        )}
+          )}
 
-        {/* MAIN STAGE / DASHBOARD */}
-        <MainStage
+          {/* MAIN STAGE / DASHBOARD */}
+          <MainStage
             slide={currentPresentation ? currentPresentation.slides[activeSlideIndex] : null}
             theme={activeTheme}
             activeWabiSabiLayout={activeWabiSabiLayout}
@@ -286,22 +289,40 @@ export default function App() {
             onUpdateSlide={actions.updateSlide}
             viewMode={viewMode}
             printMode={isPresenting}
-            // AI Refinement props
             onRefineContent={actions.refineSlideContent}
             onEnhanceImage={actions.enhanceSlideImage}
             isRefining={isRefining}
-            // Dashboard props
             savedDecks={savedDecks}
             onLoadDeck={actions.loadDeck}
             onDeleteDeck={actions.deleteDeck}
             onCreateDeck={handleCreateNew}
             onImport={actions.importDeck}
             onIdeate={handleIdeate}
-        />
+          />
+        </div>
       </div>
-    </div>
-    
-    <PrintView presentation={currentPresentation} theme={activeTheme} activeWabiSabiLayout={activeWabiSabiLayout} viewMode={viewMode} />
+
+      <PrintView
+        presentation={currentPresentation}
+        theme={activeTheme}
+        activeWabiSabiLayout={activeWabiSabiLayout}
+        viewMode={viewMode}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </>
+  );
+}
+
+// Main App wrapped with AuthProvider
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

@@ -1,13 +1,8 @@
 import { Theme } from '../types';
+import { ContrastConfig } from './contrast';
 
-export interface ContrastConfig {
-  bg: string;
-  text: string;
-  accent: string;
-  secondary: string;
-  border: string;
-  mode: string;
-}
+// Re-export for convenience
+export type { ContrastConfig } from './contrast';
 
 // Archetypes with custom contrast configurations
 // Most archetypes use theme defaults - only overrides are listed here

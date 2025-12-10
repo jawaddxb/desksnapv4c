@@ -1,0 +1,19 @@
+# Frontend Dockerfile for DeckSnap (React + Vite)
+# Development-focused with hot reload support
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies first (better caching)
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy source files
+COPY . .
+
+# Expose Vite dev server port
+EXPOSE 3000
+
+# Default command (can be overridden in docker-compose)
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

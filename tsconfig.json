@@ -18,10 +18,16 @@
     "moduleDetection": "force",
     "allowJs": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["components/*"],
+      "@hooks/*": ["hooks/*"],
+      "@services/*": ["services/*"],
+      "@lib/*": ["lib/*"],
+      "@config/*": ["config/*"],
+      "@contexts/*": ["contexts/*"],
+      "@types/*": ["types/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true

@@ -1,0 +1,119 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: decksnap-postgres
+    environment:
+      POSTGRES_DB: decksnap
+      POSTGRES_USER: decksnap
+      POSTGRES_PASSWORD: decksnap
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U decksnap"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - decksnap-network
+
+  # Redis (Celery broker and cache)
+  redis:
+    image: redis:7-alpine
+    container_name: decksnap-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - decksnap-network
+
+  # DeckSnap API (FastAPI)
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.api
+    container_name: decksnap-api
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql://decksnap:decksnap@postgres:5432/decksnap
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./packages:/app/packages
+      - ./apps:/app/apps
+      - ./infra:/app/infra
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn apps.public_api.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - decksnap-network
+
+  # Celery Worker (background task execution)
+  worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.worker
+    container_name: decksnap-worker
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql://decksnap:decksnap@postgres:5432/decksnap
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    volumes:
+      - ./packages:/app/packages
+      - ./apps:/app/apps
+      - ./infra:/app/infra
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A packages.common.core.celery_app worker --loglevel=info
+    networks:
+      - decksnap-network
+
+  # Frontend (React + Vite)
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.frontend
+    container_name: decksnap-frontend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    command: npm run dev -- --host 0.0.0.0
+    networks:
+      - decksnap-network
+
+networks:
+  decksnap-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
