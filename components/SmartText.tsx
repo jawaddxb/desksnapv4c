@@ -13,6 +13,9 @@ interface SmartTextProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaE
     fontWeight?: number;
     fontStyle?: 'normal' | 'italic';
     textAlign?: 'left' | 'center' | 'right';
+    // Selection support for per-item styling
+    isSelected?: boolean;
+    onSelect?: () => void;
 }
 
 /**
@@ -35,6 +38,8 @@ export const SmartText: React.FC<SmartTextProps> = ({
     fontWeight,
     fontStyle,
     textAlign,
+    isSelected,
+    onSelect,
     ...props
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -50,29 +55,42 @@ export const SmartText: React.FC<SmartTextProps> = ({
         textarea.style.height = `${textarea.scrollHeight}px`;
     }, [value, fontSize, lineHeight]);
 
+    const handleClick = (e: React.MouseEvent) => {
+        if (onSelect && !readOnly) {
+            e.stopPropagation();
+            onSelect();
+        }
+    };
+
     return (
-        <textarea
-            ref={textareaRef}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            readOnly={readOnly}
-            className={`
-                bg-transparent outline-none resize-none block w-full
-                ${className}
-            `}
-            style={{
-                ...style,
-                fontSize: fontSize ? `${fontSize}px` : style?.fontSize,
-                lineHeight,
-                fontWeight: fontWeight ?? style?.fontWeight,
-                fontStyle: fontStyle ?? style?.fontStyle,
-                textAlign: textAlign ?? style?.textAlign,
-                overflow: 'visible',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'normal',
-                overflowWrap: 'break-word',
-            }}
-            {...props}
-        />
+        <div
+            className={`relative ${isSelected ? 'ring-2 ring-indigo-500 ring-offset-2 rounded' : ''}`}
+            onClick={handleClick}
+        >
+            <textarea
+                ref={textareaRef}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                readOnly={readOnly}
+                className={`
+                    bg-transparent outline-none resize-none block w-full
+                    ${!readOnly && onSelect ? (isSelected ? 'cursor-text' : 'cursor-pointer') : ''}
+                    ${className}
+                `}
+                style={{
+                    ...style,
+                    fontSize: fontSize ? `${fontSize}px` : style?.fontSize,
+                    lineHeight,
+                    fontWeight: fontWeight ?? style?.fontWeight,
+                    fontStyle: fontStyle ?? style?.fontStyle,
+                    textAlign: textAlign ?? style?.textAlign,
+                    overflow: 'visible',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'normal',
+                    overflowWrap: 'break-word',
+                }}
+                {...props}
+            />
+        </div>
     );
 };

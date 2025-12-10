@@ -1,4 +1,16 @@
 
+// Layout type constants (single source of truth)
+export const LAYOUT_TYPES = ['split', 'full-bleed', 'statement', 'gallery', 'card', 'horizontal', 'magazine'] as const;
+export type LayoutType = typeof LAYOUT_TYPES[number];
+
+export const ALIGNMENTS = ['left', 'right', 'center'] as const;
+export type Alignment = typeof ALIGNMENTS[number];
+
+export const FONT_SCALES = ['auto', 'compact', 'hero', 'classic', 'modern'] as const;
+export type FontScale = typeof FONT_SCALES[number];
+
+export const LAYOUT_VARIANTS = ['default', 'inverted'] as const;
+export type LayoutVariant = typeof LAYOUT_VARIANTS[number] | number;
 
 // Style override types for editing
 export interface TextStyleOverride {
@@ -6,6 +18,19 @@ export interface TextStyleOverride {
   fontStyle?: 'normal' | 'italic';
   textAlign?: 'left' | 'center' | 'right';
 }
+
+// Per-item style for content bullets (individual styling)
+export interface ContentItemStyle {
+  fontSize?: number;
+  fontWeight?: number;
+  fontStyle?: 'normal' | 'italic';
+}
+
+// Selection identifier for text sections in Wabi-Sabi mode
+export type TextSelection =
+  | { type: 'title' }
+  | { type: 'content'; index: number }
+  | null;
 
 export interface ImageStyleOverride {
   opacity?: number;
@@ -30,10 +55,10 @@ export interface Slide {
   imageError?: string; // Error message if image generation failed
   isImageLoading: boolean;
   // Layout Engine Properties
-  layoutType: 'split' | 'full-bleed' | 'statement' | 'gallery' | 'card' | 'horizontal' | 'magazine';
-  alignment: 'left' | 'right' | 'center';
-  fontScale?: 'auto' | 'compact' | 'hero' | 'classic' | 'modern';
-  layoutVariant?: number | 'default' | 'inverted'; // Seed for generative layouts or variant name
+  layoutType: LayoutType;
+  alignment: Alignment;
+  fontScale?: FontScale;
+  layoutVariant?: LayoutVariant; // Seed for generative layouts or variant name
   // Style overrides (optional - layouts use defaults if undefined)
   titleFontSize?: number;
   contentFontSize?: number;
@@ -42,6 +67,8 @@ export interface Slide {
     content?: TextStyleOverride;
   };
   imageStyles?: ImageStyleOverride;
+  // Per-item content styles (indexed by content array position)
+  contentItemStyles?: Record<number, ContentItemStyle>;
 }
 
 export interface AnalyticsSession {
@@ -84,8 +111,8 @@ export interface PresentationPlanResponse {
     bulletPoints: string[];
     speakerNotes: string;
     imageVisualDescription: string;
-    layoutType: 'split' | 'full-bleed' | 'statement' | 'gallery' | 'card' | 'horizontal' | 'magazine';
-    alignment: 'left' | 'right' | 'center';
+    layoutType: LayoutType;
+    alignment: Alignment;
   }[];
 }
 

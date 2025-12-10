@@ -1,6 +1,6 @@
 
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Slide, Theme, Presentation, ImageStylePreset } from '../types';
 import { RotateCw, Wand2, Layers } from 'lucide-react';
 import { WabiSabiStage } from './WabiSabiStage';
@@ -11,6 +11,7 @@ import {
 import { SlideContentEditor } from './SlideContentEditor';
 import { LayoutToolbar } from './LayoutToolbar';
 import { Dashboard } from './Dashboard';
+import { SpeakerNotesPanel } from './SpeakerNotesPanel';
 
 interface MainStageProps {
   slide: Slide | null;
@@ -53,7 +54,10 @@ export const MainStage: React.FC<MainStageProps> = ({
     onImport,
     onIdeate
 }) => {
-  
+  // Speaker Notes Panel state
+  const [showNotesPanel, setShowNotesPanel] = useState(false);
+  const toggleNotesPanel = () => setShowNotesPanel(prev => !prev);
+
   // 1. Dashboard (Empty State Replaced)
   if (!slide) {
     return (
@@ -71,13 +75,24 @@ export const MainStage: React.FC<MainStageProps> = ({
   // 2. Wabi-Sabi Mode (Generative Design System)
   if (viewMode === 'wabi-sabi') {
       return (
-        <WabiSabiStage 
-            slide={slide} 
-            theme={theme} 
-            layoutStyle={activeWabiSabiLayout}
-            onUpdateSlide={onUpdateSlide} 
-            printMode={printMode} 
-        />
+        <>
+            <WabiSabiStage
+                slide={slide}
+                theme={theme}
+                layoutStyle={activeWabiSabiLayout}
+                onUpdateSlide={onUpdateSlide}
+                printMode={printMode}
+                onToggleNotes={toggleNotesPanel}
+            />
+            {/* Speaker Notes Panel - works in both modes */}
+            {showNotesPanel && !printMode && onUpdateSlide && (
+                <SpeakerNotesPanel
+                    slide={slide}
+                    onUpdateSlide={onUpdateSlide}
+                    onClose={() => setShowNotesPanel(false)}
+                />
+            )}
+        </>
       );
   }
 
@@ -115,6 +130,16 @@ export const MainStage: React.FC<MainStageProps> = ({
                 onRefineContent={onRefineContent}
                 onEnhanceImage={onEnhanceImage}
                 isRefining={isRefining}
+                onToggleNotes={toggleNotesPanel}
+            />
+        )}
+
+        {/* Speaker Notes Panel - works in both modes */}
+        {showNotesPanel && !printMode && onUpdateSlide && (
+            <SpeakerNotesPanel
+                slide={slide}
+                onUpdateSlide={onUpdateSlide}
+                onClose={() => setShowNotesPanel(false)}
             />
         )}
 

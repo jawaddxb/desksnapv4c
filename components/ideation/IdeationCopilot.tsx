@@ -104,7 +104,22 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   const handleBuildDeck = useCallback(() => {
     if (!ideation.session) return;
 
-    // Go to review stage instead of building immediately
+    // Prevent duplicate review messages (can happen with React Strict Mode or re-renders)
+    const messages = ideation.session.messages;
+    const reviewPrefix = `Here's your presentation plan`;
+    const alreadyHasReviewMessage = messages.some(m =>
+      m.role === MessageRole.MODEL && m.text.startsWith(reviewPrefix)
+    );
+
+    if (alreadyHasReviewMessage) {
+      // Just ensure we're in review stage, don't add duplicate message
+      if (ideation.stage !== 'review') {
+        ideation.setStage('review');
+      }
+      return;
+    }
+
+    // Go to review stage
     ideation.setStage('review');
 
     // Show summary message

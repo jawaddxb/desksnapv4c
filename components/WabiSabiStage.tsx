@@ -4,31 +4,53 @@ import { Slide, Theme } from '../types';
 import { PRNG } from '../lib/utils';
 import { ArchetypeProps } from './WabiSabiComponents';
 import { ensureContrast } from '../lib/contrast';
+import { getArchetypeContrast, applyTypographicInversion } from '../lib/archetypeContrast';
 import { LayoutToolbar } from './LayoutToolbar';
+import { TextSelectionProvider, useTextSelection } from '../contexts/TextSelectionContext';
+// Import archetypes from modular structure
+// Fully extracted categories import from archetypes/
+// Remaining categories are re-exported through archetypes/index.ts from legacy file
 import {
-    EditorialArchetype, TypographicArchetype, ConstructivistArchetype, BauhausArchetype,
-    BrutalistArchetype, PostModernArchetype, SchematicArchetype, CinematicArchetype,
-    CollageArchetype, ZineArchetype, SwissArchetype, CyberDeckArchetype, ReceiptArchetype,
-    Y2KArchetype, RisographArchetype, VaporwaveArchetype, SwissGridArchetype, NoirArchetype,
-    // Wabi Sabi Archetypes
-    KintsugiArchetype, HyggeArchetype, TerrazzoArchetype, KinfolkArchetype, MediterraneanArchetype,
-    SumieArchetype, MonolithArchetype, HerbariumArchetype, CoastalArchetype, AtelierArchetype,
-    // Corporate Pitch Deck Archetypes
-    VentureArchetype, KeynoteArchetype, GradientArchetype, SignalArchetype, MetricArchetype,
-    NarrativeArchetype, BeaconArchetype, SlideArchetype, CanvasArchetype, DeckArchetype,
-    // Modern Tech Aesthetics
+    // Editorial (fully extracted)
+    EditorialArchetype, TypographicArchetype, ZineArchetype, CollageArchetype, RisographArchetype, ReceiptArchetype,
+    // Design Movements (partially extracted)
+    ConstructivistArchetype, BauhausArchetype, PostModernArchetype, SwissArchetype, SwissGridArchetype,
+    MemphisArchetype, DecoArchetype, RetroArchetype, NeueArchetype, PopArchetype, ModArchetype,
+    GothicArchetype, RococoArchetype, StarkArchetype,
+    // Tech
     BentoArchetype, GlassArchetype, LiquidArchetype, TerminalArchetype, NeonArchetype,
     AuroraArchetype, MeshArchetype, PulseArchetype, CircuitArchetype, HologramArchetype,
-    // Design Movements
-    MemphisArchetype, DecoArchetype, RetroArchetype, NeueArchetype, ClayArchetype,
-    PopArchetype, ModArchetype, GothicArchetype, RococoArchetype, StarkArchetype,
+    CyberDeckArchetype, Y2KArchetype, VaporwaveArchetype,
+    // Corporate
+    VentureArchetype, KeynoteArchetype, GradientArchetype, SignalArchetype, MetricArchetype,
+    NarrativeArchetype, BeaconArchetype, SlideArchetype, CanvasArchetype, DeckArchetype,
+    // Wabi-Sabi
+    KintsugiArchetype, HyggeArchetype, TerrazzoArchetype, KinfolkArchetype, MediterraneanArchetype,
+    SumieArchetype, MonolithArchetype, HerbariumArchetype, CoastalArchetype, AtelierArchetype,
     // Natural/Organic
     TerraArchetype, ForestArchetype, StoneArchetype, BloomArchetype, DesertArchetype,
     FrostArchetype, EmberArchetype, MistArchetype, GrainArchetype, MineralArchetype,
     // Cultural/Regional
     TokyoArchetype, SeoulArchetype, ParisArchetype, MilanoArchetype, BrooklynArchetype,
-    NordicArchetype, HavanaArchetype, MarrakechArchetype, KyotoArchetype, ViennaArchetype
-} from './WabiSabiArchetypes';
+    NordicArchetype, HavanaArchetype, MarrakechArchetype, KyotoArchetype, ViennaArchetype,
+    // Cinematic
+    CinematicArchetype, NoirArchetype, SchematicArchetype, BrutalistArchetype, ClayArchetype,
+    // Cultural Heritage
+    MughalArchetype, AnkaraArchetype, TalaveraArchetype, PersianArchetype, BatikArchetype,
+    CelticArchetype, AztecArchetype, AboriginalArchetype,
+    // Historical Period
+    VictorianArchetype, DiscoArchetype, GrungeArchetype, AtomicArchetype, NouveauArchetype, TudorArchetype,
+    // Artisanal Craft
+    IndigoArchetype, CopperArchetype, RakuArchetype, WeaveArchetype, CeramicArchetype, PatinaArchetype,
+    // Atmospheric/Mood
+    DuskArchetype, MonsoonArchetype, TundraArchetype, SavannaArchetype, VolcanoArchetype, ReefArchetype,
+    // Typography & Print
+    BlackletterArchetype, NewsprintArchetype, LetterpressArchetype, StencilArchetype, WoodtypeArchetype,
+    // Contemporary Art
+    InstallationArchetype, GlitchArchetype, MixedMediaArchetype, InkArchetype, OxidizeArchetype,
+    // Future/Speculative
+    QuantumArchetype, BiotechArchetype, SolarpunkArchetype, VoidArchetype
+} from './archetypes';
 
 interface WabiSabiStageProps {
   slide: Slide;
@@ -36,6 +58,7 @@ interface WabiSabiStageProps {
   onUpdateSlide?: (updates: Partial<Slide>) => void;
   printMode?: boolean;
   layoutStyle?: string;
+  onToggleNotes?: () => void;
 }
 
 // Map of all renderers
@@ -123,14 +146,63 @@ const ARCHETYPE_RENDERERS: Record<string, React.FC<ArchetypeProps>> = {
     'Havana': HavanaArchetype,
     'Marrakech': MarrakechArchetype,
     'Kyoto': KyotoArchetype,
-    'Vienna': ViennaArchetype
+    'Vienna': ViennaArchetype,
+    // Cultural Heritage
+    'Mughal': MughalArchetype,
+    'Ankara': AnkaraArchetype,
+    'Talavera': TalaveraArchetype,
+    'Persian': PersianArchetype,
+    'Batik': BatikArchetype,
+    'Celtic': CelticArchetype,
+    'Aztec': AztecArchetype,
+    'Aboriginal': AboriginalArchetype,
+    // Historical Period
+    'Victorian': VictorianArchetype,
+    'Disco': DiscoArchetype,
+    'Grunge': GrungeArchetype,
+    'Atomic': AtomicArchetype,
+    'Nouveau': NouveauArchetype,
+    'Tudor': TudorArchetype,
+    // Artisanal Craft
+    'Indigo': IndigoArchetype,
+    'Copper': CopperArchetype,
+    'Raku': RakuArchetype,
+    'Weave': WeaveArchetype,
+    'Ceramic': CeramicArchetype,
+    'Patina': PatinaArchetype,
+    // Atmospheric/Mood
+    'Dusk': DuskArchetype,
+    'Monsoon': MonsoonArchetype,
+    'Tundra': TundraArchetype,
+    'Savanna': SavannaArchetype,
+    'Volcano': VolcanoArchetype,
+    'Reef': ReefArchetype,
+    // Typography & Print
+    'Blackletter': BlackletterArchetype,
+    'Newsprint': NewsprintArchetype,
+    'Letterpress': LetterpressArchetype,
+    'Stencil': StencilArchetype,
+    'Woodtype': WoodtypeArchetype,
+    // Contemporary Art
+    'Installation': InstallationArchetype,
+    'Glitch': GlitchArchetype,
+    'MixedMedia': MixedMediaArchetype,
+    'Ink': InkArchetype,
+    'Oxidize': OxidizeArchetype,
+    // Future/Speculative
+    'Quantum': QuantumArchetype,
+    'Biotech': BiotechArchetype,
+    'Solarpunk': SolarpunkArchetype,
+    'Void': VoidArchetype
 };
 
 export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);
 
-// --- MAIN CONTROLLER COMPONENT ---
+// --- INNER STAGE COMPONENT (uses selection context) ---
 
-export const WabiSabiStage: React.FC<WabiSabiStageProps> = ({ slide, theme, onUpdateSlide, printMode, layoutStyle }) => {
+const WabiSabiStageInner: React.FC<WabiSabiStageProps> = ({ slide, theme, onUpdateSlide, printMode, layoutStyle, onToggleNotes }) => {
+    const { clearSelection } = useTextSelection();
+
     // Idempotent RNG: Fixed seed per slide ID guarantees same random layout on every render frame
     // This stops the "dancing layout" issue completely.
     // Handle both numeric seeds and string variants
@@ -138,40 +210,41 @@ export const WabiSabiStage: React.FC<WabiSabiStageProps> = ({ slide, theme, onUp
     const rng = new PRNG(seed.toString());
 
     const archetype = layoutStyle && ARCHETYPE_RENDERERS[layoutStyle] ? layoutStyle : 'Editorial';
-    
-    // Intelligent Contrast System
-    const contrast = {
-        bg: theme.colors.surface,
-        text: theme.colors.text,
-        accent: theme.colors.accent,
-        secondary: theme.colors.secondary,
-        border: theme.colors.border,
-        mode: 'theme'
-    };
 
-    // Override contrast for dark-mode specific archetypes
-    if (archetype === 'CyberDeck') Object.assign(contrast, { bg: '#050505', text: '#22d3ee', accent: '#22d3ee', border: '#164e63', mode: 'terminal' });
-    if (archetype === 'Receipt') Object.assign(contrast, { bg: '#ffffff', text: '#18181b', accent: '#000000', border: '#e4e4e7', mode: 'paper' });
-    if (archetype === 'Schematic' && theme.colors.background === '#ffffff') Object.assign(contrast, { bg: '#f0f9ff', text: '#0033cc', mode: 'blueprint' });
+    // Get contrast from centralized registry (handles CyberDeck, Receipt, Schematic, etc.)
+    const baseContrast = getArchetypeContrast(archetype, theme);
 
-    // Typographic inversion: controlled by slide setting instead of random
-    if (archetype === 'Typographic' && slide.layoutVariant === 'inverted') {
-         const temp = contrast.bg;
-         contrast.bg = contrast.text;
-         contrast.text = temp;
-    }
+    // Apply typographic inversion if needed
+    const invertedContrast = applyTypographicInversion(baseContrast, archetype, slide.layoutVariant);
 
     // Apply WCAG contrast safety - ensures text is always readable
-    const safeContrast = ensureContrast(contrast);
+    const safeContrast = ensureContrast(invertedContrast);
 
     const Renderer = ARCHETYPE_RENDERERS[archetype] || SwissArchetype;
 
+    // Clear selection when clicking background (not text elements)
+    const handleBackgroundClick = (e: React.MouseEvent) => {
+        if (e.target === e.currentTarget) {
+            clearSelection();
+        }
+    };
+
     return (
-        <div className="w-full h-full relative group/stage">
+        <div className="w-full h-full relative group/stage" onClick={handleBackgroundClick}>
             <Renderer slide={slide} theme={theme} contrast={safeContrast} rng={rng} onUpdateSlide={onUpdateSlide} readOnly={printMode} />
             {!printMode && onUpdateSlide && (
-                <LayoutToolbar slide={slide} onUpdateSlide={onUpdateSlide} mode="wabi-sabi" />
+                <LayoutToolbar slide={slide} onUpdateSlide={onUpdateSlide} mode="wabi-sabi" onToggleNotes={onToggleNotes} />
             )}
         </div>
+    );
+};
+
+// --- MAIN CONTROLLER COMPONENT (provides selection context) ---
+
+export const WabiSabiStage: React.FC<WabiSabiStageProps> = (props) => {
+    return (
+        <TextSelectionProvider>
+            <WabiSabiStageInner {...props} />
+        </TextSelectionProvider>
     );
 };

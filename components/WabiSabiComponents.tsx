@@ -5,6 +5,7 @@ import { SmartText } from './SmartText';
 import { LayoutLayer } from '../lib/themes';
 import { PRNG } from '../lib/utils';
 import { TextRole, getTextConfigWithOverrides } from '../lib/wabiSabiText';
+import { useTextSelection } from '../contexts/TextSelectionContext';
 
 export interface ArchetypeProps {
     slide: Slide;
@@ -17,7 +18,7 @@ export interface ArchetypeProps {
         border: string;
         mode: string;
     };
-    rng: PRNG;
+    rng?: PRNG; // Optional - only ~15 of 118 archetypes use RNG
     onUpdateSlide?: (updates: Partial<Slide>) => void;
     readOnly?: boolean;
 }
@@ -43,6 +44,10 @@ export const EditableTitle = ({
     const config = getTextConfigWithOverrides(role, overrides);
     const titleStyle = slide.textStyles?.title;
 
+    // Selection integration for per-item styling
+    const { selection, setSelection } = useTextSelection();
+    const isSelected = selection?.type === 'title';
+
     return (
         <SmartText
             value={slide.title}
@@ -53,6 +58,8 @@ export const EditableTitle = ({
             fontWeight={titleStyle?.fontWeight}
             fontStyle={titleStyle?.fontStyle}
             textAlign={titleStyle?.textAlign}
+            isSelected={isSelected}
+            onSelect={() => setSelection({ type: 'title' })}
             className={`font-bold relative ${className}`}
             style={{
                 fontFamily: theme.fonts.heading,
@@ -68,7 +75,7 @@ export const EditableTitle = ({
  * EditableContent - Content-First Body Text Component
  *
  * Renders content items at preferred font size. Container expands to fit.
- * Supports style overrides from slide.textStyles.content
+ * Supports style overrides from slide.textStyles.content and per-item styles
  */
 export const EditableContent = ({
     slide, theme, contrast, onUpdateSlide,
@@ -78,6 +85,19 @@ export const EditableContent = ({
     const config = getTextConfigWithOverrides(role);
     const contentStyle = slide.textStyles?.content;
 
+    // Selection integration for per-item styling
+    const { selection, setSelection } = useTextSelection();
+
+    // Helper to get per-item or fallback styles
+    const getItemStyle = (index: number) => {
+        const itemStyle = slide.contentItemStyles?.[index];
+        return {
+            fontSize: itemStyle?.fontSize ?? slide.contentFontSize ?? config.preferredFontSize,
+            fontWeight: itemStyle?.fontWeight ?? contentStyle?.fontWeight,
+            fontStyle: itemStyle?.fontStyle ?? contentStyle?.fontStyle,
+        };
+    };
+
     return (
         <div
             className={`space-y-2 relative flex flex-col ${className}`}
@@ -86,41 +106,48 @@ export const EditableContent = ({
                 ...style
             }}
         >
-            {slide.content.map((item: string, i: number) => (
-                <div
-                    key={i}
-                    className="flex gap-3 group relative items-start"
-                >
-                    {bullet && (
-                        <span
-                            className="mt-2.5 w-1 h-1 shrink-0 rounded-full opacity-60"
-                            style={{ backgroundColor: contrast.text }}
-                        />
-                    )}
-                    <div className="flex-1 relative">
-                        <SmartText
-                            value={item}
-                            onChange={(val) => {
-                                const newC = [...slide.content];
-                                newC[i] = val;
-                                onUpdateSlide?.({ content: newC });
-                            }}
-                            readOnly={readOnly}
-                            fontSize={slide.contentFontSize ?? config.preferredFontSize}
-                            lineHeight={config.lineHeight}
-                            fontWeight={contentStyle?.fontWeight}
-                            fontStyle={contentStyle?.fontStyle}
-                            textAlign={contentStyle?.textAlign}
-                            className="w-full bg-transparent outline-none"
-                            style={{
-                                fontFamily: theme.fonts.body,
-                                color: contrast.text,
-                                opacity: 0.9,
-                            }}
-                        />
+            {slide.content.map((item: string, i: number) => {
+                const isSelected = selection?.type === 'content' && selection.index === i;
+                const itemStyles = getItemStyle(i);
+
+                return (
+                    <div
+                        key={i}
+                        className="flex gap-3 group relative items-start"
+                    >
+                        {bullet && (
+                            <span
+                                className="mt-2.5 w-1 h-1 shrink-0 rounded-full opacity-60"
+                                style={{ backgroundColor: contrast.text }}
+                            />
+                        )}
+                        <div className="flex-1 relative">
+                            <SmartText
+                                value={item}
+                                onChange={(val) => {
+                                    const newC = [...slide.content];
+                                    newC[i] = val;
+                                    onUpdateSlide?.({ content: newC });
+                                }}
+                                readOnly={readOnly}
+                                fontSize={itemStyles.fontSize}
+                                lineHeight={config.lineHeight}
+                                fontWeight={itemStyles.fontWeight}
+                                fontStyle={itemStyles.fontStyle}
+                                textAlign={contentStyle?.textAlign}
+                                isSelected={isSelected}
+                                onSelect={() => setSelection({ type: 'content', index: i })}
+                                className="w-full bg-transparent outline-none"
+                                style={{
+                                    fontFamily: theme.fonts.body,
+                                    color: contrast.text,
+                                    opacity: 0.9,
+                                }}
+                            />
+                        </div>
                     </div>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 };

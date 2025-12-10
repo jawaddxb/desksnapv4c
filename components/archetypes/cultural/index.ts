@@ -1,0 +1,10 @@
+export { TokyoArchetype } from './TokyoArchetype';
+export { SeoulArchetype } from './SeoulArchetype';
+export { ParisArchetype } from './ParisArchetype';
+export { MilanoArchetype } from './MilanoArchetype';
+export { BrooklynArchetype } from './BrooklynArchetype';
+export { NordicArchetype } from './NordicArchetype';
+export { HavanaArchetype } from './HavanaArchetype';
+export { MarrakechArchetype } from './MarrakechArchetype';
+export { KyotoArchetype } from './KyotoArchetype';
+export { ViennaArchetype } from './ViennaArchetype';

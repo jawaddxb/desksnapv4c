@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Slide, TextStyleOverride, ToneType, ContentRefinementType, ImageStylePreset } from '../types';
 import {
     Columns, Maximize2, Type, LayoutTemplate,
@@ -7,8 +7,9 @@ import {
     Type as TypeIcon, CaseSensitive, Check,
     Smartphone, Square, Rows,
     Bold, Italic, Plus, Minus, Image as ImageIcon,
-    Sparkles, MessageSquare, Wand2, ChevronRight, ChevronLeft, Loader2
+    Sparkles, MessageSquare, Wand2, ChevronRight, ChevronLeft, Loader2, X, GripHorizontal, FileText
 } from 'lucide-react';
+import { useTextSelection } from '../contexts/TextSelectionContext';
 
 interface LayoutToolbarProps {
     slide: Slide;
@@ -17,6 +18,7 @@ interface LayoutToolbarProps {
     onRefineContent?: (type: 'tone' | 'content', subType: string) => Promise<void>;
     onEnhanceImage?: (preset: ImageStylePreset) => Promise<void>;
     isRefining?: boolean;
+    onToggleNotes?: () => void;
 }
 
 export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
@@ -25,54 +27,205 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
     mode = 'standard',
     onRefineContent,
     onEnhanceImage,
-    isRefining = false
+    isRefining = false,
+    onToggleNotes
 }) => {
     const [activeLabel, setActiveLabel] = useState<string>(mode === 'wabi-sabi' ? "Text Styling" : "Layout Designer");
     const [isAIMenuOpen, setIsAIMenuOpen] = useState(false);
     const [activeAISubmenu, setActiveAISubmenu] = useState<'tone' | 'content' | 'visual' | null>(null);
     const isWabiSabi = mode === 'wabi-sabi';
 
+    // Drag state for movable toolbar
+    const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const dragRef = useRef<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
+    const toolbarRef = useRef<HTMLDivElement>(null);
+
+    // Drag handlers
+    const handleDragStart = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const toolbar = toolbarRef.current;
+        if (!toolbar) return;
+
+        const rect = toolbar.getBoundingClientRect();
+        const parentRect = toolbar.parentElement?.getBoundingClientRect();
+        if (!parentRect) return;
+
+        // If no position set yet, calculate current position from CSS
+        const currentX = position?.x ?? 0;
+        const currentY = position?.y ?? 0;
+
+        dragRef.current = {
+            startX: e.clientX,
+            startY: e.clientY,
+            startPosX: currentX,
+            startPosY: currentY,
+        };
+        setIsDragging(true);
+
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+            if (!dragRef.current) return;
+
+            const deltaX = moveEvent.clientX - dragRef.current.startX;
+            const deltaY = moveEvent.clientY - dragRef.current.startY;
+
+            setPosition({
+                x: dragRef.current.startPosX + deltaX,
+                y: dragRef.current.startPosY + deltaY,
+            });
+        };
+
+        const handleMouseUp = () => {
+            setIsDragging(false);
+            dragRef.current = null;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    }, [position]);
+
+    // Selection context for per-item styling (only used in wabi-sabi mode)
+    const { selection, clearSelection } = useTextSelection();
+
+    // Determine what's selected
+    const hasSelection = selection !== null;
+    const isTitleSelected = selection?.type === 'title';
+    const isContentSelected = selection?.type === 'content';
+    const selectedContentIndex = isContentSelected ? selection.index : -1;
+
     const handleUpdate = (updates: Partial<Slide>) => {
         onUpdateSlide(updates);
     };
 
-    // Text style helpers
-    const titleStyle = slide.textStyles?.title;
-    const contentStyle = slide.textStyles?.content;
-    const isBold = (titleStyle?.fontWeight ?? 400) >= 700;
-    const isItalic = titleStyle?.fontStyle === 'italic';
-
-    const toggleBold = () => {
-        const newWeight = isBold ? 400 : 700;
-        handleUpdate({
-            textStyles: {
-                ...slide.textStyles,
-                title: { ...titleStyle, fontWeight: newWeight },
-                content: { ...contentStyle, fontWeight: newWeight },
-            }
-        });
+    // Get current styles for selected item (or global styles if no selection)
+    const getSelectedItemStyles = () => {
+        if (isTitleSelected) {
+            return {
+                fontSize: slide.titleFontSize ?? 64,
+                fontWeight: slide.textStyles?.title?.fontWeight ?? 400,
+                fontStyle: slide.textStyles?.title?.fontStyle ?? 'normal',
+            };
+        }
+        if (isContentSelected) {
+            const itemStyle = slide.contentItemStyles?.[selectedContentIndex];
+            return {
+                fontSize: itemStyle?.fontSize ?? slide.contentFontSize ?? 20,
+                fontWeight: itemStyle?.fontWeight ?? slide.textStyles?.content?.fontWeight ?? 400,
+                fontStyle: itemStyle?.fontStyle ?? slide.textStyles?.content?.fontStyle ?? 'normal',
+            };
+        }
+        // No selection - return title styles for global controls
+        return {
+            fontSize: slide.titleFontSize ?? 64,
+            fontWeight: slide.textStyles?.title?.fontWeight ?? 400,
+            fontStyle: slide.textStyles?.title?.fontStyle ?? 'normal',
+        };
     };
 
+    const currentStyles = getSelectedItemStyles();
+    const isBold = (currentStyles.fontWeight ?? 400) >= 700;
+    const isItalic = currentStyles.fontStyle === 'italic';
+
+    // Text style helpers (legacy for non-wabi-sabi mode)
+    const titleStyle = slide.textStyles?.title;
+    const contentStyle = slide.textStyles?.content;
+
+    // Selection-aware toggleBold
+    const toggleBold = () => {
+        const newWeight = isBold ? 400 : 700;
+
+        if (isWabiSabi && isTitleSelected) {
+            // Update only title
+            handleUpdate({
+                textStyles: {
+                    ...slide.textStyles,
+                    title: { ...titleStyle, fontWeight: newWeight },
+                }
+            });
+        } else if (isWabiSabi && isContentSelected) {
+            // Update only selected content item
+            const newItemStyles = { ...slide.contentItemStyles };
+            newItemStyles[selectedContentIndex] = {
+                ...newItemStyles[selectedContentIndex],
+                fontWeight: newWeight,
+            };
+            handleUpdate({ contentItemStyles: newItemStyles });
+        } else {
+            // No selection or standard mode: apply to all (existing behavior)
+            handleUpdate({
+                textStyles: {
+                    ...slide.textStyles,
+                    title: { ...titleStyle, fontWeight: newWeight },
+                    content: { ...contentStyle, fontWeight: newWeight },
+                }
+            });
+        }
+    };
+
+    // Selection-aware toggleItalic
     const toggleItalic = () => {
         const newStyle = isItalic ? 'normal' : 'italic';
-        handleUpdate({
-            textStyles: {
-                ...slide.textStyles,
-                title: { ...titleStyle, fontStyle: newStyle },
-                content: { ...contentStyle, fontStyle: newStyle },
-            }
-        });
+
+        if (isWabiSabi && isTitleSelected) {
+            // Update only title
+            handleUpdate({
+                textStyles: {
+                    ...slide.textStyles,
+                    title: { ...titleStyle, fontStyle: newStyle },
+                }
+            });
+        } else if (isWabiSabi && isContentSelected) {
+            // Update only selected content item
+            const newItemStyles = { ...slide.contentItemStyles };
+            newItemStyles[selectedContentIndex] = {
+                ...newItemStyles[selectedContentIndex],
+                fontStyle: newStyle,
+            };
+            handleUpdate({ contentItemStyles: newItemStyles });
+        } else {
+            // No selection or standard mode: apply to all
+            handleUpdate({
+                textStyles: {
+                    ...slide.textStyles,
+                    title: { ...titleStyle, fontStyle: newStyle },
+                    content: { ...contentStyle, fontStyle: newStyle },
+                }
+            });
+        }
     };
 
     // Font size helpers (±8px increments)
     const currentTitleSize = slide.titleFontSize ?? 64;
     const currentContentSize = slide.contentFontSize ?? 20;
 
+    // Selection-aware adjustFontSize
     const adjustFontSize = (delta: number) => {
-        handleUpdate({
-            titleFontSize: Math.max(24, Math.min(120, currentTitleSize + delta)),
-            contentFontSize: Math.max(12, Math.min(48, currentContentSize + (delta / 2))),
-        });
+        if (isWabiSabi && isTitleSelected) {
+            // Update only title font size
+            handleUpdate({
+                titleFontSize: Math.max(24, Math.min(120, currentTitleSize + delta)),
+            });
+        } else if (isWabiSabi && isContentSelected) {
+            // Update only selected content item font size
+            const itemStyle = slide.contentItemStyles?.[selectedContentIndex];
+            const currentSize = itemStyle?.fontSize ?? slide.contentFontSize ?? 20;
+            const newItemStyles = { ...slide.contentItemStyles };
+            newItemStyles[selectedContentIndex] = {
+                ...newItemStyles[selectedContentIndex],
+                fontSize: Math.max(12, Math.min(48, currentSize + delta)),
+            };
+            handleUpdate({ contentItemStyles: newItemStyles });
+        } else {
+            // No selection or standard mode: apply to all (existing behavior)
+            handleUpdate({
+                titleFontSize: Math.max(24, Math.min(120, currentTitleSize + delta)),
+                contentFontSize: Math.max(12, Math.min(48, currentContentSize + (delta / 2))),
+            });
+        }
     };
 
     // Image opacity helper
@@ -156,11 +309,45 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
         </div>
     );
 
+    // Calculate transform style for drag position
+    const dragStyle = position
+        ? { transform: `translate(calc(-50% + ${position.x}px), ${position.y}px)` }
+        : { transform: 'translate(-50%, 0)' };
+
     return (
         // Z-Index boosted to 200 to sit above Content Layers
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[200] flex flex-col items-center gap-3 opacity-0 group-hover/stage:opacity-100 transition-all duration-500 translate-y-8 group-hover/stage:translate-y-0">
-            
+        <div
+            ref={toolbarRef}
+            className={`absolute bottom-8 left-1/2 z-[200] flex flex-col items-center gap-3 opacity-0 group-hover/stage:opacity-100 transition-opacity duration-500 ${isDragging ? 'cursor-grabbing' : ''}`}
+            style={dragStyle}
+        >
+
+            {/* Selection indicator badge - only in wabi-sabi mode with selection */}
+            {isWabiSabi && hasSelection && (
+                <div className="px-3 py-1.5 bg-indigo-500 text-white rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg">
+                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                    {isTitleSelected ? 'Title Selected' : `Bullet ${selectedContentIndex + 1} Selected`}
+                    <button
+                        onClick={(e) => { e.stopPropagation(); clearSelection(); }}
+                        className="ml-1 hover:bg-indigo-600 rounded p-0.5 transition-colors"
+                    >
+                        <X className="w-3 h-3" />
+                    </button>
+                </div>
+            )}
+
             <div className="flex items-center gap-1 bg-white/95 backdrop-blur-xl shadow-2xl p-2 border border-white/20 rounded-2xl ring-1 ring-zinc-900/5">
+
+                {/* Drag Handle */}
+                <div
+                    onMouseDown={handleDragStart}
+                    className="flex items-center justify-center w-6 h-9 cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-500 transition-colors"
+                    title="Drag to move toolbar"
+                >
+                    <GripHorizontal className="w-4 h-4" />
+                </div>
+
+                <Divider />
 
                 {/* LAYOUT GROUP - Standard mode only */}
                 {!isWabiSabi && (
@@ -312,6 +499,19 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
                             label="Increase Image Opacity"
                         />
                     </div>
+                )}
+
+                {/* SPEAKER NOTES TOGGLE */}
+                {onToggleNotes && (
+                    <>
+                        <Divider />
+                        <Button
+                            active={false}
+                            onClick={onToggleNotes}
+                            icon={FileText}
+                            label="Speaker Notes"
+                        />
+                    </>
                 )}
 
                 {/* AI REFINEMENT MENU */}
