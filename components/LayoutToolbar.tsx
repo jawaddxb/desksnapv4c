@@ -12,10 +12,12 @@ import {
 interface LayoutToolbarProps {
     slide: Slide;
     onUpdateSlide: (updates: Partial<Slide>) => void;
+    mode?: 'standard' | 'wabi-sabi';
 }
 
-export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSlide }) => {
-    const [activeLabel, setActiveLabel] = useState<string>("Layout Designer");
+export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSlide, mode = 'standard' }) => {
+    const [activeLabel, setActiveLabel] = useState<string>(mode === 'wabi-sabi' ? "Text Styling" : "Layout Designer");
+    const isWabiSabi = mode === 'wabi-sabi';
 
     const handleUpdate = (updates: Partial<Slide>) => {
         onUpdateSlide(updates);
@@ -118,78 +120,82 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({ slide, onUpdateSli
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[200] flex flex-col items-center gap-3 opacity-0 group-hover/stage:opacity-100 transition-all duration-500 translate-y-8 group-hover/stage:translate-y-0">
             
             <div className="flex items-center gap-1 bg-white/95 backdrop-blur-xl shadow-2xl p-2 border border-white/20 rounded-2xl ring-1 ring-zinc-900/5">
-                
-                {/* LAYOUT GROUP */}
-                <div className="flex gap-1">
-                    <Button 
-                        active={slide.layoutType === 'split'} 
-                        onClick={() => handleUpdate({ layoutType: 'split' })} 
-                        icon={Columns} 
-                        label="Split Layout" 
-                    />
-                    <Button 
-                        active={slide.layoutType === 'magazine'} 
-                        onClick={() => handleUpdate({ layoutType: 'magazine' })} 
-                        icon={Smartphone} 
-                        label="Magazine Column" 
-                    />
-                    <Button 
-                        active={slide.layoutType === 'horizontal'} 
-                        onClick={() => handleUpdate({ layoutType: 'horizontal' })} 
-                        icon={Rows} 
-                        label="Horizontal Split" 
-                    />
-                    <Button 
-                        active={slide.layoutType === 'card'} 
-                        onClick={() => handleUpdate({ layoutType: 'card' })} 
-                        icon={Square} 
-                        label="Floating Card" 
-                    />
-                    <Button 
-                        active={slide.layoutType === 'full-bleed'} 
-                        onClick={() => handleUpdate({ layoutType: 'full-bleed' })} 
-                        icon={Maximize2} 
-                        label="Full Bleed" 
-                    />
-                    <Button 
-                        active={slide.layoutType === 'statement'} 
-                        onClick={() => handleUpdate({ layoutType: 'statement' })} 
-                        icon={Type} 
-                        label="Statement" 
-                    />
-                    <Button 
-                        active={slide.layoutType === 'gallery'} 
-                        onClick={() => handleUpdate({ layoutType: 'gallery' })} 
-                        icon={LayoutTemplate} 
-                        label="Gallery Grid" 
-                    />
-                </div>
 
-                <Divider />
+                {/* LAYOUT GROUP - Standard mode only */}
+                {!isWabiSabi && (
+                    <>
+                        <div className="flex gap-1">
+                            <Button
+                                active={slide.layoutType === 'split'}
+                                onClick={() => handleUpdate({ layoutType: 'split' })}
+                                icon={Columns}
+                                label="Split Layout"
+                            />
+                            <Button
+                                active={slide.layoutType === 'magazine'}
+                                onClick={() => handleUpdate({ layoutType: 'magazine' })}
+                                icon={Smartphone}
+                                label="Magazine Column"
+                            />
+                            <Button
+                                active={slide.layoutType === 'horizontal'}
+                                onClick={() => handleUpdate({ layoutType: 'horizontal' })}
+                                icon={Rows}
+                                label="Horizontal Split"
+                            />
+                            <Button
+                                active={slide.layoutType === 'card'}
+                                onClick={() => handleUpdate({ layoutType: 'card' })}
+                                icon={Square}
+                                label="Floating Card"
+                            />
+                            <Button
+                                active={slide.layoutType === 'full-bleed'}
+                                onClick={() => handleUpdate({ layoutType: 'full-bleed' })}
+                                icon={Maximize2}
+                                label="Full Bleed"
+                            />
+                            <Button
+                                active={slide.layoutType === 'statement'}
+                                onClick={() => handleUpdate({ layoutType: 'statement' })}
+                                icon={Type}
+                                label="Statement"
+                            />
+                            <Button
+                                active={slide.layoutType === 'gallery'}
+                                onClick={() => handleUpdate({ layoutType: 'gallery' })}
+                                icon={LayoutTemplate}
+                                label="Gallery Grid"
+                            />
+                        </div>
 
-                {/* ALIGNMENT GROUP */}
-                <div className="flex gap-1">
-                    <Button 
-                        active={slide.alignment === 'left'} 
-                        onClick={() => handleUpdate({ alignment: 'left' })} 
-                        icon={AlignLeft} 
-                        label="Align Left" 
-                    />
-                    <Button 
-                        active={slide.alignment === 'center'} 
-                        onClick={() => handleUpdate({ alignment: 'center' })} 
-                        icon={AlignCenter} 
-                        label="Align Center" 
-                    />
-                    <Button 
-                        active={slide.alignment === 'right'} 
-                        onClick={() => handleUpdate({ alignment: 'right' })} 
-                        icon={AlignRight} 
-                        label="Align Right" 
-                    />
-                </div>
+                        <Divider />
 
-                <Divider />
+                        {/* ALIGNMENT GROUP - Standard mode only */}
+                        <div className="flex gap-1">
+                            <Button
+                                active={slide.alignment === 'left'}
+                                onClick={() => handleUpdate({ alignment: 'left' })}
+                                icon={AlignLeft}
+                                label="Align Left"
+                            />
+                            <Button
+                                active={slide.alignment === 'center'}
+                                onClick={() => handleUpdate({ alignment: 'center' })}
+                                icon={AlignCenter}
+                                label="Align Center"
+                            />
+                            <Button
+                                active={slide.alignment === 'right'}
+                                onClick={() => handleUpdate({ alignment: 'right' })}
+                                icon={AlignRight}
+                                label="Align Right"
+                            />
+                        </div>
+
+                        <Divider />
+                    </>
+                )}
 
                 {/* TYPOGRAPHY GROUP */}
                 <div className="flex gap-1">

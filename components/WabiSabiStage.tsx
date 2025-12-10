@@ -4,6 +4,7 @@ import { Slide, Theme } from '../types';
 import { PRNG } from '../lib/utils';
 import { ArchetypeProps } from './WabiSabiComponents';
 import { ensureContrast } from '../lib/contrast';
+import { LayoutToolbar } from './LayoutToolbar';
 import {
     EditorialArchetype, TypographicArchetype, ConstructivistArchetype, BauhausArchetype,
     BrutalistArchetype, PostModernArchetype, SchematicArchetype, CinematicArchetype,
@@ -14,7 +15,19 @@ import {
     SumieArchetype, MonolithArchetype, HerbariumArchetype, CoastalArchetype, AtelierArchetype,
     // Corporate Pitch Deck Archetypes
     VentureArchetype, KeynoteArchetype, GradientArchetype, SignalArchetype, MetricArchetype,
-    NarrativeArchetype, BeaconArchetype, SlideArchetype, CanvasArchetype, DeckArchetype
+    NarrativeArchetype, BeaconArchetype, SlideArchetype, CanvasArchetype, DeckArchetype,
+    // Modern Tech Aesthetics
+    BentoArchetype, GlassArchetype, LiquidArchetype, TerminalArchetype, NeonArchetype,
+    AuroraArchetype, MeshArchetype, PulseArchetype, CircuitArchetype, HologramArchetype,
+    // Design Movements
+    MemphisArchetype, DecoArchetype, RetroArchetype, NeueArchetype, ClayArchetype,
+    PopArchetype, ModArchetype, GothicArchetype, RococoArchetype, StarkArchetype,
+    // Natural/Organic
+    TerraArchetype, ForestArchetype, StoneArchetype, BloomArchetype, DesertArchetype,
+    FrostArchetype, EmberArchetype, MistArchetype, GrainArchetype, MineralArchetype,
+    // Cultural/Regional
+    TokyoArchetype, SeoulArchetype, ParisArchetype, MilanoArchetype, BrooklynArchetype,
+    NordicArchetype, HavanaArchetype, MarrakechArchetype, KyotoArchetype, ViennaArchetype
 } from './WabiSabiArchetypes';
 
 interface WabiSabiStageProps {
@@ -66,7 +79,51 @@ const ARCHETYPE_RENDERERS: Record<string, React.FC<ArchetypeProps>> = {
     'Beacon': BeaconArchetype,
     'Slide': SlideArchetype,
     'Canvas': CanvasArchetype,
-    'Deck': DeckArchetype
+    'Deck': DeckArchetype,
+    // Modern Tech Aesthetics
+    'Bento': BentoArchetype,
+    'Glass': GlassArchetype,
+    'Liquid': LiquidArchetype,
+    'Terminal': TerminalArchetype,
+    'Neon': NeonArchetype,
+    'Aurora': AuroraArchetype,
+    'Mesh': MeshArchetype,
+    'Pulse': PulseArchetype,
+    'Circuit': CircuitArchetype,
+    'Hologram': HologramArchetype,
+    // Design Movements
+    'Memphis': MemphisArchetype,
+    'Deco': DecoArchetype,
+    'Retro': RetroArchetype,
+    'Neue': NeueArchetype,
+    'Clay': ClayArchetype,
+    'Pop': PopArchetype,
+    'Mod': ModArchetype,
+    'Gothic': GothicArchetype,
+    'Rococo': RococoArchetype,
+    'Stark': StarkArchetype,
+    // Natural/Organic
+    'Terra': TerraArchetype,
+    'Forest': ForestArchetype,
+    'Stone': StoneArchetype,
+    'Bloom': BloomArchetype,
+    'Desert': DesertArchetype,
+    'Frost': FrostArchetype,
+    'Ember': EmberArchetype,
+    'Mist': MistArchetype,
+    'Grain': GrainArchetype,
+    'Mineral': MineralArchetype,
+    // Cultural/Regional
+    'Tokyo': TokyoArchetype,
+    'Seoul': SeoulArchetype,
+    'Paris': ParisArchetype,
+    'Milano': MilanoArchetype,
+    'Brooklyn': BrooklynArchetype,
+    'Nordic': NordicArchetype,
+    'Havana': HavanaArchetype,
+    'Marrakech': MarrakechArchetype,
+    'Kyoto': KyotoArchetype,
+    'Vienna': ViennaArchetype
 };
 
 export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);
@@ -109,5 +166,12 @@ export const WabiSabiStage: React.FC<WabiSabiStageProps> = ({ slide, theme, onUp
 
     const Renderer = ARCHETYPE_RENDERERS[archetype] || SwissArchetype;
 
-    return <Renderer slide={slide} theme={theme} contrast={safeContrast} rng={rng} onUpdateSlide={onUpdateSlide} readOnly={printMode} />;
+    return (
+        <div className="w-full h-full relative group/stage">
+            <Renderer slide={slide} theme={theme} contrast={safeContrast} rng={rng} onUpdateSlide={onUpdateSlide} readOnly={printMode} />
+            {!printMode && onUpdateSlide && (
+                <LayoutToolbar slide={slide} onUpdateSlide={onUpdateSlide} mode="wabi-sabi" />
+            )}
+        </div>
+    );
 };
