@@ -212,31 +212,49 @@ export function useImageGeneration({
     async (slides: Slide[], style: string, topic?: string) => {
       if (!presentation) return;
 
+      // Filter out slides that already have images
+      const slidesNeedingImages = slides.filter(s => !s.imageUrl);
+      if (slidesNeedingImages.length === 0) {
+        console.log('[Agent] All slides already have images, skipping generation');
+        return;
+      }
+
+      // Create index mapping from filtered array back to original
+      const indexMap = new Map<number, number>();
+      slidesNeedingImages.forEach((slide, filteredIndex) => {
+        const originalIndex = slides.findIndex(s => s.id === slide.id);
+        indexMap.set(filteredIndex, originalIndex);
+      });
+
       // Capture values upfront to avoid stale closure issues after state updates
       const presentationTopic = topic || presentation.topic;
       const themeId = presentation.themeId;
-      const slidesCopy = [...slides]; // Copy of slides array for async callbacks
+      const slidesCopy = [...slidesNeedingImages]; // Copy of slides needing images
 
       try {
         await ensureApiKeySelection();
 
         // Notify that agent processing is starting
-        onAgentStart?.(slides.length);
+        onAgentStart?.(slidesNeedingImages.length);
 
-        // Set all slides to loading
+        // Set only slides that need images to loading
         setPresentation((prev) =>
           prev
             ? {
                 ...prev,
-                slides: prev.slides.map((s) => ({ ...s, isImageLoading: true })),
+                slides: prev.slides.map((s) =>
+                  slidesNeedingImages.some(sni => sni.id === s.id)
+                    ? { ...s, isImageLoading: true }
+                    : s
+                ),
               }
             : null
         );
 
-        // Run agent-based generation
+        // Run agent-based generation only for slides needing images
         const result = await generatePresentationImagesWithAgent(
           presentationTopic,
-          slides.map((s) => ({
+          slidesNeedingImages.map((s) => ({
             title: s.title,
             content: s.content,
             imagePrompt: s.imagePrompt,
@@ -245,23 +263,28 @@ export function useImageGeneration({
           themeId,
           {
             onLog: (log) => {
-              console.log(`[Agent] Slide ${log.slideIndex}: ${log.action}`, log);
+              // Map filtered index back to original for logging
+              const originalIndex = indexMap.get(log.slideIndex) ?? log.slideIndex;
+              console.log(`[Agent] Slide ${originalIndex}: ${log.action}`, log);
               // Emit real-time activity for UI display
-              onAgentActivity?.(log);
+              onAgentActivity?.({ ...log, slideIndex: originalIndex });
             },
-            onImageGenerated: async (index, imageUrl) => {
-              // Update local state immediately
-              updateSlideAtIndex(index, {
+            onImageGenerated: async (filteredIndex, imageUrl) => {
+              // Map filtered index back to original
+              const originalIndex = indexMap.get(filteredIndex) ?? filteredIndex;
+
+              // Update local state immediately using original index
+              updateSlideAtIndex(originalIndex, {
                 imageUrl,
                 isImageLoading: false,
                 imageError: undefined,
               });
 
               // Notify parent hook of image generation for UI display
-              onImageGenerated?.(index, imageUrl);
+              onImageGenerated?.(originalIndex, imageUrl);
 
               // Persist to API using the captured slide reference
-              const slide = slidesCopy[index];
+              const slide = slidesCopy[filteredIndex];
               if (slide && presentationId) {
                 try {
                   await updateSlideMutation.mutateAsync({
@@ -274,8 +297,10 @@ export function useImageGeneration({
                 }
               }
             },
-            onImageError: (index, error) => {
-              updateSlideAtIndex(index, {
+            onImageError: (filteredIndex, error) => {
+              // Map filtered index back to original
+              const originalIndex = indexMap.get(filteredIndex) ?? filteredIndex;
+              updateSlideAtIndex(originalIndex, {
                 isImageLoading: false,
                 imageError: error.message,
               });
@@ -297,16 +322,16 @@ export function useImageGeneration({
         console.error('Agent generation error', e);
         // Notify completion even on error
         onAgentComplete?.();
-        // Reset loading states on error
+        // Reset loading states only for slides that were being generated
         setPresentation((prev) =>
           prev
             ? {
                 ...prev,
-                slides: prev.slides.map((s) => ({
-                  ...s,
-                  isImageLoading: false,
-                  imageError: 'Failed to generate images',
-                })),
+                slides: prev.slides.map((s) =>
+                  slidesNeedingImages.some(sni => sni.id === s.id)
+                    ? { ...s, isImageLoading: false, imageError: 'Failed to generate images' }
+                    : s
+                ),
               }
             : null
         );

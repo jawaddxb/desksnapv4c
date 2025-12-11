@@ -3,6 +3,7 @@
  *
  * Main container for the rough draft review stage.
  * Runs the rough draft agent and displays slides as they are generated.
+ * Persists rough drafts to the database for later retrieval.
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -19,6 +20,24 @@ import { AgentLog } from '../../services/agents/types';
 import { THEMES } from '../../config/themes';
 import { RoughDraftSlideCard } from './RoughDraftSlideCard';
 import { AgentNarrativePanel } from './AgentNarrativePanel';
+import { getAIClient } from '../../services/aiClient';
+import {
+  createRoughDraft,
+  updateRoughDraft,
+  updateSlide as apiUpdateSlide,
+  approveRoughDraft,
+} from '../../services/api/roughDraftService';
+import { RoughDraft } from '../../types/roughDraft';
+
+/**
+ * Check if a string is a valid UUID (v4 format)
+ */
+function isValidUUID(str: string | undefined): boolean {
+  if (!str) return false;
+  // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
 
 interface RoughDraftCanvasProps {
   /** Input for the rough draft agent */
@@ -66,10 +85,93 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
   // Regeneration state
   const [regeneratingSlideId, setRegeneratingSlideId] = useState<string | null>(null);
 
+  // AI enhance state
+  const [enhancingSlideId, setEnhancingSlideId] = useState<string | null>(null);
+
+  // Database persistence state
+  const [persistedDraft, setPersistedDraft] = useState<RoughDraft | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Ref to prevent double execution in React Strict Mode
   const hasStartedRef = useRef(false);
 
   const theme = THEMES[input.themeId] || THEMES.executive;
+
+  // Persist rough draft to database
+  const persistDraft = useCallback(async (finalSlides: RoughDraftSlide[]) => {
+    try {
+      setIsSaving(true);
+      // Only pass ideationSessionId if it's a valid UUID (server-generated)
+      // Client-generated IDs like "session-1234567890-abc12" will be rejected by the API
+      const validSessionId = isValidUUID(ideationSessionId) ? ideationSessionId : undefined;
+
+      if (ideationSessionId && !validSessionId) {
+        console.warn('[RoughDraftCanvas] Invalid session ID format, skipping API link:', ideationSessionId);
+      }
+
+      const draft = await createRoughDraft({
+        topic: input.topic,
+        themeId: input.themeId,
+        visualStyle: input.visualStyle || '',
+        status: 'ready',
+        ideationSessionId: validSessionId,
+        slides: finalSlides.map((s, index) => ({
+          position: index,
+          title: s.title,
+          content: s.content,
+          speakerNotes: s.speakerNotes,
+          imagePrompt: s.imagePrompt,
+          imageUrl: s.imageUrl,
+          layoutType: s.layoutType,
+          alignment: s.alignment,
+          approvalState: s.approvalState,
+        })),
+      });
+      setPersistedDraft(draft);
+      console.log('[RoughDraftCanvas] Draft persisted to database:', draft.id);
+    } catch (err) {
+      console.error('[RoughDraftCanvas] Failed to persist draft:', err);
+      // Don't fail the whole operation - draft can still work locally
+    } finally {
+      setIsSaving(false);
+    }
+  }, [input.topic, input.themeId, input.visualStyle, ideationSessionId]);
+
+  // Debounced save for slide updates
+  const debouncedSaveSlide = useCallback((slideId: string, updates: Partial<RoughDraftSlide>) => {
+    if (!persistedDraft) return;
+
+    // Clear any pending save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Schedule save after 1 second of inactivity
+    saveTimeoutRef.current = setTimeout(async () => {
+      const slideToUpdate = persistedDraft.slides.find(s => s.id === slideId);
+      if (!slideToUpdate) return;
+
+      try {
+        setIsSaving(true);
+        await apiUpdateSlide(persistedDraft.id, slideId, {
+          title: updates.title,
+          content: updates.content,
+          speakerNotes: updates.speakerNotes,
+          imagePrompt: updates.imagePrompt,
+          imageUrl: updates.imageUrl,
+          layoutType: updates.layoutType,
+          alignment: updates.alignment,
+          approvalState: updates.approvalState,
+        });
+        console.log('[RoughDraftCanvas] Slide saved:', slideId);
+      } catch (err) {
+        console.error('[RoughDraftCanvas] Failed to save slide:', err);
+      } finally {
+        setIsSaving(false);
+      }
+    }, 1000);
+  }, [persistedDraft]);
 
   // Run the rough draft agent on mount
   useEffect(() => {
@@ -153,15 +255,21 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
             setAgentLogs(prev => [...prev, log]);
           },
 
-          onComplete: (finalResult) => {
+          onComplete: async (finalResult) => {
             setResult(finalResult);
             setSlides(finalResult.slides);
             setPhase('complete');
+            // Persist to database
+            await persistDraft(finalResult.slides);
           },
         });
 
         setResult(agentResult);
         setPhase('complete');
+        // Persist to database if not already done via onComplete
+        if (!persistedDraft) {
+          await persistDraft(agentResult.slides);
+        }
       } catch (err) {
         console.error('Rough draft agent error:', err);
         setError(err instanceof Error ? err.message : 'Failed to generate draft');
@@ -182,14 +290,18 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
     setSlides(prev => prev.map(s =>
       s.id === slideId ? { ...s, ...updates, approvalState: 'modified' } : s
     ));
-  }, []);
+    // Trigger debounced save to database
+    debouncedSaveSlide(slideId, updates);
+  }, [debouncedSaveSlide]);
 
   // Handle slide approval
   const handleApproveSlide = useCallback((slideId: string) => {
     setSlides(prev => prev.map(s =>
       s.id === slideId ? { ...s, approvalState: 'approved' } : s
     ));
-  }, []);
+    // Save the approval state to database
+    debouncedSaveSlide(slideId, { approvalState: 'approved' });
+  }, [debouncedSaveSlide]);
 
   // Handle image regeneration for a single slide
   const handleRegenerateImage = useCallback(async (slideId: string) => {
@@ -238,18 +350,117 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
     }
   }, [slides, input.topic, input.visualStyle]);
 
+  // Handle AI text enhancement
+  const handleAIEnhance = useCallback(async (
+    slideId: string,
+    mode: 'research' | 'rewrite' | 'custom',
+    customPrompt?: string
+  ) => {
+    const slide = slides.find(s => s.id === slideId);
+    if (!slide) return;
+
+    setEnhancingSlideId(slideId);
+
+    try {
+      const ai = getAIClient();
+
+      // Build the enhancement prompt based on mode
+      let systemPrompt = '';
+      if (mode === 'research') {
+        systemPrompt = `You are enhancing a presentation slide about "${input.topic}". Research and add more specific facts, statistics, or details to make the content more compelling. Keep the same structure but enrich the content.`;
+      } else if (mode === 'rewrite') {
+        systemPrompt = `You are enhancing a presentation slide. Rewrite the content to be clearer, more concise, and more impactful. Remove filler words, strengthen the language, and improve flow.`;
+      } else {
+        systemPrompt = `You are enhancing a presentation slide. Follow this instruction: ${customPrompt}`;
+      }
+
+      const userPrompt = `Current slide content:
+Title: ${slide.title}
+Bullets:
+${slide.content.map((b, i) => `${i + 1}. ${b}`).join('\n')}
+Speaker Notes: ${slide.speakerNotes || 'None'}
+
+Return ONLY a JSON object with the enhanced content in this exact format:
+{"title": "enhanced title", "bullets": ["bullet 1", "bullet 2", ...], "speakerNotes": "enhanced notes"}`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{ role: 'user', parts: [{ text: systemPrompt + '\n\n' + userPrompt }] }],
+        config: {
+          responseMimeType: 'application/json',
+        },
+      });
+
+      const responseText = response.text || '';
+      const enhanced = JSON.parse(responseText);
+
+      // Update the slide with enhanced content
+      setSlides(prev => prev.map(s =>
+        s.id === slideId ? {
+          ...s,
+          title: enhanced.title || s.title,
+          content: enhanced.bullets || s.content,
+          speakerNotes: enhanced.speakerNotes || s.speakerNotes,
+          approvalState: 'modified',
+        } : s
+      ));
+
+    } catch (err) {
+      console.error('AI enhancement error:', err);
+    } finally {
+      setEnhancingSlideId(null);
+    }
+  }, [slides, input.topic]);
+
   // Handle approve all
-  const handleApproveAll = useCallback(() => {
+  const handleApproveAll = useCallback(async () => {
     if (!result) return;
 
-    // Update result with current slides
-    const finalResult: RoughDraftResult = {
-      ...result,
-      slides: slides.map(s => ({ ...s, approvalState: 'approved' })),
-    };
+    // If we have a persisted draft, use the API to approve
+    if (persistedDraft) {
+      try {
+        setIsSaving(true);
+        const presentation = await approveRoughDraft(persistedDraft.id, {
+          topic: input.topic,
+          themeId: input.themeId,
+          visualStyle: input.visualStyle,
+        });
+        console.log('[RoughDraftCanvas] Draft approved, presentation created:', presentation.id);
+        // The presentation was created via API, just call onApprove with the result
+        const finalResult: RoughDraftResult = {
+          ...result,
+          slides: slides.map(s => ({ ...s, approvalState: 'approved' })),
+        };
+        onApprove(finalResult);
+      } catch (err) {
+        console.error('[RoughDraftCanvas] Failed to approve draft:', err);
+        // Fall back to local approval
+        const finalResult: RoughDraftResult = {
+          ...result,
+          slides: slides.map(s => ({ ...s, approvalState: 'approved' })),
+        };
+        onApprove(finalResult);
+      } finally {
+        setIsSaving(false);
+      }
+    } else {
+      // No persisted draft, use local approval
+      const finalResult: RoughDraftResult = {
+        ...result,
+        slides: slides.map(s => ({ ...s, approvalState: 'approved' })),
+      };
+      onApprove(finalResult);
+    }
+  }, [result, slides, onApprove, persistedDraft, input.topic, input.themeId, input.visualStyle]);
 
-    onApprove(finalResult);
-  }, [result, slides, onApprove]);
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Calculate progress
   const completedSlides = slides.filter(s => !s.isImageLoading).length;
@@ -307,6 +518,15 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
               <span>{slides.length} slides</span>
               {approvedSlides > 0 && (
                 <span className="text-[#c5a47e]">{approvedSlides} approved</span>
+              )}
+              {isSaving && (
+                <span className="flex items-center gap-1 text-white/30">
+                  <div className="w-2 h-2 border border-white/30 border-t-transparent rounded-full animate-spin" />
+                  Saving...
+                </span>
+              )}
+              {persistedDraft && !isSaving && (
+                <span className="text-green-400/60">Saved</span>
               )}
             </div>
 
@@ -376,12 +596,15 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
                   slide={slide}
                   index={index}
                   theme={theme}
+                  visualStyle={input.visualStyle}
                   isSelected={selectedSlideId === slide.id}
                   isRegenerating={regeneratingSlideId === slide.id}
                   onSelect={() => handleSelectSlide(slide.id)}
                   onUpdate={(updates) => handleUpdateSlide(slide.id, updates)}
                   onApprove={() => handleApproveSlide(slide.id)}
                   onRegenerateImage={() => handleRegenerateImage(slide.id)}
+                  onAIEnhance={(mode, customPrompt) => handleAIEnhance(slide.id, mode, customPrompt)}
+                  isEnhancing={enhancingSlideId === slide.id}
                 />
               ))}
             </div>

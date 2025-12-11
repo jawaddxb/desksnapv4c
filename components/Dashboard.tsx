@@ -2,18 +2,22 @@
 import React, { useRef, useState } from 'react';
 import { Presentation } from '../types';
 import { IdeationSession } from '../types/ideation';
+import { RoughDraft } from '../types/roughDraft';
 import { THEMES } from '../lib/themes';
 import { WabiSabiStage } from './WabiSabiStage';
-import { Plus, Trash2, Clock, Play, Upload, BarChart2, Lightbulb, FileText, Sparkles, Copy } from 'lucide-react';
+import { Plus, Trash2, Clock, Play, Upload, BarChart2, Lightbulb, FileText, Sparkles, Copy, FileEdit } from 'lucide-react';
 import { AnalyticsModal } from './AnalyticsModal';
 import { IdeationHistoryPanel } from './ideation/IdeationHistoryPanel';
+import { RoughDraftHistoryPanel } from './rough-draft/RoughDraftHistoryPanel';
 
-type DashboardTab = 'decks' | 'ideations';
+type DashboardTab = 'decks' | 'rough-drafts' | 'ideations';
 
 interface DashboardProps {
     savedDecks: Presentation[];
     savedIdeations?: IdeationSession[];
     isLoadingIdeations?: boolean;
+    savedRoughDrafts?: RoughDraft[];
+    isLoadingRoughDrafts?: boolean;
     onLoad: (id: string) => void;
     onDelete: (id: string) => void;
     onClone?: (id: string) => void;
@@ -24,12 +28,17 @@ interface DashboardProps {
     onDeleteIdeation?: (id: string) => void;
     onGenerateDeckFromIdeation?: (id: string) => void;
     onViewJournal?: (id: string) => void;
+    onLoadRoughDraft?: (id: string) => void;
+    onDeleteRoughDraft?: (id: string) => void;
+    onApproveRoughDraft?: (id: string) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
     savedDecks,
     savedIdeations = [],
     isLoadingIdeations = false,
+    savedRoughDrafts = [],
+    isLoadingRoughDrafts = false,
     onLoad,
     onDelete,
     onClone,
@@ -40,6 +49,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
     onDeleteIdeation,
     onGenerateDeckFromIdeation,
     onViewJournal,
+    onLoadRoughDraft,
+    onDeleteRoughDraft,
+    onApproveRoughDraft,
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [analyticsDeck, setAnalyticsDeck] = useState<Presentation | null>(null);
@@ -83,6 +95,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
                                 </span>
                             </button>
                             <button
+                                onClick={() => setActiveTab('rough-drafts')}
+                                className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all duration-150 ${
+                                    activeTab === 'rough-drafts'
+                                        ? 'bg-[#c5a47e] text-black'
+                                        : 'bg-transparent text-white/60 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                <FileEdit className="w-4 h-4" />
+                                Rough Drafts
+                                <span className="px-2 py-0.5 text-[10px] bg-black/20 rounded-sm">
+                                    {savedRoughDrafts.length}
+                                </span>
+                            </button>
+                            <button
                                 onClick={() => setActiveTab('ideations')}
                                 className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all duration-150 ${
                                     activeTab === 'ideations'
@@ -100,6 +126,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <p className="text-white/60">
                             {activeTab === 'decks'
                                 ? 'Manage your generated presentations'
+                                : activeTab === 'rough-drafts'
+                                ? 'Review and refine your draft presentations'
                                 : 'Revisit and develop your brainstorming sessions'}
                         </p>
                     </div>
@@ -131,6 +159,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
                                     New Deck
                                 </button>
                             </>
+                        ) : activeTab === 'rough-drafts' ? (
+                            <button
+                                onClick={onIdeate}
+                                className="flex items-center gap-2 bg-[#c5a47e] hover:bg-white text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
+                            >
+                                <Lightbulb className="w-4 h-4" />
+                                Start Ideation
+                            </button>
                         ) : (
                             <button
                                 onClick={onIdeate}
@@ -231,6 +267,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             })}
                         </div>
                     )
+                ) : activeTab === 'rough-drafts' ? (
+                    // Rough drafts history panel
+                    <RoughDraftHistoryPanel
+                        drafts={savedRoughDrafts}
+                        isLoading={isLoadingRoughDrafts}
+                        onSelectDraft={onLoadRoughDraft || (() => {})}
+                        onDeleteDraft={onDeleteRoughDraft || (() => {})}
+                        onApproveDraft={onApproveRoughDraft || (() => {})}
+                    />
                 ) : (
                     // Ideations history panel
                     <IdeationHistoryPanel

@@ -134,7 +134,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   return (
     <div
       ref={canvasRef}
-      className="relative w-full overflow-auto"
+      className="relative w-full h-full overflow-auto"
       style={{
         minHeight: canvasHeight,
         background: `

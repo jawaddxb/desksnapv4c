@@ -98,6 +98,68 @@ function generateId(): string {
   return `slide-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+/**
+ * Safely parse JSON from AI responses, handling common malformed JSON issues.
+ * Gemini can return invalid JSON even with responseMimeType: 'application/json'
+ */
+function safeJsonParse(text: string): unknown {
+  if (!text) {
+    throw new Error('Empty response from AI');
+  }
+
+  // Step 1: Clean up markdown code fences thoroughly
+  let cleaned = text
+    .replace(/^```(?:json)?\s*/i, '')  // Leading fence
+    .replace(/```\s*$/i, '')            // Trailing fence
+    .replace(/```json\s*/gi, '')        // Inline fences
+    .replace(/```\s*/g, '')             // Any remaining fences
+    .trim();
+
+  // Step 2: Try direct parse
+  try {
+    return JSON.parse(cleaned);
+  } catch (firstError) {
+    console.warn('[safeJsonParse] Direct parse failed, attempting repair:', firstError);
+  }
+
+  // Step 3: Fix common JSON issues
+  const repaired = cleaned
+    .replace(/,\s*([}\]])/g, '$1')       // Remove trailing commas before } or ]
+    .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":')  // Quote unquoted keys
+    .replace(/:\s*'([^']*)'/g, ': "$1"')  // Convert single quotes to double
+    .replace(/[\x00-\x1F\x7F]/g, ' ')     // Remove control characters
+    .replace(/\n/g, '\\n')                // Escape newlines in strings (rough fix)
+    .trim();
+
+  try {
+    return JSON.parse(repaired);
+  } catch (secondError) {
+    console.warn('[safeJsonParse] Repaired parse failed, trying extraction:', secondError);
+  }
+
+  // Step 4: Try to extract JSON object/array from the text
+  // Look for outermost balanced braces
+  const objMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (objMatch) {
+    try {
+      // Try parsing the extracted object with repairs
+      const extracted = objMatch[0]
+        .replace(/,\s*([}\]])/g, '$1')
+        .replace(/[\x00-\x1F\x7F]/g, ' ');
+      return JSON.parse(extracted);
+    } catch (e) {
+      // Continue to error
+    }
+  }
+
+  // Step 5: If all else fails, throw with context
+  const preview = cleaned.substring(0, 300);
+  throw new Error(
+    `Failed to parse AI response as JSON. ` +
+    `Response preview: "${preview}${cleaned.length > 300 ? '...' : ''}"`
+  );
+}
+
 function createJournalEntry(
   stage: JournalStage,
   title: string,
@@ -217,10 +279,17 @@ Return as JSON with structure:
     },
   });
 
-  const text = response.text?.replace(/```json|```/g, '').trim();
-  if (!text) throw new Error('Failed to generate slide content');
+  const text = response.text;
+  if (!text) throw new Error('Failed to generate slide content - empty response');
 
-  const result = JSON.parse(text);
+  const result = safeJsonParse(text) as { topic?: string; slides: Array<{
+    title: string;
+    bulletPoints: string[];
+    speakerNotes: string;
+    imageVisualDescription: string;
+    layoutType?: LayoutType;
+    alignment?: Alignment;
+  }> };
 
   // Convert to SlideContent array
   const slides: SlideContent[] = result.slides.map((slide: {

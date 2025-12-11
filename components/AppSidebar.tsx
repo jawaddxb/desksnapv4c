@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { Presentation, Message, GenerationMode } from '../types';
 import { IdeationSession } from '../types/ideation';
+import { RoughDraft } from '../types/roughDraft';
 import { Zap, MessageSquare, ChevronDown, ChevronRight, Sparkles, Clock, ArrowRight, FileText } from 'lucide-react';
 import { ChatInterface } from './ChatInterface';
 import { SlideList } from './SlideList';
 import { VersionHistoryPanel } from './VersionHistoryPanel';
+import { RelatedContentPanel } from './RelatedContentPanel';
 import { IMAGE_STYLES } from '../lib/themes';
 import { useVersions } from '../hooks/queries/useVersionQueries';
 import { useCreateVersion, useRestoreVersion, useDeleteVersion } from '../hooks/mutations/useVersionMutations';
@@ -33,6 +35,11 @@ interface AppSidebarProps {
     recentIdeations?: IdeationSession[];
     onLoadIdeation?: (id: string) => void;
     onViewAllIdeations?: () => void;
+    // Related content props
+    sourceIdeation?: IdeationSession | null;
+    sourceRoughDraft?: RoughDraft | null;
+    onViewSourceIdeation?: (id: string) => void;
+    onViewSourceRoughDraft?: (id: string) => void;
 }
 
 export const AppSidebar: React.FC<AppSidebarProps> = ({
@@ -57,6 +64,10 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     recentIdeations = [],
     onLoadIdeation,
     onViewAllIdeations,
+    sourceIdeation,
+    sourceRoughDraft,
+    onViewSourceIdeation,
+    onViewSourceRoughDraft,
 }) => {
     const [ideationsExpanded, setIdeationsExpanded] = useState(true);
 
@@ -179,6 +190,24 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                         onMoveSlide={onMoveSlide}
                         viewMode={viewMode}
                         activeWabiSabiLayout={activeWabiSabiLayout}
+                    />
+                    {/* Related Content Panel - shows source ideation/rough draft */}
+                    <RelatedContentPanel
+                        ideation={sourceIdeation ? {
+                            id: sourceIdeation.id,
+                            topic: sourceIdeation.topic,
+                            lastModified: sourceIdeation.lastModified,
+                            notesCount: sourceIdeation.notes.length,
+                        } : null}
+                        roughDraft={sourceRoughDraft ? {
+                            id: sourceRoughDraft.id,
+                            topic: sourceRoughDraft.topic,
+                            lastModified: sourceRoughDraft.updatedAt,
+                            slidesCount: sourceRoughDraft.slides.length,
+                            status: sourceRoughDraft.status,
+                        } : null}
+                        onViewIdeation={onViewSourceIdeation}
+                        onViewRoughDraft={onViewSourceRoughDraft}
                     />
                     <VersionHistoryPanel
                         versions={versions}

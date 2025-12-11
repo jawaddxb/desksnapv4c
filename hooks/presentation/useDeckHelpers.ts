@@ -14,6 +14,7 @@ export interface SlidePlan {
   imageVisualDescription: string;
   layoutType: string;
   alignment: string;
+  existingImageUrl?: string;
 }
 
 export interface PresentationPlan {
@@ -33,7 +34,8 @@ export function createSlidesFromPlan(slides: SlidePlan[]): Slide[] {
     content: s.bulletPoints,
     speakerNotes: s.speakerNotes,
     imagePrompt: s.imageVisualDescription,
-    isImageLoading: true,
+    imageUrl: s.existingImageUrl,
+    isImageLoading: !s.existingImageUrl,
     layoutType: s.layoutType as Slide['layoutType'],
     alignment: s.alignment as Slide['alignment'],
     fontScale: 'auto' as const,

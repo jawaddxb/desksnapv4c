@@ -2,6 +2,8 @@
 
 import React, { useState, useCallback } from 'react';
 import { Slide, Theme, Presentation, ImageStylePreset } from '../types';
+import { IdeationSession } from '../types/ideation';
+import { RoughDraft } from '../types/roughDraft';
 import { RotateCw, Wand2, Layers } from 'lucide-react';
 import { WabiSabiStage } from './WabiSabiStage';
 import {
@@ -35,6 +37,19 @@ interface MainStageProps {
   onCreateDeck?: () => void;
   onImport?: (file: File) => void;
   onIdeate?: () => void;
+  // Ideation Props
+  savedIdeations?: IdeationSession[];
+  isLoadingIdeations?: boolean;
+  onLoadIdeation?: (id: string) => void;
+  onDeleteIdeation?: (id: string) => void;
+  onGenerateDeckFromIdeation?: (id: string) => void;
+  onViewJournal?: (id: string) => void;
+  // Rough Draft Props
+  savedRoughDrafts?: RoughDraft[];
+  isLoadingRoughDrafts?: boolean;
+  onLoadRoughDraft?: (id: string) => void;
+  onDeleteRoughDraft?: (id: string) => void;
+  onApproveRoughDraft?: (id: string) => void;
   // Presentation context for image prompt toolbar
   presentation?: Presentation | null;
   activeSlideIndex?: number;
@@ -59,6 +74,19 @@ export const MainStage: React.FC<MainStageProps> = ({
     onCreateDeck,
     onImport,
     onIdeate,
+    // Ideation props
+    savedIdeations = [],
+    isLoadingIdeations = false,
+    onLoadIdeation,
+    onDeleteIdeation,
+    onGenerateDeckFromIdeation,
+    onViewJournal,
+    // Rough draft props
+    savedRoughDrafts = [],
+    isLoadingRoughDrafts = false,
+    onLoadRoughDraft,
+    onDeleteRoughDraft,
+    onApproveRoughDraft,
     presentation,
     activeSlideIndex = 0
 }) => {
@@ -82,12 +110,23 @@ export const MainStage: React.FC<MainStageProps> = ({
     return (
         <Dashboard
             savedDecks={savedDecks}
+            savedIdeations={savedIdeations}
+            isLoadingIdeations={isLoadingIdeations}
+            savedRoughDrafts={savedRoughDrafts}
+            isLoadingRoughDrafts={isLoadingRoughDrafts}
             onLoad={onLoadDeck || (() => {})}
             onDelete={onDeleteDeck || (() => {})}
             onClone={onCloneDeck}
             onCreateNew={onCreateDeck || (() => {})}
             onImport={onImport || (() => {})}
             onIdeate={onIdeate}
+            onLoadIdeation={onLoadIdeation}
+            onDeleteIdeation={onDeleteIdeation}
+            onGenerateDeckFromIdeation={onGenerateDeckFromIdeation}
+            onViewJournal={onViewJournal}
+            onLoadRoughDraft={onLoadRoughDraft}
+            onDeleteRoughDraft={onDeleteRoughDraft}
+            onApproveRoughDraft={onApproveRoughDraft}
         />
     );
   }

@@ -46,6 +46,9 @@ import {
 } from './components/pages';
 import { PrototypeRouter } from './homepage-prototypes';
 import { useRealtimeSync } from './hooks/useRealtimeSync';
+import { useSavedIdeations, useIdeationSession } from './hooks/queries/useIdeationQueries';
+import { useSavedRoughDrafts, useDeleteRoughDraft, useApproveRoughDraft, useRoughDraft } from './hooks/queries/useRoughDraftQueries';
+import { deleteIdeationSession } from './services/api/ideationService';
 
 // ============ Protected App Content ============
 
@@ -92,6 +95,18 @@ function AppContent() {
 
   // Clone/duplicate mutation
   const duplicateMutation = useDuplicatePresentation();
+
+  // Ideation sessions hook
+  const { savedIdeations, isLoading: isLoadingIdeations, refetch: refetchIdeations } = useSavedIdeations();
+
+  // Rough drafts hook
+  const { savedRoughDrafts, isLoading: isLoadingRoughDrafts } = useSavedRoughDrafts();
+  const deleteRoughDraftMutation = useDeleteRoughDraft();
+  const approveRoughDraftMutation = useApproveRoughDraft();
+
+  // Source content hooks - fetch related ideation and rough draft for current presentation
+  const { data: sourceIdeation } = useIdeationSession(currentPresentation?.ideationSessionId || null);
+  const { data: sourceRoughDraft } = useRoughDraft(currentPresentation?.sourceRoughDraftId || null);
 
   // Chat hook
   const {
@@ -193,6 +208,67 @@ function AppContent() {
   const handleIdeate = () => {
     setIsIdeating(true);
   };
+
+  // Ideation handlers
+  const handleLoadIdeation = useCallback((id: string) => {
+    // TODO: In a future update, load the ideation session into IdeationCopilot for editing
+    // For now, we'll just open ideation mode - full editing will come in Phase 7
+    console.log('Load ideation:', id);
+    setIsIdeating(true);
+  }, []);
+
+  const handleDeleteIdeation = useCallback(async (id: string) => {
+    try {
+      await deleteIdeationSession(id);
+      refetchIdeations();
+    } catch (error) {
+      console.error('Failed to delete ideation:', error);
+    }
+  }, [refetchIdeations]);
+
+  const handleGenerateDeckFromIdeation = useCallback((id: string) => {
+    // TODO: Load ideation and trigger rough draft generation
+    console.log('Generate deck from ideation:', id);
+  }, []);
+
+  const handleViewJournal = useCallback((id: string) => {
+    // TODO: Show journal modal for the ideation
+    console.log('View journal for ideation:', id);
+  }, []);
+
+  // Rough draft handlers
+  const handleLoadRoughDraft = useCallback((id: string) => {
+    // TODO: Load the rough draft into RoughDraftCanvas for editing
+    console.log('Load rough draft:', id);
+  }, []);
+
+  const handleDeleteRoughDraft = useCallback((id: string) => {
+    deleteRoughDraftMutation.mutate(id);
+  }, [deleteRoughDraftMutation]);
+
+  const handleApproveRoughDraftFromDashboard = useCallback((id: string) => {
+    approveRoughDraftMutation.mutate(
+      { id },
+      {
+        onSuccess: (presentation) => {
+          // Load the newly created presentation
+          actions.loadDeck(presentation.id);
+        },
+      }
+    );
+  }, [approveRoughDraftMutation, actions]);
+
+  // Handlers for viewing source content from sidebar
+  const handleViewSourceIdeation = useCallback((id: string) => {
+    // TODO: Open ideation viewer/modal
+    console.log('View source ideation:', id);
+    setIsIdeating(true);
+  }, []);
+
+  const handleViewSourceRoughDraft = useCallback((id: string) => {
+    // TODO: Open rough draft in read-only mode
+    console.log('View source rough draft:', id);
+  }, []);
 
   const handleCloseIdeation = () => {
     setIsIdeating(false);
@@ -459,6 +535,11 @@ function AppContent() {
             scrollRef={sidebarScrollRef}
             viewMode={viewMode}
             activeWabiSabiLayout={activeWabiSabiLayout}
+            // Related content props
+            sourceIdeation={sourceIdeation}
+            sourceRoughDraft={sourceRoughDraft}
+            onViewSourceIdeation={handleViewSourceIdeation}
+            onViewSourceRoughDraft={handleViewSourceRoughDraft}
           />
         )}
 
@@ -549,6 +630,19 @@ function AppContent() {
             onCreateDeck={handleCreateNew}
             onImport={actions.importDeck}
             onIdeate={handleIdeate}
+            // Ideation props
+            savedIdeations={savedIdeations}
+            isLoadingIdeations={isLoadingIdeations}
+            onLoadIdeation={handleLoadIdeation}
+            onDeleteIdeation={handleDeleteIdeation}
+            onGenerateDeckFromIdeation={handleGenerateDeckFromIdeation}
+            onViewJournal={handleViewJournal}
+            // Rough draft props
+            savedRoughDrafts={savedRoughDrafts}
+            isLoadingRoughDrafts={isLoadingRoughDrafts}
+            onLoadRoughDraft={handleLoadRoughDraft}
+            onDeleteRoughDraft={handleDeleteRoughDraft}
+            onApproveRoughDraft={handleApproveRoughDraftFromDashboard}
             presentation={currentPresentation}
             activeSlideIndex={activeSlideIndex}
           />

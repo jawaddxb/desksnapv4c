@@ -3,8 +3,10 @@ Presentation Model
 Core model for user presentations
 """
 import uuid
+from typing import Optional
 
 from sqlalchemy import String, Boolean, Text, ForeignKey, Integer
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from packages.common.models.base import BaseModel
@@ -66,8 +68,22 @@ class Presentation(BaseModel):
         nullable=False,
     )
 
+    # Source references (for traceability)
+    ideation_session_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("ideation_sessions.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    source_rough_draft_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("rough_drafts.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
     # Relationships
     owner = relationship("User", back_populates="presentations")
+    ideation_session = relationship("IdeationSession", foreign_keys=[ideation_session_id])
+    source_rough_draft = relationship("RoughDraft", foreign_keys=[source_rough_draft_id])
     slides = relationship(
         "Slide",
         back_populates="presentation",

@@ -140,6 +140,9 @@ export interface Presentation {
   analytics?: AnalyticsSession[];
   // Rough draft workflow
   status?: PresentationStatus; // Default: 'approved' for backwards compatibility
+  // Source references (for traceability)
+  ideationSessionId?: string;
+  sourceRoughDraftId?: string;
 }
 
 export enum MessageRole {

@@ -44,6 +44,17 @@ from packages.common.schemas.ideation import (
     IdeationSessionDetailResponse,
     IdeationSessionListResponse,
 )
+from packages.common.schemas.rough_draft import (
+    RoughDraftSlideCreate,
+    RoughDraftSlideUpdate,
+    RoughDraftSlideResponse,
+    RoughDraftCreate,
+    RoughDraftUpdate,
+    RoughDraftResponse,
+    RoughDraftDetailResponse,
+    RoughDraftListResponse,
+    RoughDraftApproveRequest,
+)
 
 __all__ = [
     # Auth
@@ -84,4 +95,14 @@ __all__ = [
     "IdeationSessionResponse",
     "IdeationSessionDetailResponse",
     "IdeationSessionListResponse",
+    # Rough Draft
+    "RoughDraftSlideCreate",
+    "RoughDraftSlideUpdate",
+    "RoughDraftSlideResponse",
+    "RoughDraftCreate",
+    "RoughDraftUpdate",
+    "RoughDraftResponse",
+    "RoughDraftDetailResponse",
+    "RoughDraftListResponse",
+    "RoughDraftApproveRequest",
 ]

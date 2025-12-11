@@ -65,6 +65,10 @@ class IdeationSession(BaseModel):
         cascade="all, delete-orphan",
         order_by="IdeationJournalEntry.created_at",
     )
+    rough_drafts = relationship(
+        "RoughDraft",
+        back_populates="ideation_session",
+    )
 
 
 class IdeaNote(BaseModel):

@@ -290,8 +290,8 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
         </div>
       </div>
 
-      {/* Main content area */}
-      <div className="flex flex-1 pt-14">
+      {/* Main content area - use calc to account for header height */}
+      <div className="flex pt-14" style={{ height: 'calc(100vh - 0px)' }}>
         {/* Canvas (left side - 60%) */}
         <div className="flex-[3] h-full overflow-hidden">
           <FlowCanvas

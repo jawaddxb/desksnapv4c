@@ -13,6 +13,7 @@ from packages.common.models.ideation import (
     NoteConnection,
     IdeationJournalEntry,
 )
+from packages.common.models.rough_draft import RoughDraft, RoughDraftSlide
 
 __all__ = [
     "Base",
@@ -26,4 +27,6 @@ __all__ = [
     "IdeaNote",
     "NoteConnection",
     "IdeationJournalEntry",
+    "RoughDraft",
+    "RoughDraftSlide",
 ]
