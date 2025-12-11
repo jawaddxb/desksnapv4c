@@ -1,10 +1,17 @@
 /**
  * TestimonialsSection Component
  *
- * Customer testimonials with Studio Noir aesthetic.
+ * Customer testimonials with Studio Noir aesthetic and reveal animations.
  */
 
 import React from 'react';
+import { motion } from 'framer-motion';
+import {
+  fadeInUp,
+  staggerContainer,
+  viewportOnce,
+  springs,
+} from './animations';
 
 const testimonials = [
   {
@@ -27,57 +34,140 @@ const testimonials = [
   },
 ];
 
+// Testimonial card with staggered reveal
+const TestimonialCard: React.FC<{
+  testimonial: typeof testimonials[0];
+  index: number;
+}> = ({ testimonial, index }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  return (
+    <motion.div
+      className="bg-[#111111] p-10 cursor-pointer"
+      variants={fadeInUp}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      whileHover={{
+        backgroundColor: 'rgba(255, 255, 255, 0.02)',
+      }}
+    >
+      {/* Quote mark with scale animation */}
+      <motion.span
+        className="text-5xl text-[#c5a47e] leading-none block"
+        initial={{ opacity: 0, scale: 0.5 }}
+        whileInView={{ opacity: 0.3, scale: 1 }}
+        viewport={viewportOnce}
+        transition={{
+          ...springs.bouncy,
+          delay: index * 0.1,
+        }}
+      >
+        "
+      </motion.span>
+
+      {/* Quote with fade in */}
+      <motion.blockquote
+        className="text-lg text-white/80 leading-relaxed mt-4 mb-8"
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewportOnce}
+        transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
+      >
+        {testimonial.quote}
+      </motion.blockquote>
+
+      {/* Author with slide up */}
+      <motion.div
+        className="flex items-center gap-4"
+        initial={{ opacity: 0, y: 15 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewportOnce}
+        transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
+      >
+        <motion.div
+          className="w-10 h-10 border border-white/20 flex items-center justify-center"
+          animate={{
+            borderColor: isHovered ? 'rgba(197, 164, 126, 0.5)' : 'rgba(255, 255, 255, 0.2)',
+            boxShadow: isHovered ? '0 0 15px rgba(197, 164, 126, 0.2)' : 'none',
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          <motion.span
+            className="text-sm font-medium"
+            animate={{
+              color: isHovered ? 'rgba(197, 164, 126, 1)' : 'rgba(255, 255, 255, 1)',
+            }}
+          >
+            {testimonial.author.charAt(0)}
+          </motion.span>
+        </motion.div>
+        <div>
+          <motion.p
+            className="text-white font-medium"
+            animate={{
+              color: isHovered ? 'rgba(197, 164, 126, 1)' : 'rgba(255, 255, 255, 1)',
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            {testimonial.author}
+          </motion.p>
+          <p className="text-sm text-white/40">
+            {testimonial.role}, {testimonial.company}
+          </p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 export const TestimonialsSection: React.FC = () => {
   return (
     <section className="py-32 bg-[#111111]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
-        <div className="max-w-2xl mb-20">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+        <motion.div
+          className="max-w-2xl mb-20"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
+          <motion.span
+            variants={fadeInUp}
+            className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block"
+          >
             Testimonials
-          </span>
-          <h2 className="text-5xl md:text-6xl font-light mb-6">
+          </motion.span>
+          <motion.h2
+            variants={fadeInUp}
+            className="text-5xl md:text-6xl font-light mb-6"
+          >
             Hear from early users.
-          </h2>
-          <p className="text-xl text-white/60">
+          </motion.h2>
+          <motion.p
+            variants={fadeInUp}
+            className="text-xl text-white/60"
+          >
             Founders, designers, and educators who've discovered a better process.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-3 gap-px bg-white/10">
+        <motion.div
+          className="grid md:grid-cols-3 gap-px bg-white/10"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           {testimonials.map((testimonial, index) => (
-            <div
+            <TestimonialCard
               key={index}
-              className="bg-[#111111] p-10"
-            >
-              {/* Quote mark */}
-              <span className="text-5xl text-[#c5a47e] opacity-30 leading-none">"</span>
-
-              {/* Quote */}
-              <blockquote className="text-lg text-white/80 leading-relaxed mt-4 mb-8">
-                {testimonial.quote}
-              </blockquote>
-
-              {/* Author */}
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 border border-white/20 flex items-center justify-center">
-                  <span className="text-sm font-medium">
-                    {testimonial.author.charAt(0)}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-white font-medium">
-                    {testimonial.author}
-                  </p>
-                  <p className="text-sm text-white/40">
-                    {testimonial.role}, {testimonial.company}
-                  </p>
-                </div>
-              </div>
-            </div>
+              testimonial={testimonial}
+              index={index}
+            />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

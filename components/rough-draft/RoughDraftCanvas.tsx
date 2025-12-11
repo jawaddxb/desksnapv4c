@@ -28,6 +28,7 @@ import {
   approveRoughDraft,
 } from '../../services/api/roughDraftService';
 import { RoughDraft } from '../../types/roughDraft';
+import { useRoughDraft } from '../../hooks/queries/useRoughDraftQueries';
 
 /**
  * Check if a string is a valid UUID (v4 format)
@@ -40,10 +41,12 @@ function isValidUUID(str: string | undefined): boolean {
 }
 
 interface RoughDraftCanvasProps {
-  /** Input for the rough draft agent */
-  input: RoughDraftInput;
+  /** Input for the rough draft agent (for generating new drafts) */
+  input?: RoughDraftInput;
+  /** ID of an existing draft to load (mutually exclusive with input) */
+  existingDraftId?: string;
   /** Source of the draft request */
-  source: 'ideation' | 'copilot';
+  source: 'ideation' | 'copilot' | 'existing';
   /** Optional ideation session ID for back navigation */
   ideationSessionId?: string;
   /** Called when user approves the draft */
@@ -58,6 +61,7 @@ type GenerationPhase = 'initializing' | 'generating-content' | 'refining-prompts
 
 export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
   input,
+  existingDraftId,
   source,
   ideationSessionId,
   onApprove,
@@ -96,10 +100,22 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
   // Ref to prevent double execution in React Strict Mode
   const hasStartedRef = useRef(false);
 
-  const theme = THEMES[input.themeId] || THEMES.executive;
+  // Fetch existing draft if existingDraftId is provided
+  const { data: existingDraft, isLoading: isLoadingExisting } = useRoughDraft(
+    existingDraftId || null
+  );
 
-  // Persist rough draft to database
+  // Determine values from input or existing draft
+  const themeId = input?.themeId || existingDraft?.themeId || 'executive';
+  const theme = THEMES[themeId] || THEMES.executive;
+  const topic = input?.topic || existingDraft?.topic || 'Presentation';
+  const visualStyle = input?.visualStyle || existingDraft?.visualStyle || '';
+
+  // Persist rough draft to database (only for newly generated drafts)
   const persistDraft = useCallback(async (finalSlides: RoughDraftSlide[]) => {
+    // Only persist when generating new drafts, not when loading existing
+    if (!input) return;
+
     try {
       setIsSaving(true);
       // Only pass ideationSessionId if it's a valid UUID (server-generated)
@@ -111,9 +127,9 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
       }
 
       const draft = await createRoughDraft({
-        topic: input.topic,
-        themeId: input.themeId,
-        visualStyle: input.visualStyle || '',
+        topic: topic,
+        themeId: themeId,
+        visualStyle: visualStyle || '',
         status: 'ready',
         ideationSessionId: validSessionId,
         slides: finalSlides.map((s, index) => ({
@@ -136,7 +152,7 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
     } finally {
       setIsSaving(false);
     }
-  }, [input.topic, input.themeId, input.visualStyle, ideationSessionId]);
+  }, [input, ideationSessionId]);
 
   // Debounced save for slide updates
   const debouncedSaveSlide = useCallback((slideId: string, updates: Partial<RoughDraftSlide>) => {
@@ -173,9 +189,36 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
     }, 1000);
   }, [persistedDraft]);
 
-  // Run the rough draft agent on mount
+  // Load existing draft when existingDraftId is provided
   useEffect(() => {
-    if (hasStartedRef.current) return;
+    if (existingDraftId && existingDraft && !hasStartedRef.current) {
+      hasStartedRef.current = true;
+      // Populate state from existing draft
+      const loadedSlides: RoughDraftSlide[] = existingDraft.slides.map(s => ({
+        id: s.id,
+        position: s.position,
+        title: s.title,
+        content: s.content,
+        speakerNotes: s.speakerNotes || '',
+        imagePrompt: s.imagePrompt || '',
+        imageUrl: s.imageUrl || '',
+        layoutType: s.layoutType || 'split-left',
+        alignment: s.alignment || 'center',
+        approvalState: s.approvalState || 'pending',
+        isImageLoading: false,
+      }));
+      setSlides(loadedSlides);
+      setPersistedDraft(existingDraft);
+      setPhase('complete');
+      setTotalSlides(loadedSlides.length);
+      console.log('[RoughDraftCanvas] Loaded existing draft:', existingDraft.id);
+    }
+  }, [existingDraftId, existingDraft]);
+
+  // Run the rough draft agent on mount (only for new drafts)
+  useEffect(() => {
+    // Skip if we're loading an existing draft or already started
+    if (existingDraftId || !input || hasStartedRef.current) return;
     hasStartedRef.current = true;
 
     const runAgent = async () => {
@@ -278,7 +321,7 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
     };
 
     runAgent();
-  }, [input]);
+  }, [input, existingDraftId]);
 
   // Handle slide selection
   const handleSelectSlide = useCallback((slideId: string) => {
@@ -316,8 +359,8 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
     try {
       const updatedSlide = await regenerateSlideWithAgent(
         slide,
-        input.topic,
-        input.visualStyle,
+        topic,
+        visualStyle,
         {
           onLog: (log) => setAgentLogs(prev => [...prev, log]),
           onImageGenerated: (imageUrl) => {
@@ -348,7 +391,7 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
     } finally {
       setRegeneratingSlideId(null);
     }
-  }, [slides, input.topic, input.visualStyle]);
+  }, [slides, topic, visualStyle]);
 
   // Handle AI text enhancement
   const handleAIEnhance = useCallback(async (
@@ -367,7 +410,7 @@ export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
       // Build the enhancement prompt based on mode
       let systemPrompt = '';
       if (mode === 'research') {
-        systemPrompt = `You are enhancing a presentation slide about "${input.topic}". Research and add more specific facts, statistics, or details to make the content more compelling. Keep the same structure but enrich the content.`;
+        systemPrompt = `You are enhancing a presentation slide about "${topic}". Research and add more specific facts, statistics, or details to make the content more compelling. Keep the same structure but enrich the content.`;
       } else if (mode === 'rewrite') {
         systemPrompt = `You are enhancing a presentation slide. Rewrite the content to be clearer, more concise, and more impactful. Remove filler words, strengthen the language, and improve flow.`;
       } else {
@@ -410,7 +453,7 @@ Return ONLY a JSON object with the enhanced content in this exact format:
     } finally {
       setEnhancingSlideId(null);
     }
-  }, [slides, input.topic]);
+  }, [slides, topic]);
 
   // Handle approve all
   const handleApproveAll = useCallback(async () => {
@@ -421,9 +464,9 @@ Return ONLY a JSON object with the enhanced content in this exact format:
       try {
         setIsSaving(true);
         const presentation = await approveRoughDraft(persistedDraft.id, {
-          topic: input.topic,
-          themeId: input.themeId,
-          visualStyle: input.visualStyle,
+          topic: topic,
+          themeId: themeId,
+          visualStyle: visualStyle,
         });
         console.log('[RoughDraftCanvas] Draft approved, presentation created:', presentation.id);
         // The presentation was created via API, just call onApprove with the result
@@ -451,7 +494,7 @@ Return ONLY a JSON object with the enhanced content in this exact format:
       };
       onApprove(finalResult);
     }
-  }, [result, slides, onApprove, persistedDraft, input.topic, input.themeId, input.visualStyle]);
+  }, [result, slides, onApprove, persistedDraft, topic, themeId, visualStyle]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -469,6 +512,9 @@ Return ONLY a JSON object with the enhanced content in this exact format:
 
   // Phase label
   const getPhaseLabel = () => {
+    // Show loading state when fetching existing draft
+    if (isLoadingExisting) return 'Loading draft...';
+
     switch (phase) {
       case 'initializing': return 'Initializing...';
       case 'generating-content': return 'Structuring slides...';
@@ -500,12 +546,12 @@ Return ONLY a JSON object with the enhanced content in this exact format:
               </svg>
             </div>
             <div>
-              <h1 className="font-bold text-white uppercase tracking-wide">{input.topic}</h1>
+              <h1 className="font-bold text-white uppercase tracking-wide">{topic}</h1>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-white/40 uppercase tracking-widest">
                   {getPhaseLabel()}
                 </span>
-                {phase !== 'complete' && (
+                {(phase !== 'complete' || isLoadingExisting) && (
                   <div className="w-3 h-3 border border-[#c5a47e] border-t-transparent rounded-full animate-spin" />
                 )}
               </div>
@@ -596,7 +642,7 @@ Return ONLY a JSON object with the enhanced content in this exact format:
                   slide={slide}
                   index={index}
                   theme={theme}
-                  visualStyle={input.visualStyle}
+                  visualStyle={visualStyle}
                   isSelected={selectedSlideId === slide.id}
                   isRegenerating={regeneratingSlideId === slide.id}
                   onSelect={() => handleSelectSlide(slide.id)}

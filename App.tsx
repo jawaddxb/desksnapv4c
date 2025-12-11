@@ -61,6 +61,7 @@ function AppContent() {
   const [isPresenting, setIsPresenting] = useState(false);
   const [showCreateChat, setShowCreateChat] = useState(false);
   const [isIdeating, setIsIdeating] = useState(false);
+  const [ideationSessionIdToLoad, setIdeationSessionIdToLoad] = useState<string | null>(null);
   const [enableDraftPreview, setEnableDraftPreview] = useState(false);
   // Archetype change dialog state
   const [archetypeChangeDialog, setArchetypeChangeDialog] = useState<{
@@ -72,9 +73,10 @@ function AppContent() {
   // Rough draft state - holds data for the rough draft view
   const [roughDraftState, setRoughDraftState] = useState<{
     isOpen: boolean;
-    source: 'ideation' | 'copilot';
-    input: RoughDraftInput;
+    source: 'ideation' | 'copilot' | 'existing';
+    input?: RoughDraftInput;
     ideationSessionId?: string;
+    existingDraftId?: string;
   } | null>(null);
 
   // Main deck hook
@@ -211,9 +213,7 @@ function AppContent() {
 
   // Ideation handlers
   const handleLoadIdeation = useCallback((id: string) => {
-    // TODO: In a future update, load the ideation session into IdeationCopilot for editing
-    // For now, we'll just open ideation mode - full editing will come in Phase 7
-    console.log('Load ideation:', id);
+    setIdeationSessionIdToLoad(id);
     setIsIdeating(true);
   }, []);
 
@@ -238,8 +238,11 @@ function AppContent() {
 
   // Rough draft handlers
   const handleLoadRoughDraft = useCallback((id: string) => {
-    // TODO: Load the rough draft into RoughDraftCanvas for editing
-    console.log('Load rough draft:', id);
+    setRoughDraftState({
+      isOpen: true,
+      source: 'existing',
+      existingDraftId: id,
+    });
   }, []);
 
   const handleDeleteRoughDraft = useCallback((id: string) => {
@@ -260,18 +263,21 @@ function AppContent() {
 
   // Handlers for viewing source content from sidebar
   const handleViewSourceIdeation = useCallback((id: string) => {
-    // TODO: Open ideation viewer/modal
-    console.log('View source ideation:', id);
+    setIdeationSessionIdToLoad(id);
     setIsIdeating(true);
   }, []);
 
   const handleViewSourceRoughDraft = useCallback((id: string) => {
-    // TODO: Open rough draft in read-only mode
-    console.log('View source rough draft:', id);
+    setRoughDraftState({
+      isOpen: true,
+      source: 'existing',
+      existingDraftId: id,
+    });
   }, []);
 
   const handleCloseIdeation = () => {
     setIsIdeating(false);
+    setIdeationSessionIdToLoad(null);
   };
 
   const handleCloneDeck = useCallback((id: string) => {
@@ -452,6 +458,7 @@ function AppContent() {
     return (
       <RoughDraftCanvas
         input={roughDraftState.input}
+        existingDraftId={roughDraftState.existingDraftId}
         source={roughDraftState.source}
         ideationSessionId={roughDraftState.ideationSessionId}
         onApprove={handleApproveRoughDraft}
@@ -465,6 +472,7 @@ function AppContent() {
   if (isIdeating) {
     return (
       <IdeationCopilot
+        sessionId={ideationSessionIdToLoad || undefined}
         onClose={handleCloseIdeation}
         onBuildDeck={handleBuildDeckFromIdeation}
         onRoughDraft={handleRoughDraftFromIdeation}
