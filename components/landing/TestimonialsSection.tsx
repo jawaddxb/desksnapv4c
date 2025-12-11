@@ -8,19 +8,19 @@ import React from 'react';
 
 const testimonials = [
   {
-    quote: 'DeckSnap gave me permission to stop obsessing over pixel perfection. My presentations are better because they\'re more honest.',
+    quote: 'DeckSnap changed how I think about presentation prep. The ideation stage alone is worth it.',
     author: 'Sarah Chen',
     role: 'Product Designer',
     company: 'TechStartup',
   },
   {
-    quote: 'My students actually engage with my slides now. The aesthetic invites discussion instead of passive consumption.',
+    quote: 'Finally, an AI tool that doesn\'t skip the process. My decks are better because my thinking is better.',
     author: 'Dr. Marcus Rodriguez',
     role: 'Professor of Design',
     company: 'RISD',
   },
   {
-    quote: 'We closed our Series A with a DeckSnap presentation. Investors said it looked "refreshingly authentic."',
+    quote: 'The design quality is unreal. And Neutron remembering my past research? Game-changer.',
     author: 'Priya Sharma',
     role: 'Founder',
     company: 'SeedStage',
@@ -37,10 +37,10 @@ export const TestimonialsSection: React.FC = () => {
             Testimonials
           </span>
           <h2 className="text-5xl md:text-6xl font-light mb-6">
-            Loved by Creators
+            Hear from early users.
           </h2>
           <p className="text-xl text-white/60">
-            Join thousands of designers, educators, and founders who've discovered a better way to present.
+            Founders, designers, and educators who've discovered a better process.
           </p>
         </div>
 

@@ -28,8 +28,8 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onLogin, onSignup 
   }, []);
 
   const navLinks = [
+    { label: 'Product', href: '/#how-it-works', isAnchor: true },
     { label: 'Features', href: '/features' },
-    { label: 'Themes', href: '/themes' },
     { label: 'Pricing', href: '/pricing' },
     { label: 'About', href: '/about' },
   ];
@@ -72,13 +72,23 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onLogin, onSignup 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className="text-sm text-white/60 hover:text-white transition-colors duration-150"
-              >
-                {link.label}
-              </Link>
+              link.isAnchor ? (
+                <button
+                  key={link.href}
+                  onClick={() => scrollToSection('how-it-works')}
+                  className="text-sm text-white/60 hover:text-white transition-colors duration-150"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-sm text-white/60 hover:text-white transition-colors duration-150"
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
           </div>
 
@@ -116,14 +126,24 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onLogin, onSignup 
       >
         <div className="px-6 py-4 space-y-4">
           {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              to={link.href}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block text-base text-white/60 hover:text-white transition-colors"
-            >
-              {link.label}
-            </Link>
+            link.isAnchor ? (
+              <button
+                key={link.href}
+                onClick={() => scrollToSection('how-it-works')}
+                className="block text-base text-white/60 hover:text-white transition-colors text-left w-full"
+              >
+                {link.label}
+              </button>
+            ) : (
+              <Link
+                key={link.href}
+                to={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block text-base text-white/60 hover:text-white transition-colors"
+              >
+                {link.label}
+              </Link>
+            )
           ))}
           <hr className="border-white/10" />
           <button

@@ -6,10 +6,11 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MessageRole } from '../../types';
+import { MessageRole, ResearchPreferences, ProgressState, Finding, ProgressUpdate } from '../../types';
 import { COLUMNS, ThemeSuggestion } from '../../types/ideation';
 import { useIdeation } from '../../hooks/useIdeation';
 import { runAgentLoop, convertSessionToDeckPlan, suggestThemeForSession, convertSessionToDeckPlanWithTheme, AgentResponse } from '../../services/copilotAgent';
+import { performGrokResearch, hasGrokApiKey } from '../../services/grokService';
 import { FlowCanvas } from './FlowCanvas';
 import { CopilotPanel } from './CopilotPanel';
 
@@ -40,6 +41,10 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   // Theme selection state for style-preview stage
   const [themeSuggestion, setThemeSuggestion] = useState<ThemeSuggestion | null>(null);
   const [selectedThemeId, setSelectedThemeId] = useState<string>('executive');
+  // Enhanced Mode (Research Co-Pilot) state
+  const [researchProgress, setResearchProgress] = useState<ProgressState | null>(null);
+  const [researchFindings, setResearchFindings] = useState<Finding[]>([]);
+  const [researchSynthesis, setResearchSynthesis] = useState<string>('');
 
   // Initialize session on mount
   React.useEffect(() => {
@@ -250,6 +255,90 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     ideation.moveNote(noteId, column, row);
   }, [ideation]);
 
+  // Handle research request from Enhanced Mode
+  const handleResearch = useCallback(async (preferences: ResearchPreferences) => {
+    if (!ideation.session?.topic) return;
+
+    // Reset state
+    setResearchFindings([]);
+    setResearchSynthesis('');
+    setResearchProgress({
+      status: 'Starting research...',
+      percent: 0,
+      steps: [
+        { id: 'web', label: 'Searching the web', done: false, active: true },
+        { id: 'x', label: 'Checking X/Twitter', done: false, active: false },
+        { id: 'synthesize', label: 'Synthesizing findings', done: false, active: false },
+      ],
+    });
+
+    try {
+      const onProgress = (update: ProgressUpdate) => {
+        setResearchProgress(prev => {
+          if (!prev) return prev;
+
+          const newSteps = prev.steps.map(step => {
+            if (update.tool === 'web_search' && step.id === 'web') {
+              return { ...step, done: update.status === 'complete', active: update.status === 'searching' };
+            }
+            if (update.tool === 'x_search' && step.id === 'x') {
+              return { ...step, done: update.status === 'complete', active: update.status === 'searching' };
+            }
+            if (update.tool === 'synthesizing' && step.id === 'synthesize') {
+              return { ...step, done: update.status === 'complete', active: update.status === 'processing' };
+            }
+            return step;
+          });
+
+          const doneCount = newSteps.filter(s => s.done).length;
+          const percent = Math.round((doneCount / newSteps.length) * 100);
+
+          return {
+            status: update.message || prev.status,
+            percent,
+            steps: newSteps,
+          };
+        });
+
+        // Add findings as they come in
+        if (update.finding) {
+          setResearchFindings(prev => [...prev, update.finding!]);
+        }
+      };
+
+      const result = await performGrokResearch(ideation.session.topic, preferences, onProgress);
+
+      setResearchFindings(result.findings);
+      setResearchSynthesis(result.synthesis || '');
+      setResearchProgress(prev => prev ? { ...prev, percent: 100, status: 'Research complete!' } : null);
+    } catch (error) {
+      console.error('Research failed:', error);
+      setResearchProgress(prev => prev ? { ...prev, status: 'Research failed. Please try again.' } : null);
+    }
+  }, [ideation.session?.topic]);
+
+  // Create notes from research findings
+  const handleCreateNotesFromFindings = useCallback((findings: Finding[]) => {
+    if (!ideation.session) return;
+
+    findings.forEach((finding, index) => {
+      // Determine column based on finding type
+      let column = 2; // Default to Solution column
+      if (finding.type === 'market') column = 1; // Problem column (market context)
+      if (finding.type === 'competitor') column = 2; // Solution column
+      if (finding.type === 'trend' || finding.type === 'social') column = 3; // Proof column
+      if (finding.type === 'expert') column = 3; // Proof column
+
+      // Use ideation.addNote with content string (the hook handles creating the note object)
+      ideation.addNote(finding.summary, column, {
+        type: 'research',
+        sourceUrl: finding.citation.url,
+        sourceTitle: finding.citation.title,
+        approved: true,
+      });
+    });
+  }, [ideation]);
+
   // If no session, show loading or start screen
   if (!ideation.session) {
     return (
@@ -321,6 +410,14 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             onConfirmBuild={handleConfirmBuild}
             onConfirmThemeAndBuild={handleConfirmThemeAndBuild}
             onBackFromStylePreview={handleBackFromStylePreview}
+            // Enhanced Mode (Research Co-Pilot) props
+            topic={ideation.session?.topic || ''}
+            isPremium={true}
+            onResearch={hasGrokApiKey() ? handleResearch : undefined}
+            onCreateNotesFromFindings={handleCreateNotesFromFindings}
+            researchProgress={researchProgress}
+            researchFindings={researchFindings}
+            researchSynthesis={researchSynthesis}
           />
         </div>
       </div>

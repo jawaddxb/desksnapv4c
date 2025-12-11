@@ -15,76 +15,70 @@ interface PricingPageProps {
 
 const pricingTiers = [
   {
-    name: 'Sketcher',
+    name: 'Starter',
     price: '$0',
-    period: 'forever',
-    description: 'Perfect for trying out DeckSnap',
+    period: '/month',
+    description: 'Try the full ideation-to-deck workflow',
     features: [
-      '5 presentations',
-      'All 60+ archetypes',
-      'AI content generation',
-      'Basic image generation',
-      'Export to PowerPoint',
+      '3 decks per month',
+      'All three stages (ideate, draft, polish)',
+      'Basic design patterns',
+      'Web research (limited)',
       'Community support',
     ],
-    cta: 'Start Free',
+    cta: 'Get started',
     highlighted: false,
   },
   {
-    name: 'Creator',
+    name: 'Pro',
     price: '$19',
     period: '/month',
-    description: 'For individuals who present regularly',
+    description: 'For professionals who build decks regularly',
     features: [
-      'Unlimited presentations',
-      'All 60+ archetypes',
-      'Priority AI generation',
-      'Advanced image styles (20+)',
-      'Cloud storage & sync',
-      'Presentation analytics',
+      'Unlimited decks',
+      'Full design system access',
+      'Research agents (web + X)',
+      'Neutron knowledge layer',
       'Priority support',
+      'Export to PPT, PDF, Keynote',
     ],
-    cta: 'Start 14-Day Free Trial',
+    cta: 'Start free trial',
     highlighted: true,
   },
   {
-    name: 'Studio',
+    name: 'Team',
     price: '$49',
-    period: '/month',
-    description: 'For teams that create together',
+    period: '/user/month',
+    description: 'For teams that need shared knowledge and brand consistency',
     features: [
-      'Everything in Creator',
-      'Team collaboration (up to 10)',
-      'Shared theme library',
-      'Brand customization',
-      'API access',
+      'Everything in Pro',
+      'Team workspaces',
+      'Shared Neutron knowledge base',
+      'Brand kits and custom themes',
+      'Admin controls',
       'Dedicated support',
     ],
-    cta: 'Contact Us',
+    cta: 'Contact sales',
     highlighted: false,
   },
 ];
 
 const faqs = [
   {
-    question: 'Can I cancel anytime?',
-    answer: 'Yes, absolutely. No contracts, no hidden fees. Cancel whenever you want.',
+    question: 'Can I try Pro before committing?',
+    answer: 'Yes. Every Pro plan starts with a 14-day free trial. No credit card required.',
   },
   {
-    question: 'What happens to my presentations if I downgrade?',
-    answer: 'Your presentations are yours forever. If you downgrade, you\'ll keep access to everything you\'ve created.',
+    question: 'What happens to my decks if I downgrade?',
+    answer: 'Your decks remain accessible. You\'ll retain read access to everything you\'ve created.',
   },
   {
-    question: 'Do you offer education or nonprofit discounts?',
-    answer: 'Yes! We offer 50% off Creator plans for educators, students, and nonprofits. Contact us to apply.',
+    question: 'Does Neutron store my data securely?',
+    answer: 'Absolutely. All data is encrypted at rest and in transit. We never train models on your content.',
   },
   {
-    question: 'Is my data secure?',
-    answer: 'Absolutely. All data is encrypted at rest and in transit. We never share your content with third parties.',
-  },
-  {
-    question: 'Can I try Creator features before committing?',
-    answer: 'Yes! Our 14-day free trial gives you full access to all Creator features. No credit card required.',
+    question: 'Can I export to PowerPoint?',
+    answer: 'Yes. Pro and Team plans support export to PPT, PDF, and Keynote formats.',
   },
 ];
 
@@ -100,11 +94,11 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onAuth }) => {
             Pricing
           </span>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-6">
-            Simple Pricing.{' '}
-            <span className="text-white/40">No Surprises.</span>
+            Simple pricing.{' '}
+            <span className="text-white/40">Start free.</span>
           </h1>
           <p className="text-xl text-white/60 max-w-2xl mx-auto">
-            Start free. Upgrade when you need to. No credit card required.
+            Build better decks without the complexity of enterprise pricing.
           </p>
         </section>
 

@@ -2,15 +2,19 @@
  * LandingPage Component
  *
  * Main container for the marketing landing page.
+ * New narrative: "Decks that think with you"
  * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
 import { LandingNavbar } from './LandingNavbar';
 import { HeroSection } from './HeroSection';
-import { FeaturesPreview } from './FeaturesPreview';
+import { ProblemSection } from './ProblemSection';
 import { HowItWorks } from './HowItWorks';
-import { ThemesPreview } from './ThemesPreview';
+import { DesignPhilosophySection } from './DesignPhilosophySection';
+import { ResearchSection } from './ResearchSection';
+import { NeutronSection } from './NeutronSection';
+import { AudienceSection } from './AudienceSection';
 import { TestimonialsSection } from './TestimonialsSection';
 import { CTASection } from './CTASection';
 import { FooterSection } from './FooterSection';
@@ -30,11 +34,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onAuth }) => {
 
       {/* Main Content */}
       <main>
+        {/* Hero: "Decks that think with you" */}
         <HeroSection onGetStarted={handleSignup} />
-        <FeaturesPreview />
+
+        {/* Problem: "Most AI deck tools skip the thinking" */}
+        <ProblemSection />
+
+        {/* How It Works: Three stages - Ideate, Draft, Polish */}
         <HowItWorks />
-        <ThemesPreview />
+
+        {/* Design Philosophy: Wabi-sabi teaser */}
+        <DesignPhilosophySection />
+
+        {/* Research Integration: Grok-powered research */}
+        <ResearchSection />
+
+        {/* Neutron: Knowledge layer integration */}
+        <NeutronSection />
+
+        {/* Who It's For: Target audiences */}
+        <AudienceSection />
+
+        {/* Testimonials */}
         <TestimonialsSection />
+
+        {/* Final CTA */}
         <CTASection onGetStarted={handleSignup} />
       </main>
 

@@ -1,20 +1,32 @@
 /**
  * FeaturesPage Component
  *
- * Detailed features breakdown page.
+ * Detailed features breakdown organized by stage.
+ * Ideate → Rough Draft → Final Polish
  * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
+  Lightbulb,
+  FileEdit,
   Sparkles,
+  StickyNote,
+  Mic,
+  Search,
+  Brain,
+  Eye,
+  Check,
+  RefreshCw,
+  BookOpen,
   Palette,
-  Image,
-  Monitor,
+  LayoutGrid,
   Layers,
+  Download,
+  Monitor,
+  Image,
   ArrowRight,
-  Check
 } from 'lucide-react';
 import { LandingNavbar } from '../landing/LandingNavbar';
 import { FooterSection } from '../landing/FooterSection';
@@ -23,71 +35,114 @@ interface FeaturesPageProps {
   onAuth: (mode: 'login' | 'register') => void;
 }
 
-const features = [
+const stages = [
   {
-    id: 'ai-generation',
-    icon: Sparkles,
-    label: 'AI Content',
-    headline: 'From Topic to Structure in Seconds',
-    description: 'Describe your presentation in natural language. Our AI creates a logical slide structure, writes clear content, and suggests speaker notes—all before you touch a single design element.',
-    points: [
-      'Multiple generation modes: Concise (5-8 slides), Balanced (~12), Detailed (15+)',
-      'Tone adjustment: Professional, Casual, Technical, Persuasive',
-      'Speaker notes generated automatically',
-      'Context-aware content that flows naturally',
+    id: 'ideate',
+    stageIcon: Lightbulb,
+    stageLabel: 'Stage 1',
+    stageName: 'Ideate',
+    headline: 'Think before you build.',
+    description: 'Our ideation canvas works like a digital whiteboard—sticky notes, clusters, free-form organization. But with an AI co-pilot that populates sections, suggests structures, and helps you see the shape of your argument before you commit to slides.',
+    features: [
+      {
+        icon: StickyNote,
+        title: '5-Column Swimlane Canvas',
+        description: 'Organize ideas across Hook, Problem, Solution, Proof, and CTA columns. Drag and drop notes to structure your narrative.',
+      },
+      {
+        icon: Mic,
+        title: 'Voice Input',
+        description: 'Speak your ideas, we\'ll capture them. Voice-to-note for quick brainstorming sessions when typing feels too slow.',
+      },
+      {
+        icon: Search,
+        title: 'Research Co-Pilot',
+        description: 'Real-time web and X/Twitter search powered by Grok. Findings become sticky notes with automatic citations.',
+      },
+      {
+        icon: Brain,
+        title: 'AI Co-Pilot',
+        description: 'Conversational AI that asks clarifying questions, suggests structure, and helps develop your thinking—not just your slides.',
+      },
     ],
   },
   {
-    id: 'archetypes',
-    icon: Palette,
-    label: '60+ Archetypes',
-    headline: 'Design Systems, Not Templates',
-    description: 'Templates fight you. Archetypes work with you. Each of our 60+ visual systems includes typography, color, layout rules, and image style—all coherent, all adaptable.',
-    points: [
-      'Wabi-Sabi: Kintsugi, Hygge, Terrazzo, Kinfolk, and more',
-      'Design Movements: Bauhaus, Swiss, Memphis, Deco, Constructivist',
-      'Tech: Bento, Glass, Terminal, Neon, Aurora',
-      'Cultural: Tokyo, Nordic, Paris, Brooklyn, Marrakech',
+    id: 'draft',
+    stageIcon: FileEdit,
+    stageLabel: 'Stage 2',
+    stageName: 'Rough Draft',
+    headline: 'See the deck before it\'s done.',
+    description: 'Preview AI-generated images. Explore theme variations. Test different visual directions without locking in. The rough draft stage is your playground—change anything, regenerate what doesn\'t work, move forward when it feels right.',
+    features: [
+      {
+        icon: Eye,
+        title: 'Preview Before Committing',
+        description: 'See how your ideas translate to slides before finalizing. Storyboard view shows the full narrative arc.',
+      },
+      {
+        icon: Check,
+        title: 'Per-Slide Approval',
+        description: 'Approve, modify, or regenerate individual slides. Build your deck one decision at a time.',
+      },
+      {
+        icon: RefreshCw,
+        title: 'Regenerate Anything',
+        description: 'Don\'t like an image or slide? Regenerate until it feels right. No commitment until you\'re satisfied.',
+      },
+      {
+        icon: BookOpen,
+        title: 'Creative Journal',
+        description: 'See the AI\'s thinking process. Understand why it made the choices it did. Learn and iterate faster.',
+      },
     ],
   },
   {
-    id: 'images',
+    id: 'polish',
+    stageIcon: Sparkles,
+    stageLabel: 'Stage 3',
+    stageName: 'Final Polish',
+    headline: 'Precision when it counts.',
+    description: 'Your finished deck deserves a proper editor. Move elements, adjust text, swap images. Our design engine respects your changes while maintaining visual coherence. No fighting the tool—just refining your vision.',
+    features: [
+      {
+        icon: Palette,
+        title: '60+ Design Archetypes',
+        description: 'From Wabi-Sabi organic layouts to Swiss precision. Each archetype is a complete design system, not just a template.',
+      },
+      {
+        icon: LayoutGrid,
+        title: 'Flexible Layouts',
+        description: 'Split, full-bleed, statement, gallery—layouts adapt to your content. Fine-tune positioning and spacing.',
+      },
+      {
+        icon: Layers,
+        title: 'Wabi-Sabi Mode',
+        description: 'Embrace beautiful imperfection. Asymmetric layouts, organic shapes, breathing whitespace.',
+      },
+      {
+        icon: Download,
+        title: 'Export Everywhere',
+        description: 'PowerPoint, PDF, Keynote. Export in the format you need, with layouts preserved.',
+      },
+    ],
+  },
+];
+
+const crossCuttingFeatures = [
+  {
     icon: Image,
-    label: 'AI Images',
-    headline: 'Custom Visuals. Zero Stock Photos.',
-    description: 'Every slide can have a unique, AI-generated image that matches your theme and content. No more hunting through stock libraries for something "close enough."',
-    points: [
-      '20+ image style presets (Cinematic, Abstract 3D, Watercolor, etc.)',
-      'Theme-aware generation (images match your archetype)',
-      'Regenerate until it\'s right',
-      'Cohesive visual language across all slides',
-    ],
+    title: 'AI-Generated Images',
+    description: '20+ image style presets. Theme-aware generation. Custom visuals for every slide.',
   },
   {
-    id: 'present-export',
     icon: Monitor,
-    label: 'Present & Export',
-    headline: 'Present Anywhere. Export Everywhere.',
-    description: 'Full-screen presentation mode with keyboard navigation. Export to PowerPoint when you need to. Share a link when you don\'t.',
-    points: [
-      'Browser-based presenting with keyboard shortcuts',
-      'PowerPoint export (preserves layouts)',
-      'Print-ready PDF export',
-      'Analytics on presentation engagement (coming soon)',
-    ],
+    title: 'Presentation Mode',
+    description: 'Browser-based presenting with keyboard navigation. No software needed.',
   },
   {
-    id: 'wabi-sabi',
-    icon: Layers,
-    label: 'Wabi-Sabi Mode',
-    headline: 'Embrace Beautiful Imperfection',
-    description: 'Switch to Wabi-Sabi mode for layouts that breathe. Asymmetry, organic spacing, intentional imperfection—inspired by Japanese philosophy, designed for modern storytelling.',
-    points: [
-      'Organic, asymmetric layouts',
-      'Hand-drawn decorative elements',
-      'Breathing whitespace',
-      'Intentional imperfection as a design feature',
-    ],
+    icon: Brain,
+    title: 'Neutron Integration',
+    description: 'Connect to your knowledge base. Research persists across sessions.',
   },
 ];
 
@@ -104,76 +159,108 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
               Features
             </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-8">
-              Everything You Need.{' '}
-              <span className="text-white/40">Nothing You Don't.</span>
+              Everything you need to build decks that matter.
             </h1>
             <p className="text-xl text-white/60 leading-relaxed">
-              DeckSnap is intentionally simple. We believe the best tools get out of your way
-              and let you focus on what matters: your ideas.
+              Ideation tools, research agents, an adaptive design system, and a knowledge layer that grows with you.
             </p>
           </div>
         </section>
 
-        {/* Feature Sections */}
-        {features.map((feature, index) => {
-          const Icon = feature.icon;
-          const isEven = index % 2 === 0;
+        {/* Stage Sections */}
+        {stages.map((stage, stageIndex) => {
+          const StageIcon = stage.stageIcon;
 
           return (
             <section
-              key={feature.id}
-              id={feature.id}
-              className={`py-24 ${isEven ? 'bg-black' : 'bg-[#111111]'}`}
+              key={stage.id}
+              id={stage.id}
+              className={`py-24 ${stageIndex % 2 === 0 ? 'bg-black' : 'bg-[#111111]'}`}
             >
               <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
-                  {/* Content */}
-                  <div className={isEven ? 'lg:order-1' : 'lg:order-2'}>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 border border-white/20 mb-8">
-                      <Icon className="w-4 h-4 text-[#c5a47e]" />
-                      <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e]">
-                        {feature.label}
-                      </span>
-                    </div>
-
-                    <h2 className="text-4xl md:text-5xl font-light mb-6">
-                      {feature.headline}
-                    </h2>
-
-                    <p className="text-lg text-white/60 leading-relaxed mb-10">
-                      {feature.description}
-                    </p>
-
-                    <ul className="space-y-4">
-                      {feature.points.map((point, i) => (
-                        <li key={i} className="flex items-start gap-3">
-                          <div className="w-5 h-5 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Check className="w-3 h-3 text-[#c5a47e]" />
-                          </div>
-                          <span className="text-white/60">{point}</span>
-                        </li>
-                      ))}
-                    </ul>
+                {/* Stage Header */}
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="flex items-center gap-2 px-3 py-1 border border-[#c5a47e]/30 bg-[#c5a47e]/10">
+                    <StageIcon className="w-4 h-4 text-[#c5a47e]" />
+                    <span className="text-xs uppercase tracking-[0.15em] text-[#c5a47e]">
+                      {stage.stageLabel}: {stage.stageName}
+                    </span>
                   </div>
+                </div>
 
-                  {/* Visual */}
-                  <div className={isEven ? 'lg:order-2' : 'lg:order-1'}>
-                    <div className="aspect-[4/3] bg-white/5 border border-white/10 flex items-center justify-center">
-                      <Icon className="w-20 h-20 text-[#c5a47e] opacity-30" />
-                    </div>
-                  </div>
+                <h2 className="text-4xl md:text-5xl font-light mb-6">
+                  {stage.headline}
+                </h2>
+
+                <p className="text-xl text-white/60 leading-relaxed mb-16 max-w-3xl">
+                  {stage.description}
+                </p>
+
+                {/* Feature Grid */}
+                <div className="grid md:grid-cols-2 gap-px bg-white/10">
+                  {stage.features.map((feature, i) => {
+                    const FeatureIcon = feature.icon;
+                    return (
+                      <div
+                        key={i}
+                        className={`p-8 ${stageIndex % 2 === 0 ? 'bg-black' : 'bg-[#111111]'} hover:bg-white/5 transition-colors`}
+                      >
+                        <div className="w-10 h-10 border border-white/20 flex items-center justify-center mb-6">
+                          <FeatureIcon className="w-5 h-5 text-[#c5a47e]" />
+                        </div>
+                        <h3 className="text-xl font-light mb-3">
+                          {feature.title}
+                        </h3>
+                        <p className="text-white/60 leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </section>
           );
         })}
 
-        {/* Philosophy Callout */}
+        {/* Cross-Cutting Features */}
         <section className="py-24 border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+                Across All Stages
+              </span>
+              <h2 className="text-4xl md:text-5xl font-light">
+                Built-in everywhere.
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {crossCuttingFeatures.map((feature, i) => {
+                const Icon = feature.icon;
+                return (
+                  <div key={i} className="p-8 border border-white/10">
+                    <div className="w-12 h-12 border border-white/20 flex items-center justify-center mb-6">
+                      <Icon className="w-6 h-6 text-[#c5a47e]" />
+                    </div>
+                    <h3 className="text-xl font-light mb-3">
+                      {feature.title}
+                    </h3>
+                    <p className="text-white/60 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Philosophy Callout */}
+        <section className="py-24 bg-[#111111]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
             <p className="text-2xl md:text-3xl text-white/80 leading-relaxed italic mb-8">
-              "Wabi-Sabi teaches that imperfection and impermanence are beautiful.
-              Your presentations don't need to be perfect. They need to be true."
+              "Done beats perfect. But thinking beats rushing."
             </p>
             <Link
               to="/about"
@@ -186,19 +273,19 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
         </section>
 
         {/* CTA */}
-        <section className="py-24 bg-[#111111]">
+        <section className="py-24 border-t border-white/10">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
             <h2 className="text-4xl md:text-5xl font-light mb-6">
-              Ready to Create?
+              Ready to think differently?
             </h2>
             <p className="text-xl text-white/60 mb-10">
-              Start building your first presentation for free.
+              Start with ideation. End with a deck you believe in.
             </p>
             <button
               onClick={() => onAuth('register')}
               className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-medium hover:bg-[#c5a47e] transition-colors"
             >
-              Start Creating Free
+              Start creating
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

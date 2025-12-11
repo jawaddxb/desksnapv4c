@@ -148,17 +148,42 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
         )}
       </div>
 
-      {/* Research source link */}
-      {note.type === 'research' && note.sourceUrl && (
-        <a
-          href={note.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 text-xs text-[#c5a47e] hover:underline truncate block"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {note.sourceTitle || 'Source'}
-        </a>
+      {/* Research source link with enhanced citation */}
+      {note.type === 'research' && (note.sourceUrl || note.sourceName) && (
+        <div className="mt-2 space-y-1">
+          {/* Finding type badge */}
+          {note.findingType && (
+            <span className="inline-block text-[10px] px-1.5 py-0.5 bg-[#c5a47e]/20 text-[#c5a47e] uppercase tracking-wider">
+              {note.findingType}
+            </span>
+          )}
+
+          {/* Source with reliability */}
+          <div className="flex items-center gap-1.5">
+            {note.sourceName && (
+              <span className="text-xs text-white/50">{note.sourceName}</span>
+            )}
+            {note.sourceReliability && (
+              <span className="text-[10px] text-[#c5a47e]" title={`Reliability: ${note.sourceReliability}/5`}>
+                {'★'.repeat(note.sourceReliability)}
+                {'☆'.repeat(5 - note.sourceReliability)}
+              </span>
+            )}
+          </div>
+
+          {/* Clickable source link */}
+          {note.sourceUrl && (
+            <a
+              href={note.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[#c5a47e] hover:underline truncate block"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {note.sourceTitle || 'View Source'}
+            </a>
+          )}
+        </div>
       )}
 
       {/* Delete button (shown on hover for approved notes) */}

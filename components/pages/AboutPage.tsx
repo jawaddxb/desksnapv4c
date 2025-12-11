@@ -1,18 +1,41 @@
 /**
  * AboutPage Component
  *
- * Company story and philosophy.
+ * Company story, principles, and philosophy.
  * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Lightbulb, Palette, Brain, Sparkles } from 'lucide-react';
 import { LandingNavbar } from '../landing/LandingNavbar';
 import { FooterSection } from '../landing/FooterSection';
 
 interface AboutPageProps {
   onAuth: (mode: 'login' | 'register') => void;
 }
+
+const ourPrinciples = [
+  {
+    icon: Lightbulb,
+    title: 'Process over output',
+    description: 'Great decks come from great thinking. We built a tool that supports the full journey—ideation, refinement, polish—not just the endpoint.',
+  },
+  {
+    icon: Palette,
+    title: 'Design that serves',
+    description: 'We reject the template treadmill. Our design system adapts to content, not the other way around. Every deck should feel intentional.',
+  },
+  {
+    icon: Brain,
+    title: 'Memory that compounds',
+    description: 'Knowledge shouldn\'t evaporate between sessions. Neutron ensures that every insight you surface becomes part of your working memory.',
+  },
+  {
+    icon: Sparkles,
+    title: 'Craft matters',
+    description: 'The details matter. We obsess over the small things—type, spacing, transitions—so you can focus on the big things.',
+  },
+];
 
 const philosophyPrinciples = [
   {
@@ -49,48 +72,69 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onAuth }) => {
             About
           </span>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-light">
-            We Believe Perfect{' '}
-            <span className="text-[#c5a47e]">Is Overrated</span>
+            We're building the deck tool{' '}
+            <span className="text-[#c5a47e]">we always wanted.</span>
           </h1>
         </section>
 
-        {/* Origin Story */}
+        {/* Our Story */}
         <section className="max-w-4xl mx-auto px-6 lg:px-8 mb-32">
           <div className="space-y-8">
             <p className="text-2xl text-white/80 leading-relaxed">
-              DeckSnap started with a simple frustration: why does creating a presentation
-              feel like fighting software?
+              We've spent years making presentations. Pitching investors. Aligning teams.
+              Trying to make complex ideas clear.
             </p>
 
             <p className="text-lg text-white/60 leading-relaxed">
-              We spent hours choosing templates that never quite fit. We hunted through stock
-              photo libraries for images that were "close enough." We obsessed over alignment,
-              consistency, perfection—and our presentations still felt... forgettable.
-            </p>
-
-            <p className="text-lg text-white/60 leading-relaxed">
-              Then we discovered Wabi-Sabi.
-            </p>
-
-            <p className="text-lg text-white/60 leading-relaxed">
-              Wabi-Sabi is a 500-year-old Japanese philosophy that finds beauty in imperfection,
-              impermanence, and incompleteness. It taught us that a cracked bowl, repaired with
-              gold, is more beautiful than a perfect one.
-            </p>
-
-            <p className="text-lg text-white/60 leading-relaxed">
-              What if presentations worked the same way?
+              And we've watched AI deck tools promise to help—then deliver generic outputs
+              that skip the thinking entirely. Fast, but forgettable.
             </p>
 
             <p className="text-2xl text-white leading-relaxed">
-              DeckSnap is built on that question. We use AI to handle the tedious parts—structure,
-              content, imagery—so you can focus on what matters: your ideas, your story, your
-              authentic voice.
+              So we built DeckSnap. A tool that respects the creative process. That gives
+              ideas room to develop. That produces decks worth presenting.
             </p>
 
-            <p className="text-2xl text-white leading-relaxed">
-              We don't help you make perfect presentations. We help you make presentations that are true.
+            <p className="text-lg text-white/60 leading-relaxed">
+              We believe the best presentations come from better thinking. And better
+              thinking needs the right environment.
             </p>
+          </div>
+        </section>
+
+        {/* Our Principles */}
+        <section className="py-24 bg-[#111111]">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="max-w-2xl mb-16">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+                Our Principles
+              </span>
+              <h2 className="text-4xl md:text-5xl font-light">
+                What we believe.
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-px bg-white/10">
+              {ourPrinciples.map((principle, index) => {
+                const Icon = principle.icon;
+                return (
+                  <div
+                    key={index}
+                    className="bg-[#111111] p-10"
+                  >
+                    <div className="w-10 h-10 border border-white/20 flex items-center justify-center mb-6">
+                      <Icon className="w-5 h-5 text-[#c5a47e]" />
+                    </div>
+                    <h3 className="text-2xl font-light mb-4">
+                      {principle.title}
+                    </h3>
+                    <p className="text-white/60 leading-relaxed">
+                      {principle.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
 

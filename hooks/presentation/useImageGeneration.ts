@@ -77,7 +77,7 @@ export interface UseImageGenerationOptions {
 
 export interface UseImageGenerationReturn {
   /** Generate images for all slides with concurrency control */
-  generateAllImages: (slides: Slide[], style: string, topic?: string) => Promise<void>;
+  generateAllImages: (slides: Slide[], style: string, topic?: string, presentationOverride?: Presentation) => Promise<void>;
   /** Generate a single slide's image */
   generateSingleImage: (index: number, prompt: string, style: string) => Promise<void>;
   /** Regenerate the current slide's image */
@@ -207,10 +207,13 @@ export function useImageGeneration({
   /**
    * Generate images for all slides using the intelligent agent system.
    * The agent validates and refines prompts before generating images.
+   * @param presentationOverride - Optional presentation to use instead of closure state (fixes stale closure bug)
    */
   const generateAllImagesWithAgent = useCallback(
-    async (slides: Slide[], style: string, topic?: string) => {
-      if (!presentation) return;
+    async (slides: Slide[], style: string, topic?: string, presentationOverride?: Presentation) => {
+      // Use override if provided, otherwise fall back to closure state
+      const effectivePresentation = presentationOverride || presentation;
+      if (!effectivePresentation) return;
 
       // Filter out slides that already have images
       const slidesNeedingImages = slides.filter(s => !s.imageUrl);
@@ -227,8 +230,9 @@ export function useImageGeneration({
       });
 
       // Capture values upfront to avoid stale closure issues after state updates
-      const presentationTopic = topic || presentation.topic;
-      const themeId = presentation.themeId;
+      const presentationTopic = topic || effectivePresentation.topic;
+      const themeId = effectivePresentation.themeId;
+      const effectivePresentationId = presentationOverride?.id || presentationId;
       const slidesCopy = [...slidesNeedingImages]; // Copy of slides needing images
 
       try {
@@ -285,10 +289,10 @@ export function useImageGeneration({
 
               // Persist to API using the captured slide reference
               const slide = slidesCopy[filteredIndex];
-              if (slide && presentationId) {
+              if (slide && effectivePresentationId) {
                 try {
                   await updateSlideMutation.mutateAsync({
-                    presentationId,
+                    presentationId: effectivePresentationId,
                     slideId: slide.id,
                     updates: { imageUrl },
                   });
@@ -343,11 +347,12 @@ export function useImageGeneration({
   /**
    * Generate images for all slides (sync mode).
    * Uses agent if enabled, otherwise uses basic generation.
+   * @param presentationOverride - Optional presentation to use instead of closure state (fixes stale closure bug)
    */
   const generateAllImagesSync = useCallback(
-    async (slides: Slide[], style: string, topic?: string) => {
+    async (slides: Slide[], style: string, topic?: string, presentationOverride?: Presentation) => {
       if (USE_AGENT_MODE) {
-        await generateAllImagesWithAgent(slides, style, topic);
+        await generateAllImagesWithAgent(slides, style, topic, presentationOverride);
       } else {
         await generateAllImagesSyncBasic(slides, style);
       }
@@ -413,10 +418,13 @@ export function useImageGeneration({
 
   /**
    * Generate images for all slides (async mode - backend Celery).
+   * @param presentationOverride - Optional presentation to use instead of closure state (fixes stale closure bug)
    */
   const generateAllImagesAsync_ = useCallback(
-    async (slides: Slide[], _style: string) => {
-      if (!presentation) return;
+    async (slides: Slide[], _style: string, _topic?: string, presentationOverride?: Presentation) => {
+      // Use override if provided, otherwise fall back to closure state
+      const effectivePresentation = presentationOverride || presentation;
+      if (!effectivePresentation) return;
 
       // Stop any existing polling
       if (pollRef.current) {
@@ -435,10 +443,10 @@ export function useImageGeneration({
 
       try {
         // Trigger batch generation
-        await generateAllImagesAsync(presentation.id);
+        await generateAllImagesAsync(effectivePresentation.id);
 
         // Start polling for status updates
-        pollRef.current = pollImageGeneration(presentation.id, handleStatusUpdate, 3000);
+        pollRef.current = pollImageGeneration(effectivePresentation.id, handleStatusUpdate, 3000);
       } catch (error) {
         console.error('Batch generation error', error);
         // Reset loading states on error

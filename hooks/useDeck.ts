@@ -277,8 +277,8 @@ export const useDeck = () => {
       // Refresh deck list
       refreshDeckList();
 
-      // Start background image generation
-      imageGen.generateAllImages(savedDeck.slides, plan.visualStyle);
+      // Start background image generation (pass savedDeck to avoid stale closure issue)
+      imageGen.generateAllImages(savedDeck.slides, plan.visualStyle, undefined, savedDeck);
 
       return savedDeck.slides;
     } finally {
@@ -331,8 +331,8 @@ export const useDeck = () => {
       // Refresh deck list
       refreshDeckList();
 
-      // Start background image generation
-      imageGen.generateAllImages(savedDeck.slides, visualStyle);
+      // Start background image generation (pass savedDeck to avoid stale closure issue)
+      imageGen.generateAllImages(savedDeck.slides, visualStyle, undefined, savedDeck);
 
       return savedDeck.slides;
     } finally {

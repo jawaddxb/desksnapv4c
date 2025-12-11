@@ -3,12 +3,14 @@
  *
  * Chat interface for the ideation copilot.
  * Displays messages and handles user input.
+ * Includes Enhanced Mode toggle for Research Co-Pilot (Premium feature).
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Message, MessageRole } from '../../types';
+import { Message, MessageRole, ResearchPreferences, ProgressState, Finding } from '../../types';
 import { IdeationStage, ThemeSuggestion } from '../../types/ideation';
 import { ThemePreviewPanel } from './ThemePreviewPanel';
+import { EnhancedModePanel } from './EnhancedModePanel';
 
 interface CopilotPanelProps {
   messages: Message[];
@@ -29,6 +31,14 @@ interface CopilotPanelProps {
   /** Called when user confirms theme. mode: 'direct' builds immediately, 'draft' goes to rough draft */
   onConfirmThemeAndBuild?: (mode: 'direct' | 'draft') => void;
   onBackFromStylePreview?: () => void;
+  // Enhanced mode (Research Co-Pilot) props
+  topic?: string;
+  isPremium?: boolean;
+  onResearch?: (preferences: ResearchPreferences) => void;
+  onCreateNotesFromFindings?: (findings: Finding[]) => void;
+  researchProgress?: ProgressState | null;
+  researchFindings?: Finding[];
+  researchSynthesis?: string;
 }
 
 // Stage descriptions (Studio Noir)
@@ -97,10 +107,19 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   onConfirmBuild,
   onConfirmThemeAndBuild,
   onBackFromStylePreview,
+  // Enhanced mode props
+  topic = '',
+  isPremium = true,
+  onResearch,
+  onCreateNotesFromFindings,
+  researchProgress,
+  researchFindings = [],
+  researchSynthesis,
 }) => {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [enhancedMode, setEnhancedMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -283,6 +302,25 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
     );
   }
 
+  // Render Enhanced Mode panel when active
+  if (enhancedMode && onResearch && onCreateNotesFromFindings) {
+    return (
+      <div className="flex flex-col h-full bg-[#111111] border-l border-white/10">
+        <EnhancedModePanel
+          isActive={enhancedMode}
+          topic={topic}
+          isPremium={isPremium}
+          onResearch={onResearch}
+          onCreateNotes={onCreateNotesFromFindings}
+          onClose={() => setEnhancedMode(false)}
+          progress={researchProgress || null}
+          findings={researchFindings}
+          synthesis={researchSynthesis}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-[#111111] border-l border-white/10">
       {/* Header */}
@@ -331,6 +369,36 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
           </button>
         )}
       </div>
+
+      {/* Enhanced Mode Toggle - shows in expand stage */}
+      {(stage === 'expand' || stage === 'discover') && onResearch && (
+        <div className="flex p-2 border-b border-white/10 bg-black/50">
+          <button
+            onClick={() => setEnhancedMode(false)}
+            className={`flex-1 py-2 text-xs uppercase tracking-wider font-medium transition-colors ${
+              !enhancedMode
+                ? 'bg-white/10 text-white'
+                : 'bg-transparent text-white/50 hover:text-white/70'
+            }`}
+          >
+            Standard
+          </button>
+          <button
+            onClick={() => setEnhancedMode(true)}
+            className={`flex-1 py-2 text-xs uppercase tracking-wider font-medium transition-colors flex items-center justify-center gap-1.5 ${
+              enhancedMode
+                ? 'bg-[#c5a47e] text-black'
+                : 'bg-transparent text-white/50 hover:text-white/70'
+            }`}
+          >
+            <span>🔬</span>
+            Enhanced
+            {!isPremium && (
+              <span className="text-[10px] px-1 py-0.5 bg-black/20 rounded">Pro</span>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

@@ -24,14 +24,14 @@ export const CTASection: React.FC<CTASectionProps> = ({ onGetStarted }) => {
 
         {/* Headline */}
         <h2 className="text-5xl md:text-6xl lg:text-7xl font-light mb-8 leading-[0.95]">
-          Your Ideas Are Ready.
+          Your ideas deserve
           <br />
-          <span className="text-[#c5a47e]">Let Them Out.</span>
+          <span className="text-[#c5a47e]">a better process.</span>
         </h2>
 
         {/* Subheadline */}
         <p className="text-xl text-white/60 mb-12 max-w-2xl mx-auto">
-          Stop perfecting. Start presenting. Create your first deck in minutes—for free.
+          Start building decks that think with you.
         </p>
 
         {/* CTA Button */}
@@ -39,13 +39,13 @@ export const CTASection: React.FC<CTASectionProps> = ({ onGetStarted }) => {
           onClick={onGetStarted}
           className="group inline-flex items-center gap-3 px-10 py-5 bg-[#c5a47e] text-black font-medium hover:bg-white transition-colors duration-150"
         >
-          Create Your First Deck — Free
+          Get started free
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </button>
 
         {/* Philosophy tagline */}
         <p className="mt-16 text-sm text-white/30 italic">
-          "Done beats perfect. Always."
+          "Done beats perfect. But thinking beats rushing."
         </p>
       </div>
     </section>

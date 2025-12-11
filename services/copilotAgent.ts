@@ -11,11 +11,12 @@
 
 import { GoogleGenAI, Content, Part, FunctionCall, Type } from '@google/genai';
 import { parseAIJsonResponse } from './ai/parseJson';
-import { Message, MessageRole, PresentationPlanResponse } from '../types';
+import { Message, MessageRole, PresentationPlanResponse, ResearchPreferences, ProgressUpdate } from '../types';
 import { IdeationSession, ResearchResult, ThemeSuggestion, COLUMNS, JournalEntry, JournalStage } from '../types/ideation';
 import { THEMES, THEME_CATEGORIES } from '../config/themes';
 import { COPILOT_TOOLS } from '../lib/copilotTools';
 import { buildFullPrompt } from '../lib/copilotPrompts';
+import { performGrokResearch, hasGrokApiKey } from './grokService';
 
 // Schema for deck plan conversion - ensures proper JSON escaping
 const DECK_PLAN_SCHEMA = {
@@ -113,6 +114,15 @@ export interface ProcessedToolCall {
 export type ToolExecutor = (tool: string, args: Record<string, unknown>) => Promise<unknown>;
 
 /**
+ * Enhanced mode options for Research Co-Pilot
+ */
+export interface EnhancedModeOptions {
+  enabled: boolean;
+  preferences: ResearchPreferences;
+  onProgress?: (update: ProgressUpdate) => void;
+}
+
+/**
  * Run the agentic loop with multi-turn continuation
  *
  * This loop continues calling Gemini until:
@@ -123,12 +133,14 @@ export type ToolExecutor = (tool: string, args: Record<string, unknown>) => Prom
  * @param userMessage - The user's message
  * @param session - Current ideation session state
  * @param executeTool - Function to execute tools and update state
+ * @param enhancedMode - Optional enhanced mode settings for Research Co-Pilot
  * @returns Agent response with text and processed tool calls
  */
 export async function runAgentLoop(
   userMessage: string,
   session: IdeationSession,
-  executeTool: ToolExecutor
+  executeTool: ToolExecutor,
+  enhancedMode?: EnhancedModeOptions
 ): Promise<AgentResponse> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const MAX_ITERATIONS = 10;
@@ -229,24 +241,59 @@ export async function runAgentLoop(
           continue;
         }
 
-        // Special handling for research - perform web search
+        // Special handling for research - use Grok in enhanced mode, Gemini otherwise
         let result: unknown;
         if (toolName === 'research') {
-          const researchResults = await performResearch(
-            toolArgs.query as string,
-            toolArgs.purpose as string
-          );
-          result = {
-            success: true,
-            query: toolArgs.query,
-            findings: researchResults.map(r => ({
-              title: r.title,
-              snippet: r.snippet,
-              relevance: r.relevance,
-            })),
-          };
-          // Also call the executor to record the research
-          await executeTool(toolName, { ...toolArgs, results: researchResults });
+          // Check if enhanced mode with Grok is enabled
+          if (enhancedMode?.enabled && hasGrokApiKey()) {
+            console.log('[AgentLoop] Using Grok for enhanced research');
+            const grokResults = await performGrokResearch(
+              toolArgs.query as string,
+              enhancedMode.preferences,
+              enhancedMode.onProgress
+            );
+            result = {
+              success: true,
+              query: toolArgs.query,
+              enhanced: true,
+              findings: grokResults.findings.map(f => ({
+                title: f.citation.title,
+                snippet: f.summary,
+                relevance: f.type,
+                url: f.citation.url,
+                source: f.citation.source,
+                reliability: f.citation.reliability,
+              })),
+              xTrends: grokResults.xTrends,
+              synthesis: grokResults.synthesis,
+              mindMapData: grokResults.mindMapData,
+            };
+            // Record the enhanced research results
+            await executeTool(toolName, {
+              ...toolArgs,
+              results: grokResults.findings,
+              enhanced: true,
+              citations: grokResults.citations,
+            });
+          } else {
+            // Fallback to standard Gemini research
+            const researchResults = await performResearch(
+              toolArgs.query as string,
+              toolArgs.purpose as string
+            );
+            result = {
+              success: true,
+              query: toolArgs.query,
+              enhanced: false,
+              findings: researchResults.map(r => ({
+                title: r.title,
+                snippet: r.snippet,
+                relevance: r.relevance,
+              })),
+            };
+            // Record the standard research
+            await executeTool(toolName, { ...toolArgs, results: researchResults });
+          }
         } else {
           // Execute other tools normally
           result = await executeTool(toolName, toolArgs);

@@ -11,27 +11,27 @@ import { Twitter, Linkedin, Github } from 'lucide-react';
 
 const footerLinks = {
   product: [
+    { label: 'How It Works', href: '/#how-it-works' },
     { label: 'Features', href: '/features' },
     { label: 'Themes Gallery', href: '/themes' },
     { label: 'Pricing', href: '/pricing' },
     { label: 'Changelog', href: '#', disabled: true },
   ],
   solutions: [
-    { label: 'For Startups', href: '/solutions/startups' },
-    { label: 'For Educators', href: '/solutions/educators' },
-    { label: 'For Designers', href: '/solutions/designers' },
-    { label: 'For Teams', href: '/solutions/teams' },
+    { label: 'Pitch Decks', href: '/solutions/startups' },
+    { label: 'Research Decks', href: '/solutions/educators' },
+    { label: 'Thought Leadership', href: '/solutions/designers' },
   ],
-  resources: [
-    { label: 'Blog', href: '#', disabled: true },
-    { label: 'Help Center', href: '#', disabled: true },
-    { label: 'API Docs', href: '#', disabled: true },
+  integrations: [
+    { label: 'Neutron', href: 'https://myneutron.ai', external: true },
+    { label: 'API', href: '#', disabled: true },
   ],
   company: [
     { label: 'About', href: '/about' },
+    { label: 'Careers', href: '#', disabled: true },
     { label: 'Contact', href: '#', disabled: true },
-    { label: 'Privacy Policy', href: '#', disabled: true },
-    { label: 'Terms of Service', href: '#', disabled: true },
+    { label: 'Privacy', href: '#', disabled: true },
+    { label: 'Terms', href: '#', disabled: true },
   ],
 };
 
@@ -57,7 +57,7 @@ export const FooterSection: React.FC = () => {
               </span>
             </Link>
             <p className="text-sm text-white/60 mb-6 max-w-xs">
-              Presentations with character. AI-powered slide design for modern creators.
+              Decks that think with you. Ideate, draft, and polish with AI.
             </p>
 
             {/* Social Links */}
@@ -123,19 +123,28 @@ export const FooterSection: React.FC = () => {
             </ul>
           </div>
 
-          {/* Resources Links */}
+          {/* Integrations Links */}
           <div>
             <h3 className="text-xs uppercase tracking-[0.2em] text-white/40 mb-4">
-              Resources
+              Integrations
             </h3>
             <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
+              {footerLinks.integrations.map((link) => (
                 <li key={link.label}>
                   {link.disabled ? (
                     <span className="text-sm text-white/30">
                       {link.label}
                       <span className="ml-1 text-xs">(soon)</span>
                     </span>
+                  ) : link.external ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-white/60 hover:text-white transition-colors duration-150"
+                    >
+                      {link.label}
+                    </a>
                   ) : (
                     <Link
                       to={link.href}
@@ -182,7 +191,7 @@ export const FooterSection: React.FC = () => {
             © {new Date().getFullYear()} DeckSnap. All rights reserved.
           </p>
           <p className="text-sm text-white/40 italic">
-            "Presentations with character."
+            "Decks that think with you."
           </p>
         </div>
       </div>

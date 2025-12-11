@@ -203,6 +203,105 @@ export interface Theme {
 
 export type GenerationMode = 'concise' | 'balanced' | 'detailed' | 'verbatim';
 
+// ============================================
+// Research Co-Pilot Types (Enhanced Mode)
+// ============================================
+
+// Research preferences selected by user in Enhanced Mode
+export interface ResearchPreferences {
+  includeStats: boolean;       // Market statistics & growth data
+  includeXSearch: boolean;     // X/Twitter trends and social proof
+  includeCompetitors: boolean; // Competitor analysis
+  includeExperts: boolean;     // Expert opinions & case studies
+}
+
+// Citation for research findings
+export interface Citation {
+  id: string;
+  url: string;
+  title: string;
+  source: string;       // e.g., "Statista", "Forbes", "X/@username"
+  accessedAt: number;   // timestamp
+  reliability?: 1 | 2 | 3 | 4 | 5; // 1-5 star rating
+}
+
+// Research finding categories
+export const FINDING_TYPES = ['market', 'trend', 'competitor', 'expert', 'social'] as const;
+export type FindingType = typeof FINDING_TYPES[number];
+
+// Individual research finding
+export interface Finding {
+  id: string;
+  type: FindingType;
+  summary: string;           // Brief text summary
+  details?: string;          // Expanded details if available
+  citation: Citation;
+  icon: string;              // Emoji icon for display
+  sentiment?: 'positive' | 'negative' | 'neutral';
+  metrics?: {
+    value: string;           // e.g., "$45.2B"
+    label: string;           // e.g., "Market Size"
+    change?: string;         // e.g., "+15% YoY"
+  };
+}
+
+// X/Twitter specific trend data
+export interface XTrend {
+  query: string;
+  mentionCount: number;
+  sentiment: {
+    positive: number;        // percentage
+    negative: number;
+    neutral: number;
+  };
+  keyVoices: string[];       // @usernames
+  topPosts?: string[];       // sample post texts
+}
+
+// Progress step for visual tracking
+export interface ProgressStep {
+  id: string;
+  label: string;
+  done: boolean;
+  active: boolean;
+}
+
+// Progress state for research visualization
+export interface ProgressState {
+  status: string;            // Current status message
+  percent: number;           // 0-100
+  steps: ProgressStep[];
+}
+
+// Progress update from Grok during research
+export interface ProgressUpdate {
+  tool: 'web_search' | 'x_search' | 'code_execution' | 'synthesizing';
+  status: 'searching' | 'found' | 'processing' | 'complete' | 'error';
+  message?: string;
+  finding?: Finding;
+}
+
+// Complete research result
+export interface ResearchResult {
+  findings: Finding[];
+  citations: Citation[];
+  xTrends?: XTrend[];
+  synthesis?: string;        // AI-generated summary
+  mindMapData?: MindMapNode;
+}
+
+// Mind map node structure for visualization
+export interface MindMapNode {
+  id: string;
+  label: string;
+  type: 'topic' | 'category' | 'finding';
+  children?: MindMapNode[];
+  finding?: Finding;
+}
+
+// Enhanced mode state for CopilotPanel
+export type EnhancedModeStep = 'intro' | 'preferences' | 'researching' | 'results';
+
 declare global {
   interface AIStudio {
     hasSelectedApiKey: () => Promise<boolean>;

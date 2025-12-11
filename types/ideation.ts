@@ -35,6 +35,9 @@ export interface IdeaNote {
   type: NoteType;
   sourceUrl?: string;           // URL source for research notes
   sourceTitle?: string;         // Title of research source
+  sourceReliability?: 1 | 2 | 3 | 4 | 5; // Source reliability (1-5 stars)
+  sourceName?: string;          // Source name (e.g., "Statista", "Forbes")
+  findingType?: string;         // Type of finding (market, trend, competitor, etc.)
   parentId?: string;            // ID of parent note (for connectors)
   column: number;               // 0-4 index into COLUMNS
   row: number;                  // Vertical position within column
