@@ -14,7 +14,8 @@ interface ThemePreviewPanelProps {
   suggestion: ThemeSuggestion;
   selectedThemeId: string;
   onSelectTheme: (themeId: string) => void;
-  onConfirm: () => void;
+  /** Called when user confirms. mode: 'direct' builds immediately, 'draft' goes to rough draft review */
+  onConfirm: (mode: 'direct' | 'draft') => void;
   onBack: () => void;
   isLoading?: boolean;
 }
@@ -163,19 +164,41 @@ export const ThemePreviewPanel: React.FC<ThemePreviewPanelProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="p-4 border-t border-white/10 bg-black flex gap-2">
+      <div className="p-4 border-t border-white/10 bg-black">
+        <div className="flex gap-2 mb-2">
+          <button
+            onClick={onBack}
+            disabled={isLoading}
+            className="px-4 py-3 border border-white/20 text-white/60 text-xs font-bold uppercase tracking-wider
+                       hover:border-white/40 hover:text-white transition-colors disabled:opacity-50"
+          >
+            Back
+          </button>
+          <button
+            onClick={() => onConfirm('draft')}
+            disabled={isLoading}
+            className="flex-1 flex items-center justify-center gap-2 py-3 border border-[#c5a47e] text-[#c5a47e]
+                       font-bold text-xs uppercase tracking-wider hover:bg-[#c5a47e]/10 transition-colors disabled:opacity-50"
+          >
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-[#c5a47e]/30 border-t-[#c5a47e] rounded-full animate-spin" />
+                Preparing...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                Review Draft
+              </>
+            )}
+          </button>
+        </div>
         <button
-          onClick={onBack}
+          onClick={() => onConfirm('direct')}
           disabled={isLoading}
-          className="px-4 py-3 border border-white/20 text-white/60 text-xs font-bold uppercase tracking-wider
-                     hover:border-white/40 hover:text-white transition-colors disabled:opacity-50"
-        >
-          Back
-        </button>
-        <button
-          onClick={onConfirm}
-          disabled={isLoading}
-          className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#c5a47e] text-black
+          className="w-full flex items-center justify-center gap-2 py-3 bg-[#c5a47e] text-black
                      font-bold text-xs uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50"
         >
           {isLoading ? (
@@ -188,10 +211,13 @@ export const ThemePreviewPanel: React.FC<ThemePreviewPanelProps> = ({
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
               </svg>
-              Confirm & Build
+              Build Now
             </>
           )}
         </button>
+        <p className="text-[10px] text-white/40 text-center mt-2">
+          Review Draft lets you preview and edit slides before finalizing
+        </p>
       </div>
     </div>
   );

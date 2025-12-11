@@ -8,7 +8,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { GenerationMode } from './types';
+import { GenerationMode, PresentationPlanResponse } from './types';
+import { RoughDraftInput, RoughDraftResult } from './services/agents';
+import { RoughDraftCanvas } from './components/rough-draft';
 import { IMAGE_STYLES } from './lib/themes';
 import { MainStage } from './components/MainStage';
 import { ChatInterface } from './components/ChatInterface';
@@ -56,12 +58,21 @@ function AppContent() {
   const [isPresenting, setIsPresenting] = useState(false);
   const [showCreateChat, setShowCreateChat] = useState(false);
   const [isIdeating, setIsIdeating] = useState(false);
+  const [enableDraftPreview, setEnableDraftPreview] = useState(false);
   // Archetype change dialog state
   const [archetypeChangeDialog, setArchetypeChangeDialog] = useState<{
     isOpen: boolean;
     previousArchetype: string;
     newArchetype: string;
   }>({ isOpen: false, previousArchetype: '', newArchetype: '' });
+
+  // Rough draft state - holds data for the rough draft view
+  const [roughDraftState, setRoughDraftState] = useState<{
+    isOpen: boolean;
+    source: 'ideation' | 'copilot';
+    input: RoughDraftInput;
+    ideationSessionId?: string;
+  } | null>(null);
 
   // Main deck hook
   const {
@@ -136,17 +147,37 @@ function AppContent() {
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isGenerating) return;
 
-    addMessage(createUserMessage(inputValue));
+    const topic = inputValue.trim();
+    addMessage(createUserMessage(topic));
     setInputValue('');
 
     try {
-      addMessage(createSystemMessage('Constructing Layout & Selecting Theme...'));
+      if (enableDraftPreview) {
+        // Draft preview mode - go to rough draft canvas first
+        addMessage(createSystemMessage('Preparing rough draft preview...'));
 
-      const newSlides = await actions.createDeck(inputValue, selectedImageStyle, generationMode);
+        // Enter rough draft mode with the topic
+        setRoughDraftState({
+          isOpen: true,
+          source: 'copilot',
+          input: {
+            topic,
+            themeId: 'executive', // Default theme, agent will pick appropriate one
+            visualStyle: selectedImageStyle.prompt,
+          },
+        });
+        setIsChatOpen(false);
+        setShowCreateChat(false);
+      } else {
+        // Direct build mode
+        addMessage(createSystemMessage('Constructing Layout & Selecting Theme...'));
 
-      addMessage(createModelMessage(`Blueprint ready: ${newSlides.length} slides. Rendering visuals...`));
-      setIsChatOpen(false);
-      setShowCreateChat(false);
+        const newSlides = await actions.createDeck(topic, selectedImageStyle, generationMode);
+
+        addMessage(createModelMessage(`Blueprint ready: ${newSlides.length} slides. Rendering visuals...`));
+        setIsChatOpen(false);
+        setShowCreateChat(false);
+      }
     } catch (error) {
       console.error(error);
       addMessage(createSystemMessage('System Error. Check credentials.'));
@@ -208,6 +239,96 @@ function AppContent() {
     }
   };
 
+  // ============ Rough Draft Handlers ============
+
+  /**
+   * Enter rough draft mode from ideation (with notes and theme)
+   */
+  const handleRoughDraftFromIdeation = useCallback((
+    deckPlan: PresentationPlanResponse,
+    sessionId: string,
+    notes?: Array<{ content: string; column: number }>
+  ) => {
+    setRoughDraftState({
+      isOpen: true,
+      source: 'ideation',
+      input: {
+        ideationNotes: notes?.map((n, i) => ({
+          id: `note-${i}`,
+          content: n.content,
+          type: 'user' as const,
+          column: n.column,
+          row: 0,
+          color: 'yellow' as const,
+          approved: true,
+          createdAt: Date.now(),
+        })),
+        topic: deckPlan.topic,
+        themeId: deckPlan.themeId,
+        visualStyle: deckPlan.visualStyle,
+      },
+      ideationSessionId: sessionId,
+    });
+    // Keep ideation open in the background so user can go back
+  }, []);
+
+  /**
+   * Approve the rough draft and create the final deck
+   */
+  const handleApproveRoughDraft = useCallback(async (result: RoughDraftResult) => {
+    if (!roughDraftState) return;
+
+    const deckPlan = {
+      topic: result.topic,
+      themeId: result.themeId,
+      visualStyle: result.visualStyle,
+      slides: result.slides.map(s => ({
+        title: s.title,
+        bulletPoints: s.content,
+        speakerNotes: s.speakerNotes,
+        imageVisualDescription: s.imagePrompt,
+        layoutType: s.layoutType,
+        alignment: s.alignment,
+        // Pass through generated images
+        existingImageUrl: s.imageUrl,
+      })),
+    };
+
+    try {
+      await actions.createDeckFromPlan(deckPlan);
+      addMessage(createModelMessage(`Deck created from rough draft: ${result.slides.length} slides.`));
+    } catch (error) {
+      console.error('Error creating deck from rough draft:', error);
+      addMessage(createSystemMessage('Error creating deck from rough draft.'));
+    }
+
+    // Close rough draft view
+    setRoughDraftState(null);
+    setIsIdeating(false);
+  }, [roughDraftState, actions, addMessage, createModelMessage, createSystemMessage]);
+
+  /**
+   * Go back from rough draft to ideation
+   */
+  const handleBackFromRoughDraft = useCallback(() => {
+    if (roughDraftState?.source === 'ideation') {
+      // Return to ideation - keep session open
+      setRoughDraftState(null);
+      // Ideation is still open since we didn't close it
+    } else {
+      // From copilot - close and return to dashboard
+      setRoughDraftState(null);
+    }
+  }, [roughDraftState]);
+
+  /**
+   * Discard rough draft and return to dashboard
+   */
+  const handleDiscardRoughDraft = useCallback(() => {
+    setRoughDraftState(null);
+    setIsIdeating(false);
+  }, []);
+
   // ============ Archetype Change Handlers ============
 
   // Handle archetype selection - show dialog if presentation exists and has images
@@ -250,12 +371,27 @@ function AppContent() {
 
   // ============ Render ============
 
+  // Rough Draft Mode - Full screen canvas for reviewing/editing draft
+  if (roughDraftState?.isOpen) {
+    return (
+      <RoughDraftCanvas
+        input={roughDraftState.input}
+        source={roughDraftState.source}
+        ideationSessionId={roughDraftState.ideationSessionId}
+        onApprove={handleApproveRoughDraft}
+        onBack={handleBackFromRoughDraft}
+        onDiscard={handleDiscardRoughDraft}
+      />
+    );
+  }
+
   // Ideation Mode - Full screen copilot
   if (isIdeating) {
     return (
       <IdeationCopilot
         onClose={handleCloseIdeation}
         onBuildDeck={handleBuildDeckFromIdeation}
+        onRoughDraft={handleRoughDraftFromIdeation}
       />
     );
   }
@@ -293,6 +429,8 @@ function AppContent() {
               generationMode={generationMode}
               setGenerationMode={setGenerationMode}
               scrollRef={modalScrollRef}
+              enableDraftPreview={enableDraftPreview}
+              setEnableDraftPreview={setEnableDraftPreview}
             />
           </div>
         )}

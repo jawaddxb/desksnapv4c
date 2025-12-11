@@ -26,7 +26,8 @@ interface CopilotPanelProps {
   onSendMessage: (message: string) => void;
   onBuildDeck?: () => void;
   onConfirmBuild?: () => void;
-  onConfirmThemeAndBuild?: () => void;
+  /** Called when user confirms theme. mode: 'direct' builds immediately, 'draft' goes to rough draft */
+  onConfirmThemeAndBuild?: (mode: 'direct' | 'draft') => void;
   onBackFromStylePreview?: () => void;
 }
 

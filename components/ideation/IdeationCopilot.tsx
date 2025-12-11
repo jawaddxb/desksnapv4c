@@ -18,6 +18,12 @@ interface IdeationCopilotProps {
   sessionId?: string;
   onClose?: () => void;
   onBuildDeck?: (deckPlan: any) => void;
+  /** Called when user chooses to review a rough draft instead of building directly */
+  onRoughDraft?: (
+    deckPlan: any,
+    sessionId: string,
+    notes?: Array<{ content: string; column: number }>
+  ) => void;
 }
 
 export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
@@ -25,6 +31,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   sessionId,
   onClose,
   onBuildDeck,
+  onRoughDraft,
 }) => {
   const ideation = useIdeation();
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
@@ -176,8 +183,11 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   }, [ideation]);
 
   // Handle final build after theme confirmation
-  const handleConfirmThemeAndBuild = useCallback(async () => {
-    if (!ideation.session || !onBuildDeck || !selectedThemeId) return;
+  // mode: 'direct' builds deck immediately, 'draft' goes to rough draft view
+  const handleConfirmThemeAndBuild = useCallback(async (mode: 'direct' | 'draft' = 'direct') => {
+    if (!ideation.session || !selectedThemeId) return;
+    if (mode === 'direct' && !onBuildDeck) return;
+    if (mode === 'draft' && !onRoughDraft) return;
 
     setIsThinking(true);
     try {
@@ -186,7 +196,17 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
         ideation.session,
         selectedThemeId
       );
-      onBuildDeck(deckPlan);
+
+      if (mode === 'direct') {
+        onBuildDeck?.(deckPlan);
+      } else {
+        // Go to rough draft with notes for reference
+        const notes = ideation.session.notes.map(n => ({
+          content: n.content,
+          column: n.column,
+        }));
+        onRoughDraft?.(deckPlan, ideation.session.id, notes);
+      }
     } catch (error) {
       console.error('Deck conversion error:', error);
       ideation.addMessage(
@@ -196,7 +216,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     } finally {
       setIsThinking(false);
     }
-  }, [ideation, onBuildDeck, selectedThemeId]);
+  }, [ideation, onBuildDeck, onRoughDraft, selectedThemeId]);
 
   // Handle going back from style-preview to review
   const handleBackFromStylePreview = useCallback(() => {

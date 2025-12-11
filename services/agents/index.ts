@@ -10,5 +10,15 @@ export * from './types';
 // Agent tools
 export * from './tools';
 
-// Main agent
+// Main agents
 export { runImagePromptAgent, refinePromptWithAgent } from './imagePromptAgent';
+export {
+  runRoughDraftAgent,
+  regenerateSlideWithAgent,
+  type RoughDraftInput,
+  type RoughDraftResult,
+  type RoughDraftSlide,
+  type RoughDraftAgentCallbacks,
+  type RoughDraftAgentOptions,
+  type SlideContent,
+} from './roughDraftAgent';

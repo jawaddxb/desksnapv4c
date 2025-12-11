@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Message, Presentation, MessageRole, GenerationMode } from '../types';
-import { Bot, Minus, RefreshCw, ImageIcon, ArrowRight, StopCircle, AlignLeft, Layers, FileText, Quote } from 'lucide-react';
+import { Bot, Minus, RefreshCw, ImageIcon, ArrowRight, StopCircle, AlignLeft, Layers, FileText, Quote, Eye } from 'lucide-react';
 import { IMAGE_STYLES } from '../lib/themes';
 
 interface ChatInterfaceProps {
@@ -19,6 +19,9 @@ interface ChatInterfaceProps {
   generationMode: GenerationMode;
   setGenerationMode: (m: GenerationMode) => void;
   scrollRef: React.RefObject<HTMLDivElement | null>;
+  /** Whether to show draft preview before building (optional) */
+  enableDraftPreview?: boolean;
+  setEnableDraftPreview?: (v: boolean) => void;
 }
 
 const MODE_OPTIONS: { id: GenerationMode; label: string; icon: React.FC<any>; desc: string }[] = [
@@ -32,7 +35,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     mode, messages, isGenerating, currentPresentation, isChatOpen, setIsChatOpen,
     inputValue, setInputValue, handleSendMessage, selectedImageStyle, setSelectedImageStyle,
     generationMode, setGenerationMode,
-    scrollRef
+    scrollRef,
+    enableDraftPreview,
+    setEnableDraftPreview,
 }) => {
     return (
         <>
@@ -87,6 +92,22 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             ))}
                         </div>
                      </div>
+
+                     {/* Draft Preview Toggle (optional) */}
+                     {setEnableDraftPreview && (
+                        <div className="flex items-center justify-between py-2 px-3 border border-white/10 bg-white/5">
+                            <div className="flex items-center gap-2">
+                                <Eye className="w-3.5 h-3.5 text-white/40" />
+                                <span className="text-[11px] font-bold text-white/60">Preview slides before building</span>
+                            </div>
+                            <button
+                                onClick={() => setEnableDraftPreview(!enableDraftPreview)}
+                                className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${enableDraftPreview ? 'bg-[#c5a47e]' : 'bg-white/20'}`}
+                            >
+                                <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${enableDraftPreview ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                            </button>
+                        </div>
+                     )}
                 </div>
             )}
             <div className="relative group">

@@ -12,6 +12,14 @@ export type FontScale = typeof FONT_SCALES[number];
 export const LAYOUT_VARIANTS = ['default', 'inverted'] as const;
 export type LayoutVariant = typeof LAYOUT_VARIANTS[number] | number;
 
+// Presentation workflow status
+export const PRESENTATION_STATUSES = ['generating', 'rough-draft', 'approved'] as const;
+export type PresentationStatus = typeof PRESENTATION_STATUSES[number];
+
+// Slide approval state (for rough draft workflow)
+export const SLIDE_APPROVAL_STATES = ['pending', 'approved', 'modified'] as const;
+export type SlideApprovalState = typeof SLIDE_APPROVAL_STATES[number];
+
 // Content types (user-selectable per slide)
 export const CONTENT_TYPES = ['bullets', 'numbered', 'checkmarks', 'quotes', 'plain'] as const;
 export type ContentType = typeof CONTENT_TYPES[number];
@@ -96,6 +104,8 @@ export interface Slide {
   contentItemStyles?: Record<number, ContentItemStyle>;
   // Content display type (user-selectable)
   contentType?: ContentType;
+  // Rough draft workflow
+  approvalState?: SlideApprovalState; // For rough draft review workflow
 }
 
 export interface AnalyticsSession {
@@ -128,6 +138,8 @@ export interface Presentation {
   wabiSabiLayout?: string;
   viewMode?: ViewMode; // Persisted view mode preference (structured vs organic)
   analytics?: AnalyticsSession[];
+  // Rough draft workflow
+  status?: PresentationStatus; // Default: 'approved' for backwards compatibility
 }
 
 export enum MessageRole {
