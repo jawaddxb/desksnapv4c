@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Slide, Theme } from '../types';
+import { Slide, Theme, Presentation } from '../types';
 import { PRNG } from '../lib/utils';
 import { ArchetypeProps } from './WabiSabiComponents';
 import { ensureContrast } from '../lib/contrast';
@@ -59,6 +59,10 @@ interface WabiSabiStageProps {
   printMode?: boolean;
   layoutStyle?: string;
   onToggleNotes?: () => void;
+  // Image prompt editing
+  presentation?: Presentation | null;
+  onRegenerateImage?: () => void;
+  onGenerateSuggestions?: () => Promise<string[]>;
 }
 
 // Map of all renderers
@@ -200,7 +204,7 @@ export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);
 
 // --- INNER STAGE COMPONENT (uses selection context) ---
 
-const WabiSabiStageInner: React.FC<WabiSabiStageProps> = ({ slide, theme, onUpdateSlide, printMode, layoutStyle, onToggleNotes }) => {
+const WabiSabiStageInner: React.FC<WabiSabiStageProps> = ({ slide, theme, onUpdateSlide, printMode, layoutStyle, onToggleNotes, presentation, onRegenerateImage, onGenerateSuggestions }) => {
     const { clearSelection } = useTextSelection();
 
     // Guard against undefined slide
@@ -245,7 +249,15 @@ const WabiSabiStageInner: React.FC<WabiSabiStageProps> = ({ slide, theme, onUpda
         <div className="w-full h-full relative group/stage" onClick={handleBackgroundClick}>
             <Renderer slide={slide} theme={theme} contrast={safeContrast} rng={rng} onUpdateSlide={onUpdateSlide} readOnly={printMode} />
             {!printMode && onUpdateSlide && (
-                <LayoutToolbar slide={slide} onUpdateSlide={onUpdateSlide} mode="wabi-sabi" onToggleNotes={onToggleNotes} />
+                <LayoutToolbar
+                    slide={slide}
+                    onUpdateSlide={onUpdateSlide}
+                    mode="wabi-sabi"
+                    onToggleNotes={onToggleNotes}
+                    presentation={presentation}
+                    onRegenerateImage={onRegenerateImage}
+                    onGenerateSuggestions={onGenerateSuggestions}
+                />
             )}
         </div>
     );

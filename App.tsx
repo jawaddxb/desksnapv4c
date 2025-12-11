@@ -16,19 +16,25 @@ import { AppHeader } from './components/AppHeader';
 import { AppSidebar } from './components/AppSidebar';
 import { PrintView } from './components/PrintView';
 import { useDeck } from './hooks/useDeck';
+import { useDuplicatePresentation } from './hooks/mutations/usePresentationMutations';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import { useChat } from './hooks/useChat';
 import { IdeationCopilot } from './components/ideation/IdeationCopilot';
+import { AgentActivityPanel } from './components/AgentActivityPanel';
+import { ArchetypeChangeDialog } from './components/ArchetypeChangeDialog';
+import { getArchetypeVisualStyle } from './lib/archetypeVisualStyles';
 import { AuthProvider } from './contexts/AuthContext';
 import { QueryProvider } from './contexts/QueryContext';
 import { NetworkProvider } from './contexts/NetworkContext';
 import { DebugProvider } from './contexts/DebugContext';
-import { DebugRoute, ThumbnailGenerator, ComponentShowcase } from './components/debug';
+import { DebugRoute, ThumbnailGenerator, ComponentShowcase, ImageAgentRoute } from './components/debug';
 import { AuthModal } from './components/auth';
 import { preloadCommonFonts } from './lib/fonts';
 import { ProtectedRoute, OfflineGate } from './components/routing';
 import { LandingPage } from './components/landing';
+import { migrateIdeationSessions, isMigrationComplete } from './services/migration/ideationMigration';
+import { useAuth } from './contexts/AuthContext';
 import {
   FeaturesPage,
   PricingPage,
@@ -50,6 +56,12 @@ function AppContent() {
   const [isPresenting, setIsPresenting] = useState(false);
   const [showCreateChat, setShowCreateChat] = useState(false);
   const [isIdeating, setIsIdeating] = useState(false);
+  // Archetype change dialog state
+  const [archetypeChangeDialog, setArchetypeChangeDialog] = useState<{
+    isOpen: boolean;
+    previousArchetype: string;
+    newArchetype: string;
+  }>({ isOpen: false, previousArchetype: '', newArchetype: '' });
 
   // Main deck hook
   const {
@@ -66,6 +78,9 @@ function AppContent() {
     saveStatus,
     actions,
   } = useDeck();
+
+  // Clone/duplicate mutation
+  const duplicateMutation = useDuplicatePresentation();
 
   // Chat hook
   const {
@@ -99,6 +114,21 @@ function AppContent() {
   // Preload common fonts in the background after initial render
   useEffect(() => {
     preloadCommonFonts();
+  }, []);
+
+  // Run ideation migration from IndexedDB to backend API (one-time)
+  useEffect(() => {
+    if (!isMigrationComplete()) {
+      migrateIdeationSessions()
+        .then((result) => {
+          if (result.migrated > 0 || result.failed > 0) {
+            console.log(`[App] Ideation migration complete: ${result.migrated} migrated, ${result.failed} failed`);
+          }
+        })
+        .catch((error) => {
+          console.error('[App] Ideation migration error:', error);
+        });
+    }
   }, []);
 
   // ============ Handlers ============
@@ -137,6 +167,21 @@ function AppContent() {
     setIsIdeating(false);
   };
 
+  const handleCloneDeck = useCallback((id: string) => {
+    duplicateMutation.mutate(id, {
+      onSuccess: (clonedDeck) => {
+        // Optionally load the cloned deck
+        actions.loadDeck(clonedDeck.id);
+      },
+    });
+  }, [duplicateMutation, actions]);
+
+  const handleCloneCurrentDeck = useCallback(() => {
+    if (currentPresentation) {
+      handleCloneDeck(currentPresentation.id);
+    }
+  }, [currentPresentation, handleCloneDeck]);
+
   const handleBuildDeckFromIdeation = async (deckPlan: {
     topic: string;
     slides: Array<{
@@ -162,6 +207,46 @@ function AppContent() {
       addMessage(createSystemMessage('Error building deck from ideation plan.'));
     }
   };
+
+  // ============ Archetype Change Handlers ============
+
+  // Handle archetype selection - show dialog if presentation exists and has images
+  const handleSetWabiSabiLayout = useCallback((layoutName: string) => {
+    // If no presentation or same archetype, just set it
+    if (!currentPresentation || layoutName === activeWabiSabiLayout) {
+      actions.setWabiSabiLayout(layoutName);
+      return;
+    }
+
+    // Check if any slides have images (meaning regeneration would have an effect)
+    const hasImages = currentPresentation.slides.some(slide => slide.imageUrl);
+
+    if (hasImages) {
+      // Show dialog to ask about image regeneration
+      setArchetypeChangeDialog({
+        isOpen: true,
+        previousArchetype: activeWabiSabiLayout,
+        newArchetype: layoutName,
+      });
+    } else {
+      // No images yet, just change archetype
+      actions.setWabiSabiLayout(layoutName);
+    }
+  }, [currentPresentation, activeWabiSabiLayout, actions]);
+
+  // Handle dialog confirmation
+  const handleArchetypeChangeConfirm = useCallback((regenerateImages: boolean) => {
+    const { newArchetype } = archetypeChangeDialog;
+
+    // Always set the new archetype
+    actions.setWabiSabiLayout(newArchetype);
+
+    // If user wants to regenerate, update visual style and regenerate
+    if (regenerateImages) {
+      const newVisualStyle = getArchetypeVisualStyle(newArchetype);
+      actions.updateVisualStyleAndRegenerateImages(newVisualStyle, true);
+    }
+  }, [archetypeChangeDialog, actions]);
 
   // ============ Render ============
 
@@ -212,6 +297,9 @@ function AppContent() {
           </div>
         )}
 
+        {/* AGENT ACTIVITY PANEL - shows during image generation */}
+        {currentPresentation && !isPresenting && <AgentActivityPanel />}
+
         {/* LEFT SIDEBAR */}
         {!isPresenting && currentPresentation && (
           <AppSidebar
@@ -251,13 +339,14 @@ function AppContent() {
               setViewMode={setViewMode}
               onApplyTheme={actions.applyTheme}
               onApplyTypography={actions.applyTypography}
-              onSetWabiSabiLayout={actions.setWabiSabiLayout}
+              onSetWabiSabiLayout={handleSetWabiSabiLayout}
               onCycleWabiSabiLayout={actions.cycleWabiSabiLayout}
               onRegenerateAllImages={actions.regenerateAllImages}
               onRemixDeck={actions.remixDeck}
               setIsPresenting={setIsPresenting}
               onSave={actions.saveDeck}
               onClose={actions.closeDeck}
+              onClone={handleCloneCurrentDeck}
               onShuffleLayout={actions.shuffleLayoutVariants}
               onExportDeck={actions.exportDeck}
               saveStatus={saveStatus}
@@ -318,9 +407,12 @@ function AppContent() {
             savedDecks={savedDecks}
             onLoadDeck={actions.loadDeck}
             onDeleteDeck={actions.deleteDeck}
+            onCloneDeck={handleCloneDeck}
             onCreateDeck={handleCreateNew}
             onImport={actions.importDeck}
             onIdeate={handleIdeate}
+            presentation={currentPresentation}
+            activeSlideIndex={activeSlideIndex}
           />
         </div>
       </div>
@@ -330,6 +422,15 @@ function AppContent() {
         theme={activeTheme}
         activeWabiSabiLayout={activeWabiSabiLayout}
         viewMode={viewMode}
+      />
+
+      {/* Archetype Change Confirmation Dialog */}
+      <ArchetypeChangeDialog
+        isOpen={archetypeChangeDialog.isOpen}
+        onClose={() => setArchetypeChangeDialog(prev => ({ ...prev, isOpen: false }))}
+        previousArchetype={archetypeChangeDialog.previousArchetype}
+        newArchetype={archetypeChangeDialog.newArchetype}
+        onConfirm={handleArchetypeChangeConfirm}
       />
     </>
   );
@@ -381,6 +482,7 @@ function AppRoutes() {
         <Route path="/debug" element={<DebugRoute />} />
         <Route path="/debug/thumbnails" element={<ThumbnailGenerator />} />
         <Route path="/debug/components" element={<ComponentShowcase />} />
+        <Route path="/debug/image-agent" element={<ImageAgentRoute />} />
 
         {/* Auth Routes (trigger modal) */}
         <Route

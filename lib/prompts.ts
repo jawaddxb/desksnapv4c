@@ -106,8 +106,8 @@ export const PRESENTATION_SCHEMA = {
                 enum: ['split', 'full-bleed', 'statement', 'gallery', 'card', 'horizontal', 'magazine'],
                 description: "The structural layout of the slide"
             },
-            alignment: { 
-                type: Type.STRING, 
+            alignment: {
+                type: Type.STRING,
                 enum: ['left', 'right', 'center'],
                 description: "Content alignment for organic flow"
             }
@@ -117,4 +117,107 @@ export const PRESENTATION_SCHEMA = {
       }
     },
     required: ["topic", "visualStyle", "themeId", "slides"]
+};
+
+// ============================================================================
+// CONTENT DECONSTRUCTION (for pasted content → ideation map)
+// ============================================================================
+
+export const CONTENT_DECONSTRUCTION_PROMPT = `You are a Creative Director analyzing content for a presentation. Your task is to deconstruct the user's pasted content into a structured ideation map.
+
+Organize the content into the 5-column narrative framework:
+1. **Hook** (column 0) - Attention-grabbing opening points, surprising facts, or compelling questions
+2. **Problem** (column 1) - Pain points, challenges, issues, or problems being addressed
+3. **Solution** (column 2) - Proposed solutions, approaches, methods, or recommendations
+4. **Proof** (column 3) - Evidence, data, statistics, case studies, testimonials, or examples
+5. **CTA** (column 4) - Call-to-action, next steps, conclusions, or key takeaways
+
+For each point extracted, create a note with:
+- content: The key point (1-2 sentences, preserving the user's original phrasing where possible)
+- column: 0-4 (matching the framework above)
+- reasoning: A brief explanation of why you placed it in this column
+
+Also provide your creative thinking as a journal entry that explains your analysis process.
+
+Return JSON in this exact format:
+{
+  "topic": "Inferred presentation topic from the content",
+  "notes": [
+    {
+      "content": "The extracted point",
+      "column": 0,
+      "reasoning": "Why this belongs in Hook"
+    }
+  ],
+  "connections": [
+    { "fromIndex": 0, "toIndex": 1 }
+  ],
+  "journalEntry": {
+    "title": "Analyzing Your Content",
+    "narrative": "I read through your content and identified the core message about [topic]. The content naturally organizes into [X] key points. I noticed strong evidence in [area] and opportunities to strengthen [area]...",
+    "stage": "analyzing"
+  }
+}
+
+Important guidelines:
+- Extract ALL meaningful points from the content, don't skip important information
+- Preserve the user's voice and key phrases where possible
+- Create logical connections between related notes (e.g., problem → solution)
+- If content doesn't fit a column naturally, use your best judgment
+- Be thorough but avoid creating redundant notes`;
+
+export const CONTENT_DECONSTRUCTION_SCHEMA = {
+    type: Type.OBJECT,
+    properties: {
+        topic: { type: Type.STRING, description: "Inferred topic from the content" },
+        notes: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    content: { type: Type.STRING, description: "The extracted point" },
+                    column: { type: Type.NUMBER, description: "Column index 0-4" },
+                    reasoning: { type: Type.STRING, description: "Why this column" }
+                },
+                required: ["content", "column", "reasoning"]
+            }
+        },
+        connections: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    fromIndex: { type: Type.NUMBER },
+                    toIndex: { type: Type.NUMBER }
+                },
+                required: ["fromIndex", "toIndex"]
+            }
+        },
+        journalEntry: {
+            type: Type.OBJECT,
+            properties: {
+                title: { type: Type.STRING },
+                narrative: { type: Type.STRING },
+                stage: { type: Type.STRING }
+            },
+            required: ["title", "narrative", "stage"]
+        }
+    },
+    required: ["topic", "notes", "journalEntry"]
+};
+
+// ============================================================================
+// CREATIVE DIRECTOR'S JOURNAL PROMPTS
+// ============================================================================
+
+export const JOURNAL_NARRATIVE_PROMPTS = {
+    theme_selection: `Write a 2-3 sentence narrative explaining why you chose this theme. Be warm and collaborative, like a creative director explaining their vision to a client. Mention what you noticed about their content and why this theme fits. Example: "Looking at your content about [topic], I felt the [theme] aesthetic would really make your message shine. The [specific quality] captures the [mood/tone] you're going for..."`,
+
+    layout_decision: `Write a 2-3 sentence narrative explaining the layout choices. Describe the visual rhythm you created and why certain slides got certain layouts. Example: "I designed a visual flow that builds momentum—starting with a bold full-bleed to grab attention, then alternating between split and statement layouts to give your audience breathing room between key points..."`,
+
+    content_structure: `Write a 2-3 sentence narrative about how you structured the content flow. Explain the storytelling arc from Hook to CTA. Example: "Your presentation tells a compelling story: we open with a surprising hook about [topic], then walk through the challenges your audience faces before revealing your solution..."`,
+
+    image_direction: `Write a 2-3 sentence narrative about the visual direction for images. Describe the mood, style, and cohesion you're aiming for. Example: "For the imagery, I'm going with [style] to create a [mood] atmosphere throughout. Each image builds on the visual theme while highlighting the specific message of its slide..."`,
+
+    deconstruction_analysis: `Write a 2-3 sentence narrative about how you analyzed and organized the pasted content. Explain what patterns you found and how you structured them. Example: "I worked through your content and found [X] key themes emerging. The strongest evidence points naturally fall into the Proof column, while your core recommendations make compelling Solution points..."`
 };

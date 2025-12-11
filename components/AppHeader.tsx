@@ -4,7 +4,7 @@ import { Presentation, Theme } from '../types';
 import { THEMES } from '../lib/themes';
 import { CURATED_FONT_PAIRINGS } from '../lib/fonts';
 import { isPptxSafe, getThemeCompatibility } from '../lib/fontCompatibility';
-import { Sparkles, Palette, ChevronDown, Check, Play, Shuffle, LayoutTemplate, Type, Search, Home, Loader2, Cloud, FileSpreadsheet } from 'lucide-react';
+import { Sparkles, Palette, ChevronDown, Check, Play, Shuffle, LayoutTemplate, Type, Search, Home, Loader2, Cloud, FileSpreadsheet, Copy } from 'lucide-react';
 import { ExportMenu } from './export';
 import { ModeSwitcher } from './ModeSwitcher';
 import { ArchetypePicker } from './ArchetypePicker';
@@ -26,6 +26,7 @@ interface AppHeaderProps {
     setIsPresenting: (v: boolean) => void;
     onSave?: () => void;
     onClose?: () => void;
+    onClone?: () => void;
     onShuffleLayout?: () => void;
     onExportDeck?: () => void;
     saveStatus?: 'idle' | 'saving' | 'saved';
@@ -119,6 +120,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     setIsPresenting,
     onSave,
     onClose,
+    onClone,
     onShuffleLayout,
     onExportDeck,
     saveStatus = 'idle',
@@ -266,6 +268,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
                         <div className="flex items-center gap-2">
                             <button onClick={() => setIsPresenting(true)} className="p-2 hover:bg-white/10 text-white/60 hover:text-[#c5a47e] transition-colors duration-150" title="Start Presentation (Rehearsal Mode)"><Play className="w-5 h-5" /></button>
+                            {onClone && (
+                                <button onClick={onClone} className="p-2 hover:bg-white/10 text-white/60 hover:text-[#c5a47e] transition-colors duration-150" title="Clone Deck"><Copy className="w-5 h-5" /></button>
+                            )}
                             <ExportMenu
                                 presentation={currentPresentation}
                                 theme={activeTheme}

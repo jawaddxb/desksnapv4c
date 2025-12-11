@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Slide, Theme, Presentation, ImageStylePreset } from '../types';
 import { RotateCw, Wand2, Layers } from 'lucide-react';
 import { WabiSabiStage } from './WabiSabiStage';
@@ -12,6 +12,7 @@ import { SlideContentEditor } from './SlideContentEditor';
 import { LayoutToolbar } from './LayoutToolbar';
 import { Dashboard } from './Dashboard';
 import { SpeakerNotesPanel } from './SpeakerNotesPanel';
+import { generateHolisticImageSuggestions } from '../services/geminiService';
 
 interface MainStageProps {
   slide: Slide | null;
@@ -30,9 +31,13 @@ interface MainStageProps {
   savedDecks?: Presentation[];
   onLoadDeck?: (id: string) => void;
   onDeleteDeck?: (id: string) => void;
+  onCloneDeck?: (id: string) => void;
   onCreateDeck?: () => void;
   onImport?: (file: File) => void;
   onIdeate?: () => void;
+  // Presentation context for image prompt toolbar
+  presentation?: Presentation | null;
+  activeSlideIndex?: number;
 }
 
 export const MainStage: React.FC<MainStageProps> = ({
@@ -50,13 +55,27 @@ export const MainStage: React.FC<MainStageProps> = ({
     savedDecks = [],
     onLoadDeck,
     onDeleteDeck,
+    onCloneDeck,
     onCreateDeck,
     onImport,
-    onIdeate
+    onIdeate,
+    presentation,
+    activeSlideIndex = 0
 }) => {
   // Speaker Notes Panel state
   const [showNotesPanel, setShowNotesPanel] = useState(false);
   const toggleNotesPanel = () => setShowNotesPanel(prev => !prev);
+
+  // Generate suggestions callback for the image prompt toolbar
+  const handleGenerateSuggestions = useCallback(async (): Promise<string[]> => {
+    if (!presentation) return [];
+    return generateHolisticImageSuggestions(presentation, activeSlideIndex);
+  }, [presentation, activeSlideIndex]);
+
+  // Regenerate image handler
+  const handleRegenerateImage = useCallback(() => {
+    onRegenerateSlide?.('same');
+  }, [onRegenerateSlide]);
 
   // 1. Dashboard (Empty State Replaced)
   if (!slide) {
@@ -65,6 +84,7 @@ export const MainStage: React.FC<MainStageProps> = ({
             savedDecks={savedDecks}
             onLoad={onLoadDeck || (() => {})}
             onDelete={onDeleteDeck || (() => {})}
+            onClone={onCloneDeck}
             onCreateNew={onCreateDeck || (() => {})}
             onImport={onImport || (() => {})}
             onIdeate={onIdeate}
@@ -83,6 +103,9 @@ export const MainStage: React.FC<MainStageProps> = ({
                 onUpdateSlide={onUpdateSlide}
                 printMode={printMode}
                 onToggleNotes={toggleNotesPanel}
+                presentation={presentation}
+                onRegenerateImage={handleRegenerateImage}
+                onGenerateSuggestions={handleGenerateSuggestions}
             />
             {/* Speaker Notes Panel - works in both modes */}
             {showNotesPanel && !printMode && onUpdateSlide && (
@@ -131,6 +154,9 @@ export const MainStage: React.FC<MainStageProps> = ({
                 onEnhanceImage={onEnhanceImage}
                 isRefining={isRefining}
                 onToggleNotes={toggleNotesPanel}
+                presentation={presentation}
+                onRegenerateImage={handleRegenerateImage}
+                onGenerateSuggestions={handleGenerateSuggestions}
             />
         )}
 

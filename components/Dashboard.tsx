@@ -1,26 +1,52 @@
 
 import React, { useRef, useState } from 'react';
 import { Presentation } from '../types';
+import { IdeationSession } from '../types/ideation';
 import { THEMES } from '../lib/themes';
 import { WabiSabiStage } from './WabiSabiStage';
-import { Plus, Trash2, Clock, Play, Upload, BarChart2, Lightbulb } from 'lucide-react';
+import { Plus, Trash2, Clock, Play, Upload, BarChart2, Lightbulb, FileText, Sparkles, Copy } from 'lucide-react';
 import { AnalyticsModal } from './AnalyticsModal';
+import { IdeationHistoryPanel } from './ideation/IdeationHistoryPanel';
+
+type DashboardTab = 'decks' | 'ideations';
 
 interface DashboardProps {
     savedDecks: Presentation[];
+    savedIdeations?: IdeationSession[];
+    isLoadingIdeations?: boolean;
     onLoad: (id: string) => void;
     onDelete: (id: string) => void;
+    onClone?: (id: string) => void;
     onCreateNew: () => void;
     onImport: (file: File) => void;
     onIdeate?: () => void;
+    onLoadIdeation?: (id: string) => void;
+    onDeleteIdeation?: (id: string) => void;
+    onGenerateDeckFromIdeation?: (id: string) => void;
+    onViewJournal?: (id: string) => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ savedDecks, onLoad, onDelete, onCreateNew, onImport, onIdeate }) => {
+export const Dashboard: React.FC<DashboardProps> = ({
+    savedDecks,
+    savedIdeations = [],
+    isLoadingIdeations = false,
+    onLoad,
+    onDelete,
+    onClone,
+    onCreateNew,
+    onImport,
+    onIdeate,
+    onLoadIdeation,
+    onDeleteIdeation,
+    onGenerateDeckFromIdeation,
+    onViewJournal,
+}) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [analyticsDeck, setAnalyticsDeck] = useState<Presentation | null>(null);
+    const [activeTab, setActiveTab] = useState<DashboardTab>('decks');
 
     const handleImportClick = () => fileInputRef.current?.click();
-    
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -37,111 +63,184 @@ export const Dashboard: React.FC<DashboardProps> = ({ savedDecks, onLoad, onDele
             )}
 
             <div className="max-w-7xl mx-auto">
-                <div className="flex items-center justify-between mb-12">
+                {/* Header with tabs */}
+                <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-light text-white mb-2">My Decks</h1>
-                        <p className="text-white/60">Manage your generated presentations</p>
+                        {/* Tab navigation */}
+                        <div className="flex gap-1 mb-2">
+                            <button
+                                onClick={() => setActiveTab('decks')}
+                                className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all duration-150 ${
+                                    activeTab === 'decks'
+                                        ? 'bg-white text-black'
+                                        : 'bg-transparent text-white/60 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                <FileText className="w-4 h-4" />
+                                My Decks
+                                <span className="px-2 py-0.5 text-[10px] bg-black/20 rounded-sm">
+                                    {savedDecks.length}
+                                </span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('ideations')}
+                                className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all duration-150 ${
+                                    activeTab === 'ideations'
+                                        ? 'bg-[#c5a47e] text-black'
+                                        : 'bg-transparent text-white/60 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                <Sparkles className="w-4 h-4" />
+                                Ideations
+                                <span className="px-2 py-0.5 text-[10px] bg-black/20 rounded-sm">
+                                    {savedIdeations.length}
+                                </span>
+                            </button>
+                        </div>
+                        <p className="text-white/60">
+                            {activeTab === 'decks'
+                                ? 'Manage your generated presentations'
+                                : 'Revisit and develop your brainstorming sessions'}
+                        </p>
                     </div>
                     <div className="flex gap-3">
-                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
-                        <button
-                            onClick={handleImportClick}
-                            className="flex items-center gap-2 bg-black hover:bg-white/5 text-white border border-white/20 hover:border-white/40 px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
-                        >
-                            <Upload className="w-4 h-4" />
-                            Import
-                        </button>
-                        {onIdeate && (
+                        {activeTab === 'decks' ? (
+                            <>
+                                <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
+                                <button
+                                    onClick={handleImportClick}
+                                    className="flex items-center gap-2 bg-black hover:bg-white/5 text-white border border-white/20 hover:border-white/40 px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
+                                >
+                                    <Upload className="w-4 h-4" />
+                                    Import
+                                </button>
+                                {onIdeate && (
+                                    <button
+                                        onClick={onIdeate}
+                                        className="flex items-center gap-2 bg-[#c5a47e] hover:bg-white text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
+                                    >
+                                        <Lightbulb className="w-4 h-4" />
+                                        Ideate
+                                    </button>
+                                )}
+                                <button
+                                    onClick={onCreateNew}
+                                    className="flex items-center gap-2 bg-white hover:bg-[#c5a47e] text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    New Deck
+                                </button>
+                            </>
+                        ) : (
                             <button
                                 onClick={onIdeate}
                                 className="flex items-center gap-2 bg-[#c5a47e] hover:bg-white text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
                             >
-                                <Lightbulb className="w-4 h-4" />
-                                Ideate
+                                <Plus className="w-4 h-4" />
+                                New Ideation
                             </button>
                         )}
-                        <button
-                            onClick={onCreateNew}
-                            className="flex items-center gap-2 bg-white hover:bg-[#c5a47e] text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
-                        >
-                            <Plus className="w-4 h-4" />
-                            New Deck
-                        </button>
                     </div>
                 </div>
 
-                {savedDecks.length === 0 ? (
-                    <div className="border border-dashed border-white/20 p-20 text-center flex flex-col items-center justify-center bg-black/50">
-                        <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
-                            <Plus className="w-8 h-8 text-white/40" />
+                {/* Content based on active tab */}
+                {activeTab === 'decks' ? (
+                    // Decks grid
+                    savedDecks.length === 0 ? (
+                        <div className="border border-dashed border-white/20 p-20 text-center flex flex-col items-center justify-center bg-black/50">
+                            <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
+                                <Plus className="w-8 h-8 text-white/40" />
+                            </div>
+                            <h3 className="text-xl font-light text-white mb-2">No Decks Yet</h3>
+                            <p className="text-white/60 mb-8 max-w-md mx-auto">Create your first presentation to get started. All your work will be automatically saved here.</p>
+                            <button onClick={onCreateNew} className="text-[#c5a47e] font-bold hover:text-white transition-colors duration-150">Start Creating &rarr;</button>
                         </div>
-                        <h3 className="text-xl font-light text-white mb-2">No Decks Yet</h3>
-                        <p className="text-white/60 mb-8 max-w-md mx-auto">Create your first presentation to get started. All your work will be automatically saved here.</p>
-                        <button onClick={onCreateNew} className="text-[#c5a47e] font-bold hover:text-white transition-colors duration-150">Start Creating &rarr;</button>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {savedDecks.map(deck => {
-                            const theme = THEMES[deck.themeId] || THEMES.neoBrutalist;
-                            const coverSlide = deck.slides?.[0];
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {savedDecks.map(deck => {
+                                const theme = THEMES[deck.themeId] || THEMES.neoBrutalist;
+                                const coverSlide = deck.slides?.[0];
 
-                            return (
-                                <div key={deck.id} className="group bg-[#1a1a1a] border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 flex flex-col overflow-hidden relative">
-                                    <div className="aspect-video w-full bg-black relative overflow-hidden cursor-pointer" onClick={() => onLoad(deck.id)}>
-                                        {/* Using WabiSabi renderer for high fidelity thumbnail */}
-                                        {coverSlide ? (
-                                            <div className="w-[800%] h-[800%] origin-top-left transform scale-[0.125] pointer-events-none select-none">
-                                                <WabiSabiStage
-                                                    slide={coverSlide}
-                                                    theme={theme}
-                                                    layoutStyle={deck.wabiSabiLayout}
-                                                    printMode={true}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                                                <span className="text-xs uppercase tracking-widest">No slides</span>
-                                            </div>
-                                        )}
-                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-150 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                            <div className="bg-[#c5a47e] text-black px-4 py-2 font-bold text-xs uppercase tracking-widest flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-150">
-                                                <Play className="w-3 h-3" fill="currentColor" /> Edit Deck
+                                return (
+                                    <div key={deck.id} className="group bg-[#1a1a1a] border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 flex flex-col overflow-hidden relative">
+                                        <div className="aspect-video w-full bg-black relative overflow-hidden cursor-pointer" onClick={() => onLoad(deck.id)}>
+                                            {/* Using WabiSabi renderer for high fidelity thumbnail */}
+                                            {coverSlide ? (
+                                                <div className="w-[800%] h-[800%] origin-top-left transform scale-[0.125] pointer-events-none select-none">
+                                                    <WabiSabiStage
+                                                        slide={coverSlide}
+                                                        theme={theme}
+                                                        layoutStyle={deck.wabiSabiLayout}
+                                                        printMode={true}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                                                    <span className="text-xs uppercase tracking-widest">No slides</span>
+                                                </div>
+                                            )}
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-150 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                                <div className="bg-[#c5a47e] text-black px-4 py-2 font-bold text-xs uppercase tracking-widest flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-150">
+                                                    <Play className="w-3 h-3" fill="currentColor" /> Edit Deck
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div className="p-5 flex flex-col flex-1">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="font-bold text-lg text-white line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150 cursor-pointer" onClick={() => onLoad(deck.id)}>{deck.topic}</h3>
-                                        </div>
-                                        <div className="flex items-center justify-between mt-auto">
-                                            <div className="flex items-center gap-4 text-[10px] text-white/40 font-bold uppercase tracking-widest">
-                                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(deck.lastModified).toLocaleDateString()}</span>
-                                                <span className="px-2 py-1 bg-white/5 text-white/60">{deck.slides.length} Slides</span>
+                                        <div className="p-5 flex flex-col flex-1">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <h3 className="font-bold text-lg text-white line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150 cursor-pointer" onClick={() => onLoad(deck.id)}>{deck.topic}</h3>
                                             </div>
+                                            <div className="flex items-center justify-between mt-auto">
+                                                <div className="flex items-center gap-4 text-[10px] text-white/40 font-bold uppercase tracking-widest">
+                                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(deck.lastModified).toLocaleDateString()}</span>
+                                                    <span className="px-2 py-1 bg-white/5 text-white/60">{deck.slides.length} Slides</span>
+                                                </div>
 
-                                            {/* Analytics Button */}
+                                                {/* Analytics Button */}
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setAnalyticsDeck(deck); }}
+                                                    className="p-2 text-white/40 hover:text-[#c5a47e] hover:bg-white/5 transition-colors duration-150"
+                                                    title="View Analytics"
+                                                >
+                                                    <BarChart2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Action buttons - top right */}
+                                        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-150 z-10">
+                                            {onClone && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); onClone(deck.id); }}
+                                                    className="p-2 bg-black/80 text-[#c5a47e] hover:bg-[#c5a47e]/20 hover:text-[#c5a47e] transition-all duration-150"
+                                                    title="Clone Deck"
+                                                >
+                                                    <Copy className="w-4 h-4" />
+                                                </button>
+                                            )}
                                             <button
-                                                onClick={(e) => { e.stopPropagation(); setAnalyticsDeck(deck); }}
-                                                className="p-2 text-white/40 hover:text-[#c5a47e] hover:bg-white/5 transition-colors duration-150"
-                                                title="View Analytics"
+                                                onClick={(e) => { e.stopPropagation(); onDelete(deck.id); }}
+                                                className="p-2 bg-black/80 text-red-400 hover:bg-red-500/20 hover:text-red-400 transition-all duration-150"
+                                                title="Delete Deck"
                                             >
-                                                <BarChart2 className="w-4 h-4" />
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </div>
-
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); onDelete(deck.id); }}
-                                        className="absolute top-3 right-3 p-2 bg-black/80 text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 hover:text-red-400 transition-all duration-150 z-10"
-                                        title="Delete Deck"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                );
+                            })}
+                        </div>
+                    )
+                ) : (
+                    // Ideations history panel
+                    <IdeationHistoryPanel
+                        ideations={savedIdeations}
+                        isLoading={isLoadingIdeations}
+                        onSelectIdeation={onLoadIdeation || (() => {})}
+                        onDeleteIdeation={onDeleteIdeation || (() => {})}
+                        onGenerateDeck={onGenerateDeckFromIdeation || (() => {})}
+                        onViewJournal={onViewJournal}
+                    />
                 )}
             </div>
         </div>

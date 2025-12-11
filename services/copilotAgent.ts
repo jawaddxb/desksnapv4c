@@ -11,10 +11,45 @@
 
 import { GoogleGenAI, Content, Part, FunctionCall } from '@google/genai';
 import { Message, MessageRole } from '../types';
-import { IdeationSession, ResearchResult, ThemeSuggestion, COLUMNS } from '../types/ideation';
+import { IdeationSession, ResearchResult, ThemeSuggestion, COLUMNS, JournalEntry, JournalStage } from '../types/ideation';
 import { THEMES, THEME_CATEGORIES } from '../config/themes';
 import { COPILOT_TOOLS } from '../lib/copilotTools';
 import { buildFullPrompt } from '../lib/copilotPrompts';
+
+// ============================================
+// JOURNAL ENTRY HELPERS
+// ============================================
+
+/**
+ * Create a journal entry with unique ID and timestamp
+ */
+function createJournalEntry(
+  stage: JournalStage,
+  title: string,
+  narrative: string,
+  options?: {
+    decision?: string;
+    alternatives?: string[];
+    confidence?: number;
+    relatedNoteIds?: string[];
+    relatedSlideIds?: string[];
+    toolsCalled?: string[];
+  }
+): JournalEntry {
+  return {
+    id: `journal-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    timestamp: Date.now(),
+    stage,
+    title,
+    narrative,
+    decision: options?.decision,
+    alternatives: options?.alternatives,
+    confidence: options?.confidence,
+    relatedNoteIds: options?.relatedNoteIds,
+    relatedSlideIds: options?.relatedSlideIds,
+    toolsCalled: options?.toolsCalled,
+  };
+}
 
 /**
  * Response from the agent loop
@@ -427,12 +462,20 @@ Return as JSON.`,
 }
 
 /**
+ * Extended theme suggestion with journal entry
+ */
+export interface ThemeSuggestionWithJournal extends ThemeSuggestion {
+  journalEntry: JournalEntry;
+}
+
+/**
  * Suggest a theme based on ideation session content.
  * FIRST STEP of the split conversion flow - analyzes content and suggests best theme.
+ * Now includes a Creative Director's Journal entry explaining the decision.
  */
 export async function suggestThemeForSession(
   session: IdeationSession
-): Promise<ThemeSuggestion> {
+): Promise<ThemeSuggestionWithJournal> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Build context from notes organized by column
@@ -511,27 +554,52 @@ Return JSON:
       suggestion.alternativeIds = suggestion.alternativeIds.filter(id => THEMES[id]);
     }
 
-    return suggestion;
+    // Create journal entry for theme selection
+    const theme = THEMES[suggestion.themeId];
+    const journalEntry = createJournalEntry(
+      'deciding',
+      'Selecting Your Visual Theme',
+      `Looking at your content about "${session.topic}", I felt the ${theme?.name || suggestion.themeId} aesthetic would really make your message shine. ${suggestion.reasoning}${suggestion.alternativeIds?.length ? ` I also considered ${suggestion.alternativeIds.map(id => THEMES[id]?.name || id).join(', ')} as alternatives.` : ''}`,
+      {
+        decision: theme?.name || suggestion.themeId,
+        alternatives: suggestion.alternativeIds?.map(id => THEMES[id]?.name || id),
+        confidence: 85,
+        relatedNoteIds: session.notes.map(n => n.id),
+      }
+    );
+
+    return {
+      ...suggestion,
+      journalEntry,
+    };
   } catch (error) {
     console.error('[suggestThemeForSession] Error:', error);
-    // Fallback suggestion
+    // Fallback suggestion with journal entry
+    const fallbackJournalEntry = createJournalEntry(
+      'deciding',
+      'Selecting Your Visual Theme',
+      `For "${session.topic}", I'm recommending the Executive theme - a professional, versatile choice that works well for most presentations. It has clean lines and a corporate aesthetic that gives your content authority.`,
+      {
+        decision: 'Executive',
+        alternatives: ['Startup', 'Minimalist', 'Swiss'],
+        confidence: 70,
+      }
+    );
+
     return {
       themeId: 'executive',
       reasoning: 'A professional, versatile theme suitable for most presentations.',
       visualStyleHint: 'Clean corporate photography with modern aesthetics',
       alternativeIds: ['startup', 'minimalist', 'swiss'],
+      journalEntry: fallbackJournalEntry,
     };
   }
 }
 
 /**
- * Convert session to deck plan WITH a pre-selected theme.
- * SECOND STEP of the split conversion flow - uses the user's confirmed theme choice.
+ * Deck plan result with journal entries
  */
-export async function convertSessionToDeckPlanWithTheme(
-  session: IdeationSession,
-  themeId: string
-): Promise<{
+export interface DeckPlanWithJournal {
   topic: string;
   slides: Array<{
     title: string;
@@ -543,7 +611,18 @@ export async function convertSessionToDeckPlanWithTheme(
   }>;
   themeId: string;
   visualStyle: string;
-}> {
+  journalEntries: JournalEntry[];
+}
+
+/**
+ * Convert session to deck plan WITH a pre-selected theme.
+ * SECOND STEP of the split conversion flow - uses the user's confirmed theme choice.
+ * Now includes Creative Director's Journal entries for layout and content decisions.
+ */
+export async function convertSessionToDeckPlanWithTheme(
+  session: IdeationSession,
+  themeId: string
+): Promise<DeckPlanWithJournal> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Get theme's bundled visual style
@@ -597,5 +676,50 @@ Return as JSON with structure:
   result.themeId = themeId;
   result.visualStyle = visualStyle;
 
-  return result;
+  // Generate journal entries for the deck plan
+  const journalEntries: JournalEntry[] = [];
+
+  // Layout decision journal entry
+  const layoutCounts: Record<string, number> = {};
+  result.slides.forEach((slide: { layoutType: string }) => {
+    layoutCounts[slide.layoutType] = (layoutCounts[slide.layoutType] || 0) + 1;
+  });
+  const layoutSummary = Object.entries(layoutCounts)
+    .map(([layout, count]) => `${count} ${layout}`)
+    .join(', ');
+
+  journalEntries.push(createJournalEntry(
+    'creating',
+    'Designing Your Visual Flow',
+    `I designed a ${result.slides.length}-slide presentation with a visual rhythm that keeps your audience engaged. The layout mix includes ${layoutSummary} layouts. I started with a ${result.slides[0]?.layoutType || 'statement'} layout to make a strong first impression, then varied the layouts to create visual interest while maintaining your message's flow.`,
+    {
+      decision: `${result.slides.length} slides with ${Object.keys(layoutCounts).length} layout types`,
+      relatedSlideIds: result.slides.map((_: unknown, i: number) => `slide-${i}`),
+    }
+  ));
+
+  // Content structure journal entry
+  journalEntries.push(createJournalEntry(
+    'creating',
+    'Structuring Your Content',
+    `Your presentation tells a compelling story: we open with "${result.slides[0]?.title || 'an introduction'}", build through the key points, and conclude with "${result.slides[result.slides.length - 1]?.title || 'a call to action'}". Each slide flows naturally from the last, creating a narrative arc that will resonate with your audience.`,
+    {
+      relatedNoteIds: session.notes.map(n => n.id),
+    }
+  ));
+
+  // Image direction journal entry
+  journalEntries.push(createJournalEntry(
+    'creating',
+    'Setting the Visual Direction',
+    `For the imagery, I'm using the ${theme.name} aesthetic with ${visualStyle}. This creates a cohesive visual language throughout your presentation. Each image is designed to reinforce the message of its slide while maintaining the overall professional look.`,
+    {
+      decision: visualStyle,
+    }
+  ));
+
+  return {
+    ...result,
+    journalEntries,
+  };
 }

@@ -1,11 +1,13 @@
 
 import React from 'react';
-import { Slide, Theme } from '../types';
+import { Slide, Theme, ContentType } from '../types';
 import { SmartText } from './SmartText';
 import { LayoutLayer } from '../lib/themes';
 import { PRNG } from '../lib/utils';
 import { TextRole, getTextConfigWithOverrides } from '../lib/wabiSabiText';
+import { applyFontScale } from '../lib/textPresets';
 import { useTextSelection } from '../contexts/TextSelectionContext';
+import { BulletRenderer } from './content';
 
 export interface ArchetypeProps {
     slide: Slide;
@@ -53,7 +55,7 @@ export const EditableTitle = ({
             value={slide.title}
             onChange={(val) => onUpdateSlide?.({ title: val })}
             readOnly={readOnly}
-            fontSize={slide.titleFontSize ?? config.preferredFontSize}
+            fontSize={applyFontScale(slide.titleFontSize ?? config.preferredFontSize, slide.fontScale)}
             lineHeight={config.lineHeight}
             fontWeight={titleStyle?.fontWeight}
             fontStyle={titleStyle?.fontStyle}
@@ -91,8 +93,9 @@ export const EditableContent = ({
     // Helper to get per-item or fallback styles
     const getItemStyle = (index: number) => {
         const itemStyle = slide.contentItemStyles?.[index];
+        const baseSize = itemStyle?.fontSize ?? slide.contentFontSize ?? config.preferredFontSize;
         return {
-            fontSize: itemStyle?.fontSize ?? slide.contentFontSize ?? config.preferredFontSize,
+            fontSize: applyFontScale(baseSize, slide.fontScale, 12, 48),
             fontWeight: itemStyle?.fontWeight ?? contentStyle?.fontWeight,
             fontStyle: itemStyle?.fontStyle ?? contentStyle?.fontStyle,
         };
@@ -109,16 +112,19 @@ export const EditableContent = ({
             {slide.content.map((item: string, i: number) => {
                 const isSelected = selection?.type === 'content' && selection.index === i;
                 const itemStyles = getItemStyle(i);
+                const contentType: ContentType = slide.contentType || 'bullets';
 
                 return (
                     <div
                         key={i}
                         className="flex gap-3 group relative items-start"
                     >
-                        {bullet && (
-                            <span
-                                className="mt-2.5 w-1 h-1 shrink-0 rounded-full opacity-60"
-                                style={{ backgroundColor: contrast.text }}
+                        {bullet && contentType !== 'plain' && (
+                            <BulletRenderer
+                                theme={theme}
+                                contentType={contentType}
+                                index={i}
+                                size={6}
                             />
                         )}
                         <div className="flex-1 relative">

@@ -5,7 +5,7 @@
  * Supports both sync (frontend Gemini) and async (backend Celery) modes.
  */
 
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Presentation, Slide } from '../../types';
 import {
@@ -13,6 +13,7 @@ import {
   refineImagePrompt,
   ensureApiKeySelection,
   RefinementFocus,
+  generatePresentationImagesWithAgent,
 } from '../../services/geminiService';
 import {
   generateAllImagesAsync,
@@ -21,6 +22,7 @@ import {
   BatchStatusResponse,
 } from '../../services/api/imageService';
 import { hasTokens } from '../../services/api/tokenManager';
+import { AgentLog } from '../../services/agents/types';
 
 /**
  * Feature flag for image generation mode.
@@ -29,6 +31,12 @@ import { hasTokens } from '../../services/api/tokenManager';
  * - 'auto': Use async if authenticated, sync otherwise
  */
 const IMAGE_GENERATION_MODE: 'sync' | 'async' | 'auto' = 'sync';
+
+/**
+ * Feature flag for intelligent agent-based image generation.
+ * When enabled, the agent validates and refines prompts before generating images.
+ */
+const USE_AGENT_MODE = true;
 
 /** Type for the updateSlide mutation */
 type UpdateSlideMutation = UseMutationResult<
@@ -54,11 +62,21 @@ export interface UseImageGenerationOptions {
   presentationId: string | null;
   /** Mutation to persist slide updates to API */
   updateSlideMutation: UpdateSlideMutation;
+  /** Callback for agent logs (final batch after completion) */
+  onAgentLogs?: (logs: AgentLog[]) => void;
+  /** Callback for real-time agent activity (single log as it happens) */
+  onAgentActivity?: (log: AgentLog) => void;
+  /** Callback when agent processing starts */
+  onAgentStart?: (totalSlides: number) => void;
+  /** Callback when agent processing completes */
+  onAgentComplete?: () => void;
+  /** Callback when an image is generated for a slide */
+  onImageGenerated?: (slideIndex: number, imageUrl: string) => void;
 }
 
 export interface UseImageGenerationReturn {
   /** Generate images for all slides with concurrency control */
-  generateAllImages: (slides: Slide[], style: string) => Promise<void>;
+  generateAllImages: (slides: Slide[], style: string, topic?: string) => Promise<void>;
   /** Generate a single slide's image */
   generateSingleImage: (index: number, prompt: string, style: string) => Promise<void>;
   /** Regenerate the current slide's image */
@@ -69,6 +87,10 @@ export interface UseImageGenerationReturn {
   regenerateAllImages: () => Promise<void>;
   /** Check if async mode is active */
   isAsyncMode: boolean;
+  /** Check if agent mode is active */
+  isAgentMode: boolean;
+  /** Recent agent logs (for debugging) */
+  agentLogs: AgentLog[];
 }
 
 /** Concurrency limit for batch image generation (sync mode) */
@@ -93,9 +115,17 @@ export function useImageGeneration({
   updateSlide,
   presentationId,
   updateSlideMutation,
+  onAgentLogs,
+  onAgentActivity,
+  onAgentStart,
+  onAgentComplete,
+  onImageGenerated,
 }: UseImageGenerationOptions): UseImageGenerationReturn {
   // Track active polling
   const pollRef = useRef<{ stop: () => void } | null>(null);
+
+  // Store agent logs for debugging
+  const [agentLogs, setAgentLogs] = useState<AgentLog[]>([]);
 
   // Cleanup polling on unmount
   useEffect(() => {
@@ -107,6 +137,7 @@ export function useImageGeneration({
   }, []);
 
   const isAsyncMode = shouldUseAsyncMode();
+  const isAgentMode = USE_AGENT_MODE;
 
   /**
    * Generate a single slide's image (sync mode - frontend Gemini).
@@ -145,8 +176,9 @@ export function useImageGeneration({
 
   /**
    * Generate images for all slides (sync mode - frontend Gemini with concurrency).
+   * Basic mode without agent validation.
    */
-  const generateAllImagesSync = useCallback(
+  const generateAllImagesSyncBasic = useCallback(
     async (slides: Slide[], style: string) => {
       try {
         await ensureApiKeySelection();
@@ -169,6 +201,132 @@ export function useImageGeneration({
       }
     },
     [generateSingleImageSync]
+  );
+
+  /**
+   * Generate images for all slides using the intelligent agent system.
+   * The agent validates and refines prompts before generating images.
+   */
+  const generateAllImagesWithAgent = useCallback(
+    async (slides: Slide[], style: string, topic?: string) => {
+      if (!presentation) return;
+
+      // Capture values upfront to avoid stale closure issues after state updates
+      const presentationTopic = topic || presentation.topic;
+      const themeId = presentation.themeId;
+      const slidesCopy = [...slides]; // Copy of slides array for async callbacks
+
+      try {
+        await ensureApiKeySelection();
+
+        // Notify that agent processing is starting
+        onAgentStart?.(slides.length);
+
+        // Set all slides to loading
+        setPresentation((prev) =>
+          prev
+            ? {
+                ...prev,
+                slides: prev.slides.map((s) => ({ ...s, isImageLoading: true })),
+              }
+            : null
+        );
+
+        // Run agent-based generation
+        const result = await generatePresentationImagesWithAgent(
+          presentationTopic,
+          slides.map((s) => ({
+            title: s.title,
+            content: s.content,
+            imagePrompt: s.imagePrompt,
+          })),
+          style,
+          themeId,
+          {
+            onLog: (log) => {
+              console.log(`[Agent] Slide ${log.slideIndex}: ${log.action}`, log);
+              // Emit real-time activity for UI display
+              onAgentActivity?.(log);
+            },
+            onImageGenerated: async (index, imageUrl) => {
+              // Update local state immediately
+              updateSlideAtIndex(index, {
+                imageUrl,
+                isImageLoading: false,
+                imageError: undefined,
+              });
+
+              // Notify parent hook of image generation for UI display
+              onImageGenerated?.(index, imageUrl);
+
+              // Persist to API using the captured slide reference
+              const slide = slidesCopy[index];
+              if (slide && presentationId) {
+                try {
+                  await updateSlideMutation.mutateAsync({
+                    presentationId,
+                    slideId: slide.id,
+                    updates: { imageUrl },
+                  });
+                } catch (apiError) {
+                  console.warn('Failed to persist image URL to API:', apiError);
+                }
+              }
+            },
+            onImageError: (index, error) => {
+              updateSlideAtIndex(index, {
+                isImageLoading: false,
+                imageError: error.message,
+              });
+            },
+          }
+        );
+
+        // Store agent logs for debugging
+        setAgentLogs(result.agentLogs);
+        onAgentLogs?.(result.agentLogs);
+
+        // Notify that agent processing is complete
+        onAgentComplete?.();
+
+        console.log(
+          `[Agent] Completed in ${result.totalDurationMs}ms. Errors: ${result.errors.length}`
+        );
+      } catch (e) {
+        console.error('Agent generation error', e);
+        // Notify completion even on error
+        onAgentComplete?.();
+        // Reset loading states on error
+        setPresentation((prev) =>
+          prev
+            ? {
+                ...prev,
+                slides: prev.slides.map((s) => ({
+                  ...s,
+                  isImageLoading: false,
+                  imageError: 'Failed to generate images',
+                })),
+              }
+            : null
+        );
+      }
+    },
+    [presentation, setPresentation, updateSlideAtIndex, presentationId, updateSlideMutation, onAgentLogs, onAgentActivity, onAgentStart, onAgentComplete, onImageGenerated]
+  );
+
+  /**
+   * Generate images for all slides (sync mode).
+   * Uses agent if enabled, otherwise uses basic generation.
+   */
+  const generateAllImagesSync = useCallback(
+    async (slides: Slide[], style: string, topic?: string) => {
+      if (USE_AGENT_MODE) {
+        await generateAllImagesWithAgent(slides, style, topic);
+      } else {
+        await generateAllImagesSyncBasic(slides, style);
+      }
+    },
+    [generateAllImagesWithAgent, generateAllImagesSyncBasic]
   );
 
   /**
@@ -339,10 +497,17 @@ export function useImageGeneration({
 
   /**
    * Remix all images with random refinement focuses.
-   * Note: This always uses sync mode for prompt refinement, then generates.
+   * Applies stylistic variations in parallel, then uses agent-based generation
+   * to validate prompts against the topic before generating images.
    */
   const remixDeck = useCallback(async () => {
     if (!presentation || isGenerating) return;
+
+    // Capture values upfront to avoid stale closure issues
+    const currentSlides = presentation.slides;
+    const currentStyle = presentation.visualStyle;
+    const currentTopic = presentation.topic;
+    const currentThemeId = presentation.themeId;
 
     try {
       await ensureApiKeySelection();
@@ -358,30 +523,47 @@ export function useImageGeneration({
           : null
       );
 
-      const slides = [...presentation.slides];
-      for (const [index, slide] of slides.entries()) {
-        try {
+      // Step 1: Apply stylistic refinements to all prompts in parallel
+      const refinedSlides = await Promise.all(
+        currentSlides.map(async (slide) => {
           const randomFocus = focuses[Math.floor(Math.random() * focuses.length)];
           const newPrompt = await refineImagePrompt(slide.imagePrompt, randomFocus);
+          return {
+            ...slide,
+            imagePrompt: newPrompt,
+          };
+        })
+      );
 
-          // Update the prompt
-          setPresentation((prev) => {
-            if (!prev) return null;
-            const s = [...prev.slides];
-            s[index] = { ...s[index], imagePrompt: newPrompt };
-            return { ...prev, slides: s };
-          });
+      // Update prompts in state
+      setPresentation((prev) =>
+        prev ? { ...prev, slides: refinedSlides } : null
+      );
 
-          // Generate the new image (uses current mode)
-          await generateSingleImage(index, newPrompt, presentation.visualStyle);
-        } catch (e) {
-          console.error(e);
-        }
+      // Step 2: Use agent-based generation (validates and regenerates)
+      // This ensures remixed prompts are still topic-relevant
+      // Pass captured values to avoid stale closure issues
+      if (USE_AGENT_MODE) {
+        await generateAllImagesWithAgent(refinedSlides, currentStyle, currentTopic);
+      } else {
+        await generateAllImagesSyncBasic(refinedSlides, currentStyle);
       }
     } catch (e) {
-      console.error(e);
+      console.error('Remix deck error', e);
+      // Reset loading states on error
+      setPresentation((prev) =>
+        prev
+          ? {
+              ...prev,
+              slides: prev.slides.map((s) => ({
+                ...s,
+                isImageLoading: false,
+              })),
+            }
+          : null
+      );
     }
-  }, [presentation, isGenerating, setPresentation, generateSingleImage]);
+  }, [presentation, isGenerating, setPresentation, generateAllImagesWithAgent, generateAllImagesSyncBasic]);
 
   /**
    * Regenerate all images in the current presentation.
@@ -398,6 +580,8 @@ export function useImageGeneration({
     remixDeck,
     regenerateAllImages,
     isAsyncMode,
+    isAgentMode,
+    agentLogs,
   };
 }
 

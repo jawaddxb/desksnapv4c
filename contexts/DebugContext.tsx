@@ -13,12 +13,19 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import { AgentLog } from '../services/agents/types';
 
 // ============ Constants ============
 
 const STORAGE_KEY = 'decksnap_debug_ui';
 
 // ============ Types ============
+
+/** Slide info for agent activity panel */
+export interface SlideInfo {
+  index: number;
+  title: string;
+}
 
 export interface DebugState {
   /** Whether debug mode is available (based on VITE_DEBUG_MODE env var) */
@@ -27,6 +34,20 @@ export interface DebugState {
   isDebugUIEnabled: boolean;
   /** Whether dev toolbar is visible */
   showDevToolbar: boolean;
+  /** Agent logs by presentation ID */
+  agentLogs: Map<string, AgentLog[]>;
+  /** Current agent activity (real-time) */
+  currentAgentActivity: AgentLog | null;
+  /** Whether agent is actively processing */
+  isAgentActive: boolean;
+  /** Total slides being processed */
+  agentTotalSlides: number;
+  /** Slides completed so far */
+  agentCompletedSlides: number;
+  /** Slide info for all slides being processed */
+  agentSlides: SlideInfo[];
+  /** Generated image URLs by slide index */
+  generatedImages: Map<number, string>;
 }
 
 export interface DebugActions {
@@ -40,6 +61,24 @@ export interface DebugActions {
   setDevToolbarVisible: (visible: boolean) => void;
   /** Clear all debug-related localStorage */
   clearDebugStorage: () => void;
+  /** Set agent logs for a presentation */
+  setAgentLogs: (presentationId: string, logs: AgentLog[]) => void;
+  /** Get agent logs for a presentation */
+  getAgentLogs: (presentationId: string) => AgentLog[];
+  /** Clear agent logs for a presentation */
+  clearAgentLogs: (presentationId: string) => void;
+  /** Set current agent activity (real-time display) */
+  setCurrentActivity: (log: AgentLog | null) => void;
+  /** Start agent processing with total slide count and slide info */
+  startAgentProcessing: (totalSlides: number, slides?: SlideInfo[]) => void;
+  /** Update agent progress */
+  updateAgentProgress: (completedSlides: number) => void;
+  /** Stop agent processing */
+  stopAgentProcessing: () => void;
+  /** Record a generated image URL for a slide */
+  recordGeneratedImage: (slideIndex: number, imageUrl: string) => void;
+  /** Clear all generated images */
+  clearGeneratedImages: () => void;
 }
 
 export interface DebugContextValue extends DebugState {
@@ -80,6 +119,17 @@ export const DebugProvider: React.FC<DebugProviderProps> = ({ children }) => {
       return false;
     }
   });
+
+  // Agent logs storage
+  const [agentLogs, setAgentLogsState] = useState<Map<string, AgentLog[]>>(new Map());
+
+  // Real-time agent activity state
+  const [currentAgentActivity, setCurrentAgentActivityState] = useState<AgentLog | null>(null);
+  const [isAgentActive, setIsAgentActive] = useState(false);
+  const [agentTotalSlides, setAgentTotalSlides] = useState(0);
+  const [agentCompletedSlides, setAgentCompletedSlides] = useState(0);
+  const [agentSlides, setAgentSlides] = useState<SlideInfo[]>([]);
+  const [generatedImages, setGeneratedImages] = useState<Map<number, string>>(new Map());
 
   // Persist debug UI state to localStorage
   useEffect(() => {
@@ -139,6 +189,71 @@ export const DebugProvider: React.FC<DebugProviderProps> = ({ children }) => {
     }
   }, []);
 
+  // Agent logs actions
+  const setAgentLogs = useCallback((presentationId: string, logs: AgentLog[]) => {
+    setAgentLogsState(prev => {
+      const next = new Map(prev);
+      next.set(presentationId, logs);
+      return next;
+    });
+  }, []);
+
+  const getAgentLogs = useCallback((presentationId: string): AgentLog[] => {
+    return agentLogs.get(presentationId) || [];
+  }, [agentLogs]);
+
+  const clearAgentLogs = useCallback((presentationId: string) => {
+    setAgentLogsState(prev => {
+      const next = new Map(prev);
+      next.delete(presentationId);
+      return next;
+    });
+  }, []);
+
+  // Real-time agent activity actions
+  const setCurrentActivity = useCallback((log: AgentLog | null) => {
+    setCurrentAgentActivityState(log);
+  }, []);
+
+  const startAgentProcessing = useCallback((totalSlides: number, slides?: SlideInfo[]) => {
+    setIsAgentActive(true);
+    setAgentTotalSlides(totalSlides);
+    setAgentCompletedSlides(0);
+    setCurrentAgentActivityState(null);
+    setAgentSlides(slides || []);
+    setGeneratedImages(new Map());
+  }, []);
+
+  const updateAgentProgress = useCallback((completedSlides: number) => {
+    setAgentCompletedSlides(completedSlides);
+  }, []);
+
+  const stopAgentProcessing = useCallback(() => {
+    setIsAgentActive(false);
+    setCurrentAgentActivityState(null);
+    // Keep total/completed for summary display, reset after delay
+    setTimeout(() => {
+      setAgentTotalSlides(0);
+      setAgentCompletedSlides(0);
+      setAgentSlides([]);
+      setGeneratedImages(new Map());
+    }, 3000);
+  }, []);
+
+  const recordGeneratedImage = useCallback((slideIndex: number, imageUrl: string) => {
+    setGeneratedImages(prev => {
+      const next = new Map(prev);
+      next.set(slideIndex, imageUrl);
+      return next;
+    });
+    // Also increment completed slides counter
+    setAgentCompletedSlides(prev => prev + 1);
+  }, []);
+
+  const clearGeneratedImages = useCallback(() => {
+    setGeneratedImages(new Map());
+  }, []);
+
   // Memoize actions
   const actions = useMemo<DebugActions>(() => ({
     toggleDebugUI,
@@ -146,15 +261,31 @@ export const DebugProvider: React.FC<DebugProviderProps> = ({ children }) => {
     toggleDevToolbar,
     setDevToolbarVisible,
     clearDebugStorage,
-  }), [toggleDebugUI, setDebugUIEnabledAction, toggleDevToolbar, setDevToolbarVisible, clearDebugStorage]);
+    setAgentLogs,
+    getAgentLogs,
+    clearAgentLogs,
+    setCurrentActivity,
+    startAgentProcessing,
+    updateAgentProgress,
+    stopAgentProcessing,
+    recordGeneratedImage,
+    clearGeneratedImages,
+  }), [toggleDebugUI, setDebugUIEnabledAction, toggleDevToolbar, setDevToolbarVisible, clearDebugStorage, setAgentLogs, getAgentLogs, clearAgentLogs, setCurrentActivity, startAgentProcessing, updateAgentProgress, stopAgentProcessing, recordGeneratedImage, clearGeneratedImages]);
 
   // Memoize context value
   const value = useMemo<DebugContextValue>(() => ({
     isDebugModeAvailable,
     isDebugUIEnabled: isDebugModeAvailable && isDebugUIEnabled,
     showDevToolbar: isDebugModeAvailable && showDevToolbar,
+    agentLogs,
+    currentAgentActivity,
+    isAgentActive,
+    agentTotalSlides,
+    agentCompletedSlides,
+    agentSlides,
+    generatedImages,
     actions,
-  }), [isDebugModeAvailable, isDebugUIEnabled, showDevToolbar, actions]);
+  }), [isDebugModeAvailable, isDebugUIEnabled, showDevToolbar, agentLogs, currentAgentActivity, isAgentActive, agentTotalSlides, agentCompletedSlides, agentSlides, generatedImages, actions]);
 
   return (
     <DebugContext.Provider value={value}>

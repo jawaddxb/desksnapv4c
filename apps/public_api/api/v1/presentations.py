@@ -19,6 +19,12 @@ from packages.common.schemas.presentation import (
     PresentationImport,
     PresentationExport,
 )
+from packages.common.schemas.presentation_version import (
+    VersionCreate,
+    VersionResponse,
+    VersionDetailResponse,
+    VersionListResponse,
+)
 from packages.common.schemas.auth import MessageResponse
 from packages.common.services.presentation_service import (
     get_presentation_by_id,
@@ -33,6 +39,13 @@ from packages.common.services.presentation_service import (
     get_slide_by_id,
     import_presentation,
     export_presentation,
+)
+from packages.common.services.version_service import (
+    create_version,
+    list_versions,
+    get_version,
+    restore_version,
+    delete_version,
 )
 from packages.common.services.authorization_service import (
     require_presentation_ownership,
@@ -253,3 +266,123 @@ def delete_existing_slide(
 
     delete_slide(db, slide)
     return MessageResponse(message="Slide deleted successfully")
+
+
+# Version History operations
+@router.get(
+    "/{presentation_id}/versions",
+    response_model=VersionListResponse,
+    summary="List versions",
+    description="Get all version checkpoints for a presentation",
+)
+def list_presentation_versions(
+    presentation_id: uuid.UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> VersionListResponse:
+    """List all versions for a presentation"""
+    presentation = get_presentation_by_id(db, presentation_id)
+    require_presentation_ownership(presentation, current_user)
+    return list_versions(db, presentation_id)
+
+
+@router.post(
+    "/{presentation_id}/versions",
+    response_model=VersionResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create version checkpoint",
+    description="Save the current state as a new version checkpoint",
+)
+def create_version_checkpoint(
+    presentation_id: uuid.UUID,
+    data: VersionCreate,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> VersionResponse:
+    """Create a new version checkpoint"""
+    presentation = get_presentation_by_id(db, presentation_id)
+    presentation = require_presentation_ownership(presentation, current_user)
+    version = create_version(db, presentation, data)
+    return VersionResponse.model_validate(version)
+
+
+@router.get(
+    "/{presentation_id}/versions/{version_id}",
+    response_model=VersionDetailResponse,
+    summary="Get version details",
+    description="Get a specific version with full snapshot data",
+)
+def get_version_detail(
+    presentation_id: uuid.UUID,
+    version_id: uuid.UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> VersionDetailResponse:
+    """Get version details with snapshot"""
+    presentation = get_presentation_by_id(db, presentation_id)
+    require_presentation_ownership(presentation, current_user)
+
+    version = get_version(db, version_id)
+    if not version or version.presentation_id != presentation_id:
+        raise NotFoundError(
+            message="Version not found",
+            resource_type="version",
+            resource_id=str(version_id),
+        )
+    return VersionDetailResponse.model_validate(version)
+
+
+@router.post(
+    "/{presentation_id}/versions/{version_id}/restore",
+    response_model=MessageResponse,
+    summary="Restore to version",
+    description="Restore the presentation to a specific version checkpoint",
+)
+def restore_to_version(
+    presentation_id: uuid.UUID,
+    version_id: uuid.UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> MessageResponse:
+    """Restore presentation to a specific version"""
+    presentation = get_presentation_by_id(db, presentation_id)
+    presentation = require_presentation_ownership(presentation, current_user)
+
+    version = get_version(db, version_id)
+    if not version or version.presentation_id != presentation_id:
+        raise NotFoundError(
+            message="Version not found",
+            resource_type="version",
+            resource_id=str(version_id),
+        )
+
+    restore_version(db, presentation, version)
+    return MessageResponse(message=f"Restored to version {version.version_number}")
+
+
+@router.delete(
+    "/{presentation_id}/versions/{version_id}",
+    response_model=MessageResponse,
+    summary="Delete version",
+    description="Delete a specific version checkpoint",
+)
+def delete_version_checkpoint(
+    presentation_id: uuid.UUID,
+    version_id: uuid.UUID,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> MessageResponse:
+    """Delete a version checkpoint"""
+    presentation = get_presentation_by_id(db, presentation_id)
+    require_presentation_ownership(presentation, current_user)
+
+    version = get_version(db, version_id)
+    if not version or version.presentation_id != presentation_id:
+        raise NotFoundError(
+            message="Version not found",
+            resource_type="version",
+            resource_id=str(version_id),
+        )
+
+    delete_version(db, version)
+    return MessageResponse(message="Version deleted successfully")

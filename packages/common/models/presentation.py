@@ -74,6 +74,12 @@ class Presentation(BaseModel):
         cascade="all, delete-orphan",
         order_by="Slide.position",
     )
+    versions = relationship(
+        "PresentationVersion",
+        back_populates="presentation",
+        cascade="all, delete-orphan",
+        order_by="PresentationVersion.version_number.desc()",
+    )
 
     def __repr__(self) -> str:
         return f"<Presentation {self.topic[:30]}>"

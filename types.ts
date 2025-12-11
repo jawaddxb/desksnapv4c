@@ -12,6 +12,28 @@ export type FontScale = typeof FONT_SCALES[number];
 export const LAYOUT_VARIANTS = ['default', 'inverted'] as const;
 export type LayoutVariant = typeof LAYOUT_VARIANTS[number] | number;
 
+// Content types (user-selectable per slide)
+export const CONTENT_TYPES = ['bullets', 'numbered', 'checkmarks', 'quotes', 'plain'] as const;
+export type ContentType = typeof CONTENT_TYPES[number];
+
+// Bullet marker styles (theme-defined)
+export const BULLET_STYLES = ['dot', 'dash', 'arrow', 'check', 'square', 'circle', 'diamond', 'number', 'none'] as const;
+export type BulletStyle = typeof BULLET_STYLES[number];
+
+// Theme content styling configuration
+export interface ThemeContentStyle {
+  bulletStyle: BulletStyle;
+  bulletSize?: number;           // 6-14px
+  bulletColor?: 'accent' | 'text' | 'secondary';
+  itemSpacing?: number;          // gap between items (8-20)
+  itemPadding?: string;          // e.g., "8px 16px"
+  itemBackground?: 'accent' | 'none';  // 'accent' = 15% opacity accent
+  itemBorderRadius?: string;     // "full", "8px", "0"
+  leftAccentBorder?: boolean;    // accent-colored left border
+  leftBorderWidth?: number;      // width of left border (2-4px)
+  numberedSuffix?: '.' | ')' | '';
+}
+
 // Style override types for editing
 export interface TextStyleOverride {
   fontWeight?: number;
@@ -72,6 +94,8 @@ export interface Slide {
   imageStyles?: ImageStyleOverride;
   // Per-item content styles (indexed by content array position)
   contentItemStyles?: Record<number, ContentItemStyle>;
+  // Content display type (user-selectable)
+  contentType?: ContentType;
 }
 
 export interface AnalyticsSession {
@@ -155,9 +179,11 @@ export interface Theme {
     borderWidth: string;
     shadow: string;
     headingTransform: 'uppercase' | 'none' | 'lowercase' | 'capitalize';
-    headingWeight: string; 
+    headingWeight: string;
   };
   imageStyle: string;
+  // Content/bullet styling (theme-driven variety)
+  contentStyle?: ThemeContentStyle;
 }
 
 export type GenerationMode = 'concise' | 'balanced' | 'detailed' | 'verbatim';

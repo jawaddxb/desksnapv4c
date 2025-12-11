@@ -64,6 +64,14 @@ export interface IdeationSession {
   stage: IdeationStage;
   createdAt: number;
   lastModified: number;
+  // One-to-Many: decks generated from this ideation
+  generatedPresentationIds?: string[];
+  // Original pasted content (if user pasted content directly)
+  sourceContent?: string;
+  // AI thinking narrative
+  creativeJournal?: CreativeJournal;
+  // API sync state
+  syncStatus?: 'synced' | 'pending' | 'error';
 }
 
 /**
@@ -121,6 +129,190 @@ export interface ThemeSuggestion {
   reasoning: string;         // Why this theme fits the content
   visualStyleHint: string;   // Brief description of the visual direction
   alternativeIds?: string[]; // 2-3 other fitting themes from different categories
+}
+
+// ============================================================================
+// CREATIVE DIRECTOR'S JOURNAL
+// ============================================================================
+
+/**
+ * Stage of the AI's creative process
+ */
+export type JournalStage = 'analyzing' | 'exploring' | 'deciding' | 'creating' | 'refining';
+
+/**
+ * A single entry in the Creative Director's Journal.
+ * Captures AI thinking at a specific decision point.
+ */
+export interface JournalEntry {
+  id: string;
+  timestamp: number;
+  stage: JournalStage;
+  title: string;              // e.g., "Selecting Your Visual Theme"
+  narrative: string;          // Prose explanation of what AI did and why
+  decision?: string;          // The actual choice made
+  alternatives?: string[];    // What else was considered
+  confidence?: number;        // 0-100
+  relatedNoteIds?: string[];  // Notes this decision relates to
+  relatedSlideIds?: string[]; // Slides this decision relates to
+  toolsCalled?: string[];     // Tools invoked for this decision
+}
+
+/**
+ * The full Creative Director's Journal for an ideation session.
+ */
+export interface CreativeJournal {
+  entries: JournalEntry[];
+  summary?: string;           // AI-generated summary of the creative process
+}
+
+// ============================================================================
+// BACKEND API TYPES (snake_case for API communication)
+// ============================================================================
+
+/**
+ * Backend representation of IdeaNote
+ */
+export interface BackendIdeaNote {
+  id: string;
+  session_id: string;
+  content: string;
+  type: NoteType;
+  source_url?: string | null;
+  source_title?: string | null;
+  parent_id?: string | null;
+  column: number;
+  row: number;
+  color: NoteColor;
+  approved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Backend representation of NoteConnection
+ */
+export interface BackendNoteConnection {
+  id: string;
+  session_id: string;
+  from_note_id: string;
+  to_note_id: string;
+}
+
+/**
+ * Backend representation of Message
+ */
+export interface BackendMessage {
+  id: string;
+  session_id: string;
+  role: 'user' | 'model' | 'system';
+  text: string;
+  created_at: string;
+}
+
+/**
+ * Backend representation of JournalEntry
+ */
+export interface BackendJournalEntry {
+  id: string;
+  timestamp: number;
+  stage: JournalStage;
+  title: string;
+  narrative: string;
+  decision?: string | null;
+  alternatives?: string[] | null;
+  confidence?: number | null;
+  related_note_ids?: string[] | null;
+  related_slide_ids?: string[] | null;
+  tools_called?: string[] | null;
+}
+
+/**
+ * Backend representation of CreativeJournal
+ */
+export interface BackendCreativeJournal {
+  entries: BackendJournalEntry[];
+  summary?: string | null;
+}
+
+/**
+ * Backend representation of IdeationSession
+ */
+export interface BackendIdeationSession {
+  id: string;
+  owner_id: string;
+  topic: string;
+  stage: IdeationStage;
+  source_content?: string | null;
+  generated_presentation_ids: string[];
+  creative_journal?: BackendCreativeJournal | null;
+  created_at: string;
+  updated_at: string;
+  notes?: BackendIdeaNote[];
+  connections?: BackendNoteConnection[];
+  messages?: BackendMessage[];
+}
+
+/**
+ * Paginated response from backend
+ */
+export interface PaginatedIdeationResponse {
+  items: BackendIdeationSession[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+}
+
+/**
+ * Request to create a new ideation session
+ */
+export interface CreateIdeationRequest {
+  topic: string;
+  stage?: IdeationStage;
+  source_content?: string | null;
+  notes?: Omit<BackendIdeaNote, 'id' | 'session_id' | 'created_at' | 'updated_at'>[];
+  creative_journal?: BackendCreativeJournal | null;
+}
+
+/**
+ * Request to update an ideation session
+ */
+export interface UpdateIdeationRequest {
+  topic?: string;
+  stage?: IdeationStage;
+  source_content?: string | null;
+  creative_journal?: BackendCreativeJournal | null;
+}
+
+/**
+ * Request to create a note
+ */
+export interface CreateNoteRequest {
+  content: string;
+  type: NoteType;
+  source_url?: string | null;
+  source_title?: string | null;
+  parent_id?: string | null;
+  column: number;
+  row: number;
+  color: NoteColor;
+  approved?: boolean;
+}
+
+/**
+ * Request to update a note
+ */
+export interface UpdateNoteRequest {
+  content?: string;
+  type?: NoteType;
+  source_url?: string | null;
+  source_title?: string | null;
+  parent_id?: string | null;
+  column?: number;
+  row?: number;
+  color?: NoteColor;
+  approved?: boolean;
 }
 
 // Helper functions

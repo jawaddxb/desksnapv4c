@@ -27,6 +27,7 @@ import {
   FileText,
   Search,
   Copy,
+  Sparkles,
 } from 'lucide-react';
 import { useDebug } from '../../contexts/DebugContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -566,6 +567,13 @@ function ServerDataInspector() {
 
 function DebugTools() {
   const tools = [
+    {
+      to: '/debug/image-agent',
+      icon: Sparkles,
+      title: 'Image Agent Inspector',
+      description: 'View agent reasoning, validation scores, and prompt refinements',
+      color: 'text-amber-400',
+    },
     {
       to: '/debug/thumbnails',
       icon: Image,

@@ -8,6 +8,8 @@ export { DebugRoute } from './DebugRoute';
 export { ThumbnailGenerator } from './ThumbnailGenerator';
 export { ComponentShowcase } from './ComponentShowcase';
 export { ThumbnailPreviewContainer } from './ThumbnailPreviewContainer';
+export { ImageAgentDebugPanel } from './ImageAgentDebugPanel';
+export { ImageAgentRoute } from './ImageAgentRoute';
 export { useThumbnailCapture, batchCapture } from './useThumbnailCapture';
 export { SAMPLE_SLIDE, SAMPLE_SLIDES, getSampleSlide } from './sampleSlideData';
 export type { CaptureOptions, CaptureResult, UseThumbnailCaptureReturn, BatchCaptureItem, BatchCaptureProgress } from './useThumbnailCapture';

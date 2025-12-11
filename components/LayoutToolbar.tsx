@@ -14,8 +14,9 @@ import {
   Bold, Italic, Plus, Minus, Image as ImageIcon,
   X, GripHorizontal, FileText,
 } from 'lucide-react';
-import { useDraggable, useSlideStyles, AIRefinementMenu, ToolbarButton } from './toolbar';
+import { useDraggable, useSlideStyles, AIRefinementMenu, ToolbarButton, ImagePromptMenu, ContentTypeSelector } from './toolbar';
 import { Divider } from './ui';
+import { Presentation } from '../types';
 
 interface LayoutToolbarProps {
   slide: Slide;
@@ -25,6 +26,10 @@ interface LayoutToolbarProps {
   onEnhanceImage?: (preset: ImageStylePreset) => Promise<void>;
   isRefining?: boolean;
   onToggleNotes?: () => void;
+  // Image prompt editing
+  presentation?: Presentation | null;
+  onRegenerateImage?: () => void;
+  onGenerateSuggestions?: () => Promise<string[]>;
 }
 
 export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
@@ -35,6 +40,9 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
   onEnhanceImage,
   isRefining = false,
   onToggleNotes,
+  presentation,
+  onRegenerateImage,
+  onGenerateSuggestions,
 }) => {
   const [activeLabel, setActiveLabel] = useState<string>(mode === 'wabi-sabi' ? 'Text Styling' : 'Layout Designer');
   const isWabiSabi = mode === 'wabi-sabi';
@@ -222,6 +230,19 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
 
         <Divider orientation="vertical" className="h-6 mx-1" />
 
+        {/* CONTENT TYPE SELECTOR - Standard mode only */}
+        {!isWabiSabi && (
+          <>
+            <ContentTypeSelector
+              currentType={slide.contentType || 'bullets'}
+              onChange={(contentType) => onUpdateSlide({ contentType })}
+              onHoverStart={handleHoverStart}
+              onHoverEnd={handleHoverEnd}
+            />
+            <Divider orientation="vertical" className="h-6 mx-1" />
+          </>
+        )}
+
         {/* TEXT STYLE GROUP */}
         <div className="flex gap-1">
           <Button active={isBold} onClick={toggleBold} icon={Bold} label="Bold" />
@@ -262,6 +283,21 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
               onRefineContent={onRefineContent}
               onEnhanceImage={onEnhanceImage}
               isRefining={isRefining}
+            />
+          </>
+        )}
+
+        {/* IMAGE PROMPT MENU */}
+        {presentation && (
+          <>
+            <Divider orientation="vertical" className="h-6 mx-1" />
+            <ImagePromptMenu
+              slide={slide}
+              presentation={presentation}
+              onUpdateSlide={onUpdateSlide}
+              onRegenerateImage={onRegenerateImage}
+              isRegenerating={slide.isImageLoading}
+              onGenerateSuggestions={onGenerateSuggestions}
             />
           </>
         )}

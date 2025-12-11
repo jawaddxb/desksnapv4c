@@ -1,10 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Presentation, Message, GenerationMode } from '../types';
-import { Zap, MessageSquare } from 'lucide-react';
+import { IdeationSession } from '../types/ideation';
+import { Zap, MessageSquare, ChevronDown, ChevronRight, Sparkles, Clock, ArrowRight, FileText } from 'lucide-react';
 import { ChatInterface } from './ChatInterface';
 import { SlideList } from './SlideList';
+import { VersionHistoryPanel } from './VersionHistoryPanel';
 import { IMAGE_STYLES } from '../lib/themes';
+import { useVersions } from '../hooks/queries/useVersionQueries';
+import { useCreateVersion, useRestoreVersion, useDeleteVersion } from '../hooks/mutations/useVersionMutations';
 
 interface AppSidebarProps {
     currentPresentation: Presentation | null;
@@ -25,6 +29,10 @@ interface AppSidebarProps {
     scrollRef: React.RefObject<HTMLDivElement | null>;
     viewMode?: 'standard' | 'wabi-sabi';
     activeWabiSabiLayout?: string;
+    // Ideation props
+    recentIdeations?: IdeationSession[];
+    onLoadIdeation?: (id: string) => void;
+    onViewAllIdeations?: () => void;
 }
 
 export const AppSidebar: React.FC<AppSidebarProps> = ({
@@ -45,8 +53,37 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     onMoveSlide,
     scrollRef,
     viewMode,
-    activeWabiSabiLayout
+    activeWabiSabiLayout,
+    recentIdeations = [],
+    onLoadIdeation,
+    onViewAllIdeations,
 }) => {
+    const [ideationsExpanded, setIdeationsExpanded] = useState(true);
+
+    // Version History hooks
+    const { data: versions = [], isLoading: isLoadingVersions } = useVersions(currentPresentation?.id || null);
+    const createVersionMutation = useCreateVersion();
+    const restoreVersionMutation = useRestoreVersion();
+    const deleteVersionMutation = useDeleteVersion();
+
+    const handleCreateVersion = (label?: string) => {
+        if (currentPresentation) {
+            createVersionMutation.mutate({ presentationId: currentPresentation.id, label });
+        }
+    };
+
+    const handleRestoreVersion = (versionId: string) => {
+        if (currentPresentation) {
+            restoreVersionMutation.mutate({ presentationId: currentPresentation.id, versionId });
+        }
+    };
+
+    const handleDeleteVersion = (versionId: string) => {
+        if (currentPresentation) {
+            deleteVersionMutation.mutate({ presentationId: currentPresentation.id, versionId });
+        }
+    };
+
     return (
         <div className="w-[360px] md:w-[400px] flex flex-col border-r border-white/10 bg-black relative z-20 h-full flex-shrink-0">
             <div className="h-20 flex-none px-6 border-b border-white/10 flex items-center justify-between bg-black z-30">
@@ -67,16 +104,92 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                         generationMode={generationMode} setGenerationMode={setGenerationMode}
                         scrollRef={scrollRef}
                     />
+
+                    {/* Recent Ideations Section */}
+                    {recentIdeations.length > 0 && onLoadIdeation && (
+                        <div className="border-t border-white/10 bg-black/50">
+                            <button
+                                onClick={() => setIdeationsExpanded(!ideationsExpanded)}
+                                className="w-full px-4 py-3 flex items-center justify-between text-white/60 hover:text-white transition-colors duration-150"
+                            >
+                                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                    <Sparkles className="w-4 h-4 text-[#c5a47e]" />
+                                    Recent Ideations
+                                </span>
+                                {ideationsExpanded ? (
+                                    <ChevronDown className="w-4 h-4" />
+                                ) : (
+                                    <ChevronRight className="w-4 h-4" />
+                                )}
+                            </button>
+
+                            {ideationsExpanded && (
+                                <div className="px-4 pb-4 space-y-2">
+                                    {recentIdeations.slice(0, 5).map((ideation) => (
+                                        <button
+                                            key={ideation.id}
+                                            onClick={() => onLoadIdeation(ideation.id)}
+                                            className="w-full p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 text-left group"
+                                        >
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm text-white font-medium line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150">
+                                                        {ideation.topic || 'Untitled Ideation'}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-1 text-[10px] text-white/40">
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock className="w-3 h-3" />
+                                                            {new Date(ideation.lastModified).toLocaleDateString()}
+                                                        </span>
+                                                        <span className="px-1.5 py-0.5 bg-white/5 rounded-sm">
+                                                            {ideation.notes.length} notes
+                                                        </span>
+                                                        {ideation.generatedPresentationIds && ideation.generatedPresentationIds.length > 0 && (
+                                                            <span className="flex items-center gap-1 text-[#c5a47e]">
+                                                                <FileText className="w-3 h-3" />
+                                                                {ideation.generatedPresentationIds.length}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-[#c5a47e] transition-colors duration-150 flex-shrink-0" />
+                                            </div>
+                                        </button>
+                                    ))}
+
+                                    {onViewAllIdeations && (
+                                        <button
+                                            onClick={onViewAllIdeations}
+                                            className="w-full py-2 text-[10px] font-bold uppercase tracking-widest text-[#c5a47e] hover:text-white transition-colors duration-150"
+                                        >
+                                            View All Ideations &rarr;
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             ) : (
-                <SlideList
-                    presentation={currentPresentation}
-                    activeSlideIndex={activeSlideIndex}
-                    setActiveSlideIndex={setActiveSlideIndex}
-                    onMoveSlide={onMoveSlide}
-                    viewMode={viewMode}
-                    activeWabiSabiLayout={activeWabiSabiLayout}
-                />
+                <div className="flex flex-col flex-1 overflow-hidden">
+                    <SlideList
+                        presentation={currentPresentation}
+                        activeSlideIndex={activeSlideIndex}
+                        setActiveSlideIndex={setActiveSlideIndex}
+                        onMoveSlide={onMoveSlide}
+                        viewMode={viewMode}
+                        activeWabiSabiLayout={activeWabiSabiLayout}
+                    />
+                    <VersionHistoryPanel
+                        versions={versions}
+                        isLoading={isLoadingVersions}
+                        onCreateVersion={handleCreateVersion}
+                        onRestoreVersion={handleRestoreVersion}
+                        onDeleteVersion={handleDeleteVersion}
+                        isCreating={createVersionMutation.isPending}
+                        isRestoring={restoreVersionMutation.isPending}
+                    />
+                </div>
             )}
         </div>
     );

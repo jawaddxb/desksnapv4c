@@ -2,7 +2,9 @@
  * useIdeation Hook
  *
  * Single source of truth for ideation session state.
- * Handles CRUD operations, auto-save, and tool execution for the agentic copilot.
+ * Handles CRUD operations via API, auto-save, and tool execution for the agentic copilot.
+ *
+ * Uses TanStack Query for server state and local state for optimistic updates.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -14,18 +16,28 @@ import {
   NoteColor,
   NoteType,
   IdeationStage,
+  JournalEntry,
+  JournalStage,
+  CreativeJournal,
   COLUMNS,
   createSession,
   createNote,
   getColumnIndex,
 } from '../types/ideation';
+import { useSavedIdeations, useIdeationSession } from './queries/useIdeationQueries';
 import {
-  getIdeationSessions,
-  getIdeationSession,
-  saveIdeationSession,
-  deleteIdeationSession,
-} from '../services/storageService';
+  useCreateIdeation,
+  useUpdateIdeation,
+  useDeleteIdeation,
+  useAddIdeationNote,
+  useUpdateIdeationNote,
+  useDeleteIdeationNote,
+  useAddIdeationConnection,
+  useLinkIdeationToDeck,
+  useAddJournalEntry,
+} from './mutations/useIdeationMutations';
 import { useAutoSave } from './useAutoSave';
+import { updateIdeationSession } from '../services/api/ideationService';
 
 export interface UseIdeationReturn {
   // State
@@ -36,9 +48,10 @@ export interface UseIdeationReturn {
   stage: IdeationStage;
   isThinking: boolean;
   saveStatus: 'idle' | 'saving' | 'saved';
+  isLoading: boolean;
 
   // Session operations
-  startSession: (topic: string) => void;
+  startSession: (topic: string, sourceContent?: string) => void;
   loadSession: (id: string) => Promise<void>;
   closeSession: () => Promise<void>;
   deleteSession: (id: string) => Promise<void>;
@@ -65,6 +78,12 @@ export interface UseIdeationReturn {
   // Topic operations
   updateTopic: (topic: string) => void;
 
+  // Journal operations
+  addJournalEntry: (entry: Omit<JournalEntry, 'id' | 'timestamp'>) => void;
+
+  // Presentation linking (One-to-Many)
+  linkToPresentation: (presentationId: string) => Promise<void>;
+
   // Tool executor (for agentic loop)
   executeToolCall: (tool: string, args: Record<string, unknown>) => Promise<unknown>;
 }
@@ -79,66 +98,111 @@ interface AddNoteOptions {
 }
 
 export function useIdeation(): UseIdeationReturn {
-  const [session, setSession] = useState<IdeationSession | null>(null);
-  const [savedSessions, setSavedSessions] = useState<IdeationSession[]>([]);
+  // Local session state (for optimistic updates)
+  const [localSession, setLocalSession] = useState<IdeationSession | null>(null);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState(false);
 
-  // Refresh session list callback (memoized to avoid useAutoSave re-renders)
-  const refreshSessionList = useCallback(async () => {
-    const sessions = await getIdeationSessions();
-    setSavedSessions(sessions);
+  // Server state via TanStack Query
+  const { savedIdeations, isLoading: isLoadingList, refetch: refetchList } = useSavedIdeations();
+  const { data: fetchedSession, isLoading: isLoadingSession } = useIdeationSession(currentSessionId);
+
+  // Mutations
+  const createMutation = useCreateIdeation();
+  const updateMutation = useUpdateIdeation();
+  const deleteMutation = useDeleteIdeation();
+  const linkToDeckMutation = useLinkIdeationToDeck();
+  const addJournalMutation = useAddJournalEntry();
+
+  // Sync fetched session to local state
+  useEffect(() => {
+    if (fetchedSession && currentSessionId) {
+      setLocalSession(prev => {
+        // If we already have local state, merge carefully
+        if (prev && prev.id === fetchedSession.id) {
+          // Preserve local changes that haven't synced yet
+          return {
+            ...fetchedSession,
+            notes: prev.notes.length > fetchedSession.notes.length ? prev.notes : fetchedSession.notes,
+            messages: prev.messages.length > fetchedSession.messages.length ? prev.messages : fetchedSession.messages,
+            creativeJournal: prev.creativeJournal || fetchedSession.creativeJournal,
+          };
+        }
+        return fetchedSession;
+      });
+    }
+  }, [fetchedSession, currentSessionId]);
+
+  // Auto-save handler
+  const handleAutoSave = useCallback(async (session: IdeationSession) => {
+    if (!session.id) return;
+    try {
+      await updateIdeationSession(session.id, session);
+    } catch (error) {
+      console.error('Auto-save failed:', error);
+    }
   }, []);
 
   // Auto-save using the reusable hook
   const { saveStatus, resetTracking, forceSave } = useAutoSave({
-    data: session,
-    onSave: saveIdeationSession,
-    onSaveComplete: refreshSessionList,
+    data: localSession,
+    onSave: handleAutoSave,
+    onSaveComplete: () => refetchList(),
   });
-
-  // Load sessions on mount
-  useEffect(() => {
-    refreshSessionList();
-  }, [refreshSessionList]);
 
   // ============ SESSION OPERATIONS ============
 
-  const startSession = (topic: string) => {
-    const newSession = createSession(topic);
-    setSession(newSession);
-    // Save immediately and reset tracking
-    saveIdeationSession(newSession).then(() => {
-      resetTracking(newSession);
-      refreshSessionList();
+  const startSession = useCallback((topic: string, sourceContent?: string) => {
+    const newSession: IdeationSession = {
+      ...createSession(topic),
+      sourceContent,
+      generatedPresentationIds: [],
+      creativeJournal: { entries: [] },
+      syncStatus: 'pending',
+    };
+
+    setLocalSession(newSession);
+    setCurrentSessionId(newSession.id);
+
+    // Persist to API
+    createMutation.mutate(newSession, {
+      onSuccess: (savedSession) => {
+        setLocalSession(savedSession);
+        resetTracking(savedSession);
+      },
     });
-  };
+  }, [createMutation, resetTracking]);
 
-  const loadSession = async (id: string) => {
-    const loaded = await getIdeationSession(id);
-    if (loaded) {
-      setSession(loaded);
-      // Reset tracking to prevent immediate save on load
-      resetTracking(loaded);
-    }
-  };
+  const loadSession = useCallback(async (id: string) => {
+    setCurrentSessionId(id);
+    // The useIdeationSession hook will fetch the data
+    // and the useEffect will sync it to localSession
+  }, []);
 
-  const closeSession = async () => {
-    if (session) {
+  const closeSession = useCallback(async () => {
+    if (localSession) {
       await forceSave();
     }
-    setSession(null);
+    setLocalSession(null);
+    setCurrentSessionId(null);
     resetTracking(null);
-    refreshSessionList();
-  };
+  }, [localSession, forceSave, resetTracking]);
 
-  const deleteSession = async (id: string) => {
-    await deleteIdeationSession(id);
-    if (session?.id === id) {
-      setSession(null);
-      resetTracking(null);
-    }
-    refreshSessionList();
-  };
+  const deleteSession = useCallback(async (id: string) => {
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        if (localSession?.id === id) {
+          setLocalSession(null);
+          setCurrentSessionId(null);
+          resetTracking(null);
+        }
+      },
+    });
+  }, [deleteMutation, localSession, resetTracking]);
+
+  const refreshSessionList = useCallback(async () => {
+    await refetchList();
+  }, [refetchList]);
 
   // ============ NOTE OPERATIONS ============
 
@@ -166,13 +230,14 @@ export function useIdeation(): UseIdeationReturn {
     if (options.sourceTitle) note.sourceTitle = options.sourceTitle;
     if (options.approved !== undefined) note.approved = options.approved;
 
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
       const newRow = computeNextRow(prev.notes, colIndex);
       return {
         ...prev,
         notes: [...prev.notes, { ...note, row: newRow }],
         lastModified: Date.now(),
+        syncStatus: 'pending' as const,
       };
     });
 
@@ -180,7 +245,7 @@ export function useIdeation(): UseIdeationReturn {
   }, []);
 
   const updateNote = useCallback((noteId: string, updates: Partial<IdeaNote>) => {
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
       return {
         ...prev,
@@ -188,12 +253,13 @@ export function useIdeation(): UseIdeationReturn {
           n.id === noteId ? { ...n, ...updates } : n
         ),
         lastModified: Date.now(),
+        syncStatus: 'pending' as const,
       };
     });
   }, []);
 
   const deleteNote = useCallback((noteId: string) => {
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
       return {
         ...prev,
@@ -203,12 +269,13 @@ export function useIdeation(): UseIdeationReturn {
           c => c.fromId !== noteId && c.toId !== noteId
         ),
         lastModified: Date.now(),
+        syncStatus: 'pending' as const,
       };
     });
   }, []);
 
   const moveNote = useCallback((noteId: string, column: number, row: number) => {
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
       return {
         ...prev,
@@ -216,6 +283,7 @@ export function useIdeation(): UseIdeationReturn {
           n.id === noteId ? { ...n, column, row } : n
         ),
         lastModified: Date.now(),
+        syncStatus: 'pending' as const,
       };
     });
   }, []);
@@ -231,7 +299,7 @@ export function useIdeation(): UseIdeationReturn {
   // ============ CONNECTION OPERATIONS ============
 
   const connectNotes = useCallback((fromId: string, toId: string) => {
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
 
       // Check if connection already exists
@@ -250,12 +318,13 @@ export function useIdeation(): UseIdeationReturn {
         ...prev,
         connections: [...prev.connections, connection],
         lastModified: Date.now(),
+        syncStatus: 'pending' as const,
       };
     });
   }, []);
 
   const disconnectNotes = useCallback((fromId: string, toId: string) => {
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
       return {
         ...prev,
@@ -263,6 +332,7 @@ export function useIdeation(): UseIdeationReturn {
           c => !(c.fromId === fromId && c.toId === toId)
         ),
         lastModified: Date.now(),
+        syncStatus: 'pending' as const,
       };
     });
   }, []);
@@ -277,12 +347,13 @@ export function useIdeation(): UseIdeationReturn {
       timestamp: Date.now(),
     };
 
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
       return {
         ...prev,
         messages: [...prev.messages, message],
         lastModified: Date.now(),
+        syncStatus: 'pending' as const,
       };
     });
   }, []);
@@ -290,20 +361,69 @@ export function useIdeation(): UseIdeationReturn {
   // ============ STAGE OPERATIONS ============
 
   const setStage = useCallback((stage: IdeationStage) => {
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
-      return { ...prev, stage, lastModified: Date.now() };
+      return { ...prev, stage, lastModified: Date.now(), syncStatus: 'pending' as const };
     });
   }, []);
 
   // ============ TOPIC OPERATIONS ============
 
   const updateTopic = useCallback((topic: string) => {
-    setSession(prev => {
+    setLocalSession(prev => {
       if (!prev) return null;
-      return { ...prev, topic, lastModified: Date.now() };
+      return { ...prev, topic, lastModified: Date.now(), syncStatus: 'pending' as const };
     });
   }, []);
+
+  // ============ JOURNAL OPERATIONS ============
+
+  const addJournalEntry = useCallback((entry: Omit<JournalEntry, 'id' | 'timestamp'>) => {
+    const fullEntry: JournalEntry = {
+      ...entry,
+      id: `journal-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      timestamp: Date.now(),
+    };
+
+    setLocalSession(prev => {
+      if (!prev) return null;
+      const existingJournal = prev.creativeJournal || { entries: [] };
+      return {
+        ...prev,
+        creativeJournal: {
+          ...existingJournal,
+          entries: [...existingJournal.entries, fullEntry],
+        },
+        lastModified: Date.now(),
+        syncStatus: 'pending' as const,
+      };
+    });
+  }, []);
+
+  // ============ PRESENTATION LINKING ============
+
+  const linkToPresentation = useCallback(async (presentationId: string) => {
+    if (!localSession) return;
+
+    // Optimistic update
+    setLocalSession(prev => {
+      if (!prev) return null;
+      const existingIds = prev.generatedPresentationIds || [];
+      if (existingIds.includes(presentationId)) return prev;
+      return {
+        ...prev,
+        generatedPresentationIds: [...existingIds, presentationId],
+        lastModified: Date.now(),
+        syncStatus: 'pending' as const,
+      };
+    });
+
+    // Persist to API
+    linkToDeckMutation.mutate({
+      sessionId: localSession.id,
+      presentationId,
+    });
+  }, [localSession, linkToDeckMutation]);
 
   // ============ TOOL EXECUTOR ============
 
@@ -375,7 +495,13 @@ export function useIdeation(): UseIdeationReturn {
           structure: string[];
           rationale: string;
         };
-        // For now, just add a system message about the structure
+        // Add journal entry for the structure suggestion
+        addJournalEntry({
+          stage: 'deciding',
+          title: 'Suggesting Presentation Structure',
+          narrative: rationale,
+          decision: structure.join(' → '),
+        });
         addMessage(
           MessageRole.SYSTEM,
           `Suggested structure: ${structure.join(' → ')}\n\nRationale: ${rationale}`
@@ -386,6 +512,11 @@ export function useIdeation(): UseIdeationReturn {
       case 'mark_ready': {
         const { summary } = args as { summary: string };
         setStage('ready');
+        addJournalEntry({
+          stage: 'creating',
+          title: 'Ideation Complete',
+          narrative: summary,
+        });
         addMessage(MessageRole.SYSTEM, `Deck plan ready: ${summary}`);
         return { success: true };
       }
@@ -419,6 +550,13 @@ export function useIdeation(): UseIdeationReturn {
               approved: true,
             });
           }
+
+          // Add journal entry for research
+          addJournalEntry({
+            stage: 'exploring',
+            title: 'Researching Your Topic',
+            narrative: `I searched for "${query}" and found ${results.length} relevant sources to strengthen your presentation with data and evidence.`,
+          });
         }
 
         return {
@@ -432,19 +570,20 @@ export function useIdeation(): UseIdeationReturn {
         console.warn(`Unknown tool: ${tool}`);
         return { success: false, error: `Unknown tool: ${tool}` };
     }
-  }, [addNote, updateNote, deleteNote, connectNotes, moveNote, addMessage, setStage, updateTopic]);
+  }, [addNote, updateNote, deleteNote, connectNotes, moveNote, addMessage, setStage, updateTopic, addJournalEntry]);
 
   // ============ RETURN ============
 
   return {
     // State
-    session,
-    savedSessions,
-    notes: session?.notes ?? [],
-    messages: session?.messages ?? [],
-    stage: session?.stage ?? 'discover',
+    session: localSession,
+    savedSessions: savedIdeations,
+    notes: localSession?.notes ?? [],
+    messages: localSession?.messages ?? [],
+    stage: localSession?.stage ?? 'discover',
     isThinking,
     saveStatus,
+    isLoading: isLoadingList || isLoadingSession,
 
     // Session operations
     startSession,
@@ -473,6 +612,12 @@ export function useIdeation(): UseIdeationReturn {
 
     // Topic operations
     updateTopic,
+
+    // Journal operations
+    addJournalEntry,
+
+    // Presentation linking
+    linkToPresentation,
 
     // Tool executor
     executeToolCall,

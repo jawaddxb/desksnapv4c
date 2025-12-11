@@ -1,0 +1,205 @@
+/**
+ * IdeationHistoryPanel
+ *
+ * Displays a grid of saved ideation sessions.
+ * Users can load, delete, or generate new decks from ideations.
+ */
+
+import React from 'react';
+import { IdeationSession, COLUMNS } from '../../types/ideation';
+import { Lightbulb, Trash2, Clock, FileText, ArrowRight, BookOpen } from 'lucide-react';
+
+interface IdeationHistoryPanelProps {
+  ideations: IdeationSession[];
+  isLoading: boolean;
+  onSelectIdeation: (id: string) => void;
+  onDeleteIdeation: (id: string) => void;
+  onGenerateDeck: (id: string) => void;
+  onViewJournal?: (id: string) => void;
+}
+
+/**
+ * Get stage badge color and label
+ */
+function getStageBadge(stage: string): { color: string; label: string } {
+  switch (stage) {
+    case 'discover':
+      return { color: 'bg-blue-500/20 text-blue-400', label: 'Discovering' };
+    case 'expand':
+      return { color: 'bg-purple-500/20 text-purple-400', label: 'Expanding' };
+    case 'structure':
+      return { color: 'bg-amber-500/20 text-amber-400', label: 'Structuring' };
+    case 'ready':
+      return { color: 'bg-green-500/20 text-green-400', label: 'Ready' };
+    case 'review':
+      return { color: 'bg-orange-500/20 text-orange-400', label: 'Reviewing' };
+    case 'style-preview':
+      return { color: 'bg-pink-500/20 text-pink-400', label: 'Styling' };
+    default:
+      return { color: 'bg-white/10 text-white/60', label: stage };
+  }
+}
+
+/**
+ * Count notes per column for visual indicator
+ */
+function getColumnCounts(notes: IdeationSession['notes']): number[] {
+  const counts = [0, 0, 0, 0, 0];
+  notes.forEach(note => {
+    if (note.column >= 0 && note.column < 5) {
+      counts[note.column]++;
+    }
+  });
+  return counts;
+}
+
+export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
+  ideations,
+  isLoading,
+  onSelectIdeation,
+  onDeleteIdeation,
+  onGenerateDeck,
+  onViewJournal,
+}) => {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-[#c5a47e] border-t-transparent rounded-full animate-spin" />
+          <p className="text-white/60 text-sm">Loading ideations...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (ideations.length === 0) {
+    return (
+      <div className="border border-dashed border-white/20 p-20 text-center flex flex-col items-center justify-center bg-black/50">
+        <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
+          <Lightbulb className="w-8 h-8 text-white/40" />
+        </div>
+        <h3 className="text-xl font-light text-white mb-2">No Ideations Yet</h3>
+        <p className="text-white/60 mb-8 max-w-md mx-auto">
+          Start brainstorming with the AI copilot to create your first ideation session.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {ideations.map(ideation => {
+        const stageBadge = getStageBadge(ideation.stage);
+        const columnCounts = getColumnCounts(ideation.notes);
+        const totalNotes = ideation.notes.length;
+        const linkedDecks = ideation.generatedPresentationIds?.length || 0;
+        const hasJournal = ideation.creativeJournal && ideation.creativeJournal.entries.length > 0;
+
+        return (
+          <div
+            key={ideation.id}
+            className="group bg-[#1a1a1a] border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 flex flex-col overflow-hidden relative"
+          >
+            {/* Header */}
+            <div
+              className="p-5 cursor-pointer"
+              onClick={() => onSelectIdeation(ideation.id)}
+            >
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-[#c5a47e]/10 flex items-center justify-center flex-shrink-0">
+                    <Lightbulb className="w-4 h-4 text-[#c5a47e]" />
+                  </div>
+                  <h3 className="font-bold text-white line-clamp-2 group-hover:text-[#c5a47e] transition-colors duration-150">
+                    {ideation.topic || 'Untitled Ideation'}
+                  </h3>
+                </div>
+                <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wide flex-shrink-0 ${stageBadge.color}`}>
+                  {stageBadge.label}
+                </span>
+              </div>
+
+              {/* Column counts visualization */}
+              <div className="flex gap-1 mb-4">
+                {COLUMNS.map((col, idx) => (
+                  <div key={col} className="flex-1" title={`${col}: ${columnCounts[idx]} notes`}>
+                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#c5a47e] transition-all duration-300"
+                        style={{
+                          width: `${Math.min(100, (columnCounts[idx] / Math.max(1, totalNotes)) * 100 * 2)}%`,
+                        }}
+                      />
+                    </div>
+                    <span className="text-[8px] text-white/40 mt-1 block text-center">
+                      {col.slice(0, 3)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Stats row */}
+              <div className="flex items-center gap-4 text-[10px] text-white/40 font-bold uppercase tracking-widest">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {new Date(ideation.lastModified).toLocaleDateString()}
+                </span>
+                <span className="px-2 py-1 bg-white/5 text-white/60">
+                  {totalNotes} Notes
+                </span>
+                {linkedDecks > 0 && (
+                  <span className="px-2 py-1 bg-[#c5a47e]/10 text-[#c5a47e]">
+                    {linkedDecks} Deck{linkedDecks > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="border-t border-white/10 p-3 flex items-center gap-2 bg-black/30">
+              <button
+                onClick={() => onGenerateDeck(ideation.id)}
+                className="flex-1 flex items-center justify-center gap-2 bg-[#c5a47e] hover:bg-white text-black px-3 py-2 text-xs font-bold uppercase tracking-wide transition-all duration-150"
+              >
+                <FileText className="w-3 h-3" />
+                Generate Deck
+              </button>
+
+              {hasJournal && onViewJournal && (
+                <button
+                  onClick={() => onViewJournal(ideation.id)}
+                  className="p-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-[#c5a47e] transition-all duration-150"
+                  title="View Creative Journal"
+                >
+                  <BookOpen className="w-4 h-4" />
+                </button>
+              )}
+
+              <button
+                onClick={() => onSelectIdeation(ideation.id)}
+                className="p-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all duration-150"
+                title="Continue Editing"
+              >
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Delete button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteIdeation(ideation.id);
+              }}
+              className="absolute top-3 right-3 p-2 bg-black/80 text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 hover:text-red-400 transition-all duration-150 z-10"
+              title="Delete Ideation"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default IdeationHistoryPanel;

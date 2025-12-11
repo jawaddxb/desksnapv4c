@@ -1,7 +1,10 @@
 
 import React from 'react';
-import { Slide, Theme } from '../types';
+import { Slide, Theme, ContentType } from '../types';
 import { SmartText } from './SmartText';
+import { applyFontScale } from '../lib/textPresets';
+import { ContentItem } from './content';
+import { DEFAULT_CONTENT_STYLE } from '../config/contentStyles';
 
 interface SlideContentEditorProps {
     slide: Slide;
@@ -43,7 +46,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                         value={slide.title}
                         onChange={updateTitle}
                         readOnly={printMode}
-                        fontSize={slide.titleFontSize ?? 72}
+                        fontSize={applyFontScale(slide.titleFontSize ?? 72, slide.fontScale)}
                         lineHeight={0.95}
                         fontWeight={titleStyle?.fontWeight}
                         fontStyle={titleStyle?.fontStyle}
@@ -63,7 +66,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                                 value={point}
                                 onChange={(val) => updateContent(idx, val)}
                                 readOnly={printMode}
-                                fontSize={slide.contentFontSize ?? 24}
+                                fontSize={applyFontScale(slide.contentFontSize ?? 24, slide.fontScale, 12, 48)}
                                 lineHeight={1.2}
                                 fontWeight={contentStyle?.fontWeight}
                                 fontStyle={contentStyle?.fontStyle}
@@ -92,7 +95,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                     value={slide.title}
                     onChange={updateTitle}
                     readOnly={printMode}
-                    fontSize={slide.titleFontSize ?? defaultTitleSize}
+                    fontSize={applyFontScale(slide.titleFontSize ?? defaultTitleSize, slide.fontScale)}
                     lineHeight={0.9}
                     fontWeight={titleStyle?.fontWeight ?? (parseInt(theme.layout.headingWeight) || undefined)}
                     fontStyle={titleStyle?.fontStyle}
@@ -112,33 +115,39 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
             )}
 
             {/* Content Region */}
-            <div className={`w-full flex flex-col ${isStatement ? 'items-center justify-center gap-2' : 'gap-4'}`}>
-                {slide.content.map((point, idx) => (
-                    <div
-                        key={idx}
-                        className={`flex items-start gap-4 group w-full shrink-0`}
-                    >
-                        {!isStatement && <span className="w-2.5 h-2.5 mt-4 shrink-0 rounded-full opacity-80" style={{ backgroundColor: theme.colors.accent }} />}
+            <div
+                className={`w-full flex flex-col ${isStatement ? 'items-center justify-center' : ''}`}
+                style={{ gap: theme.contentStyle?.itemSpacing ?? DEFAULT_CONTENT_STYLE.itemSpacing ?? 12 }}
+            >
+                {slide.content.map((point, idx) => {
+                    const contentType: ContentType = slide.contentType || 'bullets';
 
-                        <div className={`flex-1 ${isStatement ? 'bg-black/5 px-8 py-3 rounded-full' : ''}`} style={{ backgroundColor: isStatement ? `${theme.colors.accent}15` : 'transparent' }}>
+                    return (
+                        <ContentItem
+                            key={idx}
+                            theme={theme}
+                            contentType={contentType}
+                            index={idx}
+                            isStatement={isStatement}
+                        >
                             <SmartText
                                 value={point}
                                 onChange={(val) => updateContent(idx, val)}
                                 readOnly={printMode}
-                                fontSize={slide.contentFontSize ?? defaultContentSize}
+                                fontSize={applyFontScale(slide.contentFontSize ?? defaultContentSize, slide.fontScale, 12, 48)}
                                 lineHeight={1.15}
                                 fontWeight={contentStyle?.fontWeight}
                                 fontStyle={contentStyle?.fontStyle}
-                                textAlign={contentStyle?.textAlign}
+                                textAlign={contentStyle?.textAlign ?? (isStatement ? 'center' : undefined)}
                                 className={`bg-transparent outline-none w-full p-0 ${isStatement ? 'text-center' : ''}`}
                                 style={{
                                     fontFamily: theme.fonts.body,
                                     color: isStatement ? theme.colors.text : theme.colors.secondary,
                                 }}
                             />
-                        </div>
-                    </div>
-                ))}
+                        </ContentItem>
+                    );
+                })}
             </div>
         </div>
     );

@@ -24,6 +24,12 @@ from packages.common.schemas.presentation import (
     PresentationImport,
     PresentationExport,
 )
+from packages.common.schemas.presentation_version import (
+    VersionCreate,
+    VersionResponse,
+    VersionDetailResponse,
+    VersionListResponse,
+)
 
 __all__ = [
     # Auth
@@ -46,4 +52,9 @@ __all__ = [
     "PresentationListResponse",
     "PresentationImport",
     "PresentationExport",
+    # Presentation Version
+    "VersionCreate",
+    "VersionResponse",
+    "VersionDetailResponse",
+    "VersionListResponse",
 ]

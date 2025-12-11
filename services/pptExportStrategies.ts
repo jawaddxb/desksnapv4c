@@ -10,7 +10,7 @@
  */
 
 import PptxGenJS from 'pptxgenjs';
-import type { Presentation, Theme, Slide, ExportMode } from '../types';
+import type { Presentation, Theme, Slide, ExportMode, ContentType } from '../types';
 import { getThemeCompatibility, getFontMapping, extractFontName } from '../lib/fontCompatibility';
 
 // =============================================================================
@@ -132,6 +132,28 @@ function applySlideBackground(pptxSlide: PptxGenJS.Slide, theme: Theme): void {
   }
 }
 
+/**
+ * Get bullet options based on content type
+ * Maps ContentType to PptxGenJS bullet options
+ */
+function getBulletOptions(contentType: ContentType, index: number): { bullet: boolean | { type?: string; code?: string; indent?: number } } {
+  switch (contentType) {
+    case 'numbered':
+      return { bullet: { type: 'number' } };
+    case 'checkmarks':
+      // Unicode checkmark character
+      return { bullet: { code: '2713' } };
+    case 'quotes':
+    case 'plain':
+      // No bullet for quotes and plain text
+      return { bullet: false };
+    case 'bullets':
+    default:
+      // Standard bullet
+      return { bullet: true };
+  }
+}
+
 // =============================================================================
 // EDITABLE EXPORT STRATEGY
 //
@@ -188,12 +210,16 @@ export async function exportEditable(
       valign: 'middle',
     });
 
-    // Add content as bullet list
+    // Add content as bullet list with content type support
     if (slide.content.length > 0) {
-      const contentItems = slide.content.map(text => ({
-        text,
-        options: { bullet: true, indentLevel: 0 },
-      }));
+      const contentType: ContentType = slide.contentType || 'bullets';
+      const contentItems = slide.content.map((text, index) => {
+        const bulletOpts = getBulletOptions(contentType, index);
+        return {
+          text,
+          options: { ...bulletOpts, indentLevel: 0 },
+        };
+      });
 
       pptxSlide.addText(contentItems, {
         x: layout.content.x,
@@ -308,12 +334,16 @@ export async function exportHybrid(
       valign: 'middle',
     });
 
-    // Body as editable text (same as editable strategy)
+    // Body as editable text with content type support
     if (slide.content.length > 0) {
-      const contentItems = slide.content.map(text => ({
-        text,
-        options: { bullet: true, indentLevel: 0 },
-      }));
+      const contentType: ContentType = slide.contentType || 'bullets';
+      const contentItems = slide.content.map((text, index) => {
+        const bulletOpts = getBulletOptions(contentType, index);
+        return {
+          text,
+          options: { ...bulletOpts, indentLevel: 0 },
+        };
+      });
 
       pptxSlide.addText(contentItems, {
         x: layout.content.x,

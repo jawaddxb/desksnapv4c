@@ -10,6 +10,7 @@ import {
   createPresentation,
   updatePresentation,
   deletePresentation,
+  duplicatePresentation,
   updateSlide,
   addSlide,
   deleteSlide,
@@ -98,6 +99,24 @@ export function useDeletePresentation() {
     },
 
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: presentationKeys.lists() });
+    },
+  });
+}
+
+/**
+ * Hook to duplicate/clone a presentation
+ */
+export function useDuplicatePresentation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: duplicatePresentation,
+
+    onSuccess: (newPresentation) => {
+      // Add to cache
+      queryClient.setQueryData(presentationKeys.detail(newPresentation.id), newPresentation);
+      // Invalidate list to show the new clone
       queryClient.invalidateQueries({ queryKey: presentationKeys.lists() });
     },
   });
@@ -316,6 +335,7 @@ export default {
   useCreatePresentation,
   useUpdatePresentation,
   useDeletePresentation,
+  useDuplicatePresentation,
   useUpdateSlide,
   useAddSlide,
   useDeleteSlide,

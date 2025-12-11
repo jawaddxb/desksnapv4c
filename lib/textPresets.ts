@@ -4,6 +4,8 @@
  * Can be overridden per-archetype for artistic intent
  */
 
+import { FontScale } from '../types';
+
 export const TEXT_PRESETS = {
     // Standard layouts (SlideContentEditor)
     title: { maxFontSize: 200, minFontSize: 32 },
@@ -41,4 +43,24 @@ export function getPresetWithOverrides(
         maxFontSize: overrides?.maxFontSize ?? preset.maxFontSize,
         minFontSize: overrides?.minFontSize ?? preset.minFontSize,
     };
+}
+
+/** Multipliers for fontScale presets */
+export const FONT_SCALE_MULTIPLIERS: Record<FontScale, number> = {
+    compact: 0.8,   // 80% - denser text
+    auto: 1.0,      // 100% - baseline
+    hero: 1.3,      // 130% - impactful headlines
+    classic: 1.0,   // 100% - same as auto
+    modern: 1.1,    // 110% - slightly larger
+};
+
+/** Apply fontScale multiplier to a base font size with bounds */
+export function applyFontScale(
+    baseSize: number,
+    fontScale: FontScale | undefined,
+    min = 12,
+    max = 200
+): number {
+    const multiplier = FONT_SCALE_MULTIPLIERS[fontScale || 'auto'];
+    return Math.round(Math.max(min, Math.min(max, baseSize * multiplier)));
 }

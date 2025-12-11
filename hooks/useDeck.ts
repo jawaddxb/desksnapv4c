@@ -44,11 +44,17 @@ import {
   parseImportedDeck,
 } from './presentation';
 
+// Debug context for agent logs
+import { useDebugSafe } from '../contexts/DebugContext';
+
 // Save status type for compatibility
 type SaveStatus = 'idle' | 'saving' | 'saved';
 
 export const useDeck = () => {
   const queryClient = useQueryClient();
+
+  // Debug context for agent activity display (safe - returns null if no provider)
+  const debugContext = useDebugSafe();
 
   // ============ Query-Based State ============
 
@@ -193,6 +199,31 @@ export const useDeck = () => {
     updateSlide: slideUpdater.updateSlide,
     presentationId: currentPresentationId,
     updateSlideMutation,
+    // Wire agent logs to debug context for history/debugging
+    onAgentLogs: (logs) => {
+      if (currentPresentationId && debugContext) {
+        debugContext.actions.setAgentLogs(currentPresentationId, logs);
+      }
+    },
+    // Wire real-time agent activity for live UI display
+    onAgentActivity: (log) => {
+      debugContext?.actions.setCurrentActivity(log);
+    },
+    onAgentStart: (totalSlides) => {
+      // Pass slide titles to debug context for panel display
+      const slideInfo = currentPresentation?.slides.map((s, i) => ({
+        index: i,
+        title: s.title,
+      })) || [];
+      debugContext?.actions.startAgentProcessing(totalSlides, slideInfo);
+    },
+    onAgentComplete: () => {
+      debugContext?.actions.stopAgentProcessing();
+    },
+    // Wire image generation to debug context for thumbnail display
+    onImageGenerated: (slideIndex, imageUrl) => {
+      debugContext?.actions.recordGeneratedImage(slideIndex, imageUrl);
+    },
   });
 
   // Content refinement operations
@@ -467,6 +498,28 @@ export const useDeck = () => {
     }
   };
 
+  // Update visual style and optionally regenerate all images
+  const updateVisualStyleAndRegenerateImages = async (newVisualStyle: string, regenerate: boolean = true) => {
+    if (!currentPresentation || !currentPresentationId) return;
+
+    // Update the visual style in presentation
+    setLocalPresentation({
+      ...currentPresentation,
+      visualStyle: newVisualStyle,
+    });
+
+    // Sync to server
+    updateMutation.mutate({
+      id: currentPresentationId,
+      updates: { visualStyle: newVisualStyle },
+    });
+
+    // Regenerate all images with the new style if requested
+    if (regenerate) {
+      imageGen.regenerateAllImages(currentPresentation.slides, newVisualStyle);
+    }
+  };
+
   // ============ Enhanced Slide Update with API Sync ============
 
   // Wrap slide updater to also sync to API
@@ -542,6 +595,7 @@ export const useDeck = () => {
       applyTypography,
       setWabiSabiLayout,
       cycleWabiSabiLayout,
+      updateVisualStyleAndRegenerateImages,
 
       // Analytics
       recordSession,
