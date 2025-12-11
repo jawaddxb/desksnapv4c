@@ -76,6 +76,11 @@ class User(BaseModel):
         back_populates="owner",
         cascade="all, delete-orphan",
     )
+    ideation_sessions = relationship(
+        "IdeationSession",
+        back_populates="owner",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self) -> str:
         return f"<User {self.email}>"

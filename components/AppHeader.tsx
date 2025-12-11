@@ -10,6 +10,7 @@ import { ModeSwitcher } from './ModeSwitcher';
 import { ArchetypePicker } from './ArchetypePicker';
 import { UserMenu } from './auth';
 import { getThemeThumbnailPath } from '../services/thumbnailService';
+import { RemixDialog } from './RemixDialog';
 
 interface AppHeaderProps {
     currentPresentation: Presentation | null;
@@ -22,7 +23,7 @@ interface AppHeaderProps {
     onSetWabiSabiLayout: (layout: string) => void;
     onCycleWabiSabiLayout: () => void;
     onRegenerateAllImages: () => void;
-    onRemixDeck: () => void;
+    onRemixDeck: (newThemeId?: string) => void;
     setIsPresenting: (v: boolean) => void;
     onSave?: () => void;
     onClose?: () => void;
@@ -129,6 +130,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
     const [isLayoutMenuOpen, setIsLayoutMenuOpen] = useState(false);
     const [isFontMenuOpen, setIsFontMenuOpen] = useState(false);
+    const [isRemixDialogOpen, setIsRemixDialogOpen] = useState(false);
 
     return (
         <header className="h-20 min-h-[80px] border-b border-white/10 flex items-center px-8 justify-between bg-black sticky top-0 z-[500]">
@@ -280,11 +282,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                             />
                         </div>
 
-                        {/* Remix Button - Context Aware */}
-                        <button onClick={onRemixDeck} className="ml-2 flex items-center gap-2 px-5 py-2 bg-white text-black text-xs font-bold uppercase tracking-widest hover:bg-[#c5a47e] transition-all duration-150">
+                        {/* Remix Button - Opens Dialog */}
+                        <button onClick={() => setIsRemixDialogOpen(true)} className="ml-2 flex items-center gap-2 px-5 py-2 bg-white text-black text-xs font-bold uppercase tracking-widest hover:bg-[#c5a47e] transition-all duration-150">
                             <Shuffle className="w-4 h-4" strokeWidth={2.5} />
                             {'Remix All'}
                         </button>
+
+                        {/* Remix Dialog */}
+                        <RemixDialog
+                            isOpen={isRemixDialogOpen}
+                            onClose={() => setIsRemixDialogOpen(false)}
+                            currentThemeId={activeTheme.id}
+                            onConfirm={(newThemeId) => onRemixDeck(newThemeId)}
+                        />
                     </>
                 )}
 

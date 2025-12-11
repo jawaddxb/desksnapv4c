@@ -30,6 +30,20 @@ from packages.common.schemas.presentation_version import (
     VersionDetailResponse,
     VersionListResponse,
 )
+from packages.common.schemas.ideation import (
+    IdeaNoteCreate,
+    IdeaNoteUpdate,
+    IdeaNoteResponse,
+    NoteConnectionCreate,
+    NoteConnectionResponse,
+    JournalEntryCreate,
+    JournalEntryResponse,
+    IdeationSessionCreate,
+    IdeationSessionUpdate,
+    IdeationSessionResponse,
+    IdeationSessionDetailResponse,
+    IdeationSessionListResponse,
+)
 
 __all__ = [
     # Auth
@@ -57,4 +71,17 @@ __all__ = [
     "VersionResponse",
     "VersionDetailResponse",
     "VersionListResponse",
+    # Ideation
+    "IdeaNoteCreate",
+    "IdeaNoteUpdate",
+    "IdeaNoteResponse",
+    "NoteConnectionCreate",
+    "NoteConnectionResponse",
+    "JournalEntryCreate",
+    "JournalEntryResponse",
+    "IdeationSessionCreate",
+    "IdeationSessionUpdate",
+    "IdeationSessionResponse",
+    "IdeationSessionDetailResponse",
+    "IdeationSessionListResponse",
 ]

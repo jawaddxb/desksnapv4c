@@ -9,12 +9,47 @@
  * Tool results are fed back so the AI can see research results and create notes.
  */
 
-import { GoogleGenAI, Content, Part, FunctionCall } from '@google/genai';
-import { Message, MessageRole } from '../types';
+import { GoogleGenAI, Content, Part, FunctionCall, Type } from '@google/genai';
+import { parseAIJsonResponse } from './ai/parseJson';
+import { Message, MessageRole, PresentationPlanResponse } from '../types';
 import { IdeationSession, ResearchResult, ThemeSuggestion, COLUMNS, JournalEntry, JournalStage } from '../types/ideation';
 import { THEMES, THEME_CATEGORIES } from '../config/themes';
 import { COPILOT_TOOLS } from '../lib/copilotTools';
 import { buildFullPrompt } from '../lib/copilotPrompts';
+
+// Schema for deck plan conversion - ensures proper JSON escaping
+const DECK_PLAN_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    topic: { type: Type.STRING, description: "The main topic of the presentation" },
+    visualStyle: { type: Type.STRING, description: "The visual style prompt for images" },
+    themeId: { type: Type.STRING, description: "The ID of the selected theme" },
+    slides: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          title: { type: Type.STRING, description: "Compelling slide title" },
+          bulletPoints: { type: Type.ARRAY, items: { type: Type.STRING }, description: "2-4 key points" },
+          speakerNotes: { type: Type.STRING, description: "Speaker notes (2-3 sentences)" },
+          imageVisualDescription: { type: Type.STRING, description: "Visual description for image generation" },
+          layoutType: {
+            type: Type.STRING,
+            enum: ['split', 'full-bleed', 'statement', 'gallery', 'card', 'horizontal', 'magazine'],
+            description: "The structural layout of the slide"
+          },
+          alignment: {
+            type: Type.STRING,
+            enum: ['left', 'right', 'center'],
+            description: "Content alignment"
+          }
+        },
+        required: ["title", "bulletPoints", "speakerNotes", "imageVisualDescription", "layoutType", "alignment"]
+      }
+    }
+  },
+  required: ["topic", "slides"]
+};
 
 // ============================================
 // JOURNAL ENTRY HELPERS
@@ -665,13 +700,12 @@ Return as JSON with structure:
 }`,
     config: {
       responseMimeType: 'application/json',
+      responseSchema: DECK_PLAN_SCHEMA,
     },
   });
 
-  const text = response.text?.replace(/```json|```/g, '').trim();
-  if (!text) throw new Error('Failed to generate deck plan');
-
-  const result = JSON.parse(text);
+  // Use parseAIJsonResponse for robust JSON parsing with repair logic
+  const result = parseAIJsonResponse<PresentationPlanResponse>(response.text);
   // Ensure themeId and visualStyle are preserved
   result.themeId = themeId;
   result.visualStyle = visualStyle;

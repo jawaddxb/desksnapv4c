@@ -7,6 +7,12 @@ from packages.common.models.user import User, AuthProvider
 from packages.common.models.presentation import Presentation
 from packages.common.models.presentation_version import PresentationVersion
 from packages.common.models.slide import Slide
+from packages.common.models.ideation import (
+    IdeationSession,
+    IdeaNote,
+    NoteConnection,
+    IdeationJournalEntry,
+)
 
 __all__ = [
     "Base",
@@ -16,4 +22,8 @@ __all__ = [
     "Presentation",
     "PresentationVersion",
     "Slide",
+    "IdeationSession",
+    "IdeaNote",
+    "NoteConnection",
+    "IdeationJournalEntry",
 ]

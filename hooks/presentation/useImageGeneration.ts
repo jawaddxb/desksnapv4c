@@ -8,6 +8,7 @@
 import { useCallback, useRef, useEffect, useState } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Presentation, Slide } from '../../types';
+import { THEMES } from '../../lib/themes';
 import {
   generateSlideImage as generateSlideImageFrontend,
   refineImagePrompt,
@@ -81,8 +82,8 @@ export interface UseImageGenerationReturn {
   generateSingleImage: (index: number, prompt: string, style: string) => Promise<void>;
   /** Regenerate the current slide's image */
   regenerateSlideImage: (mode: 'same' | 'varied') => Promise<void>;
-  /** Remix all images with random refinement focuses */
-  remixDeck: () => Promise<void>;
+  /** Remix all images with random refinement focuses, optionally with a new theme */
+  remixDeck: (newThemeId?: string) => Promise<void>;
   /** Regenerate all images in the current presentation */
   regenerateAllImages: () => Promise<void>;
   /** Check if async mode is active */
@@ -499,25 +500,36 @@ export function useImageGeneration({
    * Remix all images with random refinement focuses.
    * Applies stylistic variations in parallel, then uses agent-based generation
    * to validate prompts against the topic before generating images.
+   * Optionally accepts a new themeId to change the theme before remixing.
    */
-  const remixDeck = useCallback(async () => {
+  const remixDeck = useCallback(async (newThemeId?: string) => {
     if (!presentation || isGenerating) return;
 
     // Capture values upfront to avoid stale closure issues
     const currentSlides = presentation.slides;
-    const currentStyle = presentation.visualStyle;
     const currentTopic = presentation.topic;
-    const currentThemeId = presentation.themeId;
+
+    // If a new theme is provided, use its visual style; otherwise keep current
+    let targetStyle = presentation.visualStyle;
+    let targetThemeId = presentation.themeId;
+
+    if (newThemeId && newThemeId !== presentation.themeId && THEMES[newThemeId]) {
+      const newTheme = THEMES[newThemeId];
+      targetStyle = newTheme.imageStyle;
+      targetThemeId = newThemeId;
+    }
 
     try {
       await ensureApiKeySelection();
       const focuses: RefinementFocus[] = ['lighting', 'camera', 'composition', 'mood'];
 
-      // Set all slides to loading
+      // Set all slides to loading and update theme if changed
       setPresentation((prev) =>
         prev
           ? {
               ...prev,
+              themeId: targetThemeId,
+              visualStyle: targetStyle,
               slides: prev.slides.map((s) => ({ ...s, isImageLoading: true })),
             }
           : null
@@ -542,11 +554,11 @@ export function useImageGeneration({
 
       // Step 2: Use agent-based generation (validates and regenerates)
       // This ensures remixed prompts are still topic-relevant
-      // Pass captured values to avoid stale closure issues
+      // Pass target style (may be new theme's style) to avoid stale closure issues
       if (USE_AGENT_MODE) {
-        await generateAllImagesWithAgent(refinedSlides, currentStyle, currentTopic);
+        await generateAllImagesWithAgent(refinedSlides, targetStyle, currentTopic);
       } else {
-        await generateAllImagesSyncBasic(refinedSlides, currentStyle);
+        await generateAllImagesSyncBasic(refinedSlides, targetStyle);
       }
     } catch (e) {
       console.error('Remix deck error', e);
