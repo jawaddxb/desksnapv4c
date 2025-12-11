@@ -2,7 +2,7 @@
  * FeaturesPage Component
  *
  * Detailed features breakdown page.
- * Long-form content with Wabi-Sabi aesthetic.
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
@@ -93,21 +93,21 @@ const features = [
 
 export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
   return (
-    <div className="min-h-screen bg-[#fafaf8]">
+    <div className="min-h-screen bg-black text-white">
       <LandingNavbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
 
-      <main className="pt-24 md:pt-32">
+      <main className="pt-32">
         {/* Page Header */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-16 md:mb-24">
+        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-24">
           <div className="max-w-3xl">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
               Features
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-[#1a1a2e] mb-6">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-8">
               Everything You Need.{' '}
-              <span className="text-[#6b6b6b]">Nothing You Don't.</span>
+              <span className="text-white/40">Nothing You Don't.</span>
             </h1>
-            <p className="text-xl text-[#6b6b6b] leading-relaxed">
+            <p className="text-xl text-white/60 leading-relaxed">
               DeckSnap is intentionally simple. We believe the best tools get out of your way
               and let you focus on what matters: your ideas.
             </p>
@@ -123,34 +123,34 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
             <section
               key={feature.id}
               id={feature.id}
-              className={`py-16 md:py-24 ${isEven ? 'bg-[#fafaf8]' : 'bg-[#f5f3ef]'}`}
+              className={`py-24 ${isEven ? 'bg-black' : 'bg-[#111111]'}`}
             >
               <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <div className="grid lg:grid-cols-2 gap-16 items-center">
                   {/* Content */}
                   <div className={isEven ? 'lg:order-1' : 'lg:order-2'}>
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#d4af37]/10 rounded-full mb-6">
-                      <Icon className="w-4 h-4 text-[#d4af37]" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37]">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 border border-white/20 mb-8">
+                      <Icon className="w-4 h-4 text-[#c5a47e]" />
+                      <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e]">
                         {feature.label}
                       </span>
                     </div>
 
-                    <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a2e] mb-4">
+                    <h2 className="text-4xl md:text-5xl font-light mb-6">
                       {feature.headline}
                     </h2>
 
-                    <p className="text-lg text-[#6b6b6b] leading-relaxed mb-8">
+                    <p className="text-lg text-white/60 leading-relaxed mb-10">
                       {feature.description}
                     </p>
 
                     <ul className="space-y-4">
                       {feature.points.map((point, i) => (
                         <li key={i} className="flex items-start gap-3">
-                          <div className="w-5 h-5 rounded-full bg-[#d4af37]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Check className="w-3 h-3 text-[#d4af37]" />
+                          <div className="w-5 h-5 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-[#c5a47e]" />
                           </div>
-                          <span className="text-[#6b6b6b]">{point}</span>
+                          <span className="text-white/60">{point}</span>
                         </li>
                       ))}
                     </ul>
@@ -158,21 +158,8 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
 
                   {/* Visual */}
                   <div className={isEven ? 'lg:order-2' : 'lg:order-1'}>
-                    <div className="relative">
-                      <div
-                        className="absolute -inset-4 bg-gradient-to-br from-[#d4af37]/5 to-transparent rounded-3xl"
-                        style={{
-                          borderRadius: isEven
-                            ? '60% 40% 55% 45% / 45% 55% 45% 55%'
-                            : '40% 60% 45% 55% / 55% 45% 55% 45%',
-                        }}
-                      />
-                      <div className="relative aspect-[4/3] bg-white rounded-2xl border border-[#e5e2dd] shadow-lg overflow-hidden">
-                        {/* Placeholder visual */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] to-[#2a2a3e] flex items-center justify-center">
-                          <Icon className="w-16 h-16 text-[#d4af37]/30" />
-                        </div>
-                      </div>
+                    <div className="aspect-[4/3] bg-white/5 border border-white/10 flex items-center justify-center">
+                      <Icon className="w-20 h-20 text-[#c5a47e] opacity-30" />
                     </div>
                   </div>
                 </div>
@@ -182,7 +169,7 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
         })}
 
         {/* Philosophy Callout */}
-        <section className="py-16 md:py-24 bg-[#1a1a2e]">
+        <section className="py-24 border-t border-white/10">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
             <p className="text-2xl md:text-3xl text-white/80 leading-relaxed italic mb-8">
               "Wabi-Sabi teaches that imperfection and impermanence are beautiful.
@@ -190,26 +177,26 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
             </p>
             <Link
               to="/about"
-              className="inline-flex items-center gap-2 text-[#d4af37] font-medium hover:text-[#e5c348] transition-colors duration-300 group"
+              className="inline-flex items-center gap-2 text-[#c5a47e] hover:text-white transition-colors group"
             >
               Learn about our philosophy
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </section>
 
         {/* CTA */}
-        <section className="py-16 md:py-24 bg-[#f5f3ef]">
+        <section className="py-24 bg-[#111111]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a2e] mb-4">
+            <h2 className="text-4xl md:text-5xl font-light mb-6">
               Ready to Create?
             </h2>
-            <p className="text-xl text-[#6b6b6b] mb-8">
+            <p className="text-xl text-white/60 mb-10">
               Start building your first presentation for free.
             </p>
             <button
               onClick={() => onAuth('register')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#1a1a2e] text-white font-medium rounded-full hover:bg-[#2a2a3e] transition-all duration-500"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-medium hover:bg-[#c5a47e] transition-colors"
             >
               Start Creating Free
               <ArrowRight className="w-4 h-4" />

@@ -4,7 +4,7 @@ Core model for user presentations
 """
 import uuid
 
-from sqlalchemy import String, Boolean, Text, ForeignKey
+from sqlalchemy import String, Boolean, Text, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from packages.common.models.base import BaseModel
@@ -42,6 +42,11 @@ class Presentation(BaseModel):
         String(100),
         nullable=True,
     )
+    view_mode: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+        default="standard",
+    )
 
     # Image and sharing
     thumbnail_url: Mapped[str | None] = mapped_column(
@@ -51,6 +56,13 @@ class Presentation(BaseModel):
     is_public: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
+        nullable=False,
+    )
+
+    # Version for optimistic concurrency control (real-time sync)
+    version: Mapped[int] = mapped_column(
+        Integer,
+        default=1,
         nullable=False,
     )
 

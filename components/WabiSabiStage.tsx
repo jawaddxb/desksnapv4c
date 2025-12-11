@@ -203,6 +203,15 @@ export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);
 const WabiSabiStageInner: React.FC<WabiSabiStageProps> = ({ slide, theme, onUpdateSlide, printMode, layoutStyle, onToggleNotes }) => {
     const { clearSelection } = useTextSelection();
 
+    // Guard against undefined slide
+    if (!slide) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-black text-white/20">
+                <span className="text-sm">No slide data</span>
+            </div>
+        );
+    }
+
     // Idempotent RNG: Fixed seed per slide ID guarantees same random layout on every render frame
     // This stops the "dancing layout" issue completely.
     // Handle both numeric seeds and string variants
@@ -222,9 +231,12 @@ const WabiSabiStageInner: React.FC<WabiSabiStageProps> = ({ slide, theme, onUpda
 
     const Renderer = ARCHETYPE_RENDERERS[archetype] || SwissArchetype;
 
-    // Clear selection when clicking background (not text elements)
+    // Clear selection when clicking anywhere that isn't a SmartText element
     const handleBackgroundClick = (e: React.MouseEvent) => {
-        if (e.target === e.currentTarget) {
+        const target = e.target as HTMLElement;
+        // Check if click is inside a SmartText element
+        const isSmartText = target.closest('[data-smarttext]');
+        if (!isSmartText) {
             clearSelection();
         }
     };

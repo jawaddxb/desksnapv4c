@@ -44,6 +44,7 @@ class SlideResponse(SlideBase):
     id: uuid.UUID
     presentation_id: uuid.UUID
     position: int
+    version: int = 1  # For optimistic concurrency control
     created_at: datetime
     updated_at: datetime
 
@@ -58,6 +59,7 @@ class PresentationBase(BaseModel):
     theme_id: str | None = None
     visual_style: str | None = None
     wabi_sabi_layout: str | None = None
+    view_mode: str | None = None  # 'standard' or 'wabi-sabi'
     thumbnail_url: str | None = None
     is_public: bool = False
 
@@ -75,6 +77,7 @@ class PresentationUpdate(BaseModel):
     theme_id: str | None = None
     visual_style: str | None = None
     wabi_sabi_layout: str | None = None
+    view_mode: str | None = None  # 'standard' or 'wabi-sabi'
     thumbnail_url: str | None = None
     is_public: bool | None = None
 
@@ -84,6 +87,7 @@ class PresentationResponse(PresentationBase):
 
     id: uuid.UUID
     owner_id: uuid.UUID
+    version: int = 1  # For optimistic concurrency control
     created_at: datetime
     updated_at: datetime
 
@@ -99,7 +103,7 @@ class PresentationDetailResponse(PresentationResponse):
 class PresentationListResponse(BaseModel):
     """List of presentations with pagination"""
 
-    items: list[PresentationResponse]
+    items: list[PresentationDetailResponse]
     total: int
     page: int
     page_size: int
@@ -131,6 +135,7 @@ class PresentationImport(BaseModel):
     themeId: str | None = None
     visualStyle: str | None = None
     wabiSabiLayout: str | None = None
+    viewMode: str | None = None  # 'standard' or 'wabi-sabi'
     slides: list[SlideImport] = []
 
 
@@ -142,6 +147,7 @@ class PresentationExport(BaseModel):
     themeId: str | None = None
     visualStyle: str | None = None
     wabiSabiLayout: str | None = None
+    viewMode: str | None = None  # 'standard' or 'wabi-sabi'
     slides: list[dict]
     createdAt: str
     updatedAt: str

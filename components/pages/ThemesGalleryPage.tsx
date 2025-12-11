@@ -2,6 +2,7 @@
  * ThemesGalleryPage Component
  *
  * Full theme gallery with category filtering.
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React, { useState } from 'react';
@@ -103,20 +104,20 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
     : themeCategories;
 
   return (
-    <div className="min-h-screen bg-[#fafaf8]">
+    <div className="min-h-screen bg-black text-white">
       <LandingNavbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
 
-      <main className="pt-24 md:pt-32">
+      <main className="pt-32">
         {/* Page Header */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-12">
-          <div className="text-center">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-16">
+          <div className="text-center max-w-3xl mx-auto">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
               Theme Gallery
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-[#1a1a2e] mb-6">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-6">
               60+ Ways to Tell Your Story
             </h1>
-            <p className="text-xl text-[#6b6b6b] max-w-2xl mx-auto">
+            <p className="text-xl text-white/60">
               Not templates. Design systems. Each archetype adapts to your content
               while maintaining visual coherence.
             </p>
@@ -124,14 +125,14 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
         </section>
 
         {/* Category Filter */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-12">
+        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-16">
           <div className="flex flex-wrap justify-center gap-3">
             <button
               onClick={() => setActiveCategory(null)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+              className={`px-4 py-2 text-sm transition-colors ${
                 activeCategory === null
-                  ? 'bg-[#1a1a2e] text-white'
-                  : 'bg-white text-[#6b6b6b] border border-[#e5e2dd] hover:border-[#d4af37]/30'
+                  ? 'bg-white text-black'
+                  : 'text-white/60 border border-white/20 hover:border-[#c5a47e] hover:text-[#c5a47e]'
               }`}
             >
               All Themes
@@ -140,10 +141,10 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`px-4 py-2 text-sm transition-colors ${
                   activeCategory === category.id
-                    ? 'bg-[#1a1a2e] text-white'
-                    : 'bg-white text-[#6b6b6b] border border-[#e5e2dd] hover:border-[#d4af37]/30'
+                    ? 'bg-white text-black'
+                    : 'text-white/60 border border-white/20 hover:border-[#c5a47e] hover:text-[#c5a47e]'
                 }`}
               >
                 {category.name}
@@ -154,20 +155,20 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
 
         {/* Theme Categories */}
         {filteredCategories.map((category) => (
-          <section key={category.id} className="py-12 md:py-16">
+          <section key={category.id} className="py-16">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
-              <div className="mb-8">
-                <h2 className="text-2xl md:text-3xl font-semibold text-[#1a1a2e] mb-2">
+              <div className="mb-10">
+                <h2 className="text-3xl font-light mb-2">
                   {category.name}
                 </h2>
-                <p className="text-[#6b6b6b]">{category.description}</p>
+                <p className="text-white/40">{category.description}</p>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1">
                 {category.themes.map((theme) => (
                   <div
                     key={theme.id}
-                    className="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer border border-[#e5e2dd] hover:border-[#d4af37]/30 transition-all duration-500"
+                    className="group relative aspect-[4/3] overflow-hidden cursor-pointer"
                     onMouseEnter={() => setHoveredTheme(theme.id)}
                     onMouseLeave={() => setHoveredTheme(null)}
                     style={{
@@ -178,37 +179,30 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
                     <div className="absolute inset-0 p-4 flex flex-col justify-between">
                       <div>
                         <div
-                          className="w-12 h-1 rounded mb-2"
+                          className="w-12 h-1 mb-2"
                           style={{ backgroundColor: theme.colors[1] }}
                         />
                         <div
-                          className="w-16 h-2 rounded"
+                          className="w-16 h-2"
                           style={{ backgroundColor: `${theme.colors[1]}40` }}
                         />
                       </div>
-                      <div
-                        className="w-10 h-10 rounded-lg opacity-30"
-                        style={{
-                          backgroundColor: theme.colors[1],
-                          borderRadius: '40% 60% 55% 45% / 45% 55% 50% 50%',
-                        }}
-                      />
                     </div>
 
                     {/* Hover Overlay */}
                     <div
-                      className={`absolute inset-0 bg-[#1a1a2e]/90 flex flex-col justify-center items-center p-4 transition-opacity duration-300 ${
+                      className={`absolute inset-0 bg-black/90 flex flex-col justify-center items-center p-4 transition-opacity duration-150 ${
                         hoveredTheme === theme.id ? 'opacity-100' : 'opacity-0'
                       }`}
                     >
-                      <h3 className="text-lg font-semibold text-white mb-2">
+                      <h3 className="text-lg font-light mb-3">
                         {theme.name}
                       </h3>
                       <div className="flex items-center gap-2">
                         {theme.colors.map((color, i) => (
                           <div
                             key={i}
-                            className="w-4 h-4 rounded-full border-2 border-white/20"
+                            className="w-4 h-4 border border-white/20"
                             style={{ backgroundColor: color }}
                           />
                         ))}
@@ -222,20 +216,20 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
         ))}
 
         {/* CTA */}
-        <section className="py-16 md:py-24 bg-[#1a1a2e]">
+        <section className="py-24 bg-[#111111]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-light mb-6">
               Find Your Visual Voice
             </h2>
-            <p className="text-xl text-white/60 mb-8">
+            <p className="text-xl text-white/60 mb-10">
               Try any archetype free. No credit card required.
             </p>
             <button
               onClick={() => onAuth('register')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#d4af37] text-[#1a1a2e] font-semibold rounded-full hover:bg-[#e5c348] transition-all duration-500 group"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#c5a47e] text-black font-medium hover:bg-white transition-colors group"
             >
               Start Creating Free
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </section>

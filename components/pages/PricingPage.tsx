@@ -1,12 +1,11 @@
 /**
  * PricingPage Component
  *
- * Pricing tiers with Wabi-Sabi aesthetic.
- * 3-tier structure with FAQ section.
+ * Pricing tiers with Studio Noir aesthetic.
  */
 
 import React from 'react';
-import { Check, ArrowRight, HelpCircle } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 import { LandingNavbar } from '../landing/LandingNavbar';
 import { FooterSection } from '../landing/FooterSection';
 
@@ -91,81 +90,71 @@ const faqs = [
 
 export const PricingPage: React.FC<PricingPageProps> = ({ onAuth }) => {
   return (
-    <div className="min-h-screen bg-[#fafaf8]">
+    <div className="min-h-screen bg-black text-white">
       <LandingNavbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
 
-      <main className="pt-24 md:pt-32">
+      <main className="pt-32">
         {/* Page Header */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-16 text-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-20 text-center">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
             Pricing
           </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-[#1a1a2e] mb-6">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-6">
             Simple Pricing.{' '}
-            <span className="text-[#6b6b6b]">No Surprises.</span>
+            <span className="text-white/40">No Surprises.</span>
           </h1>
-          <p className="text-xl text-[#6b6b6b] max-w-2xl mx-auto">
+          <p className="text-xl text-white/60 max-w-2xl mx-auto">
             Start free. Upgrade when you need to. No credit card required.
           </p>
         </section>
 
         {/* Pricing Tiers */}
-        <section className="max-w-6xl mx-auto px-6 lg:px-8 mb-24">
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <section className="max-w-6xl mx-auto px-6 lg:px-8 mb-32">
+          <div className="grid md:grid-cols-3 gap-px bg-white/10">
             {pricingTiers.map((tier) => (
               <div
                 key={tier.name}
-                className={`relative rounded-2xl p-8 transition-all duration-500 ${
+                className={`relative p-10 ${
                   tier.highlighted
-                    ? 'bg-[#1a1a2e] text-white border-2 border-[#d4af37] scale-105 shadow-xl'
-                    : 'bg-white border border-[#e5e2dd] hover:border-[#d4af37]/30 hover:shadow-lg'
+                    ? 'bg-[#111111] border-t-2 border-[#c5a47e]'
+                    : 'bg-black'
                 }`}
               >
                 {/* Popular Badge */}
                 {tier.highlighted && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#d4af37] text-[#1a1a2e] text-xs font-bold uppercase tracking-widest rounded-full">
-                    Most Popular
+                  <div className="absolute -top-3 left-10 px-3 py-1 bg-[#c5a47e] text-black text-xs uppercase tracking-[0.1em]">
+                    Popular
                   </div>
                 )}
 
                 {/* Tier Header */}
-                <div className="mb-6">
-                  <h3 className={`text-xl font-semibold mb-2 ${
-                    tier.highlighted ? 'text-white' : 'text-[#1a1a2e]'
-                  }`}>
+                <div className="mb-8">
+                  <h3 className="text-xl font-light mb-2">
                     {tier.name}
                   </h3>
-                  <p className={`text-sm ${
-                    tier.highlighted ? 'text-white/60' : 'text-[#6b6b6b]'
-                  }`}>
+                  <p className="text-sm text-white/40">
                     {tier.description}
                   </p>
                 </div>
 
                 {/* Price */}
-                <div className="mb-6">
-                  <span className={`text-5xl font-bold ${
-                    tier.highlighted ? 'text-white' : 'text-[#1a1a2e]'
-                  }`}>
+                <div className="mb-8">
+                  <span className="text-5xl font-light">
                     {tier.price}
                   </span>
-                  <span className={tier.highlighted ? 'text-white/60' : 'text-[#6b6b6b]'}>
+                  <span className="text-white/40 ml-1">
                     {tier.period}
                   </span>
                 </div>
 
                 {/* Features */}
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-4 mb-10">
                   {tier.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        tier.highlighted ? 'bg-[#d4af37]/20' : 'bg-[#d4af37]/10'
-                      }`}>
-                        <Check className={`w-3 h-3 ${
-                          tier.highlighted ? 'text-[#d4af37]' : 'text-[#d4af37]'
-                        }`} />
+                      <div className="w-4 h-4 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Check className="w-2.5 h-2.5 text-[#c5a47e]" />
                       </div>
-                      <span className={tier.highlighted ? 'text-white/80' : 'text-[#6b6b6b]'}>
+                      <span className="text-sm text-white/60">
                         {feature}
                       </span>
                     </li>
@@ -175,10 +164,10 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onAuth }) => {
                 {/* CTA */}
                 <button
                   onClick={() => onAuth('register')}
-                  className={`w-full py-3 rounded-full font-medium transition-all duration-300 ${
+                  className={`w-full py-3 font-medium transition-colors ${
                     tier.highlighted
-                      ? 'bg-[#d4af37] text-[#1a1a2e] hover:bg-[#e5c348]'
-                      : 'bg-[#1a1a2e] text-white hover:bg-[#2a2a3e]'
+                      ? 'bg-[#c5a47e] text-black hover:bg-white'
+                      : 'bg-white text-black hover:bg-[#c5a47e]'
                   }`}
                 >
                   {tier.cta}
@@ -189,36 +178,29 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onAuth }) => {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-16 md:py-24 bg-[#f5f3ef]">
+        <section className="py-24 bg-[#111111]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+            <div className="mb-16">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
                 FAQ
               </span>
-              <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a2e]">
+              <h2 className="text-4xl md:text-5xl font-light">
                 Common Questions
               </h2>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-px bg-white/10">
               {faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl p-6 border border-[#e5e2dd]"
+                  className="bg-[#111111] p-8"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-lg bg-[#d4af37]/10 flex items-center justify-center flex-shrink-0">
-                      <HelpCircle className="w-4 h-4 text-[#d4af37]" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-[#1a1a2e] mb-2">
-                        {faq.question}
-                      </h3>
-                      <p className="text-[#6b6b6b]">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  </div>
+                  <h3 className="text-lg font-light mb-3">
+                    {faq.question}
+                  </h3>
+                  <p className="text-white/60">
+                    {faq.answer}
+                  </p>
                 </div>
               ))}
             </div>
@@ -226,20 +208,20 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onAuth }) => {
         </section>
 
         {/* CTA */}
-        <section className="py-16 md:py-24 bg-[#fafaf8]">
+        <section className="py-24 border-t border-white/10">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a2e] mb-4">
+            <h2 className="text-4xl font-light mb-6">
               Still Have Questions?
             </h2>
-            <p className="text-xl text-[#6b6b6b] mb-8">
+            <p className="text-xl text-white/60 mb-8">
               We're here to help. Reach out anytime.
             </p>
             <a
               href="mailto:hello@decksnap.com"
-              className="inline-flex items-center gap-2 text-[#1a1a2e] font-medium hover:text-[#d4af37] transition-colors duration-300 group"
+              className="inline-flex items-center gap-2 text-white hover:text-[#c5a47e] transition-colors group"
             >
               Contact Us
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
         </section>

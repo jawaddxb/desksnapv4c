@@ -48,32 +48,32 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     activeWabiSabiLayout
 }) => {
     return (
-        <div className="w-[360px] md:w-[400px] flex flex-col border-r border-zinc-200 bg-white relative z-20 h-full flex-shrink-0">
-            <div className="h-20 flex-none px-6 border-b border-zinc-200 flex items-center justify-between bg-white z-30">
+        <div className="w-[360px] md:w-[400px] flex flex-col border-r border-white/10 bg-black relative z-20 h-full flex-shrink-0">
+            <div className="h-20 flex-none px-6 border-b border-white/10 flex items-center justify-between bg-black z-30">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-zinc-900 text-white flex items-center justify-center border-2 border-zinc-900 shadow-sm"><Zap className="w-6 h-6" strokeWidth={2.5} /></div>
-                    <div><h1 className="font-bold text-2xl tracking-tight text-zinc-900 leading-none">DeckSnap</h1><span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">GenAI Studio</span></div>
+                    <div className="w-10 h-10 bg-white text-black flex items-center justify-center"><Zap className="w-6 h-6" strokeWidth={2.5} /></div>
+                    <div><h1 className="font-bold text-2xl tracking-tight text-white leading-none">DeckSnap</h1><span className="text-[10px] font-bold uppercase tracking-widest text-[#c5a47e]">GenAI Studio</span></div>
                 </div>
                 {currentPresentation && (
-                    <button onClick={() => setIsChatOpen(!isChatOpen)} className={`p-2 rounded-md transition-all duration-200 border-2 ${isChatOpen ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'}`}><MessageSquare className="w-5 h-5" strokeWidth={2.5} /></button>
+                    <button onClick={() => setIsChatOpen(!isChatOpen)} className={`p-2 transition-all duration-150 ${isChatOpen ? 'bg-[#c5a47e] text-black' : 'bg-black text-white/60 border border-white/20 hover:border-[#c5a47e] hover:text-[#c5a47e]'}`}><MessageSquare className="w-5 h-5" strokeWidth={2.5} /></button>
                 )}
             </div>
             {!currentPresentation ? (
                 <div className="flex flex-col grow h-full overflow-hidden">
-                    <ChatInterface 
+                    <ChatInterface
                         mode="sidebar" messages={messages} isGenerating={isGenerating} currentPresentation={currentPresentation}
                         isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} inputValue={inputValue} setInputValue={setInputValue}
-                        handleSendMessage={handleSendMessage} selectedImageStyle={selectedImageStyle} setSelectedImageStyle={setSelectedImageStyle} 
+                        handleSendMessage={handleSendMessage} selectedImageStyle={selectedImageStyle} setSelectedImageStyle={setSelectedImageStyle}
                         generationMode={generationMode} setGenerationMode={setGenerationMode}
                         scrollRef={scrollRef}
                     />
                 </div>
             ) : (
-                <SlideList 
-                    presentation={currentPresentation} 
-                    activeSlideIndex={activeSlideIndex} 
-                    setActiveSlideIndex={setActiveSlideIndex} 
-                    onMoveSlide={onMoveSlide} 
+                <SlideList
+                    presentation={currentPresentation}
+                    activeSlideIndex={activeSlideIndex}
+                    setActiveSlideIndex={setActiveSlideIndex}
+                    onMoveSlide={onMoveSlide}
                     viewMode={viewMode}
                     activeWabiSabiLayout={activeWabiSabiLayout}
                 />

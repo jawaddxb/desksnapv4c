@@ -11,7 +11,8 @@
 
 import { GoogleGenAI, Content, Part, FunctionCall } from '@google/genai';
 import { Message, MessageRole } from '../types';
-import { IdeationSession, ResearchResult } from '../types/ideation';
+import { IdeationSession, ResearchResult, ThemeSuggestion, COLUMNS } from '../types/ideation';
+import { THEMES, THEME_CATEGORIES } from '../config/themes';
 import { COPILOT_TOOLS } from '../lib/copilotTools';
 import { buildFullPrompt } from '../lib/copilotPrompts';
 
@@ -423,4 +424,178 @@ Return as JSON.`,
   if (!text) throw new Error('Failed to generate deck plan');
 
   return JSON.parse(text);
+}
+
+/**
+ * Suggest a theme based on ideation session content.
+ * FIRST STEP of the split conversion flow - analyzes content and suggests best theme.
+ */
+export async function suggestThemeForSession(
+  session: IdeationSession
+): Promise<ThemeSuggestion> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  // Build context from notes organized by column
+  const notesContext = session.notes
+    .map(n => `[${COLUMNS[n.column]}] ${n.content}`)
+    .join('\n');
+
+  // Build theme options list
+  const themeOptions = Object.values(THEMES)
+    .map(t => `- ${t.id}: ${t.name} - ${t.description}`)
+    .join('\n');
+
+  const prompt = `You are a visual design expert. Analyze the ideation notes and recommend the best presentation theme.
+
+## Presentation Topic
+${session.topic}
+
+## Ideation Notes
+${notesContext}
+
+## Available Themes
+
+### Core (Modern Essentials)
+${Object.values(THEME_CATEGORIES.core).map(t => `- ${t.id}: ${t.name} - ${t.description}`).join('\n')}
+
+### Business & Tech
+${Object.values(THEME_CATEGORIES.business).map(t => `- ${t.id}: ${t.name} - ${t.description}`).join('\n')}
+
+### Luxury & Fashion
+${Object.values(THEME_CATEGORIES.luxury).map(t => `- ${t.id}: ${t.name} - ${t.description}`).join('\n')}
+
+### Nature & Organic
+${Object.values(THEME_CATEGORIES.nature).map(t => `- ${t.id}: ${t.name} - ${t.description}`).join('\n')}
+
+### Retro & Vintage
+${Object.values(THEME_CATEGORIES.retro).map(t => `- ${t.id}: ${t.name} - ${t.description}`).join('\n')}
+
+### Artistic & Experimental
+${Object.values(THEME_CATEGORIES.artistic).map(t => `- ${t.id}: ${t.name} - ${t.description}`).join('\n')}
+
+## Your Task
+1. Analyze the topic and notes to understand the content's tone, audience, and purpose
+2. Select the ONE theme that best matches the content
+3. Explain WHY in 1-2 sentences
+4. Suggest 2-3 alternatives from DIFFERENT categories
+
+Return JSON:
+{
+  "themeId": "exact_theme_id",
+  "reasoning": "Brief explanation of why this theme fits the content and audience",
+  "visualStyleHint": "Brief visual direction (e.g., 'Professional photography with blue tones')",
+  "alternativeIds": ["alt1", "alt2", "alt3"]
+}`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+      },
+    });
+
+    const text = response.text?.replace(/```json|```/g, '').trim();
+    if (!text) throw new Error('No response');
+
+    const suggestion = JSON.parse(text) as ThemeSuggestion;
+
+    // Validate themeId exists
+    if (!THEMES[suggestion.themeId]) {
+      suggestion.themeId = 'executive';
+    }
+
+    // Validate alternativeIds
+    if (suggestion.alternativeIds) {
+      suggestion.alternativeIds = suggestion.alternativeIds.filter(id => THEMES[id]);
+    }
+
+    return suggestion;
+  } catch (error) {
+    console.error('[suggestThemeForSession] Error:', error);
+    // Fallback suggestion
+    return {
+      themeId: 'executive',
+      reasoning: 'A professional, versatile theme suitable for most presentations.',
+      visualStyleHint: 'Clean corporate photography with modern aesthetics',
+      alternativeIds: ['startup', 'minimalist', 'swiss'],
+    };
+  }
+}
+
+/**
+ * Convert session to deck plan WITH a pre-selected theme.
+ * SECOND STEP of the split conversion flow - uses the user's confirmed theme choice.
+ */
+export async function convertSessionToDeckPlanWithTheme(
+  session: IdeationSession,
+  themeId: string
+): Promise<{
+  topic: string;
+  slides: Array<{
+    title: string;
+    bulletPoints: string[];
+    speakerNotes: string;
+    imageVisualDescription: string;
+    layoutType: string;
+    alignment: string;
+  }>;
+  themeId: string;
+  visualStyle: string;
+}> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  // Get theme's bundled visual style
+  const theme = THEMES[themeId] || THEMES.executive;
+  const visualStyle = theme.imageStyle;
+
+  // Build context from all notes
+  const notesContext = session.notes
+    .map(n => `[${COLUMNS[n.column]}] ${n.content}`)
+    .join('\n');
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: `Convert these ideation notes into a presentation plan.
+
+Topic: ${session.topic}
+Selected Theme: ${themeId} - ${theme.name}
+Theme Description: ${theme.description}
+Visual Style: ${visualStyle}
+
+Notes:
+${notesContext}
+
+Create a structured presentation with 6-12 slides. For each slide provide:
+- title: Compelling slide title
+- bulletPoints: 2-4 key points (array of strings)
+- speakerNotes: What to say (2-3 sentences)
+- imageVisualDescription: Visual description that matches the "${theme.name}" theme style: ${visualStyle}
+- layoutType: One of: split, full-bleed, statement, gallery, card
+- alignment: left, right, or center
+
+IMPORTANT: The imageVisualDescription should match the theme's visual style: ${visualStyle}
+
+Return as JSON with structure:
+{
+  "topic": "...",
+  "slides": [...],
+  "themeId": "${themeId}",
+  "visualStyle": "${visualStyle}"
+}`,
+    config: {
+      responseMimeType: 'application/json',
+    },
+  });
+
+  const text = response.text?.replace(/```json|```/g, '').trim();
+  if (!text) throw new Error('Failed to generate deck plan');
+
+  const result = JSON.parse(text);
+  // Ensure themeId and visualStyle are preserved
+  result.themeId = themeId;
+  result.visualStyle = visualStyle;
+
+  return result;
 }

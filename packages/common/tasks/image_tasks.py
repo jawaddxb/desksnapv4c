@@ -20,10 +20,10 @@ from packages.common.providers.provider_factory import get_image_storage_provide
 
 logger = logging.getLogger(__name__)
 
-# Gemini model fallback strategy (same as frontend)
+# Gemini model fallback strategy (synced with frontend geminiService.ts)
+# Uses the newer image generation models available via generateContent API
 IMAGE_MODELS = [
-    {"model": "gemini-2.0-flash-preview-image-generation", "label": "Flash Preview"},
-    {"model": "imagen-3.0-generate-002", "label": "Imagen 3"},
+    {"model": "gemini-2.0-flash-exp", "label": "Flash Exp"},
 ]
 
 
@@ -42,26 +42,14 @@ def _generate_with_gemini(prompt: str) -> str | None:
         try:
             logger.info(f"Trying model: {model}")
 
-            # Build request based on model type
-            if "imagen" in model:
-                # Imagen API format
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:predict"
-                payload = {
-                    "instances": [{"prompt": prompt}],
-                    "parameters": {
-                        "sampleCount": 1,
-                        "aspectRatio": "16:9",
-                    },
-                }
-            else:
-                # Gemini generateContent format
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-                payload = {
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {
-                        "responseModalities": ["TEXT", "IMAGE"],
-                    },
-                }
+            # Use generateContent format with image output requested
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+            payload = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {
+                    "responseModalities": ["IMAGE", "TEXT"],
+                },
+            }
 
             response = httpx.post(
                 url,
@@ -74,22 +62,16 @@ def _generate_with_gemini(prompt: str) -> str | None:
             if response.status_code == 200:
                 data = response.json()
 
-                # Extract image based on response format
-                if "predictions" in data:
-                    # Imagen format
-                    for pred in data.get("predictions", []):
-                        if "bytesBase64Encoded" in pred:
+                # Extract image from Gemini format
+                for candidate in data.get("candidates", []):
+                    for part in candidate.get("content", {}).get("parts", []):
+                        if "inlineData" in part:
                             logger.info(f"Image generated with {model}")
-                            return pred["bytesBase64Encoded"]
-                else:
-                    # Gemini format
-                    for candidate in data.get("candidates", []):
-                        for part in candidate.get("content", {}).get("parts", []):
-                            if "inlineData" in part:
-                                logger.info(f"Image generated with {model}")
-                                return part["inlineData"]["data"]
+                            return part["inlineData"]["data"]
 
-            logger.warning(f"Model {model} failed: {response.status_code} - {response.text[:200]}")
+                logger.warning(f"Model {model} returned no image data")
+            else:
+                logger.warning(f"Model {model} failed: {response.status_code} - {response.text[:200]}")
 
         except httpx.TimeoutException:
             logger.warning(f"Model {model} timed out")

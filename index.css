@@ -1,1 +1,115 @@
 @import "tailwindcss";
+
+/* Studio Noir Custom Utilities */
+@layer utilities {
+  /* Gold accent text */
+  .text-noir-gold {
+    color: #c5a47e;
+  }
+
+  /* Gold accent background */
+  .bg-noir-gold {
+    background-color: #c5a47e;
+  }
+
+  /* Gold border */
+  .border-noir-gold {
+    border-color: #c5a47e;
+  }
+
+  /* Studio Noir surfaces */
+  .bg-noir-surface {
+    background-color: #111111;
+  }
+
+  .bg-noir-surface-hover {
+    background-color: #1a1a1a;
+  }
+
+  /* Muted text */
+  .text-noir-muted {
+    color: #999999;
+  }
+
+  /* Dimmed text (disabled states) */
+  .text-noir-dimmed {
+    color: #666666;
+  }
+
+  /* Gold ring for focus states */
+  .ring-noir-gold {
+    --tw-ring-color: #c5a47e;
+  }
+
+  /* Hover gold transition */
+  .hover-gold {
+    transition: color 150ms ease;
+  }
+  .hover-gold:hover {
+    color: #c5a47e;
+  }
+
+  /* ============================================
+     Ideation Canvas Visual Enhancements
+     ============================================ */
+
+  /* Sticky Note Shadows - Layered depth effect */
+  .sticky-note-shadow {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 4px 8px rgba(0, 0, 0, 0.2),
+      0 0 1px rgba(197, 164, 126, 0.1);
+  }
+
+  .sticky-note-shadow-hover {
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 8px 16px rgba(0, 0, 0, 0.3),
+      0 0 1px rgba(197, 164, 126, 0.2);
+  }
+
+  .sticky-note-shadow-selected {
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.4),
+      0 12px 24px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(197, 164, 126, 0.3),
+      0 0 20px rgba(197, 164, 126, 0.1);
+  }
+
+  /* Unified transition for notes */
+  .transition-note {
+    transition-property: transform, box-shadow, border-color, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Ideation Keyframe Animations */
+@keyframes note-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-note-entrance {
+  animation: note-entrance 250ms ease-out forwards;
+}
+
+@keyframes connector-draw {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.connector-animate-draw {
+  stroke-dasharray: 1000;
+  animation: connector-draw 600ms ease-out forwards;
+}

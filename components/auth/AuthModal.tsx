@@ -62,18 +62,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="bg-[#111111] border border-white/20 shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+          <h2 className="text-lg font-light text-white">
             {mode === 'login' ? 'Welcome Back' : 'Create Account'}
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-1 hover:bg-white/10 transition-colors duration-150"
           >
-            <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 text-white/60 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -83,7 +83,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Error message */}
           {displayError && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm">
+            <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
               {displayError}
             </div>
           )}
@@ -91,14 +91,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* Name field (register only) */}
           {mode === 'register' && (
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-2">
                 Name (optional)
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow"
+                className="w-full px-4 py-3 border border-white/20 bg-black text-white focus:border-[#c5a47e] outline-none transition-colors duration-150 placeholder:text-white/30"
                 placeholder="Your name"
               />
             </div>
@@ -106,7 +106,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Email field */}
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-2">
               Email
             </label>
             <input
@@ -114,14 +114,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow"
+              className="w-full px-4 py-3 border border-white/20 bg-black text-white focus:border-[#c5a47e] outline-none transition-colors duration-150 placeholder:text-white/30"
               placeholder="you@example.com"
             />
           </div>
 
           {/* Password field */}
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-2">
               Password
             </label>
             <input
@@ -130,11 +130,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow"
+              className="w-full px-4 py-3 border border-white/20 bg-black text-white focus:border-[#c5a47e] outline-none transition-colors duration-150 placeholder:text-white/30"
               placeholder="Min 8 characters"
             />
             {mode === 'register' && (
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-2 text-xs text-white/40">
                 Must include uppercase, lowercase, and number
               </p>
             )}
@@ -144,7 +144,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 bg-[#c5a47e] hover:bg-white disabled:bg-white/20 text-black font-bold uppercase tracking-widest text-xs transition-colors duration-150 flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
               <>
@@ -161,14 +161,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </form>
 
         {/* Footer - switch mode */}
-        <div className="px-6 py-4 bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-200 dark:border-zinc-700 text-center">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <div className="px-6 py-4 bg-black border-t border-white/10 text-center">
+          <p className="text-sm text-white/60">
             {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
             {' '}
             <button
               type="button"
               onClick={switchMode}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-[#c5a47e] hover:text-white font-medium transition-colors duration-150"
             >
               {mode === 'login' ? 'Sign up' : 'Sign in'}
             </button>

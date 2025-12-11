@@ -7,9 +7,9 @@
 
 import React, { useState, useCallback } from 'react';
 import { MessageRole } from '../../types';
-import { COLUMNS } from '../../types/ideation';
+import { COLUMNS, ThemeSuggestion } from '../../types/ideation';
 import { useIdeation } from '../../hooks/useIdeation';
-import { runAgentLoop, convertSessionToDeckPlan, AgentResponse } from '../../services/copilotAgent';
+import { runAgentLoop, convertSessionToDeckPlan, suggestThemeForSession, convertSessionToDeckPlanWithTheme, AgentResponse } from '../../services/copilotAgent';
 import { FlowCanvas } from './FlowCanvas';
 import { CopilotPanel } from './CopilotPanel';
 
@@ -30,6 +30,9 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [askUserQuestion, setAskUserQuestion] = useState<AgentResponse['askUserQuestion'] | null>(null);
+  // Theme selection state for style-preview stage
+  const [themeSuggestion, setThemeSuggestion] = useState<ThemeSuggestion | null>(null);
+  const [selectedThemeId, setSelectedThemeId] = useState<string>('executive');
 
   // Initialize session on mount
   React.useEffect(() => {
@@ -134,24 +137,77 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     );
   }, [ideation]);
 
-  // Handle confirming the build - actually creates the deck
+  // Handle confirming the build - now triggers theme suggestion first
   const handleConfirmBuild = useCallback(async () => {
-    if (!ideation.session || !onBuildDeck) return;
+    if (!ideation.session) return;
 
     setIsThinking(true);
     try {
-      const deckPlan = await convertSessionToDeckPlan(ideation.session);
+      // STEP 1: Get AI theme suggestion
+      const suggestion = await suggestThemeForSession(ideation.session);
+      setThemeSuggestion(suggestion);
+      setSelectedThemeId(suggestion.themeId);
+
+      // Move to style-preview stage
+      ideation.setStage('style-preview');
+
+      ideation.addMessage(
+        MessageRole.MODEL,
+        `I recommend the "${suggestion.themeId}" theme: ${suggestion.reasoning}`
+      );
+    } catch (error) {
+      console.error('Theme suggestion error:', error);
+      ideation.addMessage(
+        MessageRole.MODEL,
+        "I couldn't analyze the best theme. Please select one manually."
+      );
+      // Fallback: still go to style-preview with default
+      setThemeSuggestion({
+        themeId: 'executive',
+        reasoning: 'A professional, versatile theme.',
+        visualStyleHint: 'Clean corporate photography',
+        alternativeIds: ['startup', 'minimalist'],
+      });
+      setSelectedThemeId('executive');
+      ideation.setStage('style-preview');
+    } finally {
+      setIsThinking(false);
+    }
+  }, [ideation]);
+
+  // Handle final build after theme confirmation
+  const handleConfirmThemeAndBuild = useCallback(async () => {
+    if (!ideation.session || !onBuildDeck || !selectedThemeId) return;
+
+    setIsThinking(true);
+    try {
+      // STEP 2: Convert to deck plan with confirmed theme
+      const deckPlan = await convertSessionToDeckPlanWithTheme(
+        ideation.session,
+        selectedThemeId
+      );
       onBuildDeck(deckPlan);
     } catch (error) {
       console.error('Deck conversion error:', error);
       ideation.addMessage(
         MessageRole.MODEL,
-        "I had trouble creating the deck. Please try again or check your notes."
+        "I had trouble creating the deck. Please try again."
       );
     } finally {
       setIsThinking(false);
     }
-  }, [ideation, onBuildDeck]);
+  }, [ideation, onBuildDeck, selectedThemeId]);
+
+  // Handle going back from style-preview to review
+  const handleBackFromStylePreview = useCallback(() => {
+    ideation.setStage('review');
+    setThemeSuggestion(null);
+  }, [ideation]);
+
+  // Handle theme selection change
+  const handleSelectTheme = useCallback((themeId: string) => {
+    setSelectedThemeId(themeId);
+  }, []);
 
   // Handle note operations
   const handleAddNote = useCallback((column: number) => {
@@ -177,37 +233,37 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   // If no session, show loading or start screen
   if (!ideation.session) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50">
+      <div className="flex items-center justify-center h-full bg-black">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center animate-pulse">
-            <svg className="w-8 h-8 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+          <div className="w-16 h-16 mx-auto mb-4 border border-[#c5a47e] flex items-center justify-center animate-pulse">
+            <svg className="w-8 h-8 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
             </svg>
           </div>
-          <p className="text-gray-600">Loading ideation session...</p>
+          <p className="text-white/60 uppercase tracking-widest text-sm">Loading session...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen w-full bg-gray-100 relative">
+    <div className="flex h-screen w-full bg-black relative">
       {/* Header bar */}
-      <div className="absolute top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-20">
+      <div className="absolute top-0 left-0 right-0 h-14 bg-black border-b border-white/10 flex items-center justify-between px-4 z-20">
         <div className="flex items-center gap-3">
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/5 transition-colors"
             >
-              <svg className="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="w-5 h-5 text-white/60 hover:text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
               </svg>
             </button>
           )}
           <div>
-            <h1 className="font-semibold text-gray-900">{ideation.session.topic}</h1>
-            <p className="text-xs text-gray-500">
+            <h1 className="font-bold text-white uppercase tracking-wide">{ideation.session.topic}</h1>
+            <p className="text-xs text-white/40 uppercase tracking-widest">
               {ideation.notes.length} notes • {ideation.saveStatus === 'saving' ? 'Saving...' : ideation.saveStatus === 'saved' ? 'Saved' : 'Draft'}
             </p>
           </div>
@@ -237,9 +293,14 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             stage={ideation.stage}
             isThinking={isThinking}
             askUserQuestion={askUserQuestion}
+            themeSuggestion={themeSuggestion}
+            selectedThemeId={selectedThemeId}
+            onSelectTheme={handleSelectTheme}
             onSendMessage={handleSendMessage}
             onBuildDeck={handleBuildDeck}
             onConfirmBuild={handleConfirmBuild}
+            onConfirmThemeAndBuild={handleConfirmThemeAndBuild}
+            onBackFromStylePreview={handleBackFromStylePreview}
           />
         </div>
       </div>

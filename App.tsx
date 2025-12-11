@@ -21,9 +21,13 @@ import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import { useChat } from './hooks/useChat';
 import { IdeationCopilot } from './components/ideation/IdeationCopilot';
 import { AuthProvider } from './contexts/AuthContext';
+import { QueryProvider } from './contexts/QueryContext';
+import { NetworkProvider } from './contexts/NetworkContext';
+import { DebugProvider } from './contexts/DebugContext';
+import { DebugRoute, ThumbnailGenerator, ComponentShowcase } from './components/debug';
 import { AuthModal } from './components/auth';
 import { preloadCommonFonts } from './lib/fonts';
-import { ProtectedRoute } from './components/routing';
+import { ProtectedRoute, OfflineGate } from './components/routing';
 import { LandingPage } from './components/landing';
 import {
   FeaturesPage,
@@ -32,6 +36,8 @@ import {
   ThemesGalleryPage,
   SolutionsPage,
 } from './components/pages';
+import { PrototypeRouter } from './homepage-prototypes';
+import { useRealtimeSync } from './hooks/useRealtimeSync';
 
 // ============ Protected App Content ============
 
@@ -42,7 +48,6 @@ function AppContent() {
   const [selectedImageStyle, setSelectedImageStyle] = useState(IMAGE_STYLES[0]);
   const [generationMode, setGenerationMode] = useState<GenerationMode>('balanced');
   const [isPresenting, setIsPresenting] = useState(false);
-  const [viewMode, setViewMode] = useState<'standard' | 'wabi-sabi'>('standard');
   const [showCreateChat, setShowCreateChat] = useState(false);
   const [isIdeating, setIsIdeating] = useState(false);
 
@@ -56,6 +61,8 @@ function AppContent() {
     isRefining,
     activeTheme,
     activeWabiSabiLayout,
+    viewMode,
+    setViewMode,
     saveStatus,
     actions,
   } = useDeck();
@@ -172,12 +179,12 @@ function AppContent() {
     <>
       <div
         id="app-ui"
-        className="flex h-screen w-full bg-zinc-50 overflow-hidden text-zinc-900 font-sans selection:bg-zinc-200 relative"
+        className="flex h-screen w-full bg-black overflow-hidden text-white font-sans selection:bg-white/20 relative"
       >
         {/* FLOATING CHAT MODAL */}
         {(currentPresentation || showCreateChat) && (
           <div
-            className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-lg h-[650px] bg-white rounded-xl shadow-2xl border-2 border-zinc-900 z-[1000] flex flex-col overflow-hidden transition-all duration-300 origin-center ${
+            className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-lg h-[650px] bg-[#111111] shadow-2xl border border-white/20 z-[1000] flex flex-col overflow-hidden transition-all duration-150 origin-center ${
               isChatOpen || showCreateChat
                 ? 'opacity-100 scale-100 pointer-events-auto'
                 : 'opacity-0 scale-95 pointer-events-none'
@@ -231,7 +238,7 @@ function AppContent() {
 
         {/* MAIN STAGE AREA */}
         <div
-          className="flex-1 bg-zinc-100 flex flex-col relative overflow-hidden min-w-0"
+          className="flex-1 bg-[#111111] flex flex-col relative overflow-hidden min-w-0"
           style={{ backgroundColor: currentPresentation ? activeTheme.colors.background : '#fafafa' }}
         >
           {/* HEADER */}
@@ -263,7 +270,7 @@ function AppContent() {
               {/* Close Button */}
               <button
                 onClick={() => setIsPresenting(false)}
-                className="absolute top-6 right-6 z-[1000] p-3 bg-black/50 hover:bg-black/80 text-white rounded-full backdrop-blur-md transition-all cursor-pointer shadow-lg hover:scale-105"
+                className="absolute top-6 right-6 z-[1000] p-3 bg-black/70 hover:bg-[#c5a47e] text-white hover:text-black backdrop-blur-md transition-all duration-150 cursor-pointer shadow-lg"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -272,7 +279,7 @@ function AppContent() {
               {activeSlideIndex > 0 && (
                 <button
                   onClick={goToPreviousSlide}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/10 hover:bg-black/50 text-white/50 hover:text-white rounded-full backdrop-blur-sm transition-all cursor-pointer hover:scale-110"
+                  className="absolute left-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/30 hover:bg-black/70 text-white/50 hover:text-white backdrop-blur-sm transition-all duration-150 cursor-pointer"
                 >
                   <ChevronLeft className="w-10 h-10" strokeWidth={1.5} />
                 </button>
@@ -282,14 +289,14 @@ function AppContent() {
               {activeSlideIndex < currentPresentation.slides.length - 1 && (
                 <button
                   onClick={goToNextSlide}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/10 hover:bg-black/50 text-white/50 hover:text-white rounded-full backdrop-blur-sm transition-all cursor-pointer hover:scale-110"
+                  className="absolute right-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/30 hover:bg-black/70 text-white/50 hover:text-white backdrop-blur-sm transition-all duration-150 cursor-pointer"
                 >
                   <ChevronRight className="w-10 h-10" strokeWidth={1.5} />
                 </button>
               )}
 
               {/* Slide Counter */}
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] px-4 py-1.5 bg-black/50 backdrop-blur-md rounded-full text-white/80 text-[10px] font-bold uppercase tracking-widest pointer-events-none">
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] px-4 py-1.5 bg-black/70 backdrop-blur-md text-white/80 text-[10px] font-bold uppercase tracking-widest pointer-events-none border border-white/10">
                 {activeSlideIndex + 1} / {currentPresentation.slides.length}
               </div>
             </>
@@ -328,9 +335,17 @@ function AppContent() {
   );
 }
 
+// ============ Realtime Sync Initializer ============
+
+function RealtimeSyncInitializer({ children }: { children: React.ReactNode }) {
+  // Initialize WebSocket connection when authenticated
+  useRealtimeSync();
+  return <>{children}</>;
+}
+
 // ============ Main App with Routing ============
 
-export default function App() {
+function AppRoutes() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const navigate = useNavigate();
@@ -349,7 +364,7 @@ export default function App() {
   };
 
   return (
-    <AuthProvider>
+    <>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage onAuth={handleOpenAuth} />} />
@@ -358,6 +373,14 @@ export default function App() {
         <Route path="/about" element={<AboutPage onAuth={handleOpenAuth} />} />
         <Route path="/themes" element={<ThemesGalleryPage onAuth={handleOpenAuth} />} />
         <Route path="/solutions/:solutionId" element={<SolutionsPage onAuth={handleOpenAuth} />} />
+
+        {/* Homepage Prototypes - Isolated design variations */}
+        <Route path="/prototypes/*" element={<PrototypeRouter />} />
+
+        {/* Debug Routes (dev only) */}
+        <Route path="/debug" element={<DebugRoute />} />
+        <Route path="/debug/thumbnails" element={<ThumbnailGenerator />} />
+        <Route path="/debug/components" element={<ComponentShowcase />} />
 
         {/* Auth Routes (trigger modal) */}
         <Route
@@ -398,7 +421,27 @@ export default function App() {
         initialMode={authMode}
         onSuccess={handleAuthSuccess}
       />
-    </AuthProvider>
+    </>
+  );
+}
+
+// ============ Root App Component ============
+
+export default function App() {
+  return (
+    <QueryProvider>
+      <NetworkProvider>
+        <OfflineGate>
+          <DebugProvider>
+            <AuthProvider>
+              <RealtimeSyncInitializer>
+                <AppRoutes />
+              </RealtimeSyncInitializer>
+            </AuthProvider>
+          </DebugProvider>
+        </OfflineGate>
+      </NetworkProvider>
+    </QueryProvider>
   );
 }
 

@@ -11,13 +11,13 @@ import { Message } from '../types';
 export const COLUMNS = ['Hook', 'Problem', 'Solution', 'Proof', 'CTA'] as const;
 export type ColumnName = typeof COLUMNS[number];
 
-// Note colors for visual categorization
+// Note colors for visual categorization (Studio Noir palette with subtle gradients)
 export const NOTE_COLORS = {
-  yellow: 'bg-amber-100 border-amber-300',      // User ideas
-  blue: 'bg-blue-100 border-blue-300',          // AI suggestions
-  green: 'bg-emerald-100 border-emerald-300',   // Research findings
-  pink: 'bg-pink-100 border-pink-300',          // Questions/unknowns
-  purple: 'bg-purple-100 border-purple-300',    // Key insights
+  yellow: 'bg-gradient-to-br from-[#1f1f1f] to-[#1a1a1a] border-[#c5a47e] text-white',      // User ideas (gold accent)
+  blue: 'bg-gradient-to-br from-[#141414] to-[#111111] border-white/25 text-white',          // AI suggestions
+  green: 'bg-gradient-to-br from-[#1a1a18] to-[#1a1a1a] border-[#c5a47e]/50 text-white',     // Research findings
+  pink: 'bg-gradient-to-br from-[#151515] to-[#111111] border-white/35 text-white',          // Questions/unknowns
+  purple: 'bg-gradient-to-br from-[#0f0f0f] to-[#0a0a0a] border-[#c5a47e] text-white',       // Key insights (gold accent)
 } as const;
 
 export type NoteColor = keyof typeof NOTE_COLORS;
@@ -69,7 +69,7 @@ export interface IdeationSession {
 /**
  * Stages of the ideation process (for copilot guidance)
  */
-export type IdeationStage = 'discover' | 'expand' | 'structure' | 'ready' | 'review';
+export type IdeationStage = 'discover' | 'expand' | 'structure' | 'ready' | 'review' | 'style-preview';
 
 /**
  * Response from the agentic copilot
@@ -111,6 +111,16 @@ export interface DeckPlanSection {
   noteIds: string[];
   slideCount: number;
   layoutSuggestion: string;
+}
+
+/**
+ * Theme suggestion from AI analysis of ideation content
+ */
+export interface ThemeSuggestion {
+  themeId: string;           // e.g., 'executive', 'startup'
+  reasoning: string;         // Why this theme fits the content
+  visualStyleHint: string;   // Brief description of the visual direction
+  alternativeIds?: string[]; // 2-3 other fitting themes from different categories
 }
 
 // Helper functions

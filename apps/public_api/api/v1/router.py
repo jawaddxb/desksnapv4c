@@ -5,7 +5,7 @@ Follows SOLID-S: Single responsibility (route aggregation)
 """
 from fastapi import APIRouter
 
-from apps.public_api.api.v1 import auth, images, presentations
+from apps.public_api.api.v1 import auth, images, presentations, websocket, debug
 
 # Create main API router
 api_router = APIRouter()
@@ -14,6 +14,8 @@ api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["Auth"])
 api_router.include_router(presentations.router, prefix="/presentations", tags=["Presentations"])
 api_router.include_router(images.router, prefix="/presentations", tags=["Images"])
+api_router.include_router(websocket.router, tags=["WebSocket"])
+api_router.include_router(debug.router, prefix="/debug", tags=["Debug"])
 # api_router.include_router(templates.router, prefix="/templates", tags=["Templates"])
 # api_router.include_router(shares.router, prefix="/shares", tags=["Shares"])
 # api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])

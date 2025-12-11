@@ -19,6 +19,9 @@ from packages.common.middleware.security import SecurityHeadersMiddleware
 # Import API routers
 from apps.public_api.api.v1.router import api_router
 
+# Import WebSocket manager for lifecycle management
+from packages.common.services.websocket_manager import connection_manager
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,9 +37,15 @@ async def lifespan(app: FastAPI):
     print(f"📝 Environment: {settings.environment}")
     print(f"🔧 Debug mode: {settings.debug}")
 
+    # Initialize WebSocket connection manager (Redis pub/sub)
+    await connection_manager.initialize()
+    print("🔌 WebSocket connection manager initialized")
+
     yield
 
     # Shutdown
+    await connection_manager.shutdown()
+    print("🔌 WebSocket connection manager shut down")
     print(f"👋 Shutting down {settings.app_name}")
 
 

@@ -134,12 +134,29 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   return (
     <div
       ref={canvasRef}
-      className="relative w-full bg-gray-50 overflow-auto"
-      style={{ minHeight: canvasHeight }}
+      className="relative w-full overflow-auto"
+      style={{
+        minHeight: canvasHeight,
+        background: `
+          radial-gradient(ellipse 80% 50% at 50% 0%, rgba(197, 164, 126, 0.03) 0%, transparent 50%),
+          linear-gradient(180deg, #0a0a0a 0%, #080808 100%)
+        `
+      }}
       onClick={handleCanvasClick}
     >
+      {/* Subtle grid pattern for spatial orientation */}
+      <div
+        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '44px 44px'
+        }}
+      />
       {/* Column headers and swimlanes */}
-      <div className="flex gap-6 px-3 pt-3 sticky top-0 bg-gray-50 z-10">
+      <div className="flex gap-6 px-3 pt-3 sticky top-0 bg-[#0a0a0a] z-10">
         {COLUMNS.map((colName, colIndex) => (
           <div
             key={colName}
@@ -170,8 +187,11 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
             <div
               key={colName}
               className={`
-                flex-shrink-0 min-h-full rounded-lg transition-colors duration-200
-                ${dragOverColumn === colIndex ? 'bg-blue-100/50' : ''}
+                flex-shrink-0 min-h-full
+                transition-all duration-200 ease-out
+                ${dragOverColumn === colIndex
+                  ? 'bg-[#c5a47e]/[0.08] ring-1 ring-inset ring-[#c5a47e]/20'
+                  : ''}
               `}
               style={{ width: NOTE_WIDTH }}
               onDragOver={handleDragOver(colIndex)}
@@ -196,14 +216,14 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 {/* Add note button */}
                 <button
                   onClick={handleAddNote(colIndex)}
-                  className="w-44 h-12 border-2 border-dashed border-gray-300 rounded-lg
-                             text-gray-400 hover:border-gray-400 hover:text-gray-500
+                  className="w-44 h-12 border border-dashed border-white/20
+                             text-white/40 hover:border-[#c5a47e] hover:text-[#c5a47e]
                              transition-colors flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                   </svg>
-                  <span className="text-sm">Add note</span>
+                  <span className="text-xs uppercase tracking-wider">Add note</span>
                 </button>
               </div>
             </div>
@@ -211,15 +231,18 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         </div>
       </div>
 
-      {/* Empty state */}
+      {/* Empty state - centered in the full viewport height */}
       {notes.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-center text-gray-400">
-            <svg className="w-16 h-16 mx-auto mb-4 opacity-50" viewBox="0 0 24 24" fill="currentColor">
+        <div
+          className="fixed inset-0 flex items-center justify-center pointer-events-none"
+          style={{ right: '40%' }}
+        >
+          <div className="text-center text-white/40">
+            <svg className="w-16 h-16 mx-auto mb-4 opacity-50 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
             </svg>
-            <p className="text-lg font-medium">Start brainstorming</p>
-            <p className="text-sm">Chat with the copilot or click "Add note" to begin</p>
+            <p className="text-lg font-bold text-white uppercase tracking-wide">Start brainstorming</p>
+            <p className="text-sm text-white/50">Chat with the copilot or click "Add note" to begin</p>
           </div>
         </div>
       )}

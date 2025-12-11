@@ -2,7 +2,7 @@
  * FooterSection Component
  *
  * Site-wide footer with links and branding.
- * Wabi-Sabi aesthetic with warm tones.
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
@@ -43,21 +43,21 @@ const socialLinks = [
 
 export const FooterSection: React.FC = () => {
   return (
-    <footer className="bg-[#fafaf8] border-t border-[#e5e2dd]">
+    <footer className="bg-black border-t border-white/10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-[#1a1a2e] rounded-lg flex items-center justify-center">
-                <span className="text-[#d4af37] font-bold text-sm">D</span>
+            <Link to="/" className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-white flex items-center justify-center">
+                <span className="text-black font-bold text-sm">D</span>
               </div>
-              <span className="font-semibold text-[#1a1a2e] text-lg tracking-tight">
+              <span className="font-medium text-white">
                 DeckSnap
               </span>
             </Link>
-            <p className="text-sm text-[#6b6b6b] mb-6 max-w-xs">
-              Presentations with character. AI-powered slide design inspired by Wabi-Sabi philosophy.
+            <p className="text-sm text-white/60 mb-6 max-w-xs">
+              Presentations with character. AI-powered slide design for modern creators.
             </p>
 
             {/* Social Links */}
@@ -68,7 +68,7 @@ export const FooterSection: React.FC = () => {
                   <a
                     key={social.label}
                     href={social.href}
-                    className="w-10 h-10 rounded-full bg-[#f5f3ef] flex items-center justify-center text-[#6b6b6b] hover:text-[#1a1a2e] hover:bg-[#e5e2dd] transition-colors duration-300"
+                    className="w-10 h-10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white transition-colors duration-150"
                     aria-label={social.label}
                   >
                     <Icon className="w-5 h-5" />
@@ -80,21 +80,21 @@ export const FooterSection: React.FC = () => {
 
           {/* Product Links */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#1a1a2e] mb-4">
+            <h3 className="text-xs uppercase tracking-[0.2em] text-white/40 mb-4">
               Product
             </h3>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
                   {link.disabled ? (
-                    <span className="text-sm text-[#6b6b6b]/50 cursor-not-allowed">
+                    <span className="text-sm text-white/30">
                       {link.label}
                       <span className="ml-1 text-xs">(soon)</span>
                     </span>
                   ) : (
                     <Link
                       to={link.href}
-                      className="text-sm text-[#6b6b6b] hover:text-[#1a1a2e] transition-colors duration-300"
+                      className="text-sm text-white/60 hover:text-white transition-colors duration-150"
                     >
                       {link.label}
                     </Link>
@@ -106,7 +106,7 @@ export const FooterSection: React.FC = () => {
 
           {/* Solutions Links */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#1a1a2e] mb-4">
+            <h3 className="text-xs uppercase tracking-[0.2em] text-white/40 mb-4">
               Solutions
             </h3>
             <ul className="space-y-3">
@@ -114,7 +114,7 @@ export const FooterSection: React.FC = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="text-sm text-[#6b6b6b] hover:text-[#1a1a2e] transition-colors duration-300"
+                    className="text-sm text-white/60 hover:text-white transition-colors duration-150"
                   >
                     {link.label}
                   </Link>
@@ -125,21 +125,21 @@ export const FooterSection: React.FC = () => {
 
           {/* Resources Links */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#1a1a2e] mb-4">
+            <h3 className="text-xs uppercase tracking-[0.2em] text-white/40 mb-4">
               Resources
             </h3>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
                   {link.disabled ? (
-                    <span className="text-sm text-[#6b6b6b]/50 cursor-not-allowed">
+                    <span className="text-sm text-white/30">
                       {link.label}
                       <span className="ml-1 text-xs">(soon)</span>
                     </span>
                   ) : (
                     <Link
                       to={link.href}
-                      className="text-sm text-[#6b6b6b] hover:text-[#1a1a2e] transition-colors duration-300"
+                      className="text-sm text-white/60 hover:text-white transition-colors duration-150"
                     >
                       {link.label}
                     </Link>
@@ -151,21 +151,21 @@ export const FooterSection: React.FC = () => {
 
           {/* Company Links */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#1a1a2e] mb-4">
+            <h3 className="text-xs uppercase tracking-[0.2em] text-white/40 mb-4">
               Company
             </h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
                   {link.disabled ? (
-                    <span className="text-sm text-[#6b6b6b]/50 cursor-not-allowed">
+                    <span className="text-sm text-white/30">
                       {link.label}
                       <span className="ml-1 text-xs">(soon)</span>
                     </span>
                   ) : (
                     <Link
                       to={link.href}
-                      className="text-sm text-[#6b6b6b] hover:text-[#1a1a2e] transition-colors duration-300"
+                      className="text-sm text-white/60 hover:text-white transition-colors duration-150"
                     >
                       {link.label}
                     </Link>
@@ -177,11 +177,11 @@ export const FooterSection: React.FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-[#e5e2dd] flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-[#6b6b6b]">
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-white/40">
             © {new Date().getFullYear()} DeckSnap. All rights reserved.
           </p>
-          <p className="text-sm text-[#6b6b6b] italic">
+          <p className="text-sm text-white/40 italic">
             "Presentations with character."
           </p>
         </div>

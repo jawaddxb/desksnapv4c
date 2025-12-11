@@ -2,7 +2,7 @@
  * HowItWorks Component
  *
  * 3-step process visualization.
- * Wabi-Sabi aesthetic with organic connections.
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
@@ -31,62 +31,50 @@ const steps = [
 
 export const HowItWorks: React.FC = () => {
   return (
-    <section id="how-it-works" className="py-24 md:py-32 bg-[#f5f3ef]">
+    <section id="how-it-works" className="py-32 bg-[#111111]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+        <div className="max-w-2xl mb-20">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
             How It Works
           </span>
-          <h2 className="text-4xl md:text-5xl font-semibold text-[#1a1a2e] mb-4">
+          <h2 className="text-5xl md:text-6xl font-light mb-6">
             Three Steps to Beautiful
           </h2>
-          <p className="text-xl text-[#6b6b6b] max-w-2xl mx-auto">
+          <p className="text-xl text-white/60">
             No design skills required. No learning curve. Just describe what you need.
           </p>
         </div>
 
         {/* Steps */}
-        <div className="relative">
-          {/* Connection line (desktop) */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent -translate-y-1/2" />
+        <div className="grid lg:grid-cols-3 gap-8">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <div
+                key={index}
+                className="relative p-8 border border-white/10 hover:border-white/20 transition-colors group"
+              >
+                {/* Step Number */}
+                <span className="text-6xl font-light text-[#c5a47e] opacity-20 absolute top-4 right-4">
+                  {step.number}
+                </span>
 
-          <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <div
-                  key={index}
-                  className="relative bg-white rounded-2xl p-8 border border-[#e5e2dd] hover:border-[#d4af37]/30 transition-all duration-500"
-                >
-                  {/* Step Number */}
-                  <div className="absolute -top-4 left-8 px-3 py-1 bg-[#1a1a2e] text-white text-xs font-bold rounded-full">
-                    {step.number}
-                  </div>
-
-                  {/* Icon */}
-                  <div className="w-16 h-16 rounded-2xl bg-[#f5f3ef] flex items-center justify-center mb-6 mt-2">
-                    <Icon className="w-8 h-8 text-[#d4af37]" />
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="text-xl font-semibold text-[#1a1a2e] mb-3">
-                    {step.title}
-                  </h3>
-                  <p className="text-[#6b6b6b] leading-relaxed">
-                    {step.description}
-                  </p>
-
-                  {/* Decorative element */}
-                  {index < steps.length - 1 && (
-                    <div className="hidden lg:flex absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center z-10">
-                      <div className="w-3 h-3 bg-[#d4af37] rounded-full" />
-                    </div>
-                  )}
+                {/* Icon */}
+                <div className="w-12 h-12 border border-white/20 flex items-center justify-center mb-8 group-hover:border-[#c5a47e] transition-colors">
+                  <Icon className="w-6 h-6 text-[#c5a47e]" />
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Content */}
+                <h3 className="text-2xl font-light mb-4">
+                  {step.title}
+                </h3>
+                <p className="text-white/60 leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

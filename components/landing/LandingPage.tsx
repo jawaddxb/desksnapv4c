@@ -2,7 +2,7 @@
  * LandingPage Component
  *
  * Main container for the marketing landing page.
- * Orchestrates all landing page sections.
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
@@ -24,7 +24,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onAuth }) => {
   const handleSignup = () => onAuth('register');
 
   return (
-    <div className="min-h-screen bg-[#fafaf8]">
+    <div className="min-h-screen bg-black text-white">
       {/* Navigation */}
       <LandingNavbar onLogin={handleLogin} onSignup={handleSignup} />
 

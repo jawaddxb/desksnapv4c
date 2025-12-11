@@ -1,7 +1,8 @@
 /**
  * AboutPage Component
  *
- * Company story and Wabi-Sabi philosophy explanation.
+ * Company story and philosophy.
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
@@ -38,105 +39,91 @@ const philosophyPrinciples = [
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onAuth }) => {
   return (
-    <div className="min-h-screen bg-[#fafaf8]">
+    <div className="min-h-screen bg-black text-white">
       <LandingNavbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
 
-      <main className="pt-24 md:pt-32">
+      <main className="pt-32">
         {/* Page Header */}
-        <section className="max-w-4xl mx-auto px-6 lg:px-8 mb-16 md:mb-24 text-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+        <section className="max-w-4xl mx-auto px-6 lg:px-8 mb-24 text-center">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
             About
           </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-[#1a1a2e] mb-6">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-light">
             We Believe Perfect{' '}
-            <span className="relative">
-              Is Overrated
-              <svg
-                className="absolute -bottom-2 left-0 w-full h-4 text-[#d4af37]/30"
-                viewBox="0 0 200 16"
-                preserveAspectRatio="none"
-              >
-                <path
-                  d="M0 8 Q50 2 100 8 T200 8"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                />
-              </svg>
-            </span>
+            <span className="text-[#c5a47e]">Is Overrated</span>
           </h1>
         </section>
 
         {/* Origin Story */}
-        <section className="max-w-4xl mx-auto px-6 lg:px-8 mb-24">
-          <div className="prose prose-lg max-w-none">
-            <p className="text-xl text-[#6b6b6b] leading-relaxed mb-8">
+        <section className="max-w-4xl mx-auto px-6 lg:px-8 mb-32">
+          <div className="space-y-8">
+            <p className="text-2xl text-white/80 leading-relaxed">
               DeckSnap started with a simple frustration: why does creating a presentation
               feel like fighting software?
             </p>
 
-            <p className="text-[#6b6b6b] leading-relaxed mb-6">
+            <p className="text-lg text-white/60 leading-relaxed">
               We spent hours choosing templates that never quite fit. We hunted through stock
               photo libraries for images that were "close enough." We obsessed over alignment,
               consistency, perfection—and our presentations still felt... forgettable.
             </p>
 
-            <p className="text-[#6b6b6b] leading-relaxed mb-6">
+            <p className="text-lg text-white/60 leading-relaxed">
               Then we discovered Wabi-Sabi.
             </p>
 
-            <p className="text-[#6b6b6b] leading-relaxed mb-6">
+            <p className="text-lg text-white/60 leading-relaxed">
               Wabi-Sabi is a 500-year-old Japanese philosophy that finds beauty in imperfection,
               impermanence, and incompleteness. It taught us that a cracked bowl, repaired with
               gold, is more beautiful than a perfect one.
             </p>
 
-            <p className="text-[#6b6b6b] leading-relaxed mb-6">
+            <p className="text-lg text-white/60 leading-relaxed">
               What if presentations worked the same way?
             </p>
 
-            <p className="text-xl text-[#1a1a2e] leading-relaxed font-medium">
+            <p className="text-2xl text-white leading-relaxed">
               DeckSnap is built on that question. We use AI to handle the tedious parts—structure,
               content, imagery—so you can focus on what matters: your ideas, your story, your
               authentic voice.
             </p>
 
-            <p className="text-xl text-[#1a1a2e] leading-relaxed font-medium mt-8">
+            <p className="text-2xl text-white leading-relaxed">
               We don't help you make perfect presentations. We help you make presentations that are true.
             </p>
           </div>
         </section>
 
         {/* Philosophy Section */}
-        <section className="py-16 md:py-24 bg-[#f5f3ef]">
+        <section className="py-24 bg-[#111111]">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+            <div className="max-w-2xl mb-16">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
                 Philosophy
               </span>
-              <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a2e] mb-4">
+              <h2 className="text-4xl md:text-5xl font-light mb-6">
                 Wabi-Sabi Principles in DeckSnap
               </h2>
-              <p className="text-xl text-[#6b6b6b] max-w-2xl mx-auto">
+              <p className="text-xl text-white/60">
                 How ancient Japanese wisdom shapes modern presentation design.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+            <div className="grid md:grid-cols-2 gap-px bg-white/10">
               {philosophyPrinciples.map((principle) => (
                 <div
                   key={principle.japanese}
-                  className="bg-white rounded-2xl p-8 border border-[#e5e2dd]"
+                  className="bg-[#111111] p-10"
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="text-2xl font-bold text-[#d4af37]">
+                  <div className="flex items-baseline gap-4 mb-4">
+                    <span className="text-3xl font-light text-[#c5a47e]">
                       {principle.japanese}
                     </span>
-                    <span className="text-[#6b6b6b]">
+                    <span className="text-white/40">
                       ({principle.english})
                     </span>
                   </div>
-                  <p className="text-[#6b6b6b]">
+                  <p className="text-white/60">
                     {principle.application}
                   </p>
                 </div>
@@ -146,64 +133,38 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onAuth }) => {
         </section>
 
         {/* Kintsugi Visual */}
-        <section className="py-16 md:py-24 bg-[#1a1a2e] relative overflow-hidden">
-          {/* Gold crack pattern */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-10"
-            viewBox="0 0 800 400"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0 200 Q100 150 200 200 T400 180 T600 220 T800 200"
-              stroke="#d4af37"
-              strokeWidth="2"
-              fill="none"
-            />
-            <path
-              d="M200 0 Q180 100 220 200 T200 400"
-              stroke="#d4af37"
-              strokeWidth="1.5"
-              fill="none"
-            />
-            <path
-              d="M600 0 Q620 150 580 250 T620 400"
-              stroke="#d4af37"
-              strokeWidth="1.5"
-              fill="none"
-            />
-          </svg>
-
-          <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-white mb-6">
-              The Art of Kintsugi
+        <section className="py-24 border-t border-white/10">
+          <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+            <h2 className="text-4xl md:text-5xl font-light mb-8">
+              The Art of <span className="text-[#c5a47e]">Kintsugi</span>
             </h2>
-            <p className="text-xl text-white/70 leading-relaxed mb-8">
+            <p className="text-xl text-white/60 leading-relaxed mb-6">
               In Japanese culture, Kintsugi is the art of repairing broken pottery with gold.
               Rather than hiding the cracks, it celebrates them—making the piece more valuable
               than before it was broken.
             </p>
-            <p className="text-xl text-white/70 leading-relaxed">
+            <p className="text-xl text-white/60 leading-relaxed">
               Your presentations don't need to hide their imperfections. They need to embrace them.
             </p>
           </div>
         </section>
 
         {/* Mission Statement */}
-        <section className="py-16 md:py-24 bg-[#fafaf8]">
+        <section className="py-24 bg-[#111111]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
               Our Mission
             </span>
-            <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a2e] mb-6">
+            <h2 className="text-3xl md:text-4xl font-light mb-10 leading-relaxed">
               Make beautiful presentation design accessible to everyone—without
               sacrificing authenticity for polish.
             </h2>
             <button
               onClick={() => onAuth('register')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#1a1a2e] text-white font-medium rounded-full hover:bg-[#2a2a3e] transition-all duration-500 group"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-medium hover:bg-[#c5a47e] transition-colors group"
             >
               Start Creating
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </section>

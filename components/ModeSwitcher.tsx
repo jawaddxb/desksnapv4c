@@ -11,15 +11,15 @@ export const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   setViewMode
 }) => {
   return (
-    <div className="flex items-center bg-zinc-100 p-1 rounded-lg border border-zinc-200">
+    <div className="flex items-center bg-white/5 p-1 border border-white/10">
       <button
         onClick={() => setViewMode('standard')}
         className={`
-          px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest
-          flex items-center gap-2 transition-all
+          px-3 py-1.5 text-xs font-bold uppercase tracking-widest
+          flex items-center gap-2 transition-all duration-150
           ${viewMode === 'standard'
-            ? 'bg-white text-zinc-900 shadow-sm'
-            : 'text-zinc-500 hover:text-zinc-900'}
+            ? 'bg-white text-black'
+            : 'text-white/60 hover:text-white'}
         `}
         title="Grid-based layouts with predictable structure"
       >
@@ -29,11 +29,11 @@ export const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
       <button
         onClick={() => setViewMode('wabi-sabi')}
         className={`
-          px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest
-          flex items-center gap-2 transition-all
+          px-3 py-1.5 text-xs font-bold uppercase tracking-widest
+          flex items-center gap-2 transition-all duration-150
           ${viewMode === 'wabi-sabi'
-            ? 'bg-zinc-900 text-white shadow-sm'
-            : 'text-zinc-500 hover:text-zinc-900'}
+            ? 'bg-[#c5a47e] text-black'
+            : 'text-white/60 hover:text-white'}
         `}
         title="70+ artistic archetypes with organic, generative layouts"
       >

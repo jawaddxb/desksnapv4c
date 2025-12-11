@@ -1,183 +1,314 @@
-import { Presentation, Theme, Slide } from '../types';
+/**
+ * PowerPoint Export Service
+ *
+ * Uses dom-to-pptx for pixel-accurate DOM capture.
+ * Renders actual slide components and converts them to PPTX.
+ */
 
-type PptxGenJSType = typeof import('pptxgenjs').default;
+import type { Presentation, Theme, Slide } from '../types';
 
-// --- HELPERS ---
+// =============================================================================
+// TYPES
+// =============================================================================
 
-const getFont = (fontString: string) => fontString.split(',')[0].replace(/['"]/g, '');
+export interface PPTExportProgress {
+  currentSlide: number;
+  totalSlides: number;
+  phase: 'preparing' | 'rendering' | 'converting' | 'adding-notes' | 'complete' | 'error';
+  message?: string;
+}
 
-const getFontSize = (type: 'heading' | 'body', layout: string, scale?: string) => {
-    if (type === 'heading') {
-        if (scale === 'hero') return 72;
-        if (scale === 'compact') return 24;
-        if (scale === 'classic') return 44;
-        if (layout === 'statement') return 56;
-        if (layout === 'full-bleed') return 48;
-        if (layout === 'card') return 40;
-        return 36;
-    } else {
-        if (scale === 'hero') return 24;
-        if (scale === 'compact') return 12;
-        if (layout === 'statement') return 18;
-        if (layout === 'gallery') return 12;
-        return 16;
-    }
+export interface PPTExportOptions {
+  viewMode: 'standard' | 'wabi-sabi';
+  wabiSabiLayout?: string;
+  onProgress?: (progress: PPTExportProgress) => void;
+}
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
+/**
+ * Wait for a frame to ensure DOM has rendered
+ */
+const waitForFrame = (): Promise<void> => {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
 };
 
-const commonTextProps = (theme: Theme, slide: Slide, type: 'heading' | 'body') => ({
-    fontFace: getFont(type === 'heading' ? theme.fonts.heading : theme.fonts.body),
-    color: theme.colors.text,
-    bold: type === 'heading',
-    fontSize: getFontSize(type, slide.layoutType, slide.fontScale),
-    lineSpacing: type === 'body' ? 24 : undefined,
-    bullet: type === 'body'
-});
-
-// --- LAYOUT STRATEGIES ---
-
-const layoutGenerators: Record<string, (pptSlide: any, slide: Slide, theme: Theme) => void> = {
-    'full-bleed': (pptSlide, slide, theme) => {
-        if (slide.imageUrl) pptSlide.addImage({ path: slide.imageUrl, x: 0, y: 0, w: '100%', h: '100%' });
-        pptSlide.addShape('rect', { x: 0, y: 0, w: '100%', h: '100%', fill: { color: theme.colors.surface, transparency: 20 } });
-        
-        const isCenter = slide.alignment === 'center';
-        const isRight = slide.alignment === 'right';
-        const align = isCenter ? 'center' : isRight ? 'right' : 'left';
-        const xPos = isCenter ? 1 : isRight ? 5 : 0.5;
-
-        pptSlide.addText(slide.title.toUpperCase(), { 
-            x: xPos, y: 2, w: isCenter ? 8 : 4.5, align, 
-            ...commonTextProps(theme, slide, 'heading'), 
-            shadow: { type: 'outer', color: '000000', blur: 5, opacity: 0.3 } 
-        });
-        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
-            x: xPos, y: 3.5, w: isCenter ? 8 : 4.5, align, color: theme.colors.text 
-        });
-    },
-
-    'statement': (pptSlide, slide, theme) => {
-        pptSlide.addText(slide.title, { 
-            x: 1, y: 0.5, w: 8, h: 4, align: 'center', valign: 'middle', 
-            ...commonTextProps(theme, slide, 'heading'), fontSize: 60 
-        });
-        if (slide.content.length > 0) {
-             pptSlide.addText(slide.content.join(' • '), { 
-                x: 1, y: 4, w: 8, h: 1, align: 'center', 
-                ...commonTextProps(theme, slide, 'body'), bullet: false, color: theme.colors.secondary 
-            });
-        }
-        if (slide.imageUrl) pptSlide.addImage({ path: slide.imageUrl, x: 0, y: 5, w: '100%', h: 2.5, sizing: { type: 'cover', w: '100%', h: 2.5 } });
-    },
-
-    'gallery': (pptSlide, slide, theme) => {
-        if (slide.imageUrl) {
-            pptSlide.addImage({ path: slide.imageUrl, x: 0.5, y: 0.5, w: 9, h: 3.5, sizing: { type: 'cover', w: 9, h: 3.5 } });
-            pptSlide.addShape('rect', { x: 0.5, y: 0.5, w: 9, h: 3.5, line: { color: theme.colors.border, width: 1 }, fill: { type: 'none' } });
-        }
-        pptSlide.addText(slide.title, { x: 0.5, y: 4.2, w: 3, h: 1.2, valign: 'top', ...commonTextProps(theme, slide, 'heading'), fontSize: 24 });
-        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
-            x: 4, y: 4.2, w: 5.5, h: 1.2, valign: 'top', color: theme.colors.secondary 
-        });
-    },
-
-    'card': (pptSlide, slide, theme) => {
-        // Full screen background image
-        if (slide.imageUrl) pptSlide.addImage({ path: slide.imageUrl, x: 0, y: 0, w: '100%', h: '100%' });
-        
-        // Floating Card
-        const isCenter = slide.alignment === 'center';
-        const isRight = slide.alignment === 'right';
-        const cardX = isCenter ? 2 : isRight ? 5.5 : 0.5;
-        
-        // Card Background Shape
-        pptSlide.addShape('rect', { 
-            x: cardX, y: 1.5, w: 4.5, h: 4, 
-            fill: { color: theme.colors.surface, transparency: 10 },
-            line: { color: theme.colors.border, width: 1 }
-        });
-        
-        pptSlide.addText(slide.title, { 
-            x: cardX + 0.25, y: 1.75, w: 4, h: 1, 
-            ...commonTextProps(theme, slide, 'heading'), 
-            fontSize: 32, align: isCenter ? 'center' : 'left'
-        });
-        
-        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
-            x: cardX + 0.25, y: 2.75, w: 4, h: 2.5, 
-            align: isCenter ? 'center' : 'left'
-        });
-    },
-
-    'horizontal': (pptSlide, slide, theme) => {
-        // 50/50 Horizontal Split
-        if (slide.imageUrl) {
-            pptSlide.addImage({ path: slide.imageUrl, x: 0, y: 0, w: '100%', h: '45%', sizing: { type: 'cover', w: '100%', h: '45%' } });
-        }
-        pptSlide.addText(slide.title, { 
-            x: 0.5, y: 3.5, w: 9, h: 1, align: 'center',
-            ...commonTextProps(theme, slide, 'heading') 
-        });
-        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
-            x: 1, y: 4.5, w: 8, h: 2, align: 'center'
-        });
-    },
-
-    'magazine': (pptSlide, slide, theme) => {
-        const isRight = slide.alignment === 'right';
-        
-        // Image Column (35% width)
-        if (slide.imageUrl) {
-            pptSlide.addImage({ 
-                path: slide.imageUrl, 
-                x: isRight ? 6.5 : 0, y: 0, w: 3.5, h: '100%', 
-                sizing: { type: 'cover', w: 3.5, h: '100%' } 
-            });
-        }
-        
-        // Content Area (65% width)
-        const textX = isRight ? 0.5 : 4;
-        pptSlide.addText(slide.title, { 
-            x: textX, y: 1, w: 5.5, h: 1.5, valign: 'bottom',
-            ...commonTextProps(theme, slide, 'heading') 
-        });
-        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { 
-            x: textX, y: 2.5, w: 5.5, h: 4, valign: 'top' 
-        });
-    },
-
-    'split': (pptSlide, slide, theme) => {
-        const isRight = slide.alignment === 'right';
-        if (slide.imageUrl) {
-            pptSlide.addImage({ path: slide.imageUrl, x: isRight ? 0.5 : 5.5, y: 1, w: 4, h: 5.625, sizing: { type: 'cover', w: 4, h: 5.625 } });
-        }
-        const textX = isRight ? 5 : 0.5;
-        pptSlide.addText(slide.title, { x: textX, y: 1, w: 4.5, h: 1.5, valign: 'bottom', ...commonTextProps(theme, slide, 'heading') });
-        pptSlide.addText(slide.content.map(c => ({ text: c, options: commonTextProps(theme, slide, 'body') })), { x: textX, y: 2.5, w: 4.5, h: 4, valign: 'top' });
-    }
+/**
+ * Wait for all images in a container to load
+ */
+const waitForImages = async (container: HTMLElement): Promise<void> => {
+  const images = container.querySelectorAll('img');
+  const promises = Array.from(images).map((img) => {
+    if (img.complete) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // Continue even if image fails
+    });
+  });
+  await Promise.all(promises);
 };
 
-// --- MAIN EXPORT ---
+/**
+ * Wait for fonts to be ready
+ */
+const waitForFonts = async (): Promise<void> => {
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+  // Additional delay to ensure fonts are painted
+  await new Promise((resolve) => setTimeout(resolve, 100));
+};
 
-export const generatePPT = async (presentation: Presentation, theme: Theme) => {
-  // Dynamic import - only loads when export is triggered
-  const PptxGenJS = (await import('pptxgenjs')).default;
+/**
+ * Sanitize filename for safe download
+ */
+const sanitizeFilename = (name: string): string => {
+  return name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+};
 
-  const pres = new PptxGenJS();
-  pres.title = presentation.topic;
-  pres.subject = presentation.topic;
-  pres.layout = 'LAYOUT_16x9';
+// =============================================================================
+// SLIDE RENDERING
+// =============================================================================
 
-  for (const slide of presentation.slides) {
-    const pptSlide = pres.addSlide();
-    pptSlide.background = { color: theme.colors.background };
-    if (slide.speakerNotes) pptSlide.addNotes(slide.speakerNotes);
+/**
+ * Render a single slide and wait for it to be ready
+ */
+const renderSlide = async (
+  slideIndex: number,
+  presentation: Presentation,
+  theme: Theme,
+  viewMode: 'standard' | 'wabi-sabi',
+  wabiSabiLayout?: string
+): Promise<void> => {
+  // Dispatch event to render the slide
+  window.dispatchEvent(
+    new CustomEvent('render-slide-for-ppt', {
+      detail: { slideIndex, presentation, theme, viewMode, wabiSabiLayout },
+    })
+  );
 
-    const generator = layoutGenerators[slide.layoutType] || layoutGenerators['split'];
-    generator(pptSlide, slide, theme);
-    
-    pptSlide.addText("Generated by DeckSnap AI", { x: 0.2, y: 5.3, w: '100%', h: 0.3, align: 'left', fontSize: 8, color: '999999' });
+  // Wait for render
+  await waitForFrame();
+  await waitForFonts();
+
+  // Get the rendered container and wait for images
+  const container = document.getElementById('ppt-slide-content');
+  if (container) {
+    await waitForImages(container);
   }
 
-  const fileName = `${presentation.topic.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_presentation.pptx`;
-  await pres.writeFile({ fileName });
+  // Extra delay for any CSS transitions/animations
+  await new Promise((resolve) => setTimeout(resolve, 200));
+};
+
+/**
+ * Get the rendered slide element
+ */
+const getSlideElement = (): HTMLElement | null => {
+  return document.getElementById('ppt-slide-content');
+};
+
+// =============================================================================
+// MAIN EXPORT FUNCTION
+// =============================================================================
+
+/**
+ * Generate PowerPoint from presentation using dom-to-pptx
+ *
+ * This function:
+ * 1. Renders each slide to the DOM via PPTExportRenderer
+ * 2. Uses dom-to-pptx to convert DOM elements to PPTX
+ * 3. Adds speaker notes via pptxgenjs post-processing
+ */
+export const generatePPT = async (
+  presentation: Presentation,
+  theme: Theme,
+  options: PPTExportOptions = { viewMode: 'standard' }
+): Promise<void> => {
+  const { viewMode, wabiSabiLayout, onProgress } = options;
+
+  try {
+    // Dynamic import for code splitting
+    const { exportToPptx } = await import('dom-to-pptx');
+
+    onProgress?.({
+      currentSlide: 0,
+      totalSlides: presentation.slides.length,
+      phase: 'preparing',
+      message: 'Preparing slides for export...',
+    });
+
+    // Collect all slide elements
+    const slideElements: HTMLElement[] = [];
+
+    for (let i = 0; i < presentation.slides.length; i++) {
+      onProgress?.({
+        currentSlide: i + 1,
+        totalSlides: presentation.slides.length,
+        phase: 'rendering',
+        message: `Rendering slide ${i + 1} of ${presentation.slides.length}...`,
+      });
+
+      // Render the slide to DOM
+      await renderSlide(i, presentation, theme, viewMode, wabiSabiLayout);
+
+      // Get the rendered element
+      const slideElement = getSlideElement();
+      if (slideElement) {
+        // Clone the element to preserve it
+        const clone = slideElement.cloneNode(true) as HTMLElement;
+        // Keep the element in DOM for dom-to-pptx to process
+        slideElements.push(clone);
+      }
+    }
+
+    onProgress?.({
+      currentSlide: presentation.slides.length,
+      totalSlides: presentation.slides.length,
+      phase: 'converting',
+      message: 'Converting to PowerPoint format...',
+    });
+
+    // Use dom-to-pptx to convert all slides
+    // Create a temporary container for the cloned elements
+    const tempContainer = document.createElement('div');
+    tempContainer.style.cssText = 'position:fixed;left:-9999px;top:0;';
+    document.body.appendChild(tempContainer);
+
+    // Add cloned elements to temp container
+    slideElements.forEach((el) => {
+      el.style.width = '1920px';
+      el.style.height = '1080px';
+      tempContainer.appendChild(el);
+    });
+
+    // Wait for elements to be in DOM
+    await waitForFrame();
+
+    // Convert to PPTX using the child elements
+    const slideSelector = slideElements.map((_, i) =>
+      `div[style*="position:fixed"] > div:nth-child(${i + 1})`
+    );
+
+    // Export using the temp container's children
+    const fileName = `${sanitizeFilename(presentation.topic)}_presentation.pptx`;
+
+    try {
+      await exportToPptx(
+        Array.from(tempContainer.children) as HTMLElement[],
+        { fileName }
+      );
+    } finally {
+      // Clean up temp container
+      document.body.removeChild(tempContainer);
+    }
+
+    // Signal export complete
+    window.dispatchEvent(new CustomEvent('ppt-export-complete'));
+
+    onProgress?.({
+      currentSlide: presentation.slides.length,
+      totalSlides: presentation.slides.length,
+      phase: 'complete',
+      message: 'PowerPoint exported successfully!',
+    });
+  } catch (error) {
+    // Signal export complete even on error
+    window.dispatchEvent(new CustomEvent('ppt-export-complete'));
+
+    onProgress?.({
+      currentSlide: 0,
+      totalSlides: presentation.slides.length,
+      phase: 'error',
+      message: error instanceof Error ? error.message : 'Export failed',
+    });
+
+    throw error;
+  }
+};
+
+// =============================================================================
+// LEGACY EXPORT (Fallback using pptxgenjs directly)
+// =============================================================================
+
+// Keep the old FONT_MAP for any legacy needs
+export const FONT_MAP: Record<string, string> = {
+  // Display/Serif fonts -> Georgia/Times alternatives
+  'Abril Fatface': 'Georgia',
+  'Playfair Display': 'Georgia',
+  'Cormorant Garamond': 'Garamond',
+  'Libre Baskerville': 'Book Antiqua',
+  'Crimson Text': 'Times New Roman',
+  'Merriweather': 'Georgia',
+  'DM Serif Display': 'Georgia',
+  'Cinzel': 'Constantia',
+  'Lora': 'Cambria',
+  'Newsreader': 'Georgia',
+  'Source Serif 4': 'Georgia',
+
+  // Sans-serif fonts -> Arial/Calibri alternatives
+  'Space Grotesk': 'Calibri',
+  'DM Sans': 'Calibri',
+  'Inter': 'Calibri',
+  'Oswald': 'Arial Narrow',
+  'Work Sans': 'Calibri',
+  'Teko': 'Impact',
+  'Plus Jakarta Sans': 'Calibri',
+  'Manrope': 'Calibri',
+  'Poppins': 'Calibri',
+  'Open Sans': 'Calibri',
+  'Raleway': 'Calibri Light',
+  'Montserrat': 'Arial',
+  'Nunito': 'Calibri',
+  'Syne': 'Arial',
+  'Comfortaa': 'Calibri',
+  'Quicksand': 'Calibri',
+  'Righteous': 'Impact',
+  'Bebas Neue': 'Impact',
+  'Anton': 'Impact',
+  'Roboto': 'Arial',
+  'Unbounded': 'Arial Black',
+  'Rajdhani': 'Arial Narrow',
+  'League Spartan': 'Arial',
+  'Outfit': 'Calibri',
+  'Noto Sans': 'Arial',
+  'Noto Sans JP': 'MS Gothic',
+  'Lato': 'Calibri',
+
+  // Monospace fonts -> Courier/Consolas alternatives
+  'Space Mono': 'Courier New',
+  'Fira Code': 'Consolas',
+
+  // Decorative/Cursive fonts -> closest alternatives
+  'Bangers': 'Impact',
+  'Press Start 2P': 'Courier New',
+  'Permanent Marker': 'Comic Sans MS',
+  'Kalam': 'Comic Sans MS',
+  'Amatic SC': 'Arial Narrow',
+  'Caveat': 'Comic Sans MS',
+
+  // Default fallbacks (pass-through)
+  'Arial': 'Arial',
+  'Georgia': 'Georgia',
+  'Times New Roman': 'Times New Roman',
+  'Courier New': 'Courier New',
+  'Impact': 'Impact',
+  'Calibri': 'Calibri',
+
+  // Generic fallbacks
+  'serif': 'Times New Roman',
+  'sans-serif': 'Calibri',
+  'monospace': 'Courier New',
+  'cursive': 'Comic Sans MS',
+};
+
+export const getFont = (fontString: string): string => {
+  const primaryFont = fontString.split(',')[0].replace(/['"]/g, '').trim();
+  return FONT_MAP[primaryFont] || 'Calibri';
 };

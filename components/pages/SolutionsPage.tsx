@@ -2,7 +2,7 @@
  * SolutionsPage Component
  *
  * Dynamic solutions page for different audiences.
- * Routes: /solutions/startups, /solutions/educators, /solutions/designers, /solutions/teams
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
@@ -97,7 +97,6 @@ const solutionsData = {
 export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
   const { solutionId } = useParams<{ solutionId: string }>();
 
-  // Validate route
   if (!solutionId || !solutionsData[solutionId as keyof typeof solutionsData]) {
     return <Navigate to="/solutions/startups" replace />;
   }
@@ -106,75 +105,65 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
   const Icon = solution.icon;
 
   return (
-    <div className="min-h-screen bg-[#fafaf8]">
+    <div className="min-h-screen bg-black text-white">
       <LandingNavbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
 
-      <main className="pt-24 md:pt-32">
+      <main className="pt-32">
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-16 md:mb-24">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Content */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#d4af37]/10 rounded-full mb-6">
-                <Icon className="w-4 h-4 text-[#d4af37]" />
-                <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 border border-white/20 mb-8">
+                <Icon className="w-4 h-4 text-[#c5a47e]" />
+                <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e]">
                   For {solutionId.charAt(0).toUpperCase() + solutionId.slice(1)}
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-[#1a1a2e] mb-6 leading-tight">
+              <h1 className="text-5xl md:text-6xl font-light mb-6 leading-[0.95]">
                 {solution.headline}
               </h1>
 
-              <p className="text-xl text-[#6b6b6b] mb-8">
+              <p className="text-xl text-white/60 mb-10">
                 {solution.subheadline}
               </p>
 
               <button
                 onClick={() => onAuth('register')}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-[#1a1a2e] text-white font-medium rounded-full hover:bg-[#2a2a3e] transition-all duration-500 group"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-medium hover:bg-[#c5a47e] transition-colors group"
               >
                 {solution.cta}
-                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
 
             {/* Visual */}
-            <div className="relative">
-              <div
-                className="absolute -inset-4 bg-gradient-to-br from-[#d4af37]/5 to-transparent rounded-3xl"
-                style={{
-                  borderRadius: '60% 40% 55% 45% / 45% 55% 45% 55%',
-                }}
-              />
-              <div className="relative aspect-[4/3] bg-white rounded-2xl border border-[#e5e2dd] shadow-lg overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] to-[#2a2a3e] flex items-center justify-center">
-                  <Icon className="w-24 h-24 text-[#d4af37]/30" />
-                </div>
-              </div>
+            <div className="aspect-[4/3] bg-white/5 border border-white/10 flex items-center justify-center">
+              <Icon className="w-24 h-24 text-[#c5a47e] opacity-30" />
             </div>
           </div>
         </section>
 
         {/* Pain Points */}
-        <section className="py-16 md:py-24 bg-[#f5f3ef]">
+        <section className="py-24 bg-[#111111]">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+            <div className="mb-16">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
                 Sound Familiar?
               </span>
-              <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a2e]">
+              <h2 className="text-4xl md:text-5xl font-light">
                 We've Been There Too
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-px bg-white/10">
               {solution.painPoints.map((painPoint, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-2xl p-6 border border-[#e5e2dd]"
+                  className="bg-[#111111] p-8"
                 >
-                  <p className="text-[#6b6b6b] italic">"{painPoint}"</p>
+                  <p className="text-white/60 italic">"{painPoint}"</p>
                 </div>
               ))}
             </div>
@@ -182,42 +171,42 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
         </section>
 
         {/* Solution */}
-        <section className="py-16 md:py-24 bg-[#fafaf8]">
+        <section className="py-24 border-t border-white/10">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
               The Solution
             </span>
-            <p className="text-2xl md:text-3xl text-[#1a1a2e] leading-relaxed mb-8">
+            <p className="text-2xl md:text-3xl text-white/80 leading-relaxed mb-8">
               {solution.solution}
             </p>
-            <p className="text-lg text-[#d4af37] font-medium">
+            <p className="text-lg text-[#c5a47e]">
               {solution.socialProof}
             </p>
           </div>
         </section>
 
         {/* Features */}
-        <section className="py-16 md:py-24 bg-[#f5f3ef]">
+        <section className="py-24 bg-[#111111]">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+            <div className="mb-16">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
                 Features
               </span>
-              <h2 className="text-3xl md:text-4xl font-semibold text-[#1a1a2e]">
+              <h2 className="text-4xl md:text-5xl font-light">
                 What You Get
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-px bg-white/10 max-w-3xl">
               {solution.features.map((feature, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-3 bg-white rounded-xl p-6 border border-[#e5e2dd]"
+                  className="flex items-start gap-4 bg-[#111111] p-8"
                 >
-                  <div className="w-6 h-6 rounded-full bg-[#d4af37]/10 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-4 h-4 text-[#d4af37]" />
+                  <div className="w-5 h-5 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-[#c5a47e]" />
                   </div>
-                  <span className="text-[#6b6b6b]">{feature}</span>
+                  <span className="text-white/60">{feature}</span>
                 </div>
               ))}
             </div>
@@ -225,20 +214,20 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
         </section>
 
         {/* CTA */}
-        <section className="py-16 md:py-24 bg-[#1a1a2e]">
+        <section className="py-24 border-t border-white/10">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-light mb-6">
               Ready to Get Started?
             </h2>
-            <p className="text-xl text-white/60 mb-8">
+            <p className="text-xl text-white/60 mb-10">
               Create your first presentation in minutes. Free forever for basic use.
             </p>
             <button
               onClick={() => onAuth('register')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#d4af37] text-[#1a1a2e] font-semibold rounded-full hover:bg-[#e5c348] transition-all duration-500 group"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#c5a47e] text-black font-medium hover:bg-white transition-colors group"
             >
               {solution.cta}
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </section>

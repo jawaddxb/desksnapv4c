@@ -1,12 +1,10 @@
 /**
  * TestimonialsSection Component
  *
- * Customer testimonials with Wabi-Sabi aesthetic.
- * Placeholder content for now.
+ * Customer testimonials with Studio Noir aesthetic.
  */
 
 import React from 'react';
-import { Quote } from 'lucide-react';
 
 const testimonials = [
   {
@@ -14,72 +12,66 @@ const testimonials = [
     author: 'Sarah Chen',
     role: 'Product Designer',
     company: 'TechStartup',
-    avatar: null,
   },
   {
-    quote: 'My students actually engage with my slides now. The Wabi-Sabi aesthetic invites discussion instead of passive consumption.',
+    quote: 'My students actually engage with my slides now. The aesthetic invites discussion instead of passive consumption.',
     author: 'Dr. Marcus Rodriguez',
     role: 'Professor of Design',
     company: 'RISD',
-    avatar: null,
   },
   {
     quote: 'We closed our Series A with a DeckSnap presentation. Investors said it looked "refreshingly authentic."',
     author: 'Priya Sharma',
     role: 'Founder',
     company: 'SeedStage',
-    avatar: null,
   },
 ];
 
 export const TestimonialsSection: React.FC = () => {
   return (
-    <section className="py-24 md:py-32 bg-[#f5f3ef]">
+    <section className="py-32 bg-[#111111]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+        <div className="max-w-2xl mb-20">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
             Testimonials
           </span>
-          <h2 className="text-4xl md:text-5xl font-semibold text-[#1a1a2e] mb-4">
+          <h2 className="text-5xl md:text-6xl font-light mb-6">
             Loved by Creators
           </h2>
-          <p className="text-xl text-[#6b6b6b] max-w-2xl mx-auto">
+          <p className="text-xl text-white/60">
             Join thousands of designers, educators, and founders who've discovered a better way to present.
           </p>
         </div>
 
         {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid md:grid-cols-3 gap-px bg-white/10">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl p-8 border border-[#e5e2dd] hover:border-[#d4af37]/30 transition-all duration-500 hover:shadow-lg hover:shadow-[#d4af37]/5"
+              className="bg-[#111111] p-10"
             >
-              {/* Quote Icon */}
-              <div className="w-10 h-10 rounded-xl bg-[#d4af37]/10 flex items-center justify-center mb-6">
-                <Quote className="w-5 h-5 text-[#d4af37]" />
-              </div>
+              {/* Quote mark */}
+              <span className="text-5xl text-[#c5a47e] opacity-30 leading-none">"</span>
 
               {/* Quote */}
-              <blockquote className="text-[#1a1a2e] leading-relaxed mb-6">
-                "{testimonial.quote}"
+              <blockquote className="text-lg text-white/80 leading-relaxed mt-4 mb-8">
+                {testimonial.quote}
               </blockquote>
 
               {/* Author */}
               <div className="flex items-center gap-4">
-                {/* Avatar placeholder */}
-                <div className="w-12 h-12 rounded-full bg-[#f5f3ef] flex items-center justify-center">
-                  <span className="text-lg font-semibold text-[#1a1a2e]">
+                <div className="w-10 h-10 border border-white/20 flex items-center justify-center">
+                  <span className="text-sm font-medium">
                     {testimonial.author.charAt(0)}
                   </span>
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1a1a2e]">
+                  <p className="text-white font-medium">
                     {testimonial.author}
                   </p>
-                  <p className="text-sm text-[#6b6b6b]">
-                    {testimonial.role} at {testimonial.company}
+                  <p className="text-sm text-white/40">
+                    {testimonial.role}, {testimonial.company}
                   </p>
                 </div>
               </div>

@@ -6,6 +6,7 @@
  */
 
 import { useCallback, useRef, useEffect } from 'react';
+import { UseMutationResult } from '@tanstack/react-query';
 import { Presentation, Slide } from '../../types';
 import {
   generateSlideImage as generateSlideImageFrontend,
@@ -27,7 +28,14 @@ import { hasTokens } from '../../services/api/tokenManager';
  * - 'async': Backend generates images via Celery workers (new)
  * - 'auto': Use async if authenticated, sync otherwise
  */
-const IMAGE_GENERATION_MODE: 'sync' | 'async' | 'auto' = 'auto';
+const IMAGE_GENERATION_MODE: 'sync' | 'async' | 'auto' = 'sync';
+
+/** Type for the updateSlide mutation */
+type UpdateSlideMutation = UseMutationResult<
+  Slide,
+  Error,
+  { presentationId: string; slideId: string; updates: Partial<Slide> }
+>;
 
 export interface UseImageGenerationOptions {
   /** Current presentation */
@@ -42,6 +50,10 @@ export interface UseImageGenerationOptions {
   updateSlideAtIndex: (index: number, updates: Partial<Slide>) => void;
   /** Update the active slide */
   updateSlide: (updates: Partial<Slide>) => void;
+  /** Current presentation ID for API calls */
+  presentationId: string | null;
+  /** Mutation to persist slide updates to API */
+  updateSlideMutation: UpdateSlideMutation;
 }
 
 export interface UseImageGenerationReturn {
@@ -79,6 +91,8 @@ export function useImageGeneration({
   isGenerating,
   updateSlideAtIndex,
   updateSlide,
+  presentationId,
+  updateSlideMutation,
 }: UseImageGenerationOptions): UseImageGenerationReturn {
   // Track active polling
   const pollRef = useRef<{ stop: () => void } | null>(null);
@@ -103,14 +117,30 @@ export function useImageGeneration({
 
       try {
         const url = await generateSlideImageFrontend(prompt, style);
+        // Update local state for immediate UI feedback
         updateSlideAtIndex(index, { imageUrl: url, isImageLoading: false, imageError: undefined });
+
+        // Persist to API so image survives navigation/refetch
+        const slide = presentation?.slides[index];
+        if (slide && presentationId) {
+          try {
+            await updateSlideMutation.mutateAsync({
+              presentationId,
+              slideId: slide.id,
+              updates: { imageUrl: url },
+            });
+          } catch (apiError) {
+            console.warn('Failed to persist image URL to API:', apiError);
+            // Image is still displayed locally, but may not survive refresh
+          }
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Image generation failed';
         console.warn('Image generation failed', err);
         updateSlideAtIndex(index, { isImageLoading: false, imageError: errorMessage });
       }
     },
-    [updateSlideAtIndex]
+    [updateSlideAtIndex, presentation, presentationId, updateSlideMutation]
   );
 
   /**

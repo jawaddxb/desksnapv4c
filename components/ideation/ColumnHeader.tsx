@@ -13,7 +13,7 @@ interface ColumnHeaderProps {
   isActive?: boolean;
 }
 
-// Icons for each column type
+// Icons for each column type (Studio Noir)
 const COLUMN_ICONS: Record<ColumnName, React.ReactNode> = {
   Hook: (
     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -42,13 +42,13 @@ const COLUMN_ICONS: Record<ColumnName, React.ReactNode> = {
   ),
 };
 
-// Colors for each column
+// Colors for each column (Studio Noir - gradient backgrounds with gold accent)
 const COLUMN_COLORS: Record<ColumnName, string> = {
-  Hook: 'bg-amber-50 border-amber-200 text-amber-700',
-  Problem: 'bg-red-50 border-red-200 text-red-700',
-  Solution: 'bg-green-50 border-green-200 text-green-700',
-  Proof: 'bg-blue-50 border-blue-200 text-blue-700',
-  CTA: 'bg-purple-50 border-purple-200 text-purple-700',
+  Hook: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
+  Problem: 'bg-gradient-to-b from-[#141414] to-[#111111] border-white/30 text-white/70',
+  Solution: 'bg-gradient-to-b from-[#151513] to-[#111111] border-[#c5a47e]/60 text-[#c5a47e]',
+  Proof: 'bg-gradient-to-b from-[#131313] to-[#111111] border-white/20 text-white/60',
+  CTA: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
 };
 
 // Descriptions for each column
@@ -69,27 +69,46 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   const icon = COLUMN_ICONS[name];
   const description = COLUMN_DESCRIPTIONS[name];
 
+  // Calculate fill percentage (max 5 notes per column as suggested capacity)
+  const fillPercentage = Math.min((noteCount / 5) * 100, 100);
+
   return (
     <div
       className={`
-        px-3 py-2 rounded-lg border text-center
-        transition-all duration-200
+        relative px-3 py-2 border text-center
+        transition-all duration-200 ease-out
         ${colorClasses}
-        ${isActive ? 'ring-2 ring-offset-2 ring-blue-400' : ''}
+        ${isActive ? 'ring-1 ring-[#c5a47e] bg-[#c5a47e]/[0.08]' : ''}
       `}
     >
+      {/* Completion indicator dot */}
+      {noteCount > 0 && (
+        <div className="absolute -top-1 -right-1 w-3 h-3">
+          <div className="w-full h-full bg-[#c5a47e]/30 rounded-full" />
+          <div className="absolute inset-0.5 bg-[#c5a47e] rounded-full" />
+        </div>
+      )}
+
       <div className="flex items-center justify-center gap-2 mb-1">
         {icon}
-        <span className="font-semibold text-sm uppercase tracking-wide">
+        <span className="font-bold text-xs uppercase tracking-widest">
           {name}
         </span>
         {noteCount > 0 && (
-          <span className="text-xs px-1.5 py-0.5 rounded-full bg-white/60">
+          <span className="text-xs px-1.5 py-0.5 bg-white/10">
             {noteCount}
           </span>
         )}
       </div>
-      <p className="text-xs opacity-70">{description}</p>
+      <p className="text-xs opacity-50">{description}</p>
+
+      {/* Progress bar at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5">
+        <div
+          className="h-full bg-[#c5a47e]/40 transition-all duration-300"
+          style={{ width: `${fillPercentage}%` }}
+        />
+      </div>
     </div>
   );
 };

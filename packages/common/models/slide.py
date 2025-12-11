@@ -91,6 +91,13 @@ class Slide(BaseModel):
         nullable=True,
     )
 
+    # Version for optimistic concurrency control (real-time sync)
+    version: Mapped[int] = mapped_column(
+        Integer,
+        default=1,
+        nullable=False,
+    )
+
     # Relationship
     presentation = relationship("Presentation", back_populates="slides")
 

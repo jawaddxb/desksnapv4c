@@ -35,6 +35,7 @@ interface BackendPresentation {
   theme_id: string | null;
   visual_style: string | null;
   wabi_sabi_layout: string | null;
+  view_mode: string | null;
   thumbnail_url: string | null;
   is_public: boolean;
   created_at: string;
@@ -57,6 +58,7 @@ interface ExportedPresentation {
   themeId: string | null;
   visualStyle: string | null;
   wabiSabiLayout: string | null;
+  viewMode: string | null;
   slides: Array<{
     id: string;
     title: string | null;
@@ -87,7 +89,7 @@ const backendSlideToFrontend = (slide: BackendSlide): Slide => ({
   layoutType: (slide.layout_type as Slide['layoutType']) || 'split',
   alignment: (slide.alignment as Slide['alignment']) || 'left',
   fontScale: (slide.font_scale as Slide['fontScale']) || undefined,
-  layoutVariant: slide.layout_variant || undefined,
+  layoutVariant: (slide.layout_variant as Slide['layoutVariant']) || undefined,
   textStyles: slide.style_overrides?.textStyles as Slide['textStyles'],
   imageStyles: slide.style_overrides?.imageStyles as Slide['imageStyles'],
   contentItemStyles: slide.style_overrides?.contentItemStyles as Slide['contentItemStyles'],
@@ -99,6 +101,7 @@ const backendToFrontend = (backend: BackendPresentation): Presentation => ({
   themeId: backend.theme_id || 'neoBrutalist',
   visualStyle: backend.visual_style || '',
   wabiSabiLayout: backend.wabi_sabi_layout || undefined,
+  viewMode: (backend.view_mode as Presentation['viewMode']) || 'standard',
   lastModified: new Date(backend.updated_at).getTime(),
   slides: (backend.slides || []).map(backendSlideToFrontend),
   analytics: [],
@@ -129,6 +132,7 @@ const frontendToBackendCreate = (presentation: Presentation) => ({
   theme_id: presentation.themeId || null,
   visual_style: presentation.visualStyle || null,
   wabi_sabi_layout: presentation.wabiSabiLayout || null,
+  view_mode: presentation.viewMode || 'standard',
   is_public: false,
   slides: presentation.slides.map((slide, i) => frontendSlideToBackend(slide, i)),
 });
@@ -139,6 +143,7 @@ const exportedToFrontend = (exported: ExportedPresentation): Presentation => ({
   themeId: exported.themeId || 'neoBrutalist',
   visualStyle: exported.visualStyle || '',
   wabiSabiLayout: exported.wabiSabiLayout || undefined,
+  viewMode: (exported.viewMode as Presentation['viewMode']) || 'standard',
   lastModified: new Date(exported.updatedAt).getTime(),
   slides: exported.slides.map((slide, index) => ({
     id: slide.id,
@@ -151,7 +156,7 @@ const exportedToFrontend = (exported: ExportedPresentation): Presentation => ({
     layoutType: (slide.layoutType as Slide['layoutType']) || 'split',
     alignment: (slide.alignment as Slide['alignment']) || 'left',
     fontScale: (slide.fontScale as Slide['fontScale']) || undefined,
-    layoutVariant: slide.layoutVariant || undefined,
+    layoutVariant: (slide.layoutVariant as Slide['layoutVariant']) || undefined,
   })),
   analytics: [],
 });
@@ -205,6 +210,7 @@ export const updatePresentation = async (
   if (updates.themeId !== undefined) backendUpdates.theme_id = updates.themeId;
   if (updates.visualStyle !== undefined) backendUpdates.visual_style = updates.visualStyle;
   if (updates.wabiSabiLayout !== undefined) backendUpdates.wabi_sabi_layout = updates.wabiSabiLayout;
+  if (updates.viewMode !== undefined) backendUpdates.view_mode = updates.viewMode;
 
   const response = await api.put<BackendPresentation>(`/api/v1/presentations/${id}`, backendUpdates);
   return backendToFrontend(response);

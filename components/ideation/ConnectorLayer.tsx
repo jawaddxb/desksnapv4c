@@ -121,51 +121,58 @@ export const ConnectorLayer: React.FC<ConnectorLayerProps> = ({
       style={{ zIndex: 0 }}
     >
       <defs>
-        {/* Arrow marker for connector endpoints */}
+        {/* Refined arrow marker for connector endpoints */}
         <marker
-          id="arrowhead"
-          markerWidth="10"
-          markerHeight="7"
-          refX="9"
-          refY="3.5"
+          id="arrowheadRefined"
+          markerWidth="8"
+          markerHeight="6"
+          refX="7"
+          refY="3"
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <polygon
-            points="0 0, 10 3.5, 0 7"
-            fill="currentColor"
-            className="text-gray-400"
+          <path
+            d="M0 0 L8 3 L0 6 L2 3 Z"
+            fill="#c5a47e"
+            opacity="0.8"
           />
         </marker>
 
-        {/* Gradient for connector lines */}
-        <linearGradient id="connectorGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="rgb(156, 163, 175)" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="rgb(156, 163, 175)" stopOpacity="0.8" />
+        {/* Refined gradient for connector lines */}
+        <linearGradient id="connectorGradientRefined" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="rgba(255, 255, 255, 0.25)" />
+          <stop offset="50%" stopColor="rgba(197, 164, 126, 0.6)" />
+          <stop offset="100%" stopColor="rgba(197, 164, 126, 0.4)" />
         </linearGradient>
       </defs>
 
       {/* Render all connector paths */}
       {paths.map(path => (
         <g key={path.id}>
-          {/* Shadow/glow effect */}
+          {/* Soft ambient glow - widest layer */}
           <path
             d={path.d}
             fill="none"
-            stroke="rgba(0, 0, 0, 0.1)"
-            strokeWidth="4"
+            stroke="rgba(197, 164, 126, 0.06)"
+            strokeWidth="8"
             strokeLinecap="round"
           />
-          {/* Main connector line */}
+          {/* Mid glow layer */}
           <path
             d={path.d}
             fill="none"
-            stroke="url(#connectorGradient)"
-            strokeWidth="2"
+            stroke="rgba(197, 164, 126, 0.1)"
+            strokeWidth="3"
             strokeLinecap="round"
-            strokeDasharray="6 4"
-            markerEnd="url(#arrowhead)"
-            className="transition-all duration-300"
+          />
+          {/* Main connector line - solid, refined */}
+          <path
+            d={path.d}
+            fill="none"
+            stroke="url(#connectorGradientRefined)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            markerEnd="url(#arrowheadRefined)"
           />
         </g>
       ))}

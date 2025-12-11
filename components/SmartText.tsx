@@ -56,9 +56,9 @@ export const SmartText: React.FC<SmartTextProps> = ({
     }, [value, fontSize, lineHeight]);
 
     const handleClick = (e: React.MouseEvent) => {
-        if (onSelect && !readOnly) {
+        if (!readOnly) {
             e.stopPropagation();
-            onSelect();
+            onSelect?.();
         }
     };
 
@@ -66,6 +66,7 @@ export const SmartText: React.FC<SmartTextProps> = ({
         <div
             className={`relative ${isSelected ? 'ring-2 ring-indigo-500 ring-offset-2 rounded' : ''}`}
             onClick={handleClick}
+            data-smarttext="true"
         >
             <textarea
                 ref={textareaRef}
@@ -84,9 +85,13 @@ export const SmartText: React.FC<SmartTextProps> = ({
                     fontWeight: fontWeight ?? style?.fontWeight,
                     fontStyle: fontStyle ?? style?.fontStyle,
                     textAlign: textAlign ?? style?.textAlign,
-                    overflow: 'visible',
+                    // Width constraints for proper text wrapping in export
+                    maxWidth: '100%',
+                    boxSizing: 'border-box',
+                    // Text wrapping behavior
+                    overflow: readOnly ? 'hidden' : 'visible',
                     whiteSpace: 'pre-wrap',
-                    wordBreak: 'normal',
+                    wordBreak: 'break-word',
                     overflowWrap: 'break-word',
                 }}
                 {...props}

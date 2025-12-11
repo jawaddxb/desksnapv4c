@@ -17,6 +17,7 @@ from packages.common.schemas.presentation import (
     SlideUpdate,
     PresentationListResponse,
     PresentationResponse,
+    PresentationDetailResponse,
     PresentationImport,
     PresentationExport,
 )
@@ -73,7 +74,7 @@ def list_presentations(
     )
 
     return PresentationListResponse(
-        items=[PresentationResponse.model_validate(p) for p in presentations],
+        items=[PresentationDetailResponse.model_validate(p) for p in presentations],
         total=total,
         page=page,
         page_size=page_size,

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { ArchetypeInfo } from '../lib/archetypeCategories';
+import { getArchetypeThumbnailPath } from '../services/thumbnailService';
 
 interface ArchetypeCardProps {
   archetype: ArchetypeInfo;
@@ -14,6 +15,7 @@ export const ArchetypeCard: React.FC<ArchetypeCardProps> = ({
   onClick
 }) => {
   const [color1, color2] = archetype.previewColors;
+  const [thumbnailError, setThumbnailError] = useState(false);
 
   return (
     <button
@@ -27,40 +29,52 @@ export const ArchetypeCard: React.FC<ArchetypeCardProps> = ({
       `}
       title={archetype.description}
     >
-      {/* Mini Slide Thumbnail Preview */}
-      <div
-        className="absolute inset-0 flex flex-col"
-        style={{
-          background: `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`
-        }}
-      >
-        {/* Mini slide content simulation */}
-        <div className="flex-1 p-2 flex flex-col justify-center">
-          {/* Title bar placeholder */}
-          <div
-            className="h-1.5 w-3/4 rounded-full mb-1.5 opacity-80"
-            style={{
-              backgroundColor: getContrastColor(color1)
-            }}
-          />
-          {/* Content lines placeholder */}
-          <div
-            className="h-1 w-full rounded-full mb-1 opacity-40"
-            style={{
-              backgroundColor: getContrastColor(color1)
-            }}
-          />
-          <div
-            className="h-1 w-2/3 rounded-full opacity-40"
-            style={{
-              backgroundColor: getContrastColor(color1)
-            }}
-          />
-        </div>
+      {/* Thumbnail image (shown if available) */}
+      {!thumbnailError && (
+        <img
+          src={getArchetypeThumbnailPath(archetype.id)}
+          alt={archetype.name}
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={() => setThumbnailError(true)}
+        />
+      )}
 
-        {/* Decorative element based on archetype style */}
-        <ArchetypeDecoration archetypeId={archetype.id} color1={color1} color2={color2} />
-      </div>
+      {/* Fallback: Mini Slide Thumbnail Preview (shown if no thumbnail) */}
+      {thumbnailError && (
+        <div
+          className="absolute inset-0 flex flex-col"
+          style={{
+            background: `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`
+          }}
+        >
+          {/* Mini slide content simulation */}
+          <div className="flex-1 p-2 flex flex-col justify-center">
+            {/* Title bar placeholder */}
+            <div
+              className="h-1.5 w-3/4 rounded-full mb-1.5 opacity-80"
+              style={{
+                backgroundColor: getContrastColor(color1)
+              }}
+            />
+            {/* Content lines placeholder */}
+            <div
+              className="h-1 w-full rounded-full mb-1 opacity-40"
+              style={{
+                backgroundColor: getContrastColor(color1)
+              }}
+            />
+            <div
+              className="h-1 w-2/3 rounded-full opacity-40"
+              style={{
+                backgroundColor: getContrastColor(color1)
+              }}
+            />
+          </div>
+
+          {/* Decorative element based on archetype style */}
+          <ArchetypeDecoration archetypeId={archetype.id} color1={color1} color2={color2} />
+        </div>
+      )}
 
       {/* Label overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2 pt-4">

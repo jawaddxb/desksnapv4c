@@ -2,7 +2,7 @@
  * ThemesPreview Component
  *
  * Interactive theme gallery preview for homepage.
- * Shows a selection of archetypes with hover effects.
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React, { useState } from 'react';
@@ -58,36 +58,36 @@ export const ThemesPreview: React.FC = () => {
   const [hoveredTheme, setHoveredTheme] = useState<string | null>(null);
 
   return (
-    <section id="themes" className="py-24 md:py-32 bg-[#fafaf8]">
+    <section id="themes" className="py-32 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
+          <div className="max-w-2xl">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
               Archetypes
             </span>
-            <h2 className="text-4xl md:text-5xl font-semibold text-[#1a1a2e] mb-4">
+            <h2 className="text-5xl md:text-6xl font-light mb-6">
               60+ Ways to Tell Your Story
             </h2>
-            <p className="text-xl text-[#6b6b6b] max-w-xl">
+            <p className="text-xl text-white/60">
               Not templates. Design systems. Each archetype adapts to your content while maintaining visual coherence.
             </p>
           </div>
           <Link
             to="/themes"
-            className="inline-flex items-center gap-2 text-[#1a1a2e] font-medium hover:text-[#d4af37] transition-colors duration-300 group"
+            className="inline-flex items-center gap-2 text-white hover:text-[#c5a47e] transition-colors group"
           >
             Explore All Themes
-            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         {/* Theme Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-1">
           {previewThemes.map((theme) => (
             <div
               key={theme.id}
-              className="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer border border-[#e5e2dd] hover:border-[#d4af37]/30 transition-all duration-500"
+              className="group relative aspect-[4/3] overflow-hidden cursor-pointer"
               onMouseEnter={() => setHoveredTheme(theme.id)}
               onMouseLeave={() => setHoveredTheme(null)}
               style={{
@@ -99,39 +99,30 @@ export const ThemesPreview: React.FC = () => {
                 {/* Mock slide elements */}
                 <div>
                   <div
-                    className="w-16 h-1 rounded mb-3"
+                    className="w-16 h-1 mb-3"
                     style={{ backgroundColor: theme.colors[1] }}
                   />
                   <div
-                    className="w-24 h-3 rounded mb-1"
+                    className="w-24 h-3 mb-1"
                     style={{ backgroundColor: `${theme.colors[1]}40` }}
                   />
                   <div
-                    className="w-20 h-3 rounded"
+                    className="w-20 h-3"
                     style={{ backgroundColor: `${theme.colors[1]}20` }}
                   />
                 </div>
-
-                {/* Decorative shape */}
-                <div
-                  className="absolute bottom-6 right-6 w-16 h-16 rounded-xl opacity-30"
-                  style={{
-                    backgroundColor: theme.colors[1],
-                    borderRadius: '40% 60% 55% 45% / 45% 55% 50% 50%',
-                  }}
-                />
               </div>
 
               {/* Hover Overlay */}
               <div
-                className={`absolute inset-0 bg-[#1a1a2e]/90 flex flex-col justify-center items-center p-6 transition-opacity duration-300 ${
+                className={`absolute inset-0 bg-black/90 flex flex-col justify-center items-center p-6 transition-opacity duration-150 ${
                   hoveredTheme === theme.id ? 'opacity-100' : 'opacity-0'
                 }`}
               >
-                <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-2">
+                <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-2">
                   {theme.category}
                 </span>
-                <h3 className="text-xl font-semibold text-white mb-1">
+                <h3 className="text-xl font-light mb-1">
                   {theme.name}
                 </h3>
                 <p className="text-sm text-white/60">
@@ -143,7 +134,7 @@ export const ThemesPreview: React.FC = () => {
                   {theme.colors.map((color, i) => (
                     <div
                       key={i}
-                      className="w-5 h-5 rounded-full border-2 border-white/20"
+                      className="w-4 h-4 border border-white/20"
                       style={{ backgroundColor: color }}
                     />
                   ))}
@@ -159,7 +150,7 @@ export const ThemesPreview: React.FC = () => {
             (category) => (
               <span
                 key={category}
-                className="px-4 py-2 bg-white rounded-full text-sm text-[#6b6b6b] border border-[#e5e2dd]"
+                className="px-4 py-2 text-sm text-white/60 border border-white/20 hover:border-[#c5a47e] hover:text-[#c5a47e] transition-colors cursor-pointer"
               >
                 {category}
               </span>

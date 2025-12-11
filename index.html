@@ -12,31 +12,48 @@
 
     <!-- Only load default UI fonts - theme fonts loaded on-demand -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Additional fonts for homepage prototypes -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,500;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600&family=Caveat:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <!-- Google API for Slides Export -->
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <style>
+      /* Studio Noir Design System */
+      :root {
+        --noir-black: #000000;
+        --noir-white: #ffffff;
+        --noir-gold: #c5a47e;
+        --noir-surface: #111111;
+        --noir-border: #333333;
+        --noir-muted: #999999;
+        --noir-dimmed: #666666;
+      }
       body {
         font-family: 'DM Sans', sans-serif;
-        background-color: #fafafa; /* Zinc 50 */
-        color: #18181b; /* Zinc 900 */
+        background-color: #000000; /* Studio Noir Black */
+        color: #ffffff; /* Studio Noir White */
       }
       h1, h2, h3, h4, h5, h6 {
         font-family: 'Space Grotesk', sans-serif;
       }
-      /* Custom Scrollbar - Brutalist */
+      /* Custom Scrollbar - Studio Noir */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: transparent; 
-        border-left: 1px solid #e4e4e7;
+        background: #000000;
+        border-left: 1px solid #333333;
       }
       ::-webkit-scrollbar-thumb {
-        background: #d4d4d8; 
-        border: 2px solid #fafafa;
+        background: #333333;
+        border: 2px solid #000000;
         border-radius: 0;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #a1a1aa; 
+        background: #c5a47e; /* Gold on hover */
       }
 
       @media print {

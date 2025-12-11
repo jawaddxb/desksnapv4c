@@ -81,6 +81,19 @@ export interface AnalyticsSession {
   slideDurations: Record<string, number>; // slideId -> seconds
 }
 
+// View mode for presentation display
+export const VIEW_MODES = ['standard', 'wabi-sabi'] as const;
+export type ViewMode = typeof VIEW_MODES[number];
+
+// PowerPoint export modes
+export const EXPORT_MODES = ['editable', 'hybrid', 'visual-match'] as const;
+export type ExportMode = typeof EXPORT_MODES[number];
+
+export interface ExportOptions {
+  mode: ExportMode;
+  includeNotes: boolean;
+}
+
 export interface Presentation {
   id: string;
   lastModified: number;
@@ -89,6 +102,7 @@ export interface Presentation {
   themeId: string;
   slides: Slide[];
   wabiSabiLayout?: string;
+  viewMode?: ViewMode; // Persisted view mode preference (structured vs organic)
   analytics?: AnalyticsSession[];
 }
 

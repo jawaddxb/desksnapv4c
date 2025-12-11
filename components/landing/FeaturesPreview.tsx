@@ -2,7 +2,7 @@
  * FeaturesPreview Component
  *
  * 4-card feature overview for homepage.
- * Wabi-Sabi aesthetic with organic hover effects.
+ * Studio Noir aesthetic - black, white, gold.
  */
 
 import React from 'react';
@@ -37,58 +37,48 @@ const features = [
 
 export const FeaturesPreview: React.FC = () => {
   return (
-    <section id="features" className="py-24 md:py-32 bg-[#fafaf8]">
+    <section id="features" className="py-32 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 block">
+        <div className="max-w-2xl mb-20">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
             Why DeckSnap
           </span>
-          <h2 className="text-4xl md:text-5xl font-semibold text-[#1a1a2e] mb-4">
+          <h2 className="text-5xl md:text-6xl font-light mb-6">
             AI That Gets It
           </h2>
-          <p className="text-xl text-[#6b6b6b] max-w-2xl mx-auto">
+          <p className="text-xl text-white/60">
             Not another template gallery. A creative partner that understands what makes presentations actually work.
           </p>
         </div>
 
         {/* Feature Cards Grid */}
-        <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid md:grid-cols-2 gap-px bg-white/10">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <div
                 key={index}
-                className="group relative bg-white rounded-2xl p-8 border border-[#e5e2dd] hover:border-[#d4af37]/30 transition-all duration-500 hover:shadow-lg hover:shadow-[#d4af37]/5"
+                className="bg-black p-12 hover:bg-white/5 transition-colors group"
               >
                 {/* Icon */}
-                <div className="w-12 h-12 rounded-xl bg-[#f5f3ef] flex items-center justify-center mb-6 group-hover:bg-[#d4af37]/10 transition-colors duration-500">
-                  <Icon className="w-6 h-6 text-[#1a1a2e] group-hover:text-[#d4af37] transition-colors duration-500" />
+                <div className="w-12 h-12 border border-white/20 flex items-center justify-center mb-8 group-hover:border-[#c5a47e] transition-colors">
+                  <Icon className="w-6 h-6 text-white/60 group-hover:text-[#c5a47e] transition-colors" />
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-semibold text-[#1a1a2e] mb-3">
+                <h3 className="text-2xl font-light mb-4">
                   {feature.headline}
                 </h3>
-                <p className="text-[#6b6b6b] leading-relaxed mb-4">
+                <p className="text-white/60 leading-relaxed mb-6">
                   {feature.copy}
                 </p>
 
-                {/* Benefit Badge */}
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#f5f3ef] rounded-full">
-                  <span className="w-1.5 h-1.5 bg-[#d4af37] rounded-full" />
-                  <span className="text-sm text-[#6b6b6b]">{feature.benefit}</span>
+                {/* Benefit */}
+                <div className="inline-flex items-center gap-2 text-sm text-white/40">
+                  <span className="w-1 h-1 bg-[#c5a47e]" />
+                  {feature.benefit}
                 </div>
-
-                {/* Decorative corner element */}
-                <div
-                  className="absolute top-4 right-4 w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{
-                    background: 'linear-gradient(135deg, transparent 50%, #d4af37 50%)',
-                    opacity: 0.1,
-                    borderRadius: '0 0.75rem 0 0',
-                  }}
-                />
               </div>
             );
           })}
