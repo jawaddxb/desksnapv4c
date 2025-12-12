@@ -18,6 +18,7 @@ import {
   CONTENT_DECONSTRUCTION_PROMPT,
   CONTENT_DECONSTRUCTION_SCHEMA,
 } from '../lib/prompts';
+import { getTextModel } from '../config';
 
 /**
  * Result from content deconstruction.
@@ -69,7 +70,7 @@ export const deconstructContentToIdeation = async (
   const ai = getAIClient();
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `${CONTENT_DECONSTRUCTION_PROMPT}
 
 USER'S CONTENT TO ANALYZE:

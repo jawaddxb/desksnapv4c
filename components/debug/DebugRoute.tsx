@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { useDebug } from '../../contexts/DebugContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { API_BASE_URL } from '../../config';
 import {
   getDebugMe,
   getDebugUsers,
@@ -53,7 +54,7 @@ function SystemInfo() {
   React.useEffect(() => {
     const checkApi = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/health`);
+        const response = await fetch(`${API_BASE_URL}/health`);
         setApiStatus(response.ok ? 'online' : 'offline');
       } catch {
         setApiStatus('offline');
@@ -65,7 +66,7 @@ function SystemInfo() {
   const info = [
     { label: 'Environment', value: import.meta.env.MODE },
     { label: 'Debug Mode', value: import.meta.env.VITE_DEBUG_MODE === 'true' ? 'Enabled' : 'Disabled' },
-    { label: 'API URL', value: import.meta.env.VITE_API_URL || 'http://localhost:8000' },
+    { label: 'API URL', value: API_BASE_URL },
     { label: 'React Version', value: React.version },
     { label: 'Build Time', value: new Date().toISOString().split('T')[0] },
   ];

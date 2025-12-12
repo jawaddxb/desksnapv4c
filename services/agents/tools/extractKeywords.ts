@@ -8,6 +8,7 @@
 import { getAIClient } from '../../aiClient';
 import { parseAIJsonResponse } from '../../ai/parseJson';
 import { ExtractKeywordsParams, ExtractKeywordsResult } from '../types';
+import { getTextModel } from '../../../config';
 
 /**
  * Extracts keywords from a topic to guide prompt validation and generation.
@@ -24,7 +25,7 @@ export async function extractTopicKeywords(
   const ai = getAIClient();
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `Analyze this presentation topic and extract visual keywords.
 
 TOPIC: "${topic}"

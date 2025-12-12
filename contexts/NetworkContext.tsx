@@ -6,6 +6,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL } from '../config';
 
 interface NetworkState {
   isOnline: boolean;
@@ -31,7 +32,7 @@ export const NetworkProvider: React.FC<NetworkProviderProps> = ({ children }) =>
   // Check connection by making a request to the API
   const checkConnection = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/health`, {
+      const response = await fetch(`${API_BASE_URL}/health`, {
         method: 'GET',
         cache: 'no-store',
       });

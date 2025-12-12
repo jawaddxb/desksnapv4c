@@ -14,6 +14,7 @@ import {
   PRESENTATION_SCHEMA,
   getGenerationModeInstruction,
 } from '../lib/prompts';
+import { getTextModel } from '../config';
 
 /**
  * Image style override configuration.
@@ -58,7 +59,7 @@ export const generatePresentationPlan = async (
 
   // Use Flash for the logical planning
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `${SYSTEM_INSTRUCTION_VISUAL_DIRECTOR}
 
     ${modeInstruction}
@@ -111,7 +112,7 @@ export const generateHolisticImageSuggestions = async (
   }));
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `You are an expert Visual Director analyzing a presentation deck to suggest alternative image subjects.
 
 PRESENTATION CONTEXT:

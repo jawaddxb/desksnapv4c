@@ -8,6 +8,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { getAccessToken } from './tokenManager';
 import { Presentation, Slide } from '../../types';
+import { WS_BASE_URL } from '../../config';
 
 // WebSocket message types (must match backend)
 export type MessageType =
@@ -71,7 +72,6 @@ export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 're
 type MessageHandler = (message: WebSocketMessage) => void;
 type StatusHandler = (status: ConnectionStatus) => void;
 
-const WS_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace('http', 'ws');
 const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_DELAY_BASE = 1000; // 1 second base, exponential backoff
 

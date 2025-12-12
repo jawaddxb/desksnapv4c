@@ -17,6 +17,7 @@ import { THEMES, THEME_CATEGORIES } from '../config/themes';
 import { COPILOT_TOOLS } from '../lib/copilotTools';
 import { buildFullPrompt } from '../lib/copilotPrompts';
 import { performGrokResearch, hasGrokApiKey } from './grokService';
+import { getTextModel } from '../config';
 
 // Schema for deck plan conversion - ensures proper JSON escaping
 const DECK_PLAN_SCHEMA = {
@@ -248,7 +249,7 @@ export async function runAgentLoop(
 
       // Call Gemini with tool definitions
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: getTextModel('fast'),
         contents,
         config: {
           systemInstruction: systemPrompt,
@@ -558,7 +559,7 @@ async function performResearch(
   try {
     // Use Gemini to simulate research (in production, use actual search API)
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: getTextModel(),
       contents: `You are a research assistant. Find relevant information for this query.
 
 Query: "${query}"
@@ -618,7 +619,7 @@ export async function convertSessionToDeckPlan(
     .join('\n');
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `Convert these ideation notes into a presentation plan.
 
 Topic: ${session.topic}
@@ -721,7 +722,7 @@ Return JSON:
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: getTextModel(),
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -824,7 +825,7 @@ export async function convertSessionToDeckPlanWithTheme(
     .join('\n');
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `Convert these ideation notes into a presentation plan.
 
 Topic: ${session.topic}

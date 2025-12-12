@@ -8,6 +8,7 @@
 import { getAIClient } from '../../aiClient';
 import { parseAIJsonResponse } from '../../ai/parseJson';
 import { PromptValidationResult, ValidatePromptParams } from '../types';
+import { getTextModel } from '../../../config';
 
 /**
  * Validates an image prompt for topic relevance and quality.
@@ -29,7 +30,7 @@ export async function validateImagePrompt(
     : '';
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `You are a strict image prompt validator for a presentation generator.
 Your job is to evaluate if this image prompt will generate an image that is VISUALLY RELEVANT to the presentation topic.
 
@@ -103,7 +104,7 @@ export async function quickValidatePrompt(
   const ai = getAIClient();
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `Quick check: Does this image prompt relate to the topic "${topic}"?
 
 IMAGE PROMPT: "${prompt}"

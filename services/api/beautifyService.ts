@@ -6,6 +6,7 @@
  */
 
 import { api } from './apiClient';
+import { API_BASE_URL } from '../../config';
 import type { Slide } from '../../types';
 import type {
   BeautifySession,
@@ -131,7 +132,7 @@ export async function uploadPptx(file: File): Promise<UploadResponse> {
 
   // Use fetch directly for FormData (api client JSON-ifies body)
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/beautify/upload`,
+    `${API_BASE_URL}/api/v1/beautify/upload`,
     {
       method: 'POST',
       body: formData,

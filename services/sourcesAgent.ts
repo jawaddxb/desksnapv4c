@@ -14,6 +14,7 @@
 
 import { GoogleGenAI } from '@google/genai';
 import { scrapeUrl, parseMarkdownToSections, isFirecrawlAvailable, extractComprehensiveContent, ComprehensiveContent } from './firecrawlService';
+import { getTextModel } from '../config';
 import {
   IdeationSession,
   Source,
@@ -983,7 +984,7 @@ VERIFY: Before returning, confirm you have captured the ENTIRE video.
 Return ONLY valid JSON array.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: getTextModel(),
       contents: [
         {
           role: 'user',
@@ -1053,7 +1054,7 @@ async function extractWebPageContent(url: string): Promise<{
   try {
     console.log('[extractWebPageContent] Trying Gemini urlContext...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: getTextModel(),
       contents: [
         {
           role: 'user',
@@ -1208,7 +1209,7 @@ Return ONLY valid JSON array.`;
     console.log('[categorizeContentWithAI] Analyzing content with AI...');
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: getTextModel('fast'),
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: { responseMimeType: 'application/json' },
     });

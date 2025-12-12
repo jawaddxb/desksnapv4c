@@ -8,6 +8,7 @@
 import { ToneType, ContentRefinementType } from '../types';
 import { getAIClient } from './aiClient';
 import { parseAIJsonResponse } from './ai/parseJson';
+import { getTextModel } from '../config';
 
 /**
  * Tone instructions for content refinement.
@@ -64,7 +65,7 @@ export const refineSlideContent = async (
   const instruction = TONE_INSTRUCTIONS[tone];
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `You are a presentation copywriter. Rewrite this slide content according to the tone instruction.
 
 TONE INSTRUCTION: ${instruction}
@@ -103,7 +104,7 @@ export const refineSlideContentByType = async (
   const instruction = CONTENT_REFINEMENT_INSTRUCTIONS[refinementType];
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `You are a presentation content optimizer. Transform this slide according to the refinement goal.
 
 REFINEMENT GOAL: ${instruction}

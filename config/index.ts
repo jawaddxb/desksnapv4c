@@ -44,3 +44,26 @@ export {
   enableDebugPanel,
 } from './featureFlags';
 export type { FeatureFlags, ImageGenerationMode } from './featureFlags';
+
+// AI Model Configuration
+export {
+  AI_MODELS,
+  getTextModel,
+  getImageModel,
+  getExternalModel,
+  getImageModelFallbacks,
+} from './models';
+export type { TextModelVariant, ImageModelVariant, ExternalModelVariant } from './models';
+
+// API Configuration
+export {
+  API_BASE_URL,
+  WS_BASE_URL,
+  API_VERSION,
+  API_PREFIX,
+  ENDPOINTS,
+  DEFAULT_HEADERS,
+  TIMEOUTS,
+  buildApiUrl,
+  buildWsUrl,
+} from './api';

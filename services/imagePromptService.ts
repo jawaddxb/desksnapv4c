@@ -8,6 +8,7 @@
 import { ImageStylePreset } from '../types';
 import { getAIClient } from './aiClient';
 import { REFINEMENT_INSTRUCTIONS } from '../lib/prompts';
+import { getTextModel } from '../config';
 
 export type RefinementFocus = keyof typeof REFINEMENT_INSTRUCTIONS;
 
@@ -26,7 +27,7 @@ export const refineImagePrompt = async (
   const instruction = REFINEMENT_INSTRUCTIONS[focus];
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `Act as a Prompt Engineer. Rewrite the following image prompt to satisfy the specific refinement goal.
 
       Original Prompt: "${originalPrompt}"
@@ -66,7 +67,7 @@ export const enhanceImagePrompt = async (
   const instruction = IMAGE_STYLE_INSTRUCTIONS[stylePreset];
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `You are an image prompt engineer. Enhance this prompt for a specific visual style.
 
 STYLE GOAL: ${instruction}

@@ -8,6 +8,7 @@
 import { getAIClient } from '../../aiClient';
 import { parseAIJsonResponse } from '../../ai/parseJson';
 import { RewritePromptParams, RewritePromptResult } from '../types';
+import { getTextModel } from '../../../config';
 
 /**
  * Rewrites an image prompt to fix identified issues while maintaining visual style.
@@ -31,7 +32,7 @@ export async function rewriteImagePrompt(
   const issuesList = issues.length > 0 ? issues.join('\n- ') : 'Prompt not relevant to topic';
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `You are an expert image prompt engineer. Your task is to REWRITE an image prompt that failed validation.
 
 PRESENTATION TOPIC: "${topic}"
@@ -107,7 +108,7 @@ export async function generateFreshPrompt(
     : '';
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: `Generate an image prompt for a presentation slide.
 
 PRESENTATION TOPIC: "${topic}"

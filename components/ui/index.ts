@@ -43,3 +43,7 @@ export type {
   MenuHeaderProps,
   SubmenuProps,
 } from './Menu';
+
+// ToggleButton
+export { ToggleButton, ToggleGroup } from './ToggleButton';
+export type { ToggleButtonProps, ToggleGroupProps, ToggleSize } from './ToggleButton';

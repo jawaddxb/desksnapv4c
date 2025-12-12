@@ -11,6 +11,7 @@ import {
   AgentImageGenerationOptions,
   AgentImageGenerationResult,
 } from './agents';
+import { getImageModelFallbacks } from '../config';
 
 /**
  * Options for slide image generation.
@@ -55,14 +56,15 @@ export const generateSlideImage = async (
 
   console.log('Generating image with prompt:', enhancedPrompt);
 
+  const imageModels = getImageModelFallbacks();
   const strategies = [
     {
-      model: 'gemini-3-pro-image-preview',
+      model: imageModels[0],
       label: 'Pro High-Res',
       config: { imageConfig: { aspectRatio: '16:9', imageSize: '1K' } },
     },
     {
-      model: 'gemini-2.5-flash-image',
+      model: imageModels[1],
       label: 'Flash Standard',
       config: { imageConfig: { aspectRatio: '16:9' } },
     },

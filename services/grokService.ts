@@ -19,11 +19,12 @@ import type {
   MindMapNode,
   FindingType,
 } from '../types';
+import { getExternalModel } from '../config';
 
 // Constants
 const XAI_API_BASE = 'https://api.x.ai';
 const XAI_RESPONSES_ENDPOINT = '/v1/responses';
-const MODEL = 'grok-4-1-fast';
+const MODEL = getExternalModel('grok');
 
 // System prompt for research
 const RESEARCH_SYSTEM_PROMPT = `You are a research analyst specializing in finding accurate, up-to-date information.

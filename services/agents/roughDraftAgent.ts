@@ -19,6 +19,7 @@ import { THEMES } from '../../config/themes';
 import { runImagePromptAgent } from './imagePromptAgent';
 import { AgentLog, AgentContext } from './types';
 import { generateSlideImage } from '../geminiService';
+import { getTextModel } from '../../config';
 
 // ============ Types ============
 
@@ -361,7 +362,7 @@ Return as JSON with structure:
 }`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: getTextModel(),
     contents: prompt,
     config: {
       responseMimeType: 'application/json',

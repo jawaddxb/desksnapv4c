@@ -17,7 +17,7 @@ import {
 } from '../../services/agents/roughDraftAgent';
 import { JournalEntry } from '../../types/ideation';
 import { AgentLog } from '../../services/agents/types';
-import { THEMES } from '../../config/themes';
+import { THEMES, getTextModel } from '../../config';
 import { RoughDraftSlideCard } from './RoughDraftSlideCard';
 import { AgentNarrativePanel } from './AgentNarrativePanel';
 import { getAIClient } from '../../services/aiClient';
@@ -427,7 +427,7 @@ Return ONLY a JSON object with the enhanced content in this exact format:
 {"title": "enhanced title", "bullets": ["bullet 1", "bullet 2", ...], "speakerNotes": "enhanced notes"}`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: getTextModel(),
         contents: [{ role: 'user', parts: [{ text: systemPrompt + '\n\n' + userPrompt }] }],
         config: {
           responseMimeType: 'application/json',

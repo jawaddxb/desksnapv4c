@@ -7,11 +7,10 @@
 
 import { getAccessToken, clearTokens, hasTokens } from './tokenManager';
 import { refreshAccessToken } from './tokenRefresh';
+import { API_BASE_URL } from '../../config';
 
 // Re-export token management for backward compatibility
 export { getAccessToken, getRefreshToken, setTokens, clearTokens } from './tokenManager';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // ============ API Error Handling ============
 
