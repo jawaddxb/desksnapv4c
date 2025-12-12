@@ -8,9 +8,11 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Message, MessageRole, ResearchPreferences, ProgressState, Finding } from '../../types';
-import { IdeationStage, ThemeSuggestion } from '../../types/ideation';
+import { IdeationStage, ThemeSuggestion, IdeaNote } from '../../types/ideation';
 import { ThemePreviewPanel } from './ThemePreviewPanel';
 import { EnhancedModePanel } from './EnhancedModePanel';
+import { IdeationProgressBar } from './IdeationProgressBar';
+import { CompletionQuestion } from '../../services/copilotAgent';
 
 interface CopilotPanelProps {
   messages: Message[];
@@ -20,6 +22,11 @@ interface CopilotPanelProps {
     question: string;
     options?: string[];
   } | null;
+  // Autonomous completion props
+  notes?: IdeaNote[];
+  completionQuestion?: CompletionQuestion | null;
+  onDirectBuild?: () => void;  // Skip rough draft, build immediately
+  onGoToRoughDraft?: () => void;  // Continue to rough draft first
   // Theme selection props for style-preview stage
   themeSuggestion?: ThemeSuggestion | null;
   selectedThemeId?: string;
@@ -36,6 +43,7 @@ interface CopilotPanelProps {
   isPremium?: boolean;
   onResearch?: (preferences: ResearchPreferences) => void;
   onCreateNotesFromFindings?: (findings: Finding[]) => void;
+  onOpenResearchModal?: () => void;
   researchProgress?: ProgressState | null;
   researchFindings?: Finding[];
   researchSynthesis?: string;
@@ -99,6 +107,12 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   stage,
   isThinking,
   askUserQuestion,
+  // Autonomous completion props
+  notes = [],
+  completionQuestion,
+  onDirectBuild,
+  onGoToRoughDraft,
+  // Theme selection props
   themeSuggestion,
   selectedThemeId,
   onSelectTheme,
@@ -112,6 +126,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   isPremium = true,
   onResearch,
   onCreateNotesFromFindings,
+  onOpenResearchModal,
   researchProgress,
   researchFindings = [],
   researchSynthesis,
@@ -313,6 +328,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
           onResearch={onResearch}
           onCreateNotes={onCreateNotesFromFindings}
           onClose={() => setEnhancedMode(false)}
+          onExpandModal={onOpenResearchModal}
           progress={researchProgress || null}
           findings={researchFindings}
           synthesis={researchSynthesis}
@@ -397,6 +413,58 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
               <span className="text-[10px] px-1 py-0.5 bg-black/20 rounded">Pro</span>
             )}
           </button>
+        </div>
+      )}
+
+      {/* Autonomous Progress Bar - shows when AI is working or notes exist */}
+      {(isThinking || notes.length > 0) && !completionQuestion && (
+        <IdeationProgressBar notes={notes} isThinking={isThinking} />
+      )}
+
+      {/* Completion UI - shows when autonomous ideation is complete */}
+      {completionQuestion && !isThinking && (
+        <div className="p-4 bg-gradient-to-b from-black/50 to-transparent border-b border-white/10">
+          <p className="text-white mb-4 text-sm">{completionQuestion.question}</p>
+
+          {/* Primary actions - solid gold buttons */}
+          <div className="flex gap-2 mb-3">
+            {completionQuestion.primaryActions.map((action) => {
+              const isDirectBuild = action.toLowerCase().includes('build the deck');
+              const isRoughDraft = action.toLowerCase().includes('rough draft');
+              return (
+                <button
+                  key={action}
+                  onClick={() => {
+                    if (isDirectBuild && onDirectBuild) {
+                      onDirectBuild();
+                    } else if (isRoughDraft && onGoToRoughDraft) {
+                      onGoToRoughDraft();
+                    } else if (onBuildDeck) {
+                      onBuildDeck();
+                    }
+                  }}
+                  className="flex-1 px-4 py-3 bg-[#c5a47e] text-black font-bold
+                             text-xs uppercase tracking-wider hover:bg-white transition-colors"
+                >
+                  {action}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Secondary options - text pills */}
+          <div className="flex flex-wrap gap-2">
+            {completionQuestion.secondaryOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => onSendMessage(option)}
+                className="px-3 py-1.5 border border-white/20 text-white/70
+                           text-xs hover:border-[#c5a47e] hover:text-[#c5a47e] transition-colors"
+              >
+                {option}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

@@ -37,6 +37,7 @@ celery_app.conf.update(
         "packages.common.tasks.thumbnail_task.*": {"queue": "thumbnails"},
         "packages.common.tasks.analytics_task.*": {"queue": "analytics"},
         "packages.common.tasks.image_tasks.*": {"queue": "images"},
+        "packages.common.tasks.beautify_tasks.*": {"queue": "default"},
     },
     # Default queue
     task_default_queue="default",
@@ -48,3 +49,4 @@ celery_app.autodiscover_tasks(["packages.common.tasks"])
 # Explicitly import tasks to ensure registration
 # This is needed when autodiscover doesn't work in certain environments
 import packages.common.tasks.image_tasks  # noqa: F401, E402
+import packages.common.tasks.beautify_tasks  # noqa: F401, E402

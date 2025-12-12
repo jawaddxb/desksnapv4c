@@ -160,10 +160,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                         </div>
                     </>
                 ) : (
-                    <div className="flex items-center gap-2">
+                    <button onClick={onClose} className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-150" title="Go to Dashboard">
                          <div className="w-8 h-8 bg-white text-black flex items-center justify-center"><Sparkles className="w-4 h-4" /></div>
                          <h1 className="text-xl font-bold text-white">DeckSnap</h1>
-                    </div>
+                    </button>
                 )}
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">

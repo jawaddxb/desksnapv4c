@@ -5,6 +5,7 @@ CRUD operations for ideation sessions
 import uuid
 
 from fastapi import APIRouter, Query, status
+from sqlalchemy.orm import selectinload
 
 from apps.public_api.dependencies import CurrentUser, DbSession
 from packages.common.schemas.ideation import (
@@ -54,6 +55,40 @@ def require_session_ownership(session: IdeationSession, user) -> IdeationSession
 
 
 # Session CRUD
+
+def _serialize_note(note: IdeaNote) -> dict:
+    """Manually serialize a note to ensure all fields are properly converted"""
+    return {
+        "id": note.id,
+        "session_id": note.session_id,
+        "content": note.content,
+        "type": note.note_type,  # Map note_type -> type (alias)
+        "source_url": note.source_url,
+        "parent_id": note.parent_id,
+        "column": note.column_index,  # Map column_index -> column (alias)
+        "row": note.row_index,  # Map row_index -> row (alias)
+        "color": note.color,
+        "approved": note.approved,
+        "created_at": note.created_at,
+        "updated_at": note.updated_at,
+    }
+
+
+def _serialize_session_with_notes(session: IdeationSession) -> dict:
+    """Manually serialize a session with its notes for list display"""
+    return {
+        "id": session.id,
+        "owner_id": session.owner_id,
+        "topic": session.topic,
+        "stage": session.stage,
+        "source_content": session.source_content,
+        "archetype": session.archetype,
+        "created_at": session.created_at,
+        "updated_at": session.updated_at,
+        "notes": [_serialize_note(n) for n in session.notes],
+    }
+
+
 @router.get(
     "",
     response_model=IdeationSessionListResponse,
@@ -67,15 +102,25 @@ def list_sessions(
     page_size: int = Query(50, ge=1, le=100),
 ) -> IdeationSessionListResponse:
     """List user's ideation sessions with pagination"""
-    query = db.query(IdeationSession).filter(
+    # Use selectinload to eager-load notes for display in dashboard cards
+    query = db.query(IdeationSession).options(
+        selectinload(IdeationSession.notes)
+    ).filter(
         IdeationSession.owner_id == current_user.id
     ).order_by(IdeationSession.updated_at.desc())
 
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
 
+    # Manually serialize to ensure notes are properly included
+    # (Pydantic v2 model_validate may not handle SQLAlchemy relationships correctly)
+    response_items = [
+        IdeationSessionResponse.model_validate(_serialize_session_with_notes(s))
+        for s in items
+    ]
+
     return IdeationSessionListResponse(
-        items=[IdeationSessionResponse.model_validate(s) for s in items],
+        items=response_items,
         total=total,
         page=page,
         page_size=page_size,

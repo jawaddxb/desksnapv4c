@@ -15,6 +15,7 @@ class IdeaNoteBase(BaseModel):
     content: str = Field(..., min_length=1)
     note_type: str = Field(default="insight", alias="type")  # insight, question, data, story
     source_url: str | None = None
+    source_title: str | None = None
     parent_id: str | None = None
     column_index: int = Field(default=0, alias="column")
     row_index: int = Field(default=0, alias="row")
@@ -165,3 +166,4 @@ class IdeationSessionListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+    pages: int

@@ -50,6 +50,10 @@ interface MainStageProps {
   onLoadRoughDraft?: (id: string) => void;
   onDeleteRoughDraft?: (id: string) => void;
   onApproveRoughDraft?: (id: string) => void;
+  // Sources Mode Props (VideoDeck / Research & Present)
+  onOpenSources?: (preset: 'video' | 'web' | 'mixed') => void;
+  // Beautify Mode Props
+  onBeautify?: () => void;
   // Presentation context for image prompt toolbar
   presentation?: Presentation | null;
   activeSlideIndex?: number;
@@ -87,6 +91,10 @@ export const MainStage: React.FC<MainStageProps> = ({
     onLoadRoughDraft,
     onDeleteRoughDraft,
     onApproveRoughDraft,
+    // Sources mode props
+    onOpenSources,
+    // Beautify mode props
+    onBeautify,
     presentation,
     activeSlideIndex = 0
 }) => {
@@ -120,6 +128,8 @@ export const MainStage: React.FC<MainStageProps> = ({
             onCreateNew={onCreateDeck || (() => {})}
             onImport={onImport || (() => {})}
             onIdeate={onIdeate}
+            onOpenSources={onOpenSources}
+            onBeautify={onBeautify}
             onLoadIdeation={onLoadIdeation}
             onDeleteIdeation={onDeleteIdeation}
             onGenerateDeckFromIdeation={onGenerateDeckFromIdeation}

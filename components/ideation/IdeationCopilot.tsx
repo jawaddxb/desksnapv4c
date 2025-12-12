@@ -6,18 +6,20 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MessageRole, ResearchPreferences, ProgressState, Finding, ProgressUpdate } from '../../types';
+import { MessageRole, ResearchPreferences, ProgressState, Finding, ProgressUpdate, Citation } from '../../types';
 import { COLUMNS, ThemeSuggestion } from '../../types/ideation';
 import { useIdeation } from '../../hooks/useIdeation';
-import { runAgentLoop, convertSessionToDeckPlan, suggestThemeForSession, convertSessionToDeckPlanWithTheme, AgentResponse } from '../../services/copilotAgent';
+import { runAgentLoop, convertSessionToDeckPlan, suggestThemeForSession, convertSessionToDeckPlanWithTheme, AgentResponse, CompletionQuestion } from '../../services/copilotAgent';
 import { performGrokResearch, hasGrokApiKey } from '../../services/grokService';
 import { FlowCanvas } from './FlowCanvas';
 import { CopilotPanel } from './CopilotPanel';
+import { ResearchModal } from './ResearchModal';
 
 interface IdeationCopilotProps {
   initialTopic?: string;
   sessionId?: string;
-  onClose?: () => void;
+  /** Called when closing the ideation view. Passes the current session ID so it can be resumed later. */
+  onClose?: (sessionId?: string) => void;
   onBuildDeck?: (deckPlan: any) => void;
   /** Called when user chooses to review a rough draft instead of building directly */
   onRoughDraft?: (
@@ -38,6 +40,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [askUserQuestion, setAskUserQuestion] = useState<AgentResponse['askUserQuestion'] | null>(null);
+  const [completionQuestion, setCompletionQuestion] = useState<CompletionQuestion | null>(null);
   // Theme selection state for style-preview stage
   const [themeSuggestion, setThemeSuggestion] = useState<ThemeSuggestion | null>(null);
   const [selectedThemeId, setSelectedThemeId] = useState<string>('executive');
@@ -45,6 +48,8 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   const [researchProgress, setResearchProgress] = useState<ProgressState | null>(null);
   const [researchFindings, setResearchFindings] = useState<Finding[]>([]);
   const [researchSynthesis, setResearchSynthesis] = useState<string>('');
+  const [researchCitations, setResearchCitations] = useState<Citation[]>([]);
+  const [isResearchModalOpen, setIsResearchModalOpen] = useState(false);
 
   // Initialize session on mount
   React.useEffect(() => {
@@ -66,6 +71,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     ideation.addMessage(MessageRole.USER, message);
     setIsThinking(true);
     setAskUserQuestion(null);
+    setCompletionQuestion(null);  // Clear completion state when user sends new message
 
     try {
       // Run the agentic loop
@@ -83,6 +89,11 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
       // Handle ask_user question
       if (response.askUserQuestion) {
         setAskUserQuestion(response.askUserQuestion);
+      }
+
+      // Handle completion question (autonomous deep-dive completion)
+      if (response.completionQuestion) {
+        setCompletionQuestion(response.completionQuestion);
       }
 
       // Auto-advance stage based on progress
@@ -229,6 +240,20 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     setThemeSuggestion(null);
   }, [ideation]);
 
+  // Handle direct build from completion UI (skips review stage)
+  const handleDirectBuild = useCallback(() => {
+    setCompletionQuestion(null);
+    // Go directly to theme selection
+    handleConfirmBuild();
+  }, [handleConfirmBuild]);
+
+  // Handle go to rough draft from completion UI (skips review stage)
+  const handleGoToRoughDraft = useCallback(() => {
+    setCompletionQuestion(null);
+    // Go to theme selection - user will pick "Continue to Draft" there
+    handleConfirmBuild();
+  }, [handleConfirmBuild]);
+
   // Handle theme selection change
   const handleSelectTheme = useCallback((themeId: string) => {
     setSelectedThemeId(themeId);
@@ -262,6 +287,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     // Reset state
     setResearchFindings([]);
     setResearchSynthesis('');
+    setResearchCitations([]);
     setResearchProgress({
       status: 'Starting research...',
       percent: 0,
@@ -310,12 +336,30 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
 
       setResearchFindings(result.findings);
       setResearchSynthesis(result.synthesis || '');
+      setResearchCitations(result.citations || []);
       setResearchProgress(prev => prev ? { ...prev, percent: 100, status: 'Research complete!' } : null);
     } catch (error) {
       console.error('Research failed:', error);
       setResearchProgress(prev => prev ? { ...prev, status: 'Research failed. Please try again.' } : null);
     }
   }, [ideation.session?.topic]);
+
+  // Handle opening the research modal
+  const handleOpenResearchModal = useCallback(() => {
+    setIsResearchModalOpen(true);
+  }, []);
+
+  // Handle closing the research modal
+  const handleCloseResearchModal = useCallback(() => {
+    setIsResearchModalOpen(false);
+  }, []);
+
+  // Handle "Research More" from modal
+  const handleResearchMore = useCallback(() => {
+    setIsResearchModalOpen(false);
+    // Reset to allow new research
+    setResearchProgress(null);
+  }, []);
 
   // Create notes from research findings
   const handleCreateNotesFromFindings = useCallback((findings: Finding[]) => {
@@ -362,7 +406,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
         <div className="flex items-center gap-3">
           {onClose && (
             <button
-              onClick={onClose}
+              onClick={() => onClose(ideation.session?.id)}
               className="p-2 hover:bg-white/5 transition-colors"
             >
               <svg className="w-5 h-5 text-white/60 hover:text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
@@ -402,6 +446,12 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             stage={ideation.stage}
             isThinking={isThinking}
             askUserQuestion={askUserQuestion}
+            // Autonomous completion props
+            notes={ideation.notes}
+            completionQuestion={completionQuestion}
+            onDirectBuild={handleDirectBuild}
+            onGoToRoughDraft={handleGoToRoughDraft}
+            // Theme selection props
             themeSuggestion={themeSuggestion}
             selectedThemeId={selectedThemeId}
             onSelectTheme={handleSelectTheme}
@@ -418,9 +468,22 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             researchProgress={researchProgress}
             researchFindings={researchFindings}
             researchSynthesis={researchSynthesis}
+            onOpenResearchModal={handleOpenResearchModal}
           />
         </div>
       </div>
+
+      {/* Research Modal - Full-screen overlay */}
+      <ResearchModal
+        isOpen={isResearchModalOpen}
+        topic={ideation.session?.topic || ''}
+        findings={researchFindings}
+        citations={researchCitations}
+        synthesis={researchSynthesis}
+        onClose={handleCloseResearchModal}
+        onCreateNotes={handleCreateNotesFromFindings}
+        onResearchMore={handleResearchMore}
+      />
     </div>
   );
 };

@@ -14,6 +14,7 @@ from packages.common.models.ideation import (
     IdeationJournalEntry,
 )
 from packages.common.models.rough_draft import RoughDraft, RoughDraftSlide
+from packages.common.models.beautify import BeautifySession
 
 __all__ = [
     "Base",
@@ -29,4 +30,5 @@ __all__ = [
     "IdeationJournalEntry",
     "RoughDraft",
     "RoughDraftSlide",
+    "BeautifySession",
 ]

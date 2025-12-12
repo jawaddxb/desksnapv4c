@@ -25,6 +25,7 @@ interface EnhancedModePanelProps {
   onResearch: (preferences: ResearchPreferences) => void;
   onCreateNotes: (findings: Finding[]) => void;
   onClose: () => void;
+  onExpandModal?: () => void;
   findings: Finding[];
   progress: ProgressState | null;
   synthesis?: string;
@@ -198,7 +199,8 @@ const ResultsStep: React.FC<{
   synthesis?: string;
   onCreateNotes: (findings: Finding[]) => void;
   onResearchMore: () => void;
-}> = ({ findings, topic, synthesis, onCreateNotes, onResearchMore }) => {
+  onExpandModal?: () => void;
+}> = ({ findings, topic, synthesis, onCreateNotes, onResearchMore, onExpandModal }) => {
   const [selectedFindings, setSelectedFindings] = useState<Set<string>>(
     new Set(findings.map((f) => f.id))
   );
@@ -223,11 +225,24 @@ const ResultsStep: React.FC<{
   return (
     <div className="space-y-4 animate-fadeIn">
       {/* Research complete header */}
-      <div className="flex items-center gap-2 text-green-400">
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-        </svg>
-        <span className="font-medium">Research Complete</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-green-400">
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+          </svg>
+          <span className="font-medium">Research Complete</span>
+        </div>
+        {onExpandModal && findings.length > 0 && (
+          <button
+            onClick={onExpandModal}
+            className="flex items-center gap-1 px-2 py-1 text-xs text-[#c5a47e] hover:bg-white/10 rounded transition-colors"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 11V3h-8l3.29 3.29-10 10L3 13v8h8l-3.29-3.29 10-10z" />
+            </svg>
+            Expand
+          </button>
+        )}
       </div>
 
       {/* Synthesis */}
@@ -322,6 +337,7 @@ export const EnhancedModePanel: React.FC<EnhancedModePanelProps> = ({
   onResearch,
   onCreateNotes,
   onClose,
+  onExpandModal,
   findings,
   progress,
   synthesis,
@@ -441,6 +457,7 @@ export const EnhancedModePanel: React.FC<EnhancedModePanelProps> = ({
             synthesis={synthesis}
             onCreateNotes={onCreateNotes}
             onResearchMore={handleResearchMore}
+            onExpandModal={onExpandModal}
           />
         )}
       </div>

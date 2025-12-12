@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { IdeaNote, NoteConnection, COLUMNS, ColumnName } from '../../types/ideation';
+import { IdeaNote, NoteConnection, COLUMNS } from '../../types/ideation';
 import { StickyNote } from './StickyNote';
 import { ConnectorLayer } from './ConnectorLayer';
 import { ColumnHeader } from './ColumnHeader';
@@ -20,6 +20,8 @@ interface FlowCanvasProps {
   onDeleteNote?: (noteId: string) => void;
   onMoveNote?: (noteId: string, column: number, row: number) => void;
   onAddNote?: (column: number) => void;
+  /** Custom column names (defaults to COLUMNS for pitch decks) */
+  columns?: readonly string[];
 }
 
 // Note dimensions for layout calculation
@@ -38,6 +40,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   onDeleteNote,
   onMoveNote,
   onAddNote,
+  columns = COLUMNS,
 }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [notePositions, setNotePositions] = useState<Map<string, { x: number; y: number; width: number; height: number }>>(new Map());
@@ -46,9 +49,9 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
 
   // Group notes by column
   const notesByColumn = useMemo(() => {
-    const grouped: IdeaNote[][] = COLUMNS.map(() => []);
+    const grouped: IdeaNote[][] = columns.map(() => []);
     notes.forEach(note => {
-      if (note.column >= 0 && note.column < COLUMNS.length) {
+      if (note.column >= 0 && note.column < columns.length) {
         grouped[note.column].push(note);
       }
     });
@@ -57,7 +60,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
       columnNotes.sort((a, b) => a.row - b.row);
     });
     return grouped;
-  }, [notes]);
+  }, [notes, columns]);
 
   // Calculate note positions based on column and row
   useEffect(() => {
@@ -157,14 +160,14 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
       />
       {/* Column headers and swimlanes */}
       <div className="flex gap-4 px-4 pt-3 sticky top-0 bg-[#0a0a0a] z-10">
-        {COLUMNS.map((colName, colIndex) => (
+        {columns.map((colName, colIndex) => (
           <div
             key={colName}
             className="flex-1 min-w-[160px] max-w-[280px]"
           >
             <ColumnHeader
-              name={colName as ColumnName}
-              noteCount={notesByColumn[colIndex].length}
+              name={colName}
+              noteCount={notesByColumn[colIndex]?.length || 0}
               isActive={dragOverColumn === colIndex}
             />
           </div>
@@ -182,7 +185,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
 
         {/* Column drop zones */}
         <div className="flex gap-4 px-4 absolute inset-0">
-          {COLUMNS.map((colName, colIndex) => (
+          {columns.map((colName, colIndex) => (
             <div
               key={colName}
               className={`
@@ -198,7 +201,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
             >
               {/* Notes in this column */}
               <div className="flex flex-col gap-4 pt-4">
-                {notesByColumn[colIndex].map(note => (
+                {(notesByColumn[colIndex] || []).map(note => (
                   <StickyNote
                     key={note.id}
                     note={note}

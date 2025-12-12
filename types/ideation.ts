@@ -7,7 +7,7 @@
 
 import { Message } from '../types';
 
-// Swimlane column names (presentation narrative flow)
+// Swimlane column names (presentation narrative flow) - default for pitch/persuasion
 export const COLUMNS = ['Hook', 'Problem', 'Solution', 'Proof', 'CTA'] as const;
 export type ColumnName = typeof COLUMNS[number];
 
@@ -24,6 +24,117 @@ export type NoteColor = keyof typeof NOTE_COLORS;
 
 // Source of the note
 export type NoteType = 'user' | 'ai' | 'research';
+
+// Knowledge note types (for sources mode)
+export type KnowledgeNoteType = 'idea' | 'concept' | 'framework' | 'claim' | 'example' | 'exercise' | 'quiz';
+
+// Content types for categorization (used by topic pills)
+export type ContentType =
+  | 'statistic'    // Numbers, percentages, data points
+  | 'quote'        // Expert quotes, testimonials
+  | 'framework'    // Models, processes, methodologies
+  | 'example'      // Case studies, real-world examples
+  | 'definition'   // Key term definitions
+  | 'insight'      // Conclusions, takeaways
+  | 'trend'        // Industry trends, predictions
+  | 'comparison';  // Comparisons, contrasts
+
+// ============================================================================
+// SOURCES MODE TYPES (VideoDeck / Research & Present)
+// ============================================================================
+
+/**
+ * Source type for different input types
+ */
+export type SourceType = 'video' | 'web' | 'doc';
+
+/**
+ * Recipe type for different deck outputs
+ */
+export type DeckRecipe = 'training' | 'explainer' | 'brief' | 'pitch';
+
+/**
+ * Recipe-specific column configurations
+ * Each recipe type has columns optimized for its narrative structure
+ */
+export const RECIPE_COLUMNS: Record<DeckRecipe, readonly string[]> = {
+  training: ['Objective', 'Concept', 'Example', 'Practice', 'Review'],
+  explainer: ['What', 'Why', 'How', 'Examples', 'Summary'],
+  brief: ['Context', 'Key Points', 'Analysis', 'Implications', 'Actions'],
+  pitch: ['Hook', 'Problem', 'Solution', 'Proof', 'CTA'],
+} as const;
+
+/**
+ * Get columns for a specific recipe (with fallback to default COLUMNS)
+ */
+export function getRecipeColumns(recipe?: DeckRecipe): readonly string[] {
+  return recipe ? RECIPE_COLUMNS[recipe] : COLUMNS;
+}
+
+/**
+ * A source (video, web page, or document) for content extraction
+ */
+export interface Source {
+  id: string;
+  type: SourceType;
+  url: string;
+  title?: string;
+  status: 'pending' | 'ingesting' | 'ingested' | 'error';
+  errorMessage?: string;
+  metadata?: SourceMetadata;
+  transcript?: TranscriptSegment[];  // For videos
+  chapters?: Chapter[];              // Identified chapters
+  createdAt: number;
+  // Comprehensive extraction fields (for topic pills)
+  detectedThemes?: string[];         // e.g., "AI Trends", "Market Data"
+  detectedTypes?: ContentType[];     // e.g., "statistic", "quote", "framework"
+  fullMarkdown?: string;             // Complete extracted content
+}
+
+/**
+ * Source metadata (channel, duration, etc.)
+ */
+export interface SourceMetadata {
+  duration?: number;        // Video duration in seconds
+  author?: string;          // Channel/author name
+  publishDate?: string;     // When published
+  thumbnailUrl?: string;    // Video thumbnail
+  description?: string;     // Video/page description
+}
+
+/**
+ * Transcript segment with timing
+ */
+export interface TranscriptSegment {
+  text: string;
+  startTime: number;        // Seconds
+  endTime: number;          // Seconds
+  confidence?: number;      // 0-1
+}
+
+/**
+ * Chapter/section identified in content
+ */
+export interface Chapter {
+  id: string;
+  title: string;
+  startTime: number;
+  endTime: number;
+  summary?: string;
+  topics?: string[];
+}
+
+/**
+ * Proof link connecting a note to its source(s)
+ */
+export interface ProofLink {
+  sourceId: string;         // Which source this came from
+  startTime?: number;       // Video timestamp start (seconds)
+  endTime?: number;         // Video timestamp end (seconds)
+  sectionAnchor?: string;   // Web page section/heading
+  excerpt?: string;         // Short quote from source
+  confidence: number;       // 0-1 confidence score
+}
 
 /**
  * A single sticky note on the ideation canvas.
@@ -44,6 +155,13 @@ export interface IdeaNote {
   color: NoteColor;
   approved: boolean;            // User has confirmed this note
   createdAt: number;
+
+  // Sources mode fields (VideoDeck / Research & Present)
+  knowledgeType?: KnowledgeNoteType;  // Type of extracted knowledge
+  proofLinks?: ProofLink[];           // Links to source evidence
+  // Topic categorization (for filtering with pills)
+  theme?: string;                     // e.g., "AI Trends", "Market Data"
+  contentType?: ContentType;          // e.g., "statistic", "quote"
 }
 
 /**
@@ -75,6 +193,11 @@ export interface IdeationSession {
   creativeJournal?: CreativeJournal;
   // API sync state
   syncStatus?: 'synced' | 'pending' | 'error';
+
+  // Sources mode fields (VideoDeck / Research & Present)
+  sourceMode?: 'prompt' | 'video' | 'web' | 'mixed';  // What type of input
+  sources?: Source[];                                   // Video/web sources
+  recipe?: DeckRecipe;                                  // Output deck type
 }
 
 /**
@@ -174,6 +297,35 @@ export interface CreativeJournal {
 // ============================================================================
 
 /**
+ * Backend representation of Source
+ */
+export interface BackendSource {
+  id: string;
+  session_id: string;
+  type: SourceType;
+  url: string;
+  title?: string | null;
+  status: 'pending' | 'ingesting' | 'ingested' | 'error';
+  error_message?: string | null;
+  metadata?: SourceMetadata | null;
+  transcript?: TranscriptSegment[] | null;
+  chapters?: Chapter[] | null;
+  created_at: string;
+}
+
+/**
+ * Backend representation of ProofLink
+ */
+export interface BackendProofLink {
+  source_id: string;
+  start_time?: number | null;
+  end_time?: number | null;
+  section_anchor?: string | null;
+  excerpt?: string | null;
+  confidence: number;
+}
+
+/**
  * Backend representation of IdeaNote
  */
 export interface BackendIdeaNote {
@@ -190,6 +342,9 @@ export interface BackendIdeaNote {
   approved: boolean;
   created_at: string;
   updated_at: string;
+  // Sources mode fields
+  knowledge_type?: KnowledgeNoteType | null;
+  proof_links?: BackendProofLink[] | null;
 }
 
 /**
@@ -254,6 +409,10 @@ export interface BackendIdeationSession {
   notes?: BackendIdeaNote[];
   connections?: BackendNoteConnection[];
   messages?: BackendMessage[];
+  // Sources mode fields
+  source_mode?: 'prompt' | 'video' | 'web' | 'mixed' | null;
+  sources?: BackendSource[] | null;
+  recipe?: DeckRecipe | null;
 }
 
 /**
@@ -362,4 +521,95 @@ export function getColumnIndex(column: ColumnName | number): number {
 
 export function getColumnName(index: number): ColumnName {
   return COLUMNS[index] ?? 'Hook';
+}
+
+// Sources mode helper functions
+
+export function createSource(
+  url: string,
+  type: SourceType
+): Source {
+  return {
+    id: `source-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    type,
+    url,
+    status: 'pending',
+    createdAt: Date.now(),
+  };
+}
+
+export function createSourcesSession(
+  topic: string,
+  sourceMode: 'video' | 'web' | 'mixed',
+  recipe: DeckRecipe
+): IdeationSession {
+  return {
+    id: `sources-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    topic,
+    notes: [],
+    connections: [],
+    messages: [],
+    stage: 'discover',
+    createdAt: Date.now(),
+    lastModified: Date.now(),
+    sourceMode,
+    sources: [],
+    recipe,
+  };
+}
+
+export function createKnowledgeNote(
+  content: string,
+  column: number,
+  knowledgeType: KnowledgeNoteType,
+  proofLinks: ProofLink[] = [],
+  tags?: { theme?: string; contentType?: ContentType }
+): IdeaNote {
+  return {
+    id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    content,
+    type: 'ai',
+    column,
+    row: 0,
+    color: knowledgeType === 'concept' ? 'green' : knowledgeType === 'framework' ? 'purple' : 'blue',
+    approved: false,
+    createdAt: Date.now(),
+    knowledgeType,
+    proofLinks,
+    theme: tags?.theme,
+    contentType: tags?.contentType,
+  };
+}
+
+// ============================================================================
+// COLUMN STATUS UTILITIES (for autonomous completion model)
+// ============================================================================
+
+/**
+ * Status of a single column in the ideation canvas
+ */
+export interface ColumnStatus {
+  index: number;
+  name: string;
+  count: number;
+}
+
+/**
+ * Get the fill status of all columns in the canvas
+ */
+export function getColumnFillStatus(notes: IdeaNote[]): ColumnStatus[] {
+  return COLUMNS.map((name, index) => ({
+    index,
+    name,
+    count: notes.filter(n => n.column === index).length,
+  }));
+}
+
+/**
+ * Check if ideation is complete (4+ columns filled with 10+ total notes)
+ */
+export function isIdeationComplete(notes: IdeaNote[]): boolean {
+  const status = getColumnFillStatus(notes);
+  const filledColumns = status.filter(c => c.count >= 1).length;
+  return filledColumns >= 4 && notes.length >= 10;
 }

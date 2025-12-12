@@ -31,6 +31,8 @@ export interface RoughDraftInput {
   themeId: string;
   /** Visual style for images */
   visualStyle: string;
+  /** Source of the draft request - affects how content is processed */
+  source?: 'ideation' | 'sources' | 'copilot';
 }
 
 export interface SlideContent {
@@ -127,8 +129,7 @@ function safeJsonParse(text: string): unknown {
     .replace(/,\s*([}\]])/g, '$1')       // Remove trailing commas before } or ]
     .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":')  // Quote unquoted keys
     .replace(/:\s*'([^']*)'/g, ': "$1"')  // Convert single quotes to double
-    .replace(/[\x00-\x1F\x7F]/g, ' ')     // Remove control characters
-    .replace(/\n/g, '\\n')                // Escape newlines in strings (rough fix)
+    .replace(/[\x00-\x1F\x7F]/g, ' ')     // Remove control characters (including newlines)
     .trim();
 
   try {
@@ -148,11 +149,91 @@ function safeJsonParse(text: string): unknown {
         .replace(/[\x00-\x1F\x7F]/g, ' ');
       return JSON.parse(extracted);
     } catch (e) {
-      // Continue to error
+      // Continue to next attempt
     }
   }
 
-  // Step 5: If all else fails, throw with context
+  // Step 5: Try to find and complete truncated JSON
+  // Check if response looks like it was cut off mid-JSON
+  if (cleaned.includes('"slides"') && cleaned.includes('[')) {
+    console.warn('[safeJsonParse] Attempting to recover truncated JSON...');
+    try {
+      // Count brackets to find where JSON might be incomplete
+      let braceCount = 0;
+      let bracketCount = 0;
+      let lastValidIndex = 0;
+      let inString = false;
+      let escapeNext = false;
+
+      for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+
+        if (escapeNext) {
+          escapeNext = false;
+          continue;
+        }
+
+        if (char === '\\') {
+          escapeNext = true;
+          continue;
+        }
+
+        if (char === '"') {
+          inString = !inString;
+          continue;
+        }
+
+        if (inString) continue;
+
+        if (char === '{') braceCount++;
+        if (char === '}') {
+          braceCount--;
+          if (braceCount === 0 && bracketCount === 0) {
+            lastValidIndex = i;
+          }
+        }
+        if (char === '[') bracketCount++;
+        if (char === ']') {
+          bracketCount--;
+          if (braceCount === 1 && bracketCount === 0) {
+            // Found end of slides array
+            lastValidIndex = i;
+          }
+        }
+      }
+
+      // If we have unclosed brackets/braces, try to close them
+      if (braceCount > 0 || bracketCount > 0) {
+        let fixedJson = cleaned;
+        // Close any open strings
+        const quoteCount = (fixedJson.match(/(?<!\\)"/g) || []).length;
+        if (quoteCount % 2 !== 0) {
+          fixedJson += '"';
+        }
+        // Close brackets and braces
+        while (bracketCount > 0) {
+          fixedJson += ']';
+          bracketCount--;
+        }
+        while (braceCount > 0) {
+          fixedJson += '}';
+          braceCount--;
+        }
+
+        // Clean up common issues in the fixed JSON
+        fixedJson = fixedJson
+          .replace(/,\s*([}\]])/g, '$1')  // Remove trailing commas
+          .replace(/[\x00-\x1F\x7F]/g, ' '); // Remove control chars
+
+        console.log('[safeJsonParse] Attempting to parse auto-completed JSON...');
+        return JSON.parse(fixedJson);
+      }
+    } catch (recoveryError) {
+      console.warn('[safeJsonParse] JSON recovery failed:', recoveryError);
+    }
+  }
+
+  // Step 6: If all else fails, throw with context
   const preview = cleaned.substring(0, 300);
   throw new Error(
     `Failed to parse AI response as JSON. ` +
@@ -222,8 +303,14 @@ async function generateSlideContent(
         .join('\n')
     : '';
 
+  // Use more conservative approach for source-based decks (video/web extraction)
+  const isFromSources = input.source === 'sources';
+  const openingInstruction = isFromSources
+    ? 'Organize these extracted notes into a presentation, preserving the original wording and key concepts as closely as possible.'
+    : 'Convert these ideation notes into a presentation plan.';
+
   const prompt = input.ideationNotes
-    ? `Convert these ideation notes into a presentation plan.
+    ? `${openingInstruction}
 
 Topic: ${input.topic}
 Selected Theme: ${input.themeId} - ${theme.name}
@@ -235,12 +322,14 @@ ${notesContext}
 
 Create a structured presentation with 6-12 slides. For each slide provide:
 - title: Compelling slide title
-- bulletPoints: 2-4 key points (array of strings)
+- bulletPoints: 2-4 key points (array of strings)${isFromSources ? ' - USE THE ORIGINAL NOTE CONTENT DIRECTLY where possible' : ''}
 - speakerNotes: What to say (2-3 sentences)
 - imageVisualDescription: Visual description that matches the "${theme.name}" theme style: ${input.visualStyle}
 - layoutType: One of: split, full-bleed, statement, gallery, card, horizontal, magazine
 - alignment: left, right, or center
-
+${isFromSources ? `
+IMPORTANT: This content was extracted from a source (video/article). PRESERVE the original phrasing, examples, and key concepts. Do NOT fundamentally rewrite or change the narrative. Stay faithful to the source material.
+` : ''}
 IMPORTANT: The imageVisualDescription should match the theme's visual style: ${input.visualStyle}
 
 Return as JSON with structure:
@@ -276,11 +365,15 @@ Return as JSON with structure:
     contents: prompt,
     config: {
       responseMimeType: 'application/json',
+      maxOutputTokens: 8192, // Ensure enough tokens for full JSON response
     },
   });
 
   const text = response.text;
   if (!text) throw new Error('Failed to generate slide content - empty response');
+
+  // Debug: log response length and finish reason
+  console.log(`[generateSlideContent] Response length: ${text.length} chars`);
 
   const result = safeJsonParse(text) as { topic?: string; slides: Array<{
     title: string;

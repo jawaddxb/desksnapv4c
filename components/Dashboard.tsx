@@ -1,14 +1,19 @@
 
 import React, { useRef, useState } from 'react';
 import { Presentation } from '../types';
-import { IdeationSession } from '../types/ideation';
+import { IdeationSession, DeckRecipe } from '../types/ideation';
 import { RoughDraft } from '../types/roughDraft';
 import { THEMES } from '../lib/themes';
 import { WabiSabiStage } from './WabiSabiStage';
-import { Plus, Trash2, Clock, Play, Upload, BarChart2, Lightbulb, FileText, Sparkles, Copy, FileEdit } from 'lucide-react';
+import { Trash2, Clock, Play, BarChart2, FileText, Sparkles, Copy, FileEdit, Layers } from 'lucide-react';
 import { AnalyticsModal } from './AnalyticsModal';
 import { IdeationHistoryPanel } from './ideation/IdeationHistoryPanel';
 import { RoughDraftHistoryPanel } from './rough-draft/RoughDraftHistoryPanel';
+import { RecipeSelector } from './sources/RecipeSelector';
+import { FeatureCards } from './dashboard/FeatureCards';
+import { GettingStarted } from './onboarding/GettingStarted';
+import { TabTip } from './onboarding/FeatureTooltip';
+import { useOnboarding, OnboardingStep } from '../hooks/useOnboarding';
 
 type DashboardTab = 'decks' | 'rough-drafts' | 'ideations';
 
@@ -24,6 +29,8 @@ interface DashboardProps {
     onCreateNew: () => void;
     onImport: (file: File) => void;
     onIdeate?: () => void;
+    onOpenSources?: (preset: 'video' | 'web' | 'mixed', recipe: DeckRecipe) => void;
+    onBeautify?: () => void;
     onLoadIdeation?: (id: string) => void;
     onDeleteIdeation?: (id: string) => void;
     onGenerateDeckFromIdeation?: (id: string) => void;
@@ -31,6 +38,7 @@ interface DashboardProps {
     onLoadRoughDraft?: (id: string) => void;
     onDeleteRoughDraft?: (id: string) => void;
     onApproveRoughDraft?: (id: string) => void;
+    onOpenThemePicker?: () => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -45,6 +53,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
     onCreateNew,
     onImport,
     onIdeate,
+    onOpenSources,
+    onBeautify,
     onLoadIdeation,
     onDeleteIdeation,
     onGenerateDeckFromIdeation,
@@ -52,10 +62,44 @@ export const Dashboard: React.FC<DashboardProps> = ({
     onLoadRoughDraft,
     onDeleteRoughDraft,
     onApproveRoughDraft,
+    onOpenThemePicker,
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [analyticsDeck, setAnalyticsDeck] = useState<Presentation | null>(null);
     const [activeTab, setActiveTab] = useState<DashboardTab>('decks');
+    // Recipe selector state
+    const [recipeSelectorOpen, setRecipeSelectorOpen] = useState(false);
+    const [pendingPreset, setPendingPreset] = useState<'video' | 'web' | 'mixed'>('video');
+
+    // Onboarding state
+    const {
+        isLoaded: onboardingLoaded,
+        completedSteps,
+        shouldShowChecklist,
+        markStepComplete,
+        dismissChecklist,
+        isTipDismissed,
+        dismissTip,
+    } = useOnboarding();
+
+    // Show checklist only when user has fewer than 3 decks
+    const showChecklist = shouldShowChecklist && savedDecks.length < 3;
+
+    // Tooltip visibility
+    const showIdeationTip = !isTipDismissed('ideation_tab') && savedIdeations.length === 0;
+    const showRoughDraftTip = !isTipDismissed('rough_draft_tab') && savedRoughDrafts.length === 0;
+
+    // Handle opening recipe selector before sources
+    const handleOpenRecipeSelector = (preset: 'video' | 'web' | 'mixed') => {
+        setPendingPreset(preset);
+        setRecipeSelectorOpen(true);
+    };
+
+    // Handle recipe selection
+    const handleRecipeSelect = (recipe: DeckRecipe) => {
+        setRecipeSelectorOpen(false);
+        onOpenSources?.(pendingPreset, recipe);
+    };
 
     const handleImportClick = () => fileInputRef.current?.click();
 
@@ -68,34 +112,103 @@ export const Dashboard: React.FC<DashboardProps> = ({
         }
     };
 
+    // Handle checklist step clicks
+    const handleStepClick = (step: OnboardingStep) => {
+        switch (step) {
+            case 'create_deck':
+                onCreateNew();
+                break;
+            case 'try_ideation':
+                onIdeate?.();
+                break;
+            case 'explore_themes':
+                onOpenThemePicker?.();
+                break;
+            case 'export_deck':
+                // This will be marked when user actually exports
+                break;
+        }
+    };
+
+    // Handler wrappers that mark onboarding steps complete
+    const handleCreateNew = () => {
+        markStepComplete('create_deck');
+        onCreateNew();
+    };
+
+    const handleIdeate = () => {
+        markStepComplete('try_ideation');
+        onIdeate?.();
+    };
+
     return (
         <div className="flex-1 h-full overflow-y-auto bg-[#111111] p-8 md:p-12">
             {analyticsDeck && (
                 <AnalyticsModal presentation={analyticsDeck} onClose={() => setAnalyticsDeck(null)} />
             )}
 
+            {/* Recipe selector modal */}
+            <RecipeSelector
+                isOpen={recipeSelectorOpen}
+                onSelect={handleRecipeSelect}
+                onClose={() => setRecipeSelectorOpen(false)}
+                preset={pendingPreset}
+            />
+
+            {/* Hidden file input for import */}
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
+
             <div className="max-w-7xl mx-auto">
-                {/* Header with tabs */}
-                <div className="flex items-center justify-between mb-8">
-                    <div>
-                        {/* Tab navigation */}
-                        <div className="flex gap-1 mb-2">
+                {/* Feature Cards Section */}
+                <FeatureCards
+                    onCreateNew={handleCreateNew}
+                    onIdeate={onIdeate ? handleIdeate : undefined}
+                    onOpenSources={onOpenSources}
+                    onOpenRecipeSelector={handleOpenRecipeSelector}
+                    onBeautify={onBeautify}
+                    onImport={handleImportClick}
+                />
+
+                {/* Getting Started Checklist */}
+                {onboardingLoaded && showChecklist && (
+                    <GettingStarted
+                        completedSteps={completedSteps}
+                        onStepClick={handleStepClick}
+                        onDismiss={dismissChecklist}
+                    />
+                )}
+
+                {/* Recent Work Section */}
+                <div className="mb-6">
+                    <h2 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">
+                        Your Recent Work
+                    </h2>
+
+                    {/* Tab navigation */}
+                    <div className="flex gap-1 mb-6">
+                        <button
+                            onClick={() => setActiveTab('decks')}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all duration-150 ${
+                                activeTab === 'decks'
+                                    ? 'bg-white text-black'
+                                    : 'bg-transparent text-white/60 hover:text-white hover:bg-white/5'
+                            }`}
+                        >
+                            <FileText className="w-4 h-4" />
+                            My Decks
+                            <span className={`px-2 py-0.5 text-[10px] rounded-sm ${
+                                activeTab === 'decks' ? 'bg-black/20' : 'bg-white/10'
+                            }`}>
+                                {savedDecks.length}
+                            </span>
+                        </button>
+
+                        <div className="relative">
                             <button
-                                onClick={() => setActiveTab('decks')}
-                                className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all duration-150 ${
-                                    activeTab === 'decks'
-                                        ? 'bg-white text-black'
-                                        : 'bg-transparent text-white/60 hover:text-white hover:bg-white/5'
-                                }`}
-                            >
-                                <FileText className="w-4 h-4" />
-                                My Decks
-                                <span className="px-2 py-0.5 text-[10px] bg-black/20 rounded-sm">
-                                    {savedDecks.length}
-                                </span>
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('rough-drafts')}
+                                onClick={() => {
+                                    setActiveTab('rough-drafts');
+                                    if (showRoughDraftTip) dismissTip('rough_draft_tab');
+                                }}
                                 className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all duration-150 ${
                                     activeTab === 'rough-drafts'
                                         ? 'bg-[#c5a47e] text-black'
@@ -104,12 +217,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             >
                                 <FileEdit className="w-4 h-4" />
                                 Rough Drafts
-                                <span className="px-2 py-0.5 text-[10px] bg-black/20 rounded-sm">
+                                <span className={`px-2 py-0.5 text-[10px] rounded-sm ${
+                                    activeTab === 'rough-drafts' ? 'bg-black/20' : 'bg-white/10'
+                                }`}>
                                     {savedRoughDrafts.length}
                                 </span>
                             </button>
+                            <TabTip
+                                text="Review AI-generated slides before finalizing"
+                                isVisible={showRoughDraftTip && activeTab === 'decks'}
+                                onDismiss={() => dismissTip('rough_draft_tab')}
+                            />
+                        </div>
+
+                        <div className="relative">
                             <button
-                                onClick={() => setActiveTab('ideations')}
+                                onClick={() => {
+                                    setActiveTab('ideations');
+                                    if (showIdeationTip) dismissTip('ideation_tab');
+                                }}
                                 className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wide transition-all duration-150 ${
                                     activeTab === 'ideations'
                                         ? 'bg-[#c5a47e] text-black'
@@ -118,81 +244,62 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             >
                                 <Sparkles className="w-4 h-4" />
                                 Ideations
-                                <span className="px-2 py-0.5 text-[10px] bg-black/20 rounded-sm">
+                                <span className={`px-2 py-0.5 text-[10px] rounded-sm ${
+                                    activeTab === 'ideations' ? 'bg-black/20' : 'bg-white/10'
+                                }`}>
                                     {savedIdeations.length}
                                 </span>
                             </button>
+                            <TabTip
+                                text="Start here to brainstorm before building"
+                                isVisible={showIdeationTip && activeTab === 'decks'}
+                                onDismiss={() => dismissTip('ideation_tab')}
+                            />
                         </div>
-                        <p className="text-white/60">
-                            {activeTab === 'decks'
-                                ? 'Manage your generated presentations'
-                                : activeTab === 'rough-drafts'
-                                ? 'Review and refine your draft presentations'
-                                : 'Revisit and develop your brainstorming sessions'}
-                        </p>
                     </div>
-                    <div className="flex gap-3">
-                        {activeTab === 'decks' ? (
-                            <>
-                                <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
-                                <button
-                                    onClick={handleImportClick}
-                                    className="flex items-center gap-2 bg-black hover:bg-white/5 text-white border border-white/20 hover:border-white/40 px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
-                                >
-                                    <Upload className="w-4 h-4" />
-                                    Import
-                                </button>
-                                {onIdeate && (
-                                    <button
-                                        onClick={onIdeate}
-                                        className="flex items-center gap-2 bg-[#c5a47e] hover:bg-white text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
-                                    >
-                                        <Lightbulb className="w-4 h-4" />
-                                        Ideate
-                                    </button>
-                                )}
-                                <button
-                                    onClick={onCreateNew}
-                                    className="flex items-center gap-2 bg-white hover:bg-[#c5a47e] text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    New Deck
-                                </button>
-                            </>
-                        ) : activeTab === 'rough-drafts' ? (
-                            <button
-                                onClick={onIdeate}
-                                className="flex items-center gap-2 bg-[#c5a47e] hover:bg-white text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
-                            >
-                                <Lightbulb className="w-4 h-4" />
-                                Start Ideation
-                            </button>
-                        ) : (
-                            <button
-                                onClick={onIdeate}
-                                className="flex items-center gap-2 bg-[#c5a47e] hover:bg-white text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
-                            >
-                                <Plus className="w-4 h-4" />
-                                New Ideation
-                            </button>
-                        )}
-                    </div>
+
+                    {/* Tab description */}
+                    <p className="text-white/50 text-sm mb-6">
+                        {activeTab === 'decks'
+                            ? 'Your finished presentations, ready to present or export'
+                            : activeTab === 'rough-drafts'
+                            ? 'Review and refine AI-generated slides before creating your final deck'
+                            : 'Your brainstorming sessions — develop ideas before building slides'}
+                    </p>
                 </div>
 
                 {/* Content based on active tab */}
                 {activeTab === 'decks' ? (
-                    // Decks grid
+                    // Decks grid - now 4 per row
                     savedDecks.length === 0 ? (
-                        <div className="border border-dashed border-white/20 p-20 text-center flex flex-col items-center justify-center bg-black/50">
+                        <div className="border border-dashed border-white/20 p-16 text-center flex flex-col items-center justify-center bg-black/50">
                             <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
-                                <Plus className="w-8 h-8 text-white/40" />
+                                <Layers className="w-8 h-8 text-white/40" />
                             </div>
-                            <h3 className="text-xl font-light text-white mb-2">No Decks Yet</h3>
-                            <p className="text-white/60 mb-8 max-w-md mx-auto">Create your first presentation to get started. All your work will be automatically saved here.</p>
-                            <button onClick={onCreateNew} className="text-[#c5a47e] font-bold hover:text-white transition-colors duration-150">Start Creating &rarr;</button>
+                            <h3 className="text-xl font-light text-white mb-2">Ready to create something amazing?</h3>
+                            <p className="text-white/50 mb-8 max-w-md mx-auto">
+                                DeckSnap uses AI to help you build beautiful presentations in minutes.
+                                Choose a creation method above to get started.
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                                <button
+                                    onClick={handleCreateNew}
+                                    className="bg-white hover:bg-[#c5a47e] text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
+                                >
+                                    Create Your First Deck
+                                </button>
+                                {onIdeate && (
+                                    <button
+                                        onClick={handleIdeate}
+                                        className="text-[#c5a47e] hover:text-white transition-colors duration-150 text-sm"
+                                    >
+                                        Or start by brainstorming ideas →
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {savedDecks.map(deck => {
                                 const theme = THEMES[deck.themeId] || THEMES.neoBrutalist;
                                 const coverSlide = deck.slides?.[0];
@@ -216,50 +323,55 @@ export const Dashboard: React.FC<DashboardProps> = ({
                                                 </div>
                                             )}
                                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-150 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                <div className="bg-[#c5a47e] text-black px-4 py-2 font-bold text-xs uppercase tracking-widest flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-150">
-                                                    <Play className="w-3 h-3" fill="currentColor" /> Edit Deck
+                                                <div className="bg-[#c5a47e] text-black px-3 py-1.5 font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-150">
+                                                    <Play className="w-2.5 h-2.5" fill="currentColor" /> Edit
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="p-5 flex flex-col flex-1">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <h3 className="font-bold text-lg text-white line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150 cursor-pointer" onClick={() => onLoad(deck.id)}>{deck.topic}</h3>
-                                            </div>
+                                        <div className="p-4 flex flex-col flex-1">
+                                            <h3 className="font-bold text-sm text-white line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150 cursor-pointer mb-2" onClick={() => onLoad(deck.id)}>
+                                                {deck.topic}
+                                            </h3>
                                             <div className="flex items-center justify-between mt-auto">
-                                                <div className="flex items-center gap-4 text-[10px] text-white/40 font-bold uppercase tracking-widest">
-                                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(deck.lastModified).toLocaleDateString()}</span>
-                                                    <span className="px-2 py-1 bg-white/5 text-white/60">{deck.slides.length} Slides</span>
+                                                <div className="flex items-center gap-2 text-[9px] text-white/40 font-bold uppercase tracking-widest">
+                                                    <span className="flex items-center gap-1">
+                                                        <Clock className="w-2.5 h-2.5" />
+                                                        {new Date(deck.lastModified).toLocaleDateString()}
+                                                    </span>
+                                                    <span className="px-1.5 py-0.5 bg-white/5 text-white/50">
+                                                        {deck.slides.length}
+                                                    </span>
                                                 </div>
 
                                                 {/* Analytics Button */}
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setAnalyticsDeck(deck); }}
-                                                    className="p-2 text-white/40 hover:text-[#c5a47e] hover:bg-white/5 transition-colors duration-150"
+                                                    className="p-1.5 text-white/30 hover:text-[#c5a47e] hover:bg-white/5 transition-colors duration-150"
                                                     title="View Analytics"
                                                 >
-                                                    <BarChart2 className="w-4 h-4" />
+                                                    <BarChart2 className="w-3.5 h-3.5" />
                                                 </button>
                                             </div>
                                         </div>
 
                                         {/* Action buttons - top right */}
-                                        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-150 z-10">
+                                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-150 z-10">
                                             {onClone && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); onClone(deck.id); }}
-                                                    className="p-2 bg-black/80 text-[#c5a47e] hover:bg-[#c5a47e]/20 hover:text-[#c5a47e] transition-all duration-150"
+                                                    className="p-1.5 bg-black/80 text-[#c5a47e] hover:bg-[#c5a47e]/20 hover:text-[#c5a47e] transition-all duration-150"
                                                     title="Clone Deck"
                                                 >
-                                                    <Copy className="w-4 h-4" />
+                                                    <Copy className="w-3.5 h-3.5" />
                                                 </button>
                                             )}
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onDelete(deck.id); }}
-                                                className="p-2 bg-black/80 text-red-400 hover:bg-red-500/20 hover:text-red-400 transition-all duration-150"
+                                                className="p-1.5 bg-black/80 text-red-400 hover:bg-red-500/20 hover:text-red-400 transition-all duration-150"
                                                 title="Delete Deck"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
                                     </div>

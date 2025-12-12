@@ -74,15 +74,31 @@ export const RoughDraftHistoryPanel: React.FC<RoughDraftHistoryPanelProps> = ({
 
   if (drafts.length === 0) {
     return (
-      <div className="border border-dashed border-white/20 p-20 text-center flex flex-col items-center justify-center bg-black/50">
-        <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
-          <FileEdit className="w-8 h-8 text-white/40" />
+      <div className="border border-dashed border-white/20 p-16 text-center flex flex-col items-center justify-center bg-black/50">
+        <div className="w-16 h-16 bg-[#c5a47e]/10 flex items-center justify-center mb-6">
+          <FileEdit className="w-8 h-8 text-[#c5a47e]/60" />
         </div>
-        <h3 className="text-xl font-light text-white mb-2">No Rough Drafts Yet</h3>
-        <p className="text-white/60 mb-8 max-w-md mx-auto">
-          Rough drafts are created when you generate a deck from an ideation.
-          They let you review and refine slides before creating the final presentation.
+        <h3 className="text-xl font-light text-white mb-2">Review before you build</h3>
+        <p className="text-white/50 mb-6 max-w-md mx-auto">
+          Rough drafts give you a chance to review and refine AI-generated slides
+          before creating your final presentation.
         </p>
+        <div className="flex items-center gap-3 text-sm text-white/40">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded">
+            <span className="w-2 h-2 rounded-full bg-white/30"></span>
+            <span>Pending</span>
+          </div>
+          <ArrowRight className="w-3 h-3" />
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded">
+            <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span>Modified</span>
+          </div>
+          <ArrowRight className="w-3 h-3" />
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded">
+            <span className="w-2 h-2 rounded-full bg-green-400"></span>
+            <span>Approved</span>
+          </div>
+        </div>
       </div>
     );
   }

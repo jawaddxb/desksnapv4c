@@ -9,6 +9,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GenerationMode, PresentationPlanResponse } from './types';
+import { IdeationSession } from './types/ideation';
 import { RoughDraftInput, RoughDraftResult } from './services/agents';
 import { RoughDraftCanvas } from './components/rough-draft';
 import { IMAGE_STYLES } from './lib/themes';
@@ -23,6 +24,9 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import { useChat } from './hooks/useChat';
 import { IdeationCopilot } from './components/ideation/IdeationCopilot';
+import { IdeationResumePrompt } from './components/ideation/IdeationResumePrompt';
+import { SourcesWizard } from './components/sources';
+import { BeautifyWizard } from './components/beautify/BeautifyWizard';
 import { AgentActivityPanel } from './components/AgentActivityPanel';
 import { ArchetypeChangeDialog } from './components/ArchetypeChangeDialog';
 import { getArchetypeVisualStyle } from './lib/archetypeVisualStyles';
@@ -37,6 +41,8 @@ import { ProtectedRoute, OfflineGate } from './components/routing';
 import { LandingPage } from './components/landing';
 import { migrateIdeationSessions, isMigrationComplete } from './services/migration/ideationMigration';
 import { useAuth } from './contexts/AuthContext';
+import { WelcomeModal } from './components/onboarding';
+import { useOnboarding } from './hooks/useOnboarding';
 import {
   FeaturesPage,
   PricingPage,
@@ -63,6 +69,24 @@ function AppContent() {
   const [isIdeating, setIsIdeating] = useState(false);
   const [ideationSessionIdToLoad, setIdeationSessionIdToLoad] = useState<string | null>(null);
   const [enableDraftPreview, setEnableDraftPreview] = useState(false);
+  // Session resumption state
+  const [lastIdeationSessionId, setLastIdeationSessionId] = useState<string | null>(null);
+  const [showIdeationResumePrompt, setShowIdeationResumePrompt] = useState(false);
+
+  // Onboarding state
+  const {
+    isLoaded: onboardingLoaded,
+    isFirstTimeUser,
+    markWelcomeSeen,
+  } = useOnboarding();
+  // Sources mode state (VideoDeck / Research & Present)
+  const [sourcesMode, setSourcesMode] = useState<{
+    isOpen: boolean;
+    preset: 'video' | 'web' | 'mixed';
+    recipe: 'training' | 'explainer' | 'brief' | 'pitch';
+  } | null>(null);
+  // Beautify mode state (Make My Ugly Deck Beautiful)
+  const [isBeautifying, setIsBeautifying] = useState(false);
   // Archetype change dialog state
   const [archetypeChangeDialog, setArchetypeChangeDialog] = useState<{
     isOpen: boolean;
@@ -73,10 +97,14 @@ function AppContent() {
   // Rough draft state - holds data for the rough draft view
   const [roughDraftState, setRoughDraftState] = useState<{
     isOpen: boolean;
-    source: 'ideation' | 'copilot' | 'existing';
+    source: 'ideation' | 'copilot' | 'existing' | 'sources';
     input?: RoughDraftInput;
     ideationSessionId?: string;
     existingDraftId?: string;
+    sourcesSessionId?: string;
+    // Preserve sources wizard state for navigation back
+    sourcesPreset?: 'video' | 'web' | 'mixed';
+    sourcesRecipe?: 'training' | 'explainer' | 'brief' | 'pitch';
   } | null>(null);
 
   // Main deck hook
@@ -208,8 +236,67 @@ function AppContent() {
   };
 
   const handleIdeate = () => {
-    setIsIdeating(true);
+    // If there's a recent session, show the resume prompt
+    if (lastIdeationSessionId) {
+      setShowIdeationResumePrompt(true);
+    } else {
+      setIsIdeating(true);
+    }
   };
+
+  // Sources mode handlers (VideoDeck / Research & Present)
+  const handleOpenSources = useCallback((preset: 'video' | 'web' | 'mixed', recipe: 'training' | 'explainer' | 'brief' | 'pitch' = 'training') => {
+    setSourcesMode({ isOpen: true, preset, recipe });
+  }, []);
+
+  const handleCloseSources = useCallback(() => {
+    setSourcesMode(null);
+  }, []);
+
+  const handleBuildDeckFromSources = useCallback(async (session: IdeationSession) => {
+    // Derive topic from session or sources
+    const topic = session.topic || session.sources?.[0]?.title || 'Untitled';
+
+    // Route to Rough Draft preview with extracted notes
+    // Preserve sources wizard state for "Back" navigation
+    setRoughDraftState({
+      isOpen: true,
+      source: 'sources',
+      input: {
+        topic,
+        themeId: 'executive', // Default theme, agent can suggest better
+        visualStyle: 'professional photography with clean backgrounds',
+        ideationNotes: session.notes, // Include all notes - no filter
+        source: 'sources', // Pass source type to agent for content preservation
+      },
+      sourcesSessionId: session.id,
+      sourcesPreset: sourcesMode?.preset,
+      sourcesRecipe: sourcesMode?.recipe,
+    });
+
+    // Close sources wizard
+    setSourcesMode(null);
+  }, [sourcesMode]);
+
+  // Beautify mode handlers
+  const handleOpenBeautify = useCallback(() => {
+    setIsBeautifying(true);
+  }, []);
+
+  const handleCloseBeautify = useCallback(() => {
+    setIsBeautifying(false);
+  }, []);
+
+  const handleBeautifyComplete = useCallback(async (slides: any[], themeId: string) => {
+    // Create a new presentation from the beautified slides
+    try {
+      await actions.createPresentationFromSlides(slides, themeId);
+      setIsBeautifying(false);
+    } catch (error) {
+      console.error('Failed to create presentation from beautified slides:', error);
+      // Keep the wizard open so user can try again or export manually
+    }
+  }, [actions]);
 
   // Ideation handlers
   const handleLoadIdeation = useCallback((id: string) => {
@@ -275,10 +362,14 @@ function AppContent() {
     });
   }, []);
 
-  const handleCloseIdeation = () => {
+  const handleCloseIdeation = useCallback((sessionId?: string) => {
+    // Preserve the session ID so user can resume later
+    if (sessionId) {
+      setLastIdeationSessionId(sessionId);
+    }
     setIsIdeating(false);
     setIdeationSessionIdToLoad(null);
-  };
+  }, []);
 
   const handleCloneDeck = useCallback((id: string) => {
     duplicateMutation.mutate(id, {
@@ -390,15 +481,21 @@ function AppContent() {
   }, [roughDraftState, actions, addMessage, createModelMessage, createSystemMessage]);
 
   /**
-   * Go back from rough draft to ideation
+   * Go back from rough draft to previous view
    */
   const handleBackFromRoughDraft = useCallback(() => {
     if (roughDraftState?.source === 'ideation') {
       // Return to ideation - keep session open
       setRoughDraftState(null);
       // Ideation is still open since we didn't close it
+    } else if (roughDraftState?.source === 'sources') {
+      // Return to sources wizard - reopen with preserved state
+      const preset = roughDraftState.sourcesPreset || 'video';
+      const recipe = roughDraftState.sourcesRecipe || 'training';
+      setRoughDraftState(null);
+      setSourcesMode({ isOpen: true, preset, recipe });
     } else {
-      // From copilot - close and return to dashboard
+      // From copilot or existing - close and return to dashboard
       setRoughDraftState(null);
     }
   }, [roughDraftState]);
@@ -409,6 +506,53 @@ function AppContent() {
   const handleDiscardRoughDraft = useCallback(() => {
     setRoughDraftState(null);
     setIsIdeating(false);
+  }, []);
+
+  // ============ Welcome Modal Handlers ============
+
+  const handleWelcomePathSelect = useCallback((path: 'new-deck' | 'ideate' | 'beautify') => {
+    markWelcomeSeen();
+    switch (path) {
+      case 'new-deck':
+        handleCreateNew();
+        break;
+      case 'ideate':
+        setIsIdeating(true);
+        break;
+      case 'beautify':
+        setIsBeautifying(true);
+        break;
+    }
+  }, [markWelcomeSeen]);
+
+  const handleWelcomeSkip = useCallback(() => {
+    markWelcomeSeen();
+  }, [markWelcomeSeen]);
+
+  // ============ Ideation Resume Prompt Handlers ============
+
+  const handleResumeLastSession = useCallback(() => {
+    setShowIdeationResumePrompt(false);
+    if (lastIdeationSessionId) {
+      setIdeationSessionIdToLoad(lastIdeationSessionId);
+    }
+    setIsIdeating(true);
+  }, [lastIdeationSessionId]);
+
+  const handleStartFreshSession = useCallback(() => {
+    setShowIdeationResumePrompt(false);
+    setLastIdeationSessionId(null);
+    setIsIdeating(true);
+  }, []);
+
+  const handleChooseFromSaved = useCallback(() => {
+    setShowIdeationResumePrompt(false);
+    // User can select from the ideations tab in dashboard
+    // Just close the prompt - they're already on dashboard
+  }, []);
+
+  const handleCloseResumePrompt = useCallback(() => {
+    setShowIdeationResumePrompt(false);
   }, []);
 
   // ============ Archetype Change Handlers ============
@@ -464,6 +608,28 @@ function AppContent() {
         onApprove={handleApproveRoughDraft}
         onBack={handleBackFromRoughDraft}
         onDiscard={handleDiscardRoughDraft}
+      />
+    );
+  }
+
+  // Beautify Mode - Full screen wizard (Make My Ugly Deck Beautiful)
+  if (isBeautifying) {
+    return (
+      <BeautifyWizard
+        onClose={handleCloseBeautify}
+        onComplete={handleBeautifyComplete}
+      />
+    );
+  }
+
+  // Sources Mode - Full screen wizard (VideoDeck / Research & Present)
+  if (sourcesMode?.isOpen) {
+    return (
+      <SourcesWizard
+        preset={sourcesMode.preset}
+        recipe={sourcesMode.recipe}
+        onClose={handleCloseSources}
+        onBuildDeck={handleBuildDeckFromSources}
       />
     );
   }
@@ -643,6 +809,8 @@ function AppContent() {
             onCreateDeck={handleCreateNew}
             onImport={actions.importDeck}
             onIdeate={handleIdeate}
+            onOpenSources={handleOpenSources}
+            onBeautify={handleOpenBeautify}
             // Ideation props
             savedIdeations={savedIdeations}
             isLoadingIdeations={isLoadingIdeations}
@@ -676,6 +844,23 @@ function AppContent() {
         previousArchetype={archetypeChangeDialog.previousArchetype}
         newArchetype={archetypeChangeDialog.newArchetype}
         onConfirm={handleArchetypeChangeConfirm}
+      />
+
+      {/* Welcome Modal for First-Time Users */}
+      {onboardingLoaded && isFirstTimeUser && !currentPresentation && (
+        <WelcomeModal
+          onSelectPath={handleWelcomePathSelect}
+          onSkip={handleWelcomeSkip}
+        />
+      )}
+
+      {/* Ideation Resume Prompt */}
+      <IdeationResumePrompt
+        isOpen={showIdeationResumePrompt}
+        onResume={handleResumeLastSession}
+        onStartFresh={handleStartFreshSession}
+        onChooseSaved={handleChooseFromSaved}
+        onClose={handleCloseResumePrompt}
       />
     </>
   );

@@ -9,10 +9,10 @@
  * Tool results are fed back so the AI can see research results and create notes.
  */
 
-import { GoogleGenAI, Content, Part, FunctionCall, Type } from '@google/genai';
+import { GoogleGenAI, Content, Part, FunctionCall, FunctionDeclaration, Type } from '@google/genai';
 import { parseAIJsonResponse } from './ai/parseJson';
 import { Message, MessageRole, PresentationPlanResponse, ResearchPreferences, ProgressUpdate } from '../types';
-import { IdeationSession, ResearchResult, ThemeSuggestion, COLUMNS, JournalEntry, JournalStage } from '../types/ideation';
+import { IdeationSession, ResearchResult, ThemeSuggestion, COLUMNS, JournalEntry, JournalStage, getColumnFillStatus, isIdeationComplete, ColumnStatus } from '../types/ideation';
 import { THEMES, THEME_CATEGORIES } from '../config/themes';
 import { COPILOT_TOOLS } from '../lib/copilotTools';
 import { buildFullPrompt } from '../lib/copilotPrompts';
@@ -97,6 +97,8 @@ export interface AgentResponse {
     question: string;
     options?: string[];
   };
+  // New: Completion state for autonomous deep-dive model
+  completionQuestion?: CompletionQuestion;
 }
 
 /**
@@ -114,12 +116,78 @@ export interface ProcessedToolCall {
 export type ToolExecutor = (tool: string, args: Record<string, unknown>) => Promise<unknown>;
 
 /**
+ * Completion question with primary actions (solid buttons) and secondary options (pills)
+ */
+export interface CompletionQuestion {
+  question: string;
+  primaryActions: string[];    // Solid gold buttons (Build the deck, Go to rough draft)
+  secondaryOptions: string[];  // Text pills (Add more to X, Research angle, etc.)
+}
+
+/**
+ * Generate a smart completion question when ideation is complete
+ * Includes primary actions (build/draft) and secondary refinement options
+ */
+function generateCompletionQuestion(
+  session: IdeationSession,
+  toolCalls: ProcessedToolCall[],
+): CompletionQuestion {
+  const columnStatus = getColumnFillStatus(session.notes);
+  const totalNotes = session.notes.length;
+  const researchCalls = toolCalls.filter(tc => tc.name === 'research').length;
+
+  // Find weakest column
+  const sortedColumns = [...columnStatus].sort((a, b) => a.count - b.count);
+  const weakestColumn = sortedColumns[0];
+
+  // Build summary
+  const summary = `I've created ${totalNotes} notes across all sections based on ${researchCalls} research pass${researchCalls === 1 ? '' : 'es'}.`;
+
+  // PRIMARY ACTIONS - Solid gold buttons (always shown)
+  const primaryActions = [
+    "Build the deck",
+    "Go to rough draft",
+  ];
+
+  // SECONDARY OPTIONS - Text pills
+  const secondaryOptions: string[] = [];
+
+  // If a column is weak, suggest improving it
+  if (weakestColumn && weakestColumn.count <= 1) {
+    secondaryOptions.push(`Add more to ${weakestColumn.name}`);
+  }
+
+  secondaryOptions.push("Research a specific angle");
+  secondaryOptions.push("Do extended research"); // Premium feature (unlock logic later)
+
+  return {
+    question: summary,
+    primaryActions,
+    secondaryOptions,
+  };
+}
+
+/**
  * Enhanced mode options for Research Co-Pilot
  */
 export interface EnhancedModeOptions {
   enabled: boolean;
   preferences: ResearchPreferences;
   onProgress?: (update: ProgressUpdate) => void;
+}
+
+/**
+ * Options for the agent loop
+ */
+export interface AgentLoopOptions {
+  /** Custom tools to use instead of COPILOT_TOOLS */
+  tools?: FunctionDeclaration[];
+  /** Custom system prompt builder */
+  systemPromptBuilder?: (session: IdeationSession) => string;
+  /** Enhanced research mode settings */
+  enhancedMode?: EnhancedModeOptions;
+  /** Maximum iterations for the agent loop (default: 10, sources: 25) */
+  maxIterations?: number;
 }
 
 /**
@@ -133,17 +201,22 @@ export interface EnhancedModeOptions {
  * @param userMessage - The user's message
  * @param session - Current ideation session state
  * @param executeTool - Function to execute tools and update state
- * @param enhancedMode - Optional enhanced mode settings for Research Co-Pilot
+ * @param options - Optional settings including custom tools, prompt builder, and enhanced mode
  * @returns Agent response with text and processed tool calls
  */
 export async function runAgentLoop(
   userMessage: string,
   session: IdeationSession,
   executeTool: ToolExecutor,
-  enhancedMode?: EnhancedModeOptions
+  options?: AgentLoopOptions
 ): Promise<AgentResponse> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const MAX_ITERATIONS = 10;
+  // Increased from 10 to 25 for autonomous deep-dive completion model
+  const MAX_ITERATIONS = options?.maxIterations ?? 25;
+
+  // Use custom tools or default to COPILOT_TOOLS
+  const tools = options?.tools ?? COPILOT_TOOLS;
+  const enhancedMode = options?.enhancedMode;
 
   // Build conversation history for Gemini
   const contents: Content[] = session.messages.map(msg => ({
@@ -157,8 +230,10 @@ export async function runAgentLoop(
     parts: [{ text: userMessage }],
   });
 
-  // Build the system prompt with current context
-  const systemPrompt = buildFullPrompt(session);
+  // Build the system prompt with current context (use custom builder if provided)
+  const systemPrompt = options?.systemPromptBuilder
+    ? options.systemPromptBuilder(session)
+    : buildFullPrompt(session);
 
   const allToolCalls: ProcessedToolCall[] = [];
   let responseText = '';
@@ -177,7 +252,7 @@ export async function runAgentLoop(
         contents,
         config: {
           systemInstruction: systemPrompt,
-          tools: [{ functionDeclarations: COPILOT_TOOLS }],
+          tools: [{ functionDeclarations: tools }],
           toolConfig: {
             functionCallingConfig: {
               mode: 'AUTO',
@@ -378,18 +453,50 @@ export async function runAgentLoop(
     responseText = "I encountered an issue processing your request. Let me try a different approach - could you tell me more about what you'd like to create?";
   }
 
-  // CRITICAL: If AI didn't call ask_user, inject a fallback question
+  // AUTONOMOUS COMPLETION MODEL:
+  // Only generate completion question when canvas is sufficiently populated
+  // This allows the AI to work autonomously through multiple iterations
+  let completionQuestion: CompletionQuestion | undefined;
+
   if (!askUserQuestion) {
-    // Count notes created in this run
+    const markedReady = allToolCalls.some(tc => tc.name === 'mark_ready');
+    const extractionTools = [
+      'extract_transcript', 'extract_web_content',
+      'extract_concept', 'extract_claim', 'extract_example', 'extract_framework',
+      'identify_chapters', 'add_learning_objective', 'add_exercise', 'add_quiz_question'
+    ];
+    const extractionHappened = allToolCalls.some(tc => extractionTools.includes(tc.name));
+
+    // Calculate current canvas status
     const notesCreated = allToolCalls.filter(tc => tc.name === 'create_note').length;
+    const currentNotes = [...session.notes];
+    // Add newly created notes to the count
     const totalNotes = session.notes.length + notesCreated;
-    askUserQuestion = generateFallbackQuestion(session.stage, totalNotes, allToolCalls.length > 0);
+    const columnStatus = getColumnFillStatus(session.notes);
+    const filledColumns = columnStatus.filter(c => c.count >= 1).length;
+    const allColumnsFilled = filledColumns === 5;
+    const minimumFilled = filledColumns >= 4;
+
+    // ONLY show completion UI if:
+    // 1. AI explicitly marked ready OR
+    // 2. All 5 columns have content OR
+    // 3. Hit max iterations with substantial progress (4+ columns, 10+ notes)
+    const isAutonomouslyComplete = markedReady || allColumnsFilled || (minimumFilled && totalNotes >= 10);
+
+    // Don't interrupt extraction mode
+    if (!extractionHappened && isAutonomouslyComplete) {
+      completionQuestion = generateCompletionQuestion(session, allToolCalls);
+      console.log('[AgentLoop] Canvas complete - showing completion UI');
+    }
+    // Otherwise: NO fallback question - let the loop continue silently
+    // This is the key change for autonomous deep-dive model
   }
 
   return {
     text: responseText,
     toolCalls: allToolCalls,
     askUserQuestion,
+    completionQuestion,
   };
 }
 

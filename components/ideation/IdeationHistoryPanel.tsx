@@ -74,14 +74,38 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
 
   if (ideations.length === 0) {
     return (
-      <div className="border border-dashed border-white/20 p-20 text-center flex flex-col items-center justify-center bg-black/50">
-        <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
-          <Lightbulb className="w-8 h-8 text-white/40" />
+      <div className="border border-dashed border-white/20 p-16 text-center flex flex-col items-center justify-center bg-black/50">
+        <div className="w-16 h-16 bg-[#c5a47e]/10 flex items-center justify-center mb-6">
+          <Lightbulb className="w-8 h-8 text-[#c5a47e]/60" />
         </div>
-        <h3 className="text-xl font-light text-white mb-2">No Ideations Yet</h3>
-        <p className="text-white/60 mb-8 max-w-md mx-auto">
-          Start brainstorming with the AI copilot to create your first ideation session.
+        <h3 className="text-xl font-light text-white mb-2">Start with a brainstorm</h3>
+        <p className="text-white/50 mb-6 max-w-md mx-auto">
+          Ideations help you structure your thoughts before building slides.
+          Use the AI copilot to explore ideas, organize content, and plan your presentation.
         </p>
+        <div className="flex flex-col items-center gap-2 text-sm">
+          <div className="flex items-center gap-4 text-white/40">
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+              Discover
+            </span>
+            <ArrowRight className="w-3 h-3" />
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+              Expand
+            </span>
+            <ArrowRight className="w-3 h-3" />
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+              Structure
+            </span>
+            <ArrowRight className="w-3 h-3" />
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-green-400"></span>
+              Build
+            </span>
+          </div>
+        </div>
       </div>
     );
   }

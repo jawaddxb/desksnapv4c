@@ -340,6 +340,53 @@ export const useDeck = () => {
     }
   };
 
+  /**
+   * Create a presentation from pre-transformed slides (e.g., from Beautify feature).
+   * Unlike createDeck, this takes already-formatted Slide[] and just saves them.
+   */
+  const createPresentationFromSlides = async (
+    slides: Slide[],
+    themeId: string,
+    topic?: string
+  ): Promise<Presentation> => {
+    setIsGenerating(true);
+    try {
+      // Resolve theme
+      const resolvedThemeId = themeId && THEMES[themeId] ? themeId : 'neoBrutalist';
+      const theme = THEMES[resolvedThemeId];
+      setActiveTheme(theme);
+
+      // Set random wabi-sabi layout
+      const startLayout = WABI_SABI_LAYOUT_NAMES[Math.floor(Math.random() * WABI_SABI_LAYOUT_NAMES.length)];
+      setActiveWabiSabiLayout(startLayout);
+
+      // Create presentation object
+      const visualStyle = theme.imageStyle || 'Professional photography';
+      const newDeck = createPresentation(
+        topic || 'Beautified Deck',
+        slides,
+        resolvedThemeId,
+        visualStyle,
+        startLayout
+      );
+
+      // Save to API
+      const savedDeck = await createMutation.mutateAsync(newDeck);
+
+      // Set as current presentation
+      setCurrentPresentationId(savedDeck.id);
+      setLocalPresentation(savedDeck);
+      setActiveSlideIndex(0);
+
+      // Refresh deck list
+      refreshDeckList();
+
+      return savedDeck;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const saveDeck = async () => {
     if (!currentPresentation || !currentPresentationId) return;
 
@@ -569,6 +616,7 @@ export const useDeck = () => {
       // Deck CRUD
       createDeck,
       createDeckFromPlan,
+      createPresentationFromSlides,
       saveDeck,
       loadDeck,
       closeDeck,
