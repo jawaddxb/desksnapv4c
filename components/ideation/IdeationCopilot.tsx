@@ -380,9 +380,9 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
       </div>
 
       {/* Main content area - use calc to account for header height */}
-      <div className="flex pt-14" style={{ height: 'calc(100vh - 0px)' }}>
-        {/* Canvas (left side - 60%) */}
-        <div className="flex-[3] h-full overflow-hidden">
+      <div className="flex w-full pt-14" style={{ height: 'calc(100vh - 0px)' }}>
+        {/* Canvas (left side - takes remaining space) */}
+        <div className="flex-1 h-full overflow-hidden">
           <FlowCanvas
             notes={ideation.notes}
             connections={ideation.session.connections}
@@ -395,8 +395,8 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
           />
         </div>
 
-        {/* Chat panel (right side - 40%) */}
-        <div className="flex-[2] h-full min-w-[360px] max-w-[480px]">
+        {/* Chat panel (right side - fixed width, snapped to canvas) */}
+        <div className="w-[480px] flex-shrink-0 h-full">
           <CopilotPanel
             messages={ideation.messages}
             stage={ideation.stage}

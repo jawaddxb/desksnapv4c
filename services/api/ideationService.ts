@@ -187,6 +187,15 @@ export const updateIdeationSession = async (
   if (updates.creativeJournal !== undefined) {
     backendUpdates.creative_journal = frontendJournalToBackend(updates.creativeJournal);
   }
+  if (updates.notes !== undefined) {
+    backendUpdates.notes = updates.notes.map(frontendNoteToBackendCreate);
+  }
+  if (updates.connections !== undefined) {
+    backendUpdates.connections = updates.connections.map(c => ({
+      from_note_id: c.fromId,
+      to_note_id: c.toId,
+    }));
+  }
 
   const response = await api.put<BackendIdeationSession>(`/api/v1/ideations/${id}`, backendUpdates);
   return backendToFrontend(response);

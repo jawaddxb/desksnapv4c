@@ -156,12 +156,11 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         }}
       />
       {/* Column headers and swimlanes */}
-      <div className="flex gap-6 px-3 pt-3 sticky top-0 bg-[#0a0a0a] z-10">
+      <div className="flex gap-4 px-4 pt-3 sticky top-0 bg-[#0a0a0a] z-10">
         {COLUMNS.map((colName, colIndex) => (
           <div
             key={colName}
-            className="flex-shrink-0"
-            style={{ width: NOTE_WIDTH }}
+            className="flex-1 min-w-[160px] max-w-[280px]"
           >
             <ColumnHeader
               name={colName as ColumnName}
@@ -182,18 +181,17 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         />
 
         {/* Column drop zones */}
-        <div className="flex gap-6 px-3 absolute inset-0">
+        <div className="flex gap-4 px-4 absolute inset-0">
           {COLUMNS.map((colName, colIndex) => (
             <div
               key={colName}
               className={`
-                flex-shrink-0 min-h-full
+                flex-1 min-w-[160px] max-w-[280px] min-h-full
                 transition-all duration-200 ease-out
                 ${dragOverColumn === colIndex
                   ? 'bg-[#c5a47e]/[0.08] ring-1 ring-inset ring-[#c5a47e]/20'
                   : ''}
               `}
-              style={{ width: NOTE_WIDTH }}
               onDragOver={handleDragOver(colIndex)}
               onDragLeave={() => setDragOverColumn(null)}
               onDrop={handleDrop(colIndex)}
@@ -216,7 +214,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 {/* Add note button */}
                 <button
                   onClick={handleAddNote(colIndex)}
-                  className="w-44 h-12 border border-dashed border-white/20
+                  className="w-full h-12 border border-dashed border-white/20
                              text-white/40 hover:border-[#c5a47e] hover:text-[#c5a47e]
                              transition-colors flex items-center justify-center gap-2"
                 >
@@ -235,7 +233,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
       {notes.length === 0 && (
         <div
           className="fixed inset-0 flex items-center justify-center pointer-events-none"
-          style={{ right: '40%' }}
+          style={{ right: '480px' }}
         >
           <div className="text-center text-white/40">
             <svg className="w-16 h-16 mx-auto mb-4 opacity-50 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">

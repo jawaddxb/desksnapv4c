@@ -28,3 +28,19 @@ export {
   createThemes,
 } from './themes';
 export type { ThemeConfig } from './themes';
+
+// Colors
+export { COLORS, COLOR_CLASSES } from './colors';
+export type { Colors, ColorClasses } from './colors';
+
+// Feature Flags
+export {
+  FEATURE_FLAGS,
+  getEffectiveImageGenerationMode,
+  imageGenerationMode,
+  useAgentMode,
+  enableRealtimeSync,
+  enableAnalytics,
+  enableDebugPanel,
+} from './featureFlags';
+export type { FeatureFlags, ImageGenerationMode } from './featureFlags';

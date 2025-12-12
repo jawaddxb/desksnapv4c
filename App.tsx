@@ -548,6 +548,11 @@ function AppContent() {
             sourceRoughDraft={sourceRoughDraft}
             onViewSourceIdeation={handleViewSourceIdeation}
             onViewSourceRoughDraft={handleViewSourceRoughDraft}
+            // Workspace navigation
+            onIdeate={handleIdeate}
+            onGoToDashboard={actions.closeDeck}
+            ideationsCount={savedIdeations.length}
+            roughDraftsCount={savedRoughDrafts.length}
           />
         )}
 

@@ -75,24 +75,46 @@ export type ToneType = 'professional' | 'casual' | 'technical' | 'persuasive' | 
 export type ContentRefinementType = 'expand' | 'simplify' | 'clarify' | 'storytelling';
 export type ImageStylePreset = 'vivid' | 'muted' | 'high-contrast' | 'soft';
 
-export interface Slide {
+// ============================================
+// Slide Interface - Split by Concern (ISP)
+// ============================================
+
+/**
+ * Core slide content that defines the slide's information.
+ */
+export interface SlideCore {
   id: string;
   title: string;
   content: string[];
   speakerNotes: string;
   imagePrompt: string;
+}
+
+/**
+ * Image generation state and storage references.
+ */
+export interface SlideImageState {
   imageUrl?: string;
-  imageError?: string; // Error message if image generation failed
+  imageError?: string;          // Error message if image generation failed
   isImageLoading: boolean;
-  // Async image generation tracking
-  imageTaskId?: string; // Celery task ID if generation in progress
-  imageStorageKey?: string; // Storage provider key (S3 path, etc.)
-  // Layout Engine Properties
+  imageTaskId?: string;         // Celery task ID if generation in progress
+  imageStorageKey?: string;     // Storage provider key (S3 path, etc.)
+}
+
+/**
+ * Layout engine properties for slide positioning and display.
+ */
+export interface SlideLayout {
   layoutType: LayoutType;
   alignment: Alignment;
   fontScale?: FontScale;
   layoutVariant?: LayoutVariant; // Seed for generative layouts or variant name
-  // Style overrides (optional - layouts use defaults if undefined)
+}
+
+/**
+ * Style overrides for fine-grained visual control.
+ */
+export interface SlideStyles {
   titleFontSize?: number;
   contentFontSize?: number;
   textStyles?: {
@@ -100,13 +122,28 @@ export interface Slide {
     content?: TextStyleOverride;
   };
   imageStyles?: ImageStyleOverride;
-  // Per-item content styles (indexed by content array position)
-  contentItemStyles?: Record<number, ContentItemStyle>;
-  // Content display type (user-selectable)
-  contentType?: ContentType;
-  // Rough draft workflow
-  approvalState?: SlideApprovalState; // For rough draft review workflow
+  contentItemStyles?: Record<number, ContentItemStyle>; // Per-item content styles
 }
+
+/**
+ * Workflow-related properties for draft review and content type.
+ */
+export interface SlideWorkflow {
+  contentType?: ContentType;           // Content display type (user-selectable)
+  approvalState?: SlideApprovalState;  // For rough draft review workflow
+}
+
+/**
+ * Complete Slide type - intersection of all concerns.
+ * Use specific sub-interfaces when a component only needs partial data.
+ */
+export type Slide = SlideCore & SlideImageState & SlideLayout & SlideStyles & SlideWorkflow;
+
+/**
+ * Legacy interface for backwards compatibility.
+ * @deprecated Use Slide type (intersection) instead.
+ */
+export interface SlideInterface extends SlideCore, SlideImageState, SlideLayout, SlideStyles, SlideWorkflow {}
 
 export interface AnalyticsSession {
   id: string;

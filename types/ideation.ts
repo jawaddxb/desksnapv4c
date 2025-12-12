@@ -286,6 +286,8 @@ export interface UpdateIdeationRequest {
   stage?: IdeationStage;
   source_content?: string | null;
   creative_journal?: BackendCreativeJournal | null;
+  notes?: CreateNoteRequest[];
+  connections?: { from_note_id: string; to_note_id: string }[];
 }
 
 /**

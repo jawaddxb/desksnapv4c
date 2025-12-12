@@ -97,7 +97,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
   return (
     <div
       className={`
-        group relative w-44 min-h-[100px] p-3 border
+        group relative w-full min-h-[120px] p-3 border
         transition-note cursor-pointer select-none
         sticky-note-shadow
         ${colorClasses}

@@ -13,13 +13,15 @@ class IdeaNoteBase(BaseModel):
     """Base note fields"""
 
     content: str = Field(..., min_length=1)
-    note_type: str = "insight"  # insight, question, data, story
+    note_type: str = Field(default="insight", alias="type")  # insight, question, data, story
     source_url: str | None = None
     parent_id: str | None = None
-    column_index: int = 0
-    row_index: int = 0
+    column_index: int = Field(default=0, alias="column")
+    row_index: int = Field(default=0, alias="row")
     color: str | None = None
     approved: bool = False
+
+    model_config = {"populate_by_name": True}
 
 
 class IdeaNoteCreate(IdeaNoteBase):
@@ -49,7 +51,7 @@ class IdeaNoteResponse(IdeaNoteBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "populate_by_name": True, "by_alias": True}
 
 
 # Connection Schemas
@@ -132,15 +134,18 @@ class IdeationSessionUpdate(BaseModel):
     stage: str | None = None
     source_content: str | None = None
     archetype: str | None = None
+    notes: list[IdeaNoteCreate] | None = None
+    connections: list[NoteConnectionCreate] | None = None
 
 
 class IdeationSessionResponse(IdeationSessionBase):
-    """Session response without nested data"""
+    """Session response with notes for list display"""
 
     id: uuid.UUID
     owner_id: uuid.UUID
     created_at: datetime
     updated_at: datetime
+    notes: list[IdeaNoteResponse] = []
 
     model_config = {"from_attributes": True}
 

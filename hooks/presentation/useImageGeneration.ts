@@ -1,43 +1,27 @@
 /**
  * useImageGeneration Hook
  *
- * Handles all image generation operations for slides.
- * Supports both sync (frontend Gemini) and async (backend Celery) modes.
+ * Mode selector that composes sync and async image generation hooks.
+ * Single responsibility: Select appropriate generation mode and provide unified API.
  */
 
-import { useCallback, useRef, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Presentation, Slide } from '../../types';
 import { THEMES } from '../../lib/themes';
 import {
-  generateSlideImage as generateSlideImageFrontend,
   refineImagePrompt,
   ensureApiKeySelection,
   RefinementFocus,
-  generatePresentationImagesWithAgent,
 } from '../../services/geminiService';
-import {
-  generateAllImagesAsync,
-  regenerateSlideImageAsync,
-  pollImageGeneration,
-  BatchStatusResponse,
-} from '../../services/api/imageService';
 import { hasTokens } from '../../services/api/tokenManager';
 import { AgentLog } from '../../services/agents/types';
-
-/**
- * Feature flag for image generation mode.
- * - 'sync': Frontend generates images directly via Gemini API (original behavior)
- * - 'async': Backend generates images via Celery workers (new)
- * - 'auto': Use async if authenticated, sync otherwise
- */
-const IMAGE_GENERATION_MODE: 'sync' | 'async' | 'auto' = 'sync';
-
-/**
- * Feature flag for intelligent agent-based image generation.
- * When enabled, the agent validates and refines prompts before generating images.
- */
-const USE_AGENT_MODE = true;
+import {
+  imageGenerationMode as IMAGE_GENERATION_MODE,
+  useAgentMode as USE_AGENT_MODE,
+} from '../../config/featureFlags';
+import { useSyncImageGeneration } from './useSyncImageGeneration';
+import { useAsyncImageGeneration } from './useAsyncImageGeneration';
 
 /** Type for the updateSlide mutation */
 type UpdateSlideMutation = UseMutationResult<
@@ -94,9 +78,6 @@ export interface UseImageGenerationReturn {
   agentLogs: AgentLog[];
 }
 
-/** Concurrency limit for batch image generation (sync mode) */
-const CONCURRENCY = 3;
-
 /**
  * Determine if async mode should be used based on configuration and auth state.
  */
@@ -107,398 +88,53 @@ function shouldUseAsyncMode(): boolean {
   return hasTokens();
 }
 
-export function useImageGeneration({
-  presentation,
-  setPresentation,
-  activeSlideIndex,
-  isGenerating,
-  updateSlideAtIndex,
-  updateSlide,
-  presentationId,
-  updateSlideMutation,
-  onAgentLogs,
-  onAgentActivity,
-  onAgentStart,
-  onAgentComplete,
-  onImageGenerated,
-}: UseImageGenerationOptions): UseImageGenerationReturn {
-  // Track active polling
-  const pollRef = useRef<{ stop: () => void } | null>(null);
-
-  // Store agent logs for debugging
-  const [agentLogs, setAgentLogs] = useState<AgentLog[]>([]);
-
-  // Cleanup polling on unmount
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) {
-        pollRef.current.stop();
-      }
-    };
-  }, []);
+/**
+ * Hook for image generation - selects between sync and async modes.
+ */
+export function useImageGeneration(options: UseImageGenerationOptions): UseImageGenerationReturn {
+  const {
+    presentation,
+    setPresentation,
+    activeSlideIndex,
+    isGenerating,
+    updateSlideAtIndex,
+    updateSlide,
+    presentationId,
+    updateSlideMutation,
+    onAgentLogs,
+    onAgentActivity,
+    onAgentStart,
+    onAgentComplete,
+    onImageGenerated,
+  } = options;
 
   const isAsyncMode = shouldUseAsyncMode();
   const isAgentMode = USE_AGENT_MODE;
 
-  /**
-   * Generate a single slide's image (sync mode - frontend Gemini).
-   */
-  const generateSingleImageSync = useCallback(
-    async (index: number, prompt: string, style: string) => {
-      updateSlideAtIndex(index, { isImageLoading: true, imageError: undefined });
+  // Compose sync and async hooks
+  const syncGen = useSyncImageGeneration({
+    presentation,
+    setPresentation,
+    updateSlideAtIndex,
+    presentationId,
+    updateSlideMutation,
+    onAgentLogs,
+    onAgentActivity,
+    onAgentStart,
+    onAgentComplete,
+    onImageGenerated,
+  });
 
-      try {
-        const url = await generateSlideImageFrontend(prompt, style);
-        // Update local state for immediate UI feedback
-        updateSlideAtIndex(index, { imageUrl: url, isImageLoading: false, imageError: undefined });
-
-        // Persist to API so image survives navigation/refetch
-        const slide = presentation?.slides[index];
-        if (slide && presentationId) {
-          try {
-            await updateSlideMutation.mutateAsync({
-              presentationId,
-              slideId: slide.id,
-              updates: { imageUrl: url },
-            });
-          } catch (apiError) {
-            console.warn('Failed to persist image URL to API:', apiError);
-            // Image is still displayed locally, but may not survive refresh
-          }
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Image generation failed';
-        console.warn('Image generation failed', err);
-        updateSlideAtIndex(index, { isImageLoading: false, imageError: errorMessage });
-      }
-    },
-    [updateSlideAtIndex, presentation, presentationId, updateSlideMutation]
-  );
-
-  /**
-   * Generate images for all slides (sync mode - frontend Gemini with concurrency).
-   * Basic mode without agent validation.
-   */
-  const generateAllImagesSyncBasic = useCallback(
-    async (slides: Slide[], style: string) => {
-      try {
-        await ensureApiKeySelection();
-        const queue = slides.map((slide, index) => ({ index, prompt: slide.imagePrompt }));
-
-        const processQueue = async () => {
-          while (queue.length > 0) {
-            const batch = queue.splice(0, CONCURRENCY);
-            await Promise.allSettled(
-              batch.map(async ({ index, prompt }) => {
-                await generateSingleImageSync(index, prompt, style);
-              })
-            );
-          }
-        };
-
-        await processQueue();
-      } catch (e) {
-        console.error('Batch generation error', e);
-      }
-    },
-    [generateSingleImageSync]
-  );
-
-  /**
-   * Generate images for all slides using the intelligent agent system.
-   * The agent validates and refines prompts before generating images.
-   * @param presentationOverride - Optional presentation to use instead of closure state (fixes stale closure bug)
-   */
-  const generateAllImagesWithAgent = useCallback(
-    async (slides: Slide[], style: string, topic?: string, presentationOverride?: Presentation) => {
-      // Use override if provided, otherwise fall back to closure state
-      const effectivePresentation = presentationOverride || presentation;
-      if (!effectivePresentation) return;
-
-      // Filter out slides that already have images
-      const slidesNeedingImages = slides.filter(s => !s.imageUrl);
-      if (slidesNeedingImages.length === 0) {
-        console.log('[Agent] All slides already have images, skipping generation');
-        return;
-      }
-
-      // Create index mapping from filtered array back to original
-      const indexMap = new Map<number, number>();
-      slidesNeedingImages.forEach((slide, filteredIndex) => {
-        const originalIndex = slides.findIndex(s => s.id === slide.id);
-        indexMap.set(filteredIndex, originalIndex);
-      });
-
-      // Capture values upfront to avoid stale closure issues after state updates
-      const presentationTopic = topic || effectivePresentation.topic;
-      const themeId = effectivePresentation.themeId;
-      const effectivePresentationId = presentationOverride?.id || presentationId;
-      const slidesCopy = [...slidesNeedingImages]; // Copy of slides needing images
-
-      try {
-        await ensureApiKeySelection();
-
-        // Notify that agent processing is starting
-        onAgentStart?.(slidesNeedingImages.length);
-
-        // Set only slides that need images to loading
-        setPresentation((prev) =>
-          prev
-            ? {
-                ...prev,
-                slides: prev.slides.map((s) =>
-                  slidesNeedingImages.some(sni => sni.id === s.id)
-                    ? { ...s, isImageLoading: true }
-                    : s
-                ),
-              }
-            : null
-        );
-
-        // Run agent-based generation only for slides needing images
-        const result = await generatePresentationImagesWithAgent(
-          presentationTopic,
-          slidesNeedingImages.map((s) => ({
-            title: s.title,
-            content: s.content,
-            imagePrompt: s.imagePrompt,
-          })),
-          style,
-          themeId,
-          {
-            onLog: (log) => {
-              // Map filtered index back to original for logging
-              const originalIndex = indexMap.get(log.slideIndex) ?? log.slideIndex;
-              console.log(`[Agent] Slide ${originalIndex}: ${log.action}`, log);
-              // Emit real-time activity for UI display
-              onAgentActivity?.({ ...log, slideIndex: originalIndex });
-            },
-            onImageGenerated: async (filteredIndex, imageUrl) => {
-              // Map filtered index back to original
-              const originalIndex = indexMap.get(filteredIndex) ?? filteredIndex;
-
-              // Update local state immediately using original index
-              updateSlideAtIndex(originalIndex, {
-                imageUrl,
-                isImageLoading: false,
-                imageError: undefined,
-              });
-
-              // Notify parent hook of image generation for UI display
-              onImageGenerated?.(originalIndex, imageUrl);
-
-              // Persist to API using the captured slide reference
-              const slide = slidesCopy[filteredIndex];
-              if (slide && effectivePresentationId) {
-                try {
-                  await updateSlideMutation.mutateAsync({
-                    presentationId: effectivePresentationId,
-                    slideId: slide.id,
-                    updates: { imageUrl },
-                  });
-                } catch (apiError) {
-                  console.warn('Failed to persist image URL to API:', apiError);
-                }
-              }
-            },
-            onImageError: (filteredIndex, error) => {
-              // Map filtered index back to original
-              const originalIndex = indexMap.get(filteredIndex) ?? filteredIndex;
-              updateSlideAtIndex(originalIndex, {
-                isImageLoading: false,
-                imageError: error.message,
-              });
-            },
-          }
-        );
-
-        // Store agent logs for debugging
-        setAgentLogs(result.agentLogs);
-        onAgentLogs?.(result.agentLogs);
-
-        // Notify that agent processing is complete
-        onAgentComplete?.();
-
-        console.log(
-          `[Agent] Completed in ${result.totalDurationMs}ms. Errors: ${result.errors.length}`
-        );
-      } catch (e) {
-        console.error('Agent generation error', e);
-        // Notify completion even on error
-        onAgentComplete?.();
-        // Reset loading states only for slides that were being generated
-        setPresentation((prev) =>
-          prev
-            ? {
-                ...prev,
-                slides: prev.slides.map((s) =>
-                  slidesNeedingImages.some(sni => sni.id === s.id)
-                    ? { ...s, isImageLoading: false, imageError: 'Failed to generate images' }
-                    : s
-                ),
-              }
-            : null
-        );
-      }
-    },
-    [presentation, setPresentation, updateSlideAtIndex, presentationId, updateSlideMutation, onAgentLogs, onAgentActivity, onAgentStart, onAgentComplete, onImageGenerated]
-  );
-
-  /**
-   * Generate images for all slides (sync mode).
-   * Uses agent if enabled, otherwise uses basic generation.
-   * @param presentationOverride - Optional presentation to use instead of closure state (fixes stale closure bug)
-   */
-  const generateAllImagesSync = useCallback(
-    async (slides: Slide[], style: string, topic?: string, presentationOverride?: Presentation) => {
-      if (USE_AGENT_MODE) {
-        await generateAllImagesWithAgent(slides, style, topic, presentationOverride);
-      } else {
-        await generateAllImagesSyncBasic(slides, style);
-      }
-    },
-    [generateAllImagesWithAgent, generateAllImagesSyncBasic]
-  );
-
-  /**
-   * Handle status update from async polling.
-   * Updates slide states based on task statuses.
-   */
-  const handleStatusUpdate = useCallback(
-    (status: BatchStatusResponse) => {
-      setPresentation((prev) => {
-        if (!prev) return null;
-
-        return {
-          ...prev,
-          slides: prev.slides.map((slide) => {
-            const slideStatus = status.slide_statuses[slide.id];
-            if (!slideStatus) return slide;
-
-            if (slideStatus.status === 'SUCCESS' || slideStatus.status === 'COMPLETE') {
-              return {
-                ...slide,
-                imageUrl: slideStatus.image_url || slide.imageUrl,
-                isImageLoading: false,
-                imageError: undefined,
-                imageTaskId: undefined,
-              };
-            } else if (slideStatus.status === 'FAILURE') {
-              return {
-                ...slide,
-                isImageLoading: false,
-                imageError: slideStatus.error || 'Generation failed',
-                imageTaskId: undefined,
-              };
-            } else if (
-              slideStatus.status === 'PENDING' ||
-              slideStatus.status === 'STARTED' ||
-              slideStatus.status === 'RETRY'
-            ) {
-              return {
-                ...slide,
-                isImageLoading: true,
-                imageTaskId: slideStatus.task_id,
-              };
-            }
-
-            return slide;
-          }),
-        };
-      });
-
-      // Stop polling when complete
-      if (status.all_complete && pollRef.current) {
-        pollRef.current.stop();
-        pollRef.current = null;
-      }
-    },
-    [setPresentation]
-  );
-
-  /**
-   * Generate images for all slides (async mode - backend Celery).
-   * @param presentationOverride - Optional presentation to use instead of closure state (fixes stale closure bug)
-   */
-  const generateAllImagesAsync_ = useCallback(
-    async (slides: Slide[], _style: string, _topic?: string, presentationOverride?: Presentation) => {
-      // Use override if provided, otherwise fall back to closure state
-      const effectivePresentation = presentationOverride || presentation;
-      if (!effectivePresentation) return;
-
-      // Stop any existing polling
-      if (pollRef.current) {
-        pollRef.current.stop();
-      }
-
-      // Set all slides to loading
-      setPresentation((prev) =>
-        prev
-          ? {
-              ...prev,
-              slides: prev.slides.map((s) => ({ ...s, isImageLoading: true })),
-            }
-          : null
-      );
-
-      try {
-        // Trigger batch generation
-        await generateAllImagesAsync(effectivePresentation.id);
-
-        // Start polling for status updates
-        pollRef.current = pollImageGeneration(effectivePresentation.id, handleStatusUpdate, 3000);
-      } catch (error) {
-        console.error('Batch generation error', error);
-        // Reset loading states on error
-        setPresentation((prev) =>
-          prev
-            ? {
-                ...prev,
-                slides: prev.slides.map((s) => ({
-                  ...s,
-                  isImageLoading: false,
-                  imageError: 'Failed to start generation',
-                })),
-              }
-            : null
-        );
-      }
-    },
-    [presentation, setPresentation, handleStatusUpdate]
-  );
-
-  /**
-   * Generate a single slide's image (async mode - backend Celery).
-   */
-  const generateSingleImageAsync = useCallback(
-    async (index: number, _prompt: string, _style: string) => {
-      if (!presentation) return;
-
-      const slide = presentation.slides[index];
-      updateSlideAtIndex(index, { isImageLoading: true, imageError: undefined });
-
-      try {
-        await regenerateSlideImageAsync(presentation.id, slide.id);
-
-        // Start polling for this presentation's status
-        if (pollRef.current) {
-          pollRef.current.stop();
-        }
-        pollRef.current = pollImageGeneration(presentation.id, handleStatusUpdate, 2000);
-      } catch (error) {
-        console.error('Single image generation error', error);
-        updateSlideAtIndex(index, {
-          isImageLoading: false,
-          imageError: 'Failed to start generation',
-        });
-      }
-    },
-    [presentation, updateSlideAtIndex, handleStatusUpdate]
-  );
+  const asyncGen = useAsyncImageGeneration({
+    presentation,
+    setPresentation,
+    updateSlideAtIndex,
+  });
 
   // Select implementation based on mode
-  const generateSingleImage = isAsyncMode ? generateSingleImageAsync : generateSingleImageSync;
-  const generateAllImages = isAsyncMode ? generateAllImagesAsync_ : generateAllImagesSync;
+  const generateSingleImage = isAsyncMode ? asyncGen.generateSingleImage : syncGen.generateSingleImage;
+  const generateAllImages = isAsyncMode ? asyncGen.generateAllImages : syncGen.generateAllImages;
+  const agentLogs = syncGen.agentLogs;
 
   /**
    * Regenerate the current slide's image.
@@ -531,18 +167,14 @@ export function useImageGeneration({
 
   /**
    * Remix all images with random refinement focuses.
-   * Applies stylistic variations in parallel, then uses agent-based generation
-   * to validate prompts against the topic before generating images.
-   * Optionally accepts a new themeId to change the theme before remixing.
    */
   const remixDeck = useCallback(async (newThemeId?: string) => {
     if (!presentation || isGenerating) return;
 
-    // Capture values upfront to avoid stale closure issues
     const currentSlides = presentation.slides;
     const currentTopic = presentation.topic;
 
-    // If a new theme is provided, use its visual style; otherwise keep current
+    // Determine target style based on theme
     let targetStyle = presentation.visualStyle;
     let targetThemeId = presentation.themeId;
 
@@ -556,7 +188,7 @@ export function useImageGeneration({
       await ensureApiKeySelection();
       const focuses: RefinementFocus[] = ['lighting', 'camera', 'composition', 'mood'];
 
-      // Set all slides to loading and update theme if changed
+      // Set all slides to loading and update theme
       setPresentation((prev) =>
         prev
           ? {
@@ -568,15 +200,12 @@ export function useImageGeneration({
           : null
       );
 
-      // Step 1: Apply stylistic refinements to all prompts in parallel
+      // Apply stylistic refinements in parallel
       const refinedSlides = await Promise.all(
         currentSlides.map(async (slide) => {
           const randomFocus = focuses[Math.floor(Math.random() * focuses.length)];
           const newPrompt = await refineImagePrompt(slide.imagePrompt, randomFocus);
-          return {
-            ...slide,
-            imagePrompt: newPrompt,
-          };
+          return { ...slide, imagePrompt: newPrompt };
         })
       );
 
@@ -585,30 +214,17 @@ export function useImageGeneration({
         prev ? { ...prev, slides: refinedSlides } : null
       );
 
-      // Step 2: Use agent-based generation (validates and regenerates)
-      // This ensures remixed prompts are still topic-relevant
-      // Pass target style (may be new theme's style) to avoid stale closure issues
-      if (USE_AGENT_MODE) {
-        await generateAllImagesWithAgent(refinedSlides, targetStyle, currentTopic);
-      } else {
-        await generateAllImagesSyncBasic(refinedSlides, targetStyle);
-      }
+      // Generate images with agent or basic mode
+      await generateAllImages(refinedSlides, targetStyle, currentTopic);
     } catch (e) {
       console.error('Remix deck error', e);
-      // Reset loading states on error
       setPresentation((prev) =>
         prev
-          ? {
-              ...prev,
-              slides: prev.slides.map((s) => ({
-                ...s,
-                isImageLoading: false,
-              })),
-            }
+          ? { ...prev, slides: prev.slides.map((s) => ({ ...s, isImageLoading: false })) }
           : null
       );
     }
-  }, [presentation, isGenerating, setPresentation, generateAllImagesWithAgent, generateAllImagesSyncBasic]);
+  }, [presentation, isGenerating, setPresentation, generateAllImages]);
 
   /**
    * Regenerate all images in the current presentation.

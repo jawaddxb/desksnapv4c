@@ -58,13 +58,30 @@ setup:
 
 # Development commands
 dev:
-	@echo "Killing existing processes on ports 8000, 3000..."
+	@echo "=== DeckSnap Full Dev Environment ==="
+	@echo ""
+	@echo "Step 1: Killing existing processes..."
 	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
 	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
-	@echo "Killing existing Celery workers..."
 	@pkill -f "celery.*worker" 2>/dev/null || true
 	@sleep 1
-	@echo "Starting API (8000), Worker, and Frontend (3000)..."
+	@echo ""
+	@echo "Step 2: Starting infrastructure (postgres, redis)..."
+	@docker-compose up -d postgres redis
+	@echo "Waiting for postgres to be healthy..."
+	@until docker-compose exec -T postgres pg_isready -U decksnap > /dev/null 2>&1; do \
+		echo "  Postgres not ready yet, waiting..."; \
+		sleep 2; \
+	done
+	@echo "✅ Postgres ready on localhost:5433"
+	@echo "Waiting for redis to be healthy..."
+	@until docker-compose exec -T redis redis-cli ping > /dev/null 2>&1; do \
+		echo "  Redis not ready yet, waiting..."; \
+		sleep 2; \
+	done
+	@echo "✅ Redis ready on localhost:6381"
+	@echo ""
+	@echo "Step 3: Starting API (8000), Worker, and Frontend (3000)..."
 	poetry run honcho start -f Procfile.dev
 
 # Infrastructure commands (Docker services)

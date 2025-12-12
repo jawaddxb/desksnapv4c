@@ -168,21 +168,21 @@ def get_session(
 
 @router.put(
     "/{session_id}",
-    response_model=IdeationSessionResponse,
+    response_model=IdeationSessionDetailResponse,
     summary="Update ideation session",
-    description="Update ideation session metadata",
+    description="Update ideation session metadata and notes",
 )
 def update_session(
     session_id: uuid.UUID,
     data: IdeationSessionUpdate,
     current_user: CurrentUser,
     db: DbSession,
-) -> IdeationSessionResponse:
+) -> IdeationSessionDetailResponse:
     """Update an ideation session"""
     session = get_session_by_id(db, session_id)
     session = require_session_ownership(session, current_user)
 
-    # Update fields
+    # Update metadata fields
     if data.topic is not None:
         session.topic = data.topic
     if data.stage is not None:
@@ -192,9 +192,39 @@ def update_session(
     if data.archetype is not None:
         session.archetype = data.archetype
 
+    # Handle notes (replace all)
+    if data.notes is not None:
+        # Delete existing notes
+        db.query(IdeaNote).filter(IdeaNote.session_id == session_id).delete()
+        # Add new notes
+        for note_data in data.notes:
+            note = IdeaNote(
+                session_id=session.id,
+                content=note_data.content,
+                note_type=note_data.note_type,
+                column_index=note_data.column_index,
+                row_index=note_data.row_index,
+                color=note_data.color,
+                approved=note_data.approved,
+                source_url=note_data.source_url,
+                parent_id=note_data.parent_id,
+            )
+            db.add(note)
+
+    # Handle connections (replace all)
+    if data.connections is not None:
+        db.query(NoteConnection).filter(NoteConnection.session_id == session_id).delete()
+        for conn_data in data.connections:
+            conn = NoteConnection(
+                session_id=session.id,
+                from_note_id=conn_data.from_note_id,
+                to_note_id=conn_data.to_note_id,
+            )
+            db.add(conn)
+
     db.commit()
     db.refresh(session)
-    return IdeationSessionResponse.model_validate(session)
+    return IdeationSessionDetailResponse.model_validate(session)
 
 
 @router.delete(
