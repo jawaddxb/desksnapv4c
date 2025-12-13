@@ -1,5 +1,14 @@
-export { BlackletterArchetype } from './BlackletterArchetype';
-export { NewsprintArchetype } from './NewsprintArchetype';
-export { LetterpressArchetype } from './LetterpressArchetype';
-export { StencilArchetype } from './StencilArchetype';
-export { WoodtypeArchetype } from './WoodtypeArchetype';
+/**
+ * Typography-Print Archetypes
+ *
+ * Re-exports factory-generated components.
+ * All individual archetype files have been migrated to the factory pattern.
+ */
+
+export {
+  BlackletterArchetype,
+  LetterpressArchetype,
+  NewsprintArchetype,
+  StencilArchetype,
+  WoodtypeArchetype,
+} from '../generated/typographyPrint';

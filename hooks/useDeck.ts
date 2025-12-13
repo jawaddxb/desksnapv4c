@@ -2,24 +2,22 @@
  * useDeck Hook
  *
  * Main orchestrator hook for presentation management.
- * Composes focused hooks for slides, images, and content refinement.
+ * Composes focused hooks for slides, images, content refinement, UI state, and sync.
  *
  * REFACTORED: Now API-driven with real-time sync via WebSocket.
  * - TanStack Query for server state
  * - WebSocket subscription for real-time updates
- * - No local IndexedDB storage
+ * - Composed hooks for focused responsibilities (SRP)
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession, ViewMode } from '../types';
+import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession } from '../types';
 import { generatePresentationPlan, ensureApiKeySelection } from '../services/geminiService';
-import { THEMES, IMAGE_STYLES } from '../lib/themes';
-import { WABI_SABI_LAYOUT_NAMES } from '../components/WabiSabiStage';
-import { loadGoogleFont, loadThemeFonts } from '../lib/fonts';
-
-// API services
-import { createPresentation as apiCreatePresentation } from '../services/api/presentationService';
+import { THEMES } from '../config/themes';
+import { IMAGE_STYLES } from '../config/imageStyles';
+import { WABI_SABI_LAYOUT_NAMES } from '../config/layoutConstants';
+import { loadThemeFonts } from '../lib/fonts';
 
 // Query and mutation hooks
 import { useSavedDecks, usePresentation, presentationKeys } from './queries/usePresentationQueries';
@@ -38,6 +36,8 @@ import {
   useSlideUpdater,
   useImageGeneration,
   useContentRefinement,
+  useDeckUIState,
+  useDeckSyncState,
   createSlidesFromPlan,
   createPresentation,
   exportPresentationToFile,
@@ -46,9 +46,6 @@ import {
 
 // Debug context for agent logs
 import { useDebugSafe } from '../contexts/DebugContext';
-
-// Save status type for compatibility
-type SaveStatus = 'idle' | 'saving' | 'saved';
 
 export const useDeck = () => {
   const queryClient = useQueryClient();
@@ -70,55 +67,49 @@ export const useDeck = () => {
     isLoading: isLoadingPresentation,
   } = usePresentation(currentPresentationId);
 
-  // Local state for presentation (hydrated from query, updated optimistically)
-  const [localPresentation, setLocalPresentation] = useState<Presentation | null>(null);
+  // ============ Mutations ============
 
-  // Sync fetched presentation to local state
-  // Uses merge strategy to preserve locally-generated images during refetch
-  useEffect(() => {
-    if (fetchedPresentation) {
-      setLocalPresentation(prev => {
-        if (!prev) return fetchedPresentation;
+  const createMutation = useCreatePresentation();
+  const updateMutation = useUpdatePresentation();
+  const deleteMutation = useDeletePresentation();
+  const updateSlideMutation = useUpdateSlide();
 
-        // Merge slides, preserving local imageUrls that server doesn't have yet
-        // This prevents images from disappearing when switching view modes during generation
-        const mergedSlides = fetchedPresentation.slides.map(serverSlide => {
-          const localSlide = prev.slides.find(s => s.id === serverSlide.id);
-          if (localSlide) {
-            // Preserve local image if server doesn't have it
-            const imageUrl = serverSlide.imageUrl || localSlide.imageUrl;
-            // Preserve loading state if still generating
-            const isImageLoading = localSlide.isImageLoading && !serverSlide.imageUrl;
-            return {
-              ...serverSlide,
-              imageUrl,
-              isImageLoading: isImageLoading || serverSlide.isImageLoading,
-            };
-          }
-          return serverSlide;
-        });
+  // ============ UI State (Composed) ============
 
-        return {
-          ...fetchedPresentation,
-          slides: mergedSlides,
-        };
-      });
+  const uiState = useDeckUIState();
 
-      // Also restore UI state from the fetched presentation
-      if (fetchedPresentation.viewMode) {
-        setViewMode(fetchedPresentation.viewMode);
-      }
-      if (fetchedPresentation.wabiSabiLayout) {
-        setActiveWabiSabiLayout(fetchedPresentation.wabiSabiLayout);
-      }
-      if (fetchedPresentation.themeId && THEMES[fetchedPresentation.themeId]) {
-        setActiveTheme(THEMES[fetchedPresentation.themeId]);
-      }
-    }
-  }, [fetchedPresentation]);
+  const {
+    activeTheme,
+    setActiveTheme,
+    activeWabiSabiLayout,
+    setActiveWabiSabiLayout,
+    viewMode,
+    setViewMode,
+    saveStatus,
+    setSaveStatus,
+    actions: { applyTypography },
+  } = uiState;
 
-  // Current presentation is either local state or fetched data
+  // ============ Sync State (Composed) ============
+
+  const {
+    localPresentation,
+    setLocalPresentation,
+    clearPresentation,
+  } = useDeckSyncState({
+    fetchedPresentation,
+    onHydrateTheme: setActiveTheme,
+    onHydrateViewMode: setViewMode,
+    onHydrateLayout: setActiveWabiSabiLayout,
+  });
+
+  // Current presentation is the local synced state
   const currentPresentation = localPresentation;
+
+  // ============ Local UI State (Additional) ============
+
+  const [activeSlideIndex, setActiveSlideIndex] = useState<number>(0);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // ============ Real-Time Sync ============
 
@@ -129,22 +120,6 @@ export const useDeck = () => {
     sendSlideUpdate,
     sendPresentationUpdate,
   } = usePresentationSubscription(currentPresentationId);
-
-  // ============ Local UI State ============
-
-  const [activeSlideIndex, setActiveSlideIndex] = useState<number>(0);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [activeTheme, setActiveTheme] = useState<Theme>(THEMES.neoBrutalist);
-  const [activeWabiSabiLayout, setActiveWabiSabiLayout] = useState<string>('Editorial');
-  const [viewMode, setViewMode] = useState<ViewMode>('standard');
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
-
-  // ============ Mutations ============
-
-  const createMutation = useCreatePresentation();
-  const updateMutation = useUpdatePresentation();
-  const deleteMutation = useDeletePresentation();
-  const updateSlideMutation = useUpdateSlide();
 
   // ============ Deck List Management ============
 
@@ -502,18 +477,6 @@ export const useDeck = () => {
         });
       }
     }
-  };
-
-  const applyTypography = (headingFont: string, bodyFont: string) => {
-    loadGoogleFont(headingFont);
-    loadGoogleFont(bodyFont);
-    setActiveTheme(prev => ({
-      ...prev,
-      fonts: {
-        heading: `"${headingFont}", sans-serif`,
-        body: `"${bodyFont}", sans-serif`,
-      },
-    }));
   };
 
   const cycleWabiSabiLayout = () => {

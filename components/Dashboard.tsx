@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Presentation } from '../types';
 import { IdeationSession, DeckRecipe } from '../types/ideation';
 import { RoughDraft } from '../types/roughDraft';
-import { THEMES } from '../lib/themes';
+import { THEMES } from '../config/themes';
 import { WabiSabiStage } from './WabiSabiStage';
 import { Trash2, Clock, Play, BarChart2, FileText, Sparkles, Copy, FileEdit, Layers } from 'lucide-react';
 import { AnalyticsModal } from './AnalyticsModal';

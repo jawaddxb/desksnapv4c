@@ -1,5 +1,8 @@
-export { CinematicArchetype } from './CinematicArchetype';
-export { NoirArchetype } from './NoirArchetype';
-export { SchematicArchetype } from './SchematicArchetype';
-export { BrutalistArchetype } from './BrutalistArchetype';
-export { ClayArchetype } from './ClayArchetype';
+// Re-export factory-generated cinematic archetypes
+export {
+  CinematicArchetype,
+  NoirArchetype,
+  SchematicArchetype,
+  BrutalistArchetype,
+  ClayArchetype,
+} from '../generated/cinematic';

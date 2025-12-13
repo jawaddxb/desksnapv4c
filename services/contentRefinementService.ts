@@ -49,65 +49,43 @@ export interface ContentRefinementResult {
 }
 
 /**
- * Refine slide content according to a specific tone.
- *
- * @param title - The slide title
- * @param content - Array of bullet points
- * @param tone - The tone to apply (professional, casual, technical, etc.)
- * @returns Refined title and content
+ * Options for content refinement.
  */
-export const refineSlideContent = async (
-  title: string,
-  content: string[],
-  tone: ToneType
-): Promise<ContentRefinementResult> => {
-  const ai = getAIClient();
-  const instruction = TONE_INSTRUCTIONS[tone];
-
-  const response = await ai.models.generateContent({
-    model: getTextModel(),
-    contents: `You are a presentation copywriter. Rewrite this slide content according to the tone instruction.
-
-TONE INSTRUCTION: ${instruction}
-
-CURRENT SLIDE:
-Title: "${title}"
-Bullets:
-${content.map((c, i) => `${i + 1}. ${c}`).join('\n')}
-
-Return ONLY valid JSON with this exact structure:
-{"title": "new title", "content": ["bullet 1", "bullet 2", "bullet 3"]}
-
-Keep the same number of bullets. Do not add markdown or explanations.`,
-    config: {
-      responseMimeType: 'application/json',
-    },
-  });
-
-  return parseAIJsonResponse<ContentRefinementResult>(response.text);
-};
+interface RefineContentOptions {
+  /** Whether bullet count can be adjusted */
+  allowBulletCountChange?: boolean;
+}
 
 /**
- * Refine slide content according to a specific refinement type.
+ * Generic content refinement function.
+ * Core implementation used by all refinement operations.
  *
  * @param title - The slide title
  * @param content - Array of bullet points
- * @param refinementType - The type of refinement (expand, simplify, clarify, storytelling)
+ * @param instruction - The refinement instruction to apply
+ * @param role - The AI role description
+ * @param options - Optional settings
  * @returns Refined title and content
  */
-export const refineSlideContentByType = async (
+async function refineContent(
   title: string,
   content: string[],
-  refinementType: ContentRefinementType
-): Promise<ContentRefinementResult> => {
+  instruction: string,
+  role: string,
+  options: RefineContentOptions = {}
+): Promise<ContentRefinementResult> {
   const ai = getAIClient();
-  const instruction = CONTENT_REFINEMENT_INSTRUCTIONS[refinementType];
+  const { allowBulletCountChange = false } = options;
+
+  const bulletInstruction = allowBulletCountChange
+    ? 'You may adjust the number of bullets if the refinement requires it (e.g., expand may add bullets, simplify may merge).'
+    : 'Keep the same number of bullets.';
 
   const response = await ai.models.generateContent({
     model: getTextModel(),
-    contents: `You are a presentation content optimizer. Transform this slide according to the refinement goal.
+    contents: `You are a presentation ${role}. Transform this slide content according to the instruction.
 
-REFINEMENT GOAL: ${instruction}
+INSTRUCTION: ${instruction}
 
 CURRENT SLIDE:
 Title: "${title}"
@@ -117,11 +95,45 @@ ${content.map((c, i) => `${i + 1}. ${c}`).join('\n')}
 Return ONLY valid JSON with this exact structure:
 {"title": "new title", "content": ["bullet 1", "bullet 2", ...]}
 
-You may adjust the number of bullets if the refinement requires it (e.g., expand may add bullets, simplify may merge). Do not add markdown or explanations.`,
+${bulletInstruction} Do not add markdown or explanations.`,
     config: {
       responseMimeType: 'application/json',
     },
   });
 
   return parseAIJsonResponse<ContentRefinementResult>(response.text);
-};
+}
+
+/**
+ * Refine slide content according to a specific tone.
+ *
+ * @param title - The slide title
+ * @param content - Array of bullet points
+ * @param tone - The tone to apply (professional, casual, technical, etc.)
+ * @returns Refined title and content
+ */
+export const refineSlideContent = (
+  title: string,
+  content: string[],
+  tone: ToneType
+): Promise<ContentRefinementResult> =>
+  refineContent(title, content, TONE_INSTRUCTIONS[tone], 'copywriter', {
+    allowBulletCountChange: false,
+  });
+
+/**
+ * Refine slide content according to a specific refinement type.
+ *
+ * @param title - The slide title
+ * @param content - Array of bullet points
+ * @param refinementType - The type of refinement (expand, simplify, clarify, storytelling)
+ * @returns Refined title and content
+ */
+export const refineSlideContentByType = (
+  title: string,
+  content: string[],
+  refinementType: ContentRefinementType
+): Promise<ContentRefinementResult> =>
+  refineContent(title, content, CONTENT_REFINEMENT_INSTRUCTIONS[refinementType], 'content optimizer', {
+    allowBulletCountChange: true,
+  });

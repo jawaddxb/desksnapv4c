@@ -8,7 +8,7 @@
 import React from 'react';
 import { Presentation } from '../../types';
 import { IdeationSession, COLUMNS, JournalEntry } from '../../types/ideation';
-import { THEMES } from '../../lib/themes';
+import { THEMES } from '../../config/themes';
 import { CreativeJournal } from '../ideation/CreativeJournal';
 import {
   X,

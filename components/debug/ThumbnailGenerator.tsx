@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import html2canvas from 'html2canvas-pro';
 import { THEMES, getThemeIds, THEME_CATEGORIES } from '../../config/themes';
-import { WABI_SABI_LAYOUT_NAMES } from '../WabiSabiStage';
+import { WABI_SABI_LAYOUT_NAMES } from '../../config/layoutConstants';
 import { SAMPLE_SLIDE } from './sampleSlideData';
 import { ThumbnailPreviewContainer } from './ThumbnailPreviewContainer';
 import {

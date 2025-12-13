@@ -9,7 +9,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Presentation, Slide, Theme } from '../../types';
 import { MainStage } from '../MainStage';
 import { WabiSabiStage } from '../WabiSabiStage';
-import { THEMES } from '../../lib/themes';
+import { THEMES } from '../../config/themes';
 
 interface PPTExportRendererProps {
   width?: number;

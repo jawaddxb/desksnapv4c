@@ -7,7 +7,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
 import { GenerationMode, Message } from '../types';
-import { IMAGE_STYLES } from '../lib/themes';
+import { IMAGE_STYLES } from '../config/imageStyles';
 import { useChat } from '../hooks/useChat';
 
 export type ImageStyle = typeof IMAGE_STYLES[number];

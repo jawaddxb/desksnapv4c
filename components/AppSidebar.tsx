@@ -8,7 +8,7 @@ import { ChatInterface } from './ChatInterface';
 import { SlideList } from './SlideList';
 import { VersionHistoryPanel } from './VersionHistoryPanel';
 import { RelatedContentPanel } from './RelatedContentPanel';
-import { IMAGE_STYLES } from '../lib/themes';
+import { IMAGE_STYLES } from '../config/imageStyles';
 import { useVersions } from '../hooks/queries/useVersionQueries';
 import { useCreateVersion, useRestoreVersion, useDeleteVersion } from '../hooks/mutations/useVersionMutations';
 

@@ -2,7 +2,7 @@
  * useIdeation Hook
  *
  * Single source of truth for ideation session state.
- * Handles CRUD operations via API, auto-save, and tool execution for the agentic copilot.
+ * Orchestrates focused hooks for notes, connections, and tool execution.
  *
  * Uses TanStack Query for server state and local state for optimistic updates.
  */
@@ -12,32 +12,27 @@ import { Message, MessageRole } from '../types';
 import {
   IdeationSession,
   IdeaNote,
-  NoteConnection,
-  NoteColor,
-  NoteType,
   IdeationStage,
   JournalEntry,
-  JournalStage,
-  CreativeJournal,
-  COLUMNS,
   createSession,
-  createNote,
-  getColumnIndex,
 } from '../types/ideation';
 import { useSavedIdeations, useIdeationSession } from './queries/useIdeationQueries';
 import {
   useCreateIdeation,
   useUpdateIdeation,
   useDeleteIdeation,
-  useAddIdeationNote,
-  useUpdateIdeationNote,
-  useDeleteIdeationNote,
-  useAddIdeationConnection,
   useLinkIdeationToDeck,
-  useAddJournalEntry,
 } from './mutations/useIdeationMutations';
 import { useAutoSave } from './useAutoSave';
 import { updateIdeationSession } from '../services/api/ideationService';
+
+// Composed hooks
+import {
+  useIdeationNotes,
+  useIdeationConnections,
+  useIdeationTools,
+  AddNoteOptions,
+} from './ideation';
 
 export interface UseIdeationReturn {
   // State
@@ -88,15 +83,6 @@ export interface UseIdeationReturn {
   executeToolCall: (tool: string, args: Record<string, unknown>) => Promise<unknown>;
 }
 
-interface AddNoteOptions {
-  type?: NoteType;
-  color?: NoteColor;
-  parentId?: string;
-  sourceUrl?: string;
-  sourceTitle?: string;
-  approved?: boolean;
-}
-
 export function useIdeation(): UseIdeationReturn {
   // Local session state (for optimistic updates)
   const [localSession, setLocalSession] = useState<IdeationSession | null>(null);
@@ -112,7 +98,24 @@ export function useIdeation(): UseIdeationReturn {
   const updateMutation = useUpdateIdeation();
   const deleteMutation = useDeleteIdeation();
   const linkToDeckMutation = useLinkIdeationToDeck();
-  const addJournalMutation = useAddJournalEntry();
+
+  // ============ COMPOSED HOOKS ============
+
+  // Note operations (composed)
+  const {
+    addNote,
+    updateNote,
+    deleteNote,
+    moveNote,
+    approveNote,
+    rejectNote,
+  } = useIdeationNotes({ setLocalSession });
+
+  // Connection operations (composed)
+  const {
+    connectNotes,
+    disconnectNotes,
+  } = useIdeationConnections({ setLocalSession });
 
   // Sync fetched session to local state
   useEffect(() => {
@@ -204,139 +207,6 @@ export function useIdeation(): UseIdeationReturn {
     await refetchList();
   }, [refetchList]);
 
-  // ============ NOTE OPERATIONS ============
-
-  const computeNextRow = (notes: IdeaNote[], column: number): number => {
-    const columnNotes = notes.filter(n => n.column === column);
-    return columnNotes.length > 0 ? Math.max(...columnNotes.map(n => n.row)) + 1 : 0;
-  };
-
-  const addNote = useCallback((
-    content: string,
-    column: number | string,
-    options: AddNoteOptions = {}
-  ): string => {
-    const colIndex = typeof column === 'string' ? getColumnIndex(column as any) : column;
-
-    const note = createNote(
-      content,
-      colIndex,
-      options.type ?? 'user',
-      options.color ?? (options.type === 'ai' ? 'blue' : options.type === 'research' ? 'green' : 'yellow'),
-      options.parentId
-    );
-
-    if (options.sourceUrl) note.sourceUrl = options.sourceUrl;
-    if (options.sourceTitle) note.sourceTitle = options.sourceTitle;
-    if (options.approved !== undefined) note.approved = options.approved;
-
-    setLocalSession(prev => {
-      if (!prev) return null;
-      const newRow = computeNextRow(prev.notes, colIndex);
-      return {
-        ...prev,
-        notes: [...prev.notes, { ...note, row: newRow }],
-        lastModified: Date.now(),
-        syncStatus: 'pending' as const,
-      };
-    });
-
-    return note.id;
-  }, []);
-
-  const updateNote = useCallback((noteId: string, updates: Partial<IdeaNote>) => {
-    setLocalSession(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        notes: prev.notes.map(n =>
-          n.id === noteId ? { ...n, ...updates } : n
-        ),
-        lastModified: Date.now(),
-        syncStatus: 'pending' as const,
-      };
-    });
-  }, []);
-
-  const deleteNote = useCallback((noteId: string) => {
-    setLocalSession(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        notes: prev.notes.filter(n => n.id !== noteId),
-        // Also remove connections involving this note
-        connections: prev.connections.filter(
-          c => c.fromId !== noteId && c.toId !== noteId
-        ),
-        lastModified: Date.now(),
-        syncStatus: 'pending' as const,
-      };
-    });
-  }, []);
-
-  const moveNote = useCallback((noteId: string, column: number, row: number) => {
-    setLocalSession(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        notes: prev.notes.map(n =>
-          n.id === noteId ? { ...n, column, row } : n
-        ),
-        lastModified: Date.now(),
-        syncStatus: 'pending' as const,
-      };
-    });
-  }, []);
-
-  const approveNote = useCallback((noteId: string) => {
-    updateNote(noteId, { approved: true });
-  }, [updateNote]);
-
-  const rejectNote = useCallback((noteId: string) => {
-    deleteNote(noteId);
-  }, [deleteNote]);
-
-  // ============ CONNECTION OPERATIONS ============
-
-  const connectNotes = useCallback((fromId: string, toId: string) => {
-    setLocalSession(prev => {
-      if (!prev) return null;
-
-      // Check if connection already exists
-      const exists = prev.connections.some(
-        c => c.fromId === fromId && c.toId === toId
-      );
-      if (exists) return prev;
-
-      const connection: NoteConnection = {
-        id: `conn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        fromId,
-        toId,
-      };
-
-      return {
-        ...prev,
-        connections: [...prev.connections, connection],
-        lastModified: Date.now(),
-        syncStatus: 'pending' as const,
-      };
-    });
-  }, []);
-
-  const disconnectNotes = useCallback((fromId: string, toId: string) => {
-    setLocalSession(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        connections: prev.connections.filter(
-          c => !(c.fromId === fromId && c.toId === toId)
-        ),
-        lastModified: Date.now(),
-        syncStatus: 'pending' as const,
-      };
-    });
-  }, []);
-
   // ============ MESSAGE OPERATIONS ============
 
   const addMessage = useCallback((role: MessageRole, text: string) => {
@@ -425,152 +295,19 @@ export function useIdeation(): UseIdeationReturn {
     });
   }, [localSession, linkToDeckMutation]);
 
-  // ============ TOOL EXECUTOR ============
+  // ============ TOOL EXECUTOR (Composed) ============
 
-  const executeToolCall = useCallback(async (
-    tool: string,
-    args: Record<string, unknown>
-  ): Promise<unknown> => {
-    switch (tool) {
-      case 'set_topic': {
-        const { topic } = args as { topic: string };
-        updateTopic(topic);
-        return { success: true, topic };
-      }
-
-      case 'create_note': {
-        const { content, column, parentId, color } = args as {
-          content: string;
-          column: string;
-          parentId?: string;
-          color?: NoteColor;
-        };
-        const colIndex = COLUMNS.findIndex(
-          c => c.toLowerCase() === (column as string).toLowerCase()
-        );
-        const noteId = addNote(content, colIndex >= 0 ? colIndex : 0, {
-          type: 'ai',
-          color: color ?? 'blue',
-          parentId,
-          approved: true, // AI notes are ready to use
-        });
-        return { success: true, noteId };
-      }
-
-      case 'update_note': {
-        const { noteId, content } = args as { noteId: string; content: string };
-        updateNote(noteId, { content });
-        return { success: true };
-      }
-
-      case 'delete_note': {
-        const { noteId } = args as { noteId: string };
-        deleteNote(noteId);
-        return { success: true };
-      }
-
-      case 'connect_notes': {
-        const { fromId, toId } = args as { fromId: string; toId: string };
-        connectNotes(fromId, toId);
-        return { success: true };
-      }
-
-      case 'move_note': {
-        const { noteId, column, row } = args as {
-          noteId: string;
-          column: string;
-          row: number;
-        };
-        const colIndex = COLUMNS.findIndex(
-          c => c.toLowerCase() === (column as string).toLowerCase()
-        );
-        if (colIndex >= 0) {
-          moveNote(noteId, colIndex, row);
-        }
-        return { success: true };
-      }
-
-      case 'suggest_structure': {
-        const { structure, rationale } = args as {
-          structure: string[];
-          rationale: string;
-        };
-        // Add journal entry for the structure suggestion
-        addJournalEntry({
-          stage: 'deciding',
-          title: 'Suggesting Presentation Structure',
-          narrative: rationale,
-          decision: structure.join(' → '),
-        });
-        addMessage(
-          MessageRole.SYSTEM,
-          `Suggested structure: ${structure.join(' → ')}\n\nRationale: ${rationale}`
-        );
-        return { success: true, structure };
-      }
-
-      case 'mark_ready': {
-        const { summary } = args as { summary: string };
-        setStage('ready');
-        addJournalEntry({
-          stage: 'creating',
-          title: 'Ideation Complete',
-          narrative: summary,
-        });
-        addMessage(MessageRole.SYSTEM, `Deck plan ready: ${summary}`);
-        return { success: true };
-      }
-
-      case 'ask_user': {
-        // This is handled specially in the agent loop
-        // The question is returned to the UI for display
-        return { type: 'ask_user', ...args };
-      }
-
-      case 'research': {
-        // Research results are passed in by the agent service
-        const { query, results } = args as {
-          query: string;
-          results?: Array<{
-            title: string;
-            snippet: string;
-            url?: string;
-            relevance?: string;
-          }>;
-        };
-
-        // Create notes from research findings if results provided
-        if (results && results.length > 0) {
-          for (const result of results.slice(0, 3)) {
-            addNote(result.snippet, 3, { // Column 3 = Proof
-              type: 'research',
-              color: 'green',
-              sourceUrl: result.url,
-              sourceTitle: result.title,
-              approved: true,
-            });
-          }
-
-          // Add journal entry for research
-          addJournalEntry({
-            stage: 'exploring',
-            title: 'Researching Your Topic',
-            narrative: `I searched for "${query}" and found ${results.length} relevant sources to strengthen your presentation with data and evidence.`,
-          });
-        }
-
-        return {
-          success: true,
-          query,
-          resultsCount: results?.length ?? 0,
-        };
-      }
-
-      default:
-        console.warn(`Unknown tool: ${tool}`);
-        return { success: false, error: `Unknown tool: ${tool}` };
-    }
-  }, [addNote, updateNote, deleteNote, connectNotes, moveNote, addMessage, setStage, updateTopic, addJournalEntry]);
+  const { executeToolCall } = useIdeationTools({
+    addNote,
+    updateNote,
+    deleteNote,
+    connectNotes,
+    moveNote,
+    addMessage,
+    setStage,
+    updateTopic,
+    addJournalEntry,
+  });
 
   // ============ RETURN ============
 

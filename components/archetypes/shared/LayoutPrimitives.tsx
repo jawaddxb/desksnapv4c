@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutLayer } from '../../../lib/themes';
+import { LayoutLayer } from '../../../config/zIndex';
 import { Slide, Theme } from '../../../types';
 import { ImageContainer } from '../../StandardLayouts';
 

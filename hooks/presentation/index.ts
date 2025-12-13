@@ -28,8 +28,11 @@ export {
 } from './useDeckHelpers';
 export type { SlidePlan, PresentationPlan } from './useDeckHelpers';
 
-export { useDeckCRUD } from './useDeckCRUD';
-export type { UseDeckCRUDOptions, UseDeckCRUDResult } from './useDeckCRUD';
-
 export { useThemeManager } from './useThemeManager';
 export type { UseThemeManagerOptions, UseThemeManagerResult } from './useThemeManager';
+
+export { useDeckUIState } from './useDeckUIState';
+export type { UseDeckUIStateOptions, UseDeckUIStateResult, SaveStatus } from './useDeckUIState';
+
+export { useDeckSyncState } from './useDeckSyncState';
+export type { UseDeckSyncStateOptions, UseDeckSyncStateResult } from './useDeckSyncState';

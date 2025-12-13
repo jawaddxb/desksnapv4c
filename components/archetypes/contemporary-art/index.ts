@@ -1,5 +1,7 @@
-export { InstallationArchetype } from './InstallationArchetype';
-export { GlitchArchetype } from './GlitchArchetype';
-export { MixedMediaArchetype } from './MixedMediaArchetype';
-export { InkArchetype } from './InkArchetype';
-export { OxidizeArchetype } from './OxidizeArchetype';
+export {
+  InstallationArchetype,
+  GlitchArchetype,
+  MixedMediaArchetype,
+  InkArchetype,
+  OxidizeArchetype
+} from '../generated/contemporaryArt';

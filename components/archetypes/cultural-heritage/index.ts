@@ -1,8 +1,17 @@
-export { MughalArchetype } from './MughalArchetype';
-export { AnkaraArchetype } from './AnkaraArchetype';
-export { TalaveraArchetype } from './TalaveraArchetype';
-export { PersianArchetype } from './PersianArchetype';
-export { BatikArchetype } from './BatikArchetype';
-export { CelticArchetype } from './CelticArchetype';
-export { AztecArchetype } from './AztecArchetype';
-export { AboriginalArchetype } from './AboriginalArchetype';
+/**
+ * Cultural Heritage Archetypes
+ *
+ * Re-exports factory-generated components from the generated folder.
+ * Individual archetype files have been migrated to the factory pattern.
+ */
+
+export {
+  MughalArchetype,
+  AnkaraArchetype,
+  TalaveraArchetype,
+  PersianArchetype,
+  BatikArchetype,
+  CelticArchetype,
+  AztecArchetype,
+  AboriginalArchetype,
+} from '../generated/culturalHeritage';

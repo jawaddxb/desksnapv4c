@@ -20,10 +20,6 @@ export { DebugProvider, useDebug, useDebugSafe } from './DebugContext';
 export { ServiceProvider, useServices, useServicesSafe } from './ServiceContext';
 export type { Services, ServiceProviderProps } from './ServiceContext';
 
-// Presentation/Deck
-export { DeckProvider, useDeckContext, useDeckContextSafe, useCurrentSlide } from './DeckContext';
-export type { DeckContextValue, DeckActions, DeckProviderProps } from './DeckContext';
-
 // Chat/Copilot
 export { ChatProvider, useChatContext, useChatContextSafe } from './ChatContext';
 export type { ChatContextValue, ChatProviderProps, ImageStyle } from './ChatContext';
@@ -55,6 +51,9 @@ export type {
 
 // Text selection
 export { TextSelectionProvider, useTextSelection } from './TextSelectionContext';
+
+// Chat UI state
+export { ChatUIProvider, useChatUI } from './ChatUIContext';
 
 // Legacy presentation context (if still used)
 export { PresentationProvider, usePresentationContext } from './PresentationContext';

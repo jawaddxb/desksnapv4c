@@ -1,6 +1,14 @@
-export { VictorianArchetype } from './VictorianArchetype';
-export { DiscoArchetype } from './DiscoArchetype';
-export { GrungeArchetype } from './GrungeArchetype';
-export { AtomicArchetype } from './AtomicArchetype';
-export { NouveauArchetype } from './NouveauArchetype';
-export { TudorArchetype } from './TudorArchetype';
+/**
+ * Historical Period Archetypes Index
+ *
+ * Re-exports factory-generated archetypes from ../generated/historicalPeriod
+ */
+
+export {
+  VictorianArchetype,
+  DiscoArchetype,
+  GrungeArchetype,
+  AtomicArchetype,
+  NouveauArchetype,
+  TudorArchetype,
+} from '../generated/historicalPeriod';

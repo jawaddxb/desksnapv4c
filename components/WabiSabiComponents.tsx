@@ -2,7 +2,7 @@
 import React from 'react';
 import { Slide, Theme, ContentType } from '../types';
 import { SmartText } from './SmartText';
-import { LayoutLayer } from '../lib/themes';
+import { LayoutLayer } from '../config/zIndex';
 import { PRNG } from '../lib/utils';
 import { TextRole, getTextConfigWithOverrides } from '../lib/wabiSabiText';
 import { applyFontScale } from '../lib/textPresets';

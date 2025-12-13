@@ -6,10 +6,7 @@ import { IdeationSession } from '../types/ideation';
 import { RoughDraft } from '../types/roughDraft';
 import { RotateCw, Wand2, Layers } from 'lucide-react';
 import { WabiSabiStage } from './WabiSabiStage';
-import {
-    SplitLayout, FullBleedLayout, StatementLayout, GalleryLayout,
-    CardLayout, HorizontalLayout, MagazineLayout
-} from './StandardLayouts';
+import { getLayout } from '../lib/layoutRegistry';
 import { SlideContentEditor } from './SlideContentEditor';
 import { LayoutToolbar } from './LayoutToolbar';
 import { Dashboard } from './Dashboard';
@@ -168,17 +165,9 @@ export const MainStage: React.FC<MainStageProps> = ({
       );
   }
 
-  // 3. Standard Layout Selection
+  // 3. Standard Layout Selection - uses layout registry for OCP compliance
   const renderLayout = () => {
-    const LayoutComponent = {
-        'split': SplitLayout,
-        'full-bleed': FullBleedLayout,
-        'statement': StatementLayout,
-        'gallery': GalleryLayout,
-        'card': CardLayout,
-        'horizontal': HorizontalLayout,
-        'magazine': MagazineLayout
-    }[slide.layoutType] || SplitLayout;
+    const LayoutComponent = getLayout(slide.layoutType);
 
     return (
         <LayoutComponent slide={slide} theme={theme} printMode={printMode}>

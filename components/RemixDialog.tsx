@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import { X, Shuffle, Check, FileSpreadsheet } from 'lucide-react';
-import { THEMES } from '../lib/themes';
+import { THEMES } from '../config/themes';
 import { isPptxSafe } from '../lib/fontCompatibility';
 import { getThemeThumbnailPath } from '../services/thumbnailService';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Presentation, Slide, Theme } from '../types';
 import { SlideCard } from './SlideCard';
 import { Grid3X3 } from 'lucide-react';
-import { SYSTEM_THEME } from '../lib/themes';
+import { SYSTEM_THEME } from '../config/themes';
 
 interface SlideListProps {
     presentation: Presentation;

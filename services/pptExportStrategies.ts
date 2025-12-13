@@ -12,6 +12,7 @@
 import PptxGenJS from 'pptxgenjs';
 import type { Presentation, Theme, Slide, ExportMode, ContentType } from '../types';
 import { getThemeCompatibility, getFontMapping, extractFontName } from '../lib/fontCompatibility';
+import { downloadBlob } from '../lib/fileUtils';
 
 // =============================================================================
 // TYPES
@@ -476,16 +477,7 @@ export async function exportPresentation(
 }
 
 // =============================================================================
-// FILE DOWNLOAD HELPER
+// FILE DOWNLOAD HELPER (re-exported from lib/fileUtils)
 // =============================================================================
 
-export function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
+export { downloadBlob } from '../lib/fileUtils';

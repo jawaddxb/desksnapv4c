@@ -1,6 +1,13 @@
-export { DuskArchetype } from './DuskArchetype';
-export { MonsoonArchetype } from './MonsoonArchetype';
-export { TundraArchetype } from './TundraArchetype';
-export { SavannaArchetype } from './SavannaArchetype';
-export { VolcanoArchetype } from './VolcanoArchetype';
-export { ReefArchetype } from './ReefArchetype';
+/**
+ * Atmospheric Archetypes
+ *
+ * Re-exports factory-generated atmospheric archetype components.
+ */
+export {
+  DuskArchetype,
+  MonsoonArchetype,
+  TundraArchetype,
+  SavannaArchetype,
+  VolcanoArchetype,
+  ReefArchetype,
+} from '../generated/atmospheric';

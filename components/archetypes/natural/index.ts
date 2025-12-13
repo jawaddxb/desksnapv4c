@@ -1,10 +1,8 @@
-export { TerraArchetype } from './TerraArchetype';
-export { ForestArchetype } from './ForestArchetype';
-export { StoneArchetype } from './StoneArchetype';
-export { BloomArchetype } from './BloomArchetype';
-export { DesertArchetype } from './DesertArchetype';
-export { FrostArchetype } from './FrostArchetype';
-export { EmberArchetype } from './EmberArchetype';
-export { MistArchetype } from './MistArchetype';
-export { GrainArchetype } from './GrainArchetype';
-export { MineralArchetype } from './MineralArchetype';
+/**
+ * Natural Archetypes Index
+ *
+ * Re-exports factory-generated natural archetype components.
+ * Individual archetype files have been migrated to the factory pattern.
+ */
+
+export * from '../generated/natural';

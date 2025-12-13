@@ -8,7 +8,7 @@
 import { useCallback } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Presentation, Slide } from '../../types';
-import { THEMES } from '../../lib/themes';
+import { THEMES } from '../../config/themes';
 import {
   refineImagePrompt,
   ensureApiKeySelection,

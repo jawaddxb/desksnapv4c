@@ -7,6 +7,7 @@ import { ensureContrast } from '../lib/contrast';
 import { getArchetypeContrast, applyTypographicInversion } from '../lib/archetypeContrast';
 import { LayoutToolbar } from './LayoutToolbar';
 import { TextSelectionProvider, useTextSelection } from '../contexts/TextSelectionContext';
+import { WABI_SABI_LAYOUT_NAMES } from '../config/layoutConstants';
 // Import archetypes from modular structure
 // Fully extracted categories import from archetypes/
 // Remaining categories are re-exported through archetypes/index.ts from legacy file
@@ -200,7 +201,8 @@ const ARCHETYPE_RENDERERS: Record<string, React.FC<ArchetypeProps>> = {
     'Void': VoidArchetype
 };
 
-export const WABI_SABI_LAYOUT_NAMES = Object.keys(ARCHETYPE_RENDERERS);
+// Re-export for backward compatibility (now imported from config/layoutConstants)
+export { WABI_SABI_LAYOUT_NAMES } from '../config/layoutConstants';
 
 // --- INNER STAGE COMPONENT (uses selection context) ---
 

@@ -1,10 +1,7 @@
-export { TokyoArchetype } from './TokyoArchetype';
-export { SeoulArchetype } from './SeoulArchetype';
-export { ParisArchetype } from './ParisArchetype';
-export { MilanoArchetype } from './MilanoArchetype';
-export { BrooklynArchetype } from './BrooklynArchetype';
-export { NordicArchetype } from './NordicArchetype';
-export { HavanaArchetype } from './HavanaArchetype';
-export { MarrakechArchetype } from './MarrakechArchetype';
-export { KyotoArchetype } from './KyotoArchetype';
-export { ViennaArchetype } from './ViennaArchetype';
+/**
+ * Cultural Archetypes
+ *
+ * Re-exports all cultural archetype components from the factory-generated module.
+ */
+
+export * from '../generated/cultural';
