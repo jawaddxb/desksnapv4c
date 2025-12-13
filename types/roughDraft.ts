@@ -11,6 +11,7 @@ import { LayoutType, Alignment } from '../types';
 
 export type RoughDraftStatus = 'in_progress' | 'ready' | 'approved' | 'discarded';
 export type ApprovalState = 'pending' | 'approved' | 'modified';
+export type GenerationPhase = 'initializing' | 'generating-content' | 'refining-prompts' | 'generating-images' | 'complete';
 
 export interface RoughDraftSlide {
   id: string;

@@ -37,6 +37,22 @@ export type {
   ArchetypeChangeDialogState,
 } from './UIStateContext';
 
+// Workspace Mode
+export {
+  WorkspaceModeProvider,
+  useWorkspaceMode,
+  useWorkspaceModeSafe,
+} from './WorkspaceModeContext';
+export type {
+  WorkspaceMode,
+  WorkspaceModeContextValue,
+  WorkspaceModeProviderProps,
+  RoughDraftSource,
+  RoughDraftNavigationOptions,
+  SourcesPreset,
+  SourcesRecipe,
+} from './WorkspaceModeContext';
+
 // Text selection
 export { TextSelectionProvider, useTextSelection } from './TextSelectionContext';
 

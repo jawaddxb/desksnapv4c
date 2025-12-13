@@ -8,8 +8,7 @@
  */
 
 import React from 'react';
-
-type GenerationPhase = 'initializing' | 'generating-content' | 'refining-prompts' | 'generating-images' | 'complete';
+import { GenerationPhase } from '../../types/roughDraft';
 
 export interface RoughDraftHeaderProps {
   /** Topic of the presentation */

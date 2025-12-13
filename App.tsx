@@ -34,6 +34,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { QueryProvider } from './contexts/QueryContext';
 import { NetworkProvider } from './contexts/NetworkContext';
 import { DebugProvider } from './contexts/DebugContext';
+import { WorkspaceModeProvider, useWorkspaceMode } from './contexts/WorkspaceModeContext';
 import { DebugRoute, ThumbnailGenerator, ComponentShowcase, ImageAgentRoute } from './components/debug';
 import { AuthModal } from './components/auth';
 import { preloadCommonFonts } from './lib/fonts';
@@ -966,9 +967,11 @@ export default function App() {
         <OfflineGate>
           <DebugProvider>
             <AuthProvider>
-              <RealtimeSyncInitializer>
-                <AppRoutes />
-              </RealtimeSyncInitializer>
+              <WorkspaceModeProvider>
+                <RealtimeSyncInitializer>
+                  <AppRoutes />
+                </RealtimeSyncInitializer>
+              </WorkspaceModeProvider>
             </AuthProvider>
           </DebugProvider>
         </OfflineGate>
