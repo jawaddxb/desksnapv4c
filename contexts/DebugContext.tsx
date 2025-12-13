@@ -1,18 +1,19 @@
 /**
  * DebugContext (Facade)
  *
+ * @deprecated This facade is deprecated. Use the focused contexts directly:
+ * - `DebugUIContext` for debug UI toggle state
+ * - `AgentActivityContext` for agent processing and image generation
+ *
  * BACKWARD COMPATIBILITY LAYER
  *
  * This context composes DebugUIContext and AgentActivityContext
  * to provide the legacy DebugContext API for existing consumers.
- *
- * For new code, prefer using the focused contexts directly:
- * - DebugUIContext for debug UI toggle state
- * - AgentActivityContext for agent processing and image generation
+ * It will be removed in a future version.
  */
 
 import React, { createContext, useContext, useMemo, ReactNode } from 'react';
-import { AgentLog } from '../services/agents/types';
+import { AgentLog } from '../types/agents';
 import {
   DebugUIProvider,
   useDebugUISafe,

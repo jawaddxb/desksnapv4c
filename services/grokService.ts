@@ -11,7 +11,7 @@
 
 import type {
   ResearchPreferences,
-  ResearchResult,
+  ComprehensiveResearch,
   ProgressUpdate,
 } from '../types';
 import { getExternalModel } from '../config';
@@ -91,7 +91,7 @@ export async function performGrokResearch(
   query: string,
   preferences: ResearchPreferences,
   onProgress?: (update: ProgressUpdate) => void
-): Promise<ResearchResult> {
+): Promise<ComprehensiveResearch> {
   const apiKey = getApiKey();
   const tools = buildServerTools(preferences);
 

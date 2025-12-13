@@ -13,33 +13,6 @@ import { getTextModel } from '../config';
 export type RefinementFocus = keyof typeof REFINEMENT_INSTRUCTIONS;
 
 /**
- * Refine an image prompt according to a specific refinement focus.
- *
- * @param originalPrompt - The original image prompt
- * @param focus - The refinement goal (lighting, composition, mood, etc.)
- * @returns The refined prompt string
- */
-export const refineImagePrompt = async (
-  originalPrompt: string,
-  focus: RefinementFocus = 'general'
-): Promise<string> => {
-  const ai = getAIClient();
-  const instruction = REFINEMENT_INSTRUCTIONS[focus];
-
-  const response = await ai.models.generateContent({
-    model: getTextModel(),
-    contents: `Act as a Prompt Engineer. Rewrite the following image prompt to satisfy the specific refinement goal.
-
-      Original Prompt: "${originalPrompt}"
-
-      Refinement Goal: ${instruction}
-
-      Return ONLY the new prompt string, no markdown or explanations.`,
-  });
-  return response.text?.trim() || originalPrompt;
-};
-
-/**
  * Image style instructions for each preset.
  */
 const IMAGE_STYLE_INSTRUCTIONS: Record<ImageStylePreset, string> = {
@@ -53,31 +26,72 @@ const IMAGE_STYLE_INSTRUCTIONS: Record<ImageStylePreset, string> = {
 };
 
 /**
+ * Generic image prompt transformer.
+ * Core implementation used by all prompt transformation operations.
+ *
+ * @param originalPrompt - The original image prompt
+ * @param instruction - The transformation instruction
+ * @param systemPrompt - The full system prompt with {instruction} and {prompt} placeholders
+ * @returns Transformed prompt string
+ */
+async function transformImagePrompt(
+  originalPrompt: string,
+  instruction: string,
+  systemPrompt: string
+): Promise<string> {
+  const ai = getAIClient();
+
+  const response = await ai.models.generateContent({
+    model: getTextModel(),
+    contents: systemPrompt
+      .replace('{instruction}', instruction)
+      .replace('{prompt}', originalPrompt),
+  });
+
+  return response.text?.trim() || originalPrompt;
+}
+
+// System prompts for different transformation types
+const REFINE_PROMPT = `Act as a Prompt Engineer. Rewrite the following image prompt to satisfy the specific refinement goal.
+
+Original Prompt: "{prompt}"
+
+Refinement Goal: {instruction}
+
+Return ONLY the new prompt string, no markdown or explanations.`;
+
+const ENHANCE_PROMPT = `You are an image prompt engineer. Enhance this prompt for a specific visual style.
+
+STYLE GOAL: {instruction}
+
+ORIGINAL PROMPT: "{prompt}"
+
+Rewrite the prompt to achieve the style goal. Add lighting, color, and atmosphere modifiers. Keep the core subject intact.
+
+Return ONLY the new prompt string, no markdown or explanations.`;
+
+/**
+ * Refine an image prompt according to a specific refinement focus.
+ *
+ * @param originalPrompt - The original image prompt
+ * @param focus - The refinement goal (lighting, composition, mood, etc.)
+ * @returns The refined prompt string
+ */
+export const refineImagePrompt = (
+  originalPrompt: string,
+  focus: RefinementFocus = 'general'
+): Promise<string> =>
+  transformImagePrompt(originalPrompt, REFINEMENT_INSTRUCTIONS[focus], REFINE_PROMPT);
+
+/**
  * Enhance an image prompt with a specific visual style preset.
  *
  * @param originalPrompt - The original image prompt
  * @param stylePreset - The visual style to apply (vivid, muted, high-contrast, soft)
  * @returns The enhanced prompt string
  */
-export const enhanceImagePrompt = async (
+export const enhanceImagePrompt = (
   originalPrompt: string,
   stylePreset: ImageStylePreset
-): Promise<string> => {
-  const ai = getAIClient();
-  const instruction = IMAGE_STYLE_INSTRUCTIONS[stylePreset];
-
-  const response = await ai.models.generateContent({
-    model: getTextModel(),
-    contents: `You are an image prompt engineer. Enhance this prompt for a specific visual style.
-
-STYLE GOAL: ${instruction}
-
-ORIGINAL PROMPT: "${originalPrompt}"
-
-Rewrite the prompt to achieve the style goal. Add lighting, color, and atmosphere modifiers. Keep the core subject intact.
-
-Return ONLY the new prompt string, no markdown or explanations.`,
-  });
-
-  return response.text?.trim() || originalPrompt;
-};
+): Promise<string> =>
+  transformImagePrompt(originalPrompt, IMAGE_STYLE_INSTRUCTIONS[stylePreset], ENHANCE_PROMPT);

@@ -40,9 +40,7 @@ export type {
 export { DebugProvider, useDebug, useDebugSafe } from './DebugContext';
 export type { DebugState, DebugActions, DebugContextValue } from './DebugContext';
 
-// Service injection
-export { ServiceProvider, useServices, useServicesSafe } from './ServiceContext';
-export type { Services, ServiceProviderProps } from './ServiceContext';
+// NOTE: ServiceContext exists but is not used - import directly if needed
 
 // Chat UI state (active context for chat/copilot interface)
 export { ChatUIProvider, useChatUI } from './ChatUIContext';
@@ -66,5 +64,4 @@ export type {
 // Text selection
 export { TextSelectionProvider, useTextSelection } from './TextSelectionContext';
 
-// Legacy presentation context (if still used)
-export { PresentationProvider, usePresentationContext } from './PresentationContext';
+// NOTE: PresentationContext exists but is not used - use TanStack Query hooks instead

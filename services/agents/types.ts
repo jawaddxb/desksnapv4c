@@ -74,19 +74,8 @@ export interface ExtractKeywordsResult {
 }
 
 // ============ Agent Log Types ============
-
-export type AgentAction = 'validate' | 'rewrite' | 'finalize' | 'extract_keywords';
-
-export interface AgentLog {
-  slideIndex: number;
-  iteration: number;
-  action: AgentAction;
-  input: string;
-  output: string;
-  reasoning?: string;
-  timestamp: number;
-  durationMs?: number;
-}
+// Re-exported from types layer for backward compatibility
+export type { AgentLog, AgentAction } from '../../types/agents';
 
 // ============ Agent Result Types ============
 

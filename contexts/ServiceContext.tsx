@@ -1,6 +1,10 @@
 /**
  * Service Context
  *
+ * @deprecated This context is not used in the application.
+ * Services are currently imported directly. This context was designed for
+ * dependency injection but was never integrated. Kept for reference.
+ *
  * Provides dependency injection for services across the application.
  * This enables:
  * - Easy mocking for tests
@@ -125,4 +129,12 @@ export const useAIClient = (): GoogleGenAI => {
 export const useHasApiKey = (): boolean => {
   const { hasApiKey } = useServices();
   return hasApiKey();
+};
+
+/**
+ * Hook to access services safely (returns null if not in provider).
+ * Useful for optional contexts or conditional rendering.
+ */
+export const useServicesSafe = (): Services | null => {
+  return useContext(ServiceContext);
 };

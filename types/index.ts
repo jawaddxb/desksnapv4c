@@ -19,5 +19,8 @@ export * from './export';
 // Beautify types
 export * from './beautify';
 
+// Agent types (logs, actions)
+export * from './agents';
+
 // Re-export main types from the root types.ts for convenience
 // Note: Main types are still in ./types.ts for backwards compatibility

@@ -2,26 +2,17 @@
  * Utility Functions
  *
  * Shared utilities used across the application.
+ * PRNG is now in a separate module but re-exported here for backward compatibility.
  */
 
-// PRNG for deterministic randomization
-export class PRNG {
-  private seed: number;
-  constructor(seedString: string) {
-    let h = 0x811c9dc5;
-    for (let i = 0; i < seedString.length; i++) {
-      h ^= seedString.charCodeAt(i);
-      h = Math.imul(h, 0x01000193);
-    }
-    this.seed = h >>> 0;
-  }
-  next(): number {
-    this.seed = (Math.imul(1664525, this.seed) + 1013904223) | 0;
-    return ((this.seed >>> 0) / 4294967296);
-  }
-  range(min: number, max: number): number { return min + this.next() * (max - min); }
-  pick<T>(array: T[]): T { return array[Math.floor(this.next() * array.length)]; }
-}
+// Re-export PRNG from dedicated module
+export { PRNG } from './prng';
+
+// Import centralized colors
+import { COLORS } from '../config/colors';
+
+// Brand color for Tailwind classes (extracted for DRY)
+const BRAND = COLORS.brand; // #c5a47e
 
 /**
  * Utility for conditionally joining class names together.
@@ -42,10 +33,10 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'white' | 'dange
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: 'bg-[#c5a47e] hover:bg-white text-black',
+  primary: `bg-[${BRAND}] hover:bg-white text-black`,
   secondary: 'bg-black hover:bg-white/5 text-white border border-white/20 hover:border-white/40',
   ghost: 'bg-transparent text-white/60 hover:text-white hover:bg-white/5',
-  white: 'bg-white hover:bg-[#c5a47e] text-black',
+  white: `bg-white hover:bg-[${BRAND}] text-black`,
   danger: 'bg-red-600 hover:bg-red-500 text-white',
 };
 
@@ -74,9 +65,9 @@ export function buttonClass(
 export type InputVariant = 'default' | 'search' | 'minimal';
 
 const inputVariants: Record<InputVariant, string> = {
-  default: 'bg-black border border-white/20 focus:border-[#c5a47e]',
+  default: `bg-black border border-white/20 focus:border-[${BRAND}]`,
   search: 'bg-white/5 border border-transparent focus:border-white/20',
-  minimal: 'bg-transparent border-b border-white/20 focus:border-[#c5a47e] rounded-none px-0',
+  minimal: `bg-transparent border-b border-white/20 focus:border-[${BRAND}] rounded-none px-0`,
 };
 
 export function inputClass(
@@ -97,8 +88,8 @@ export type CardVariant = 'default' | 'interactive' | 'selected' | 'ghost';
 
 const cardVariants: Record<CardVariant, string> = {
   default: 'bg-[#1a1a1a] border border-white/10',
-  interactive: 'bg-[#1a1a1a] border border-white/10 hover:border-[#c5a47e]/50 cursor-pointer',
-  selected: 'bg-[#1a1a1a] border border-[#c5a47e] ring-2 ring-[#c5a47e]/20',
+  interactive: `bg-[#1a1a1a] border border-white/10 hover:border-[${BRAND}]/50 cursor-pointer`,
+  selected: `bg-[#1a1a1a] border border-[${BRAND}] ring-2 ring-[${BRAND}]/20`,
   ghost: 'bg-transparent border border-white/10 hover:border-white/20',
 };
 

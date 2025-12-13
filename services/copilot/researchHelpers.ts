@@ -6,7 +6,7 @@
  */
 
 import { getAIClient } from '../aiClient';
-import { ResearchResult } from '../../types/ideation';
+import { WebSearchResult } from '../../types/ideation';
 import { getTextModel } from '../../config';
 
 /**
@@ -16,7 +16,7 @@ import { getTextModel } from '../../config';
 export async function performResearch(
   query: string,
   purpose: string
-): Promise<ResearchResult[]> {
+): Promise<WebSearchResult[]> {
   const ai = getAIClient();
 
   try {
@@ -47,7 +47,7 @@ Be factual and cite real or realistic sources. Return ONLY valid JSON array.`,
     const text = response.text?.replace(/```json|```/g, '').trim();
     if (!text) return [];
 
-    const results = JSON.parse(text) as ResearchResult[];
+    const results = JSON.parse(text) as WebSearchResult[];
     console.log(`[Research] Found ${results.length} results for: ${query}`);
     return results;
   } catch (error) {

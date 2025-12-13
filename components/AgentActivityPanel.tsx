@@ -16,8 +16,9 @@ import {
   Sparkles,
   Clock,
 } from 'lucide-react';
-import { useDebugSafe, SlideInfo } from '../contexts/DebugContext';
-import { AgentLog, PromptValidationResult } from '../services/agents/types';
+import { useAgentActivitySafe, SlideInfo } from '../contexts/AgentActivityContext';
+import { AgentLog } from '../types/agents';
+import { PromptValidationResult } from '../services/agents/types';
 
 export interface AgentActivityPanelProps {
   className?: string;
@@ -38,19 +39,19 @@ interface SlideState {
 }
 
 export function AgentActivityPanel({ className }: AgentActivityPanelProps) {
-  const debugContext = useDebugSafe();
+  const agentContext = useAgentActivitySafe();
   const [isDismissed, setIsDismissed] = useState(false);
   const [slideStates, setSlideStates] = useState<Map<number, SlideState>>(new Map());
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeSlideRef = useRef<HTMLDivElement>(null);
 
   // Get state from context
-  const currentActivity = debugContext?.currentAgentActivity;
-  const isAgentActive = debugContext?.isAgentActive ?? false;
-  const totalSlides = debugContext?.agentTotalSlides ?? 0;
-  const completedSlides = debugContext?.agentCompletedSlides ?? 0;
-  const agentSlides = debugContext?.agentSlides ?? [];
-  const generatedImages = debugContext?.generatedImages ?? new Map();
+  const currentActivity = agentContext?.currentAgentActivity;
+  const isAgentActive = agentContext?.isAgentActive ?? false;
+  const totalSlides = agentContext?.agentTotalSlides ?? 0;
+  const completedSlides = agentContext?.agentCompletedSlides ?? 0;
+  const agentSlides = agentContext?.agentSlides ?? [];
+  const generatedImages = agentContext?.generatedImages ?? new Map();
 
   // Initialize slide states when agent starts
   useEffect(() => {

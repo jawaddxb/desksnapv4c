@@ -47,7 +47,11 @@ export interface SlideContent {
   alignment: Alignment;
 }
 
-export interface RoughDraftSlide extends SlideContent {
+/**
+ * Working slide type during rough draft generation.
+ * Different from RoughDraftSlide in types/roughDraft.ts which is the persistence type.
+ */
+export interface RoughDraftWorkingSlide extends SlideContent {
   id: string;
   imageUrl?: string;
   imageError?: string;
@@ -55,11 +59,14 @@ export interface RoughDraftSlide extends SlideContent {
   approvalState: 'pending' | 'approved' | 'modified';
 }
 
+/** @deprecated Use RoughDraftWorkingSlide instead */
+export type RoughDraftSlide = RoughDraftWorkingSlide;
+
 export interface RoughDraftResult {
   topic: string;
   themeId: string;
   visualStyle: string;
-  slides: RoughDraftSlide[];
+  slides: RoughDraftWorkingSlide[];
   journalEntries: JournalEntry[];
   agentLogs: AgentLog[];
   totalDurationMs: number;
@@ -77,7 +84,7 @@ export interface RoughDraftAgentCallbacks {
   /** Called when image generation fails */
   onImageError?: (index: number, error: string) => void;
   /** Called when a slide is fully complete */
-  onSlideComplete?: (index: number, slide: RoughDraftSlide) => void;
+  onSlideComplete?: (index: number, slide: RoughDraftWorkingSlide) => void;
   /** Called when a narrative journal entry is created */
   onNarrativeEntry?: (entry: JournalEntry) => void;
   /** Called for each agent activity log */
@@ -296,7 +303,7 @@ export async function runRoughDraftAgent(
   callbacks?.onContentPhaseComplete?.(slideContents);
 
   // Initialize slides with content
-  const slides: RoughDraftSlide[] = slideContents.map((content, index) => ({
+  const slides: RoughDraftWorkingSlide[] = slideContents.map((content, index) => ({
     ...content,
     id: generateId(),
     isImageLoading: !opts.skipImageGeneration,
@@ -473,7 +480,7 @@ export async function runRoughDraftAgent(
  * Regenerate image for a single slide with agent refinement
  */
 export async function regenerateSlideWithAgent(
-  slide: RoughDraftSlide,
+  slide: RoughDraftWorkingSlide,
   topic: string,
   visualStyle: string,
   callbacks?: {
@@ -481,7 +488,7 @@ export async function regenerateSlideWithAgent(
     onImageGenerated?: (imageUrl: string) => void;
     onError?: (error: string) => void;
   }
-): Promise<RoughDraftSlide> {
+): Promise<RoughDraftWorkingSlide> {
   const logs: AgentLog[] = [];
 
   // Refine the prompt first

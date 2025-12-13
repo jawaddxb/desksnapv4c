@@ -16,11 +16,13 @@ import {
   RefreshCw,
   Trash2,
 } from 'lucide-react';
-import { useDebug } from '../../contexts/DebugContext';
+import { useDebugUI } from '../../contexts/DebugUIContext';
+import { useAgentActivity } from '../../contexts/AgentActivityContext';
 import { ImageAgentDebugPanel } from './ImageAgentDebugPanel';
 
 export function ImageAgentRoute() {
-  const { isDebugModeAvailable, agentLogs, actions } = useDebug();
+  const { isDebugModeAvailable } = useDebugUI();
+  const { agentLogs, actions } = useAgentActivity();
   const [selectedPresentationId, setSelectedPresentationId] = useState<string | null>(null);
 
   // Get list of presentations with logs

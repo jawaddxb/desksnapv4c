@@ -8,9 +8,37 @@
 import { getRefreshToken, setTokens, clearTokens } from './tokenManager';
 import { API_BASE_URL } from '../../config';
 
+// ============ Error Types ============
+
+export type TokenRefreshErrorCode =
+  | 'NO_REFRESH_TOKEN'
+  | 'REFRESH_FAILED'
+  | 'NETWORK_ERROR'
+  | 'INVALID_RESPONSE';
+
+/**
+ * Structured error for token refresh failures.
+ * Provides typed error codes for programmatic handling.
+ */
+export class TokenRefreshError extends Error {
+  code: TokenRefreshErrorCode;
+  cause?: unknown;
+
+  constructor(code: TokenRefreshErrorCode, message: string, cause?: unknown) {
+    super(message);
+    this.name = 'TokenRefreshError';
+    this.code = code;
+    this.cause = cause;
+  }
+}
+
+// ============ State ============
+
 // Track if a refresh is currently in progress
 let isRefreshing = false;
 let refreshSubscribers: ((token: string | null) => void)[] = [];
+/** Last error encountered during refresh (for debugging/inspection) */
+let lastRefreshError: TokenRefreshError | null = null;
 
 /**
  * Subscribe to the current refresh attempt.
@@ -46,6 +74,10 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 
   const refreshToken = getRefreshToken();
   if (!refreshToken) {
+    lastRefreshError = new TokenRefreshError(
+      'NO_REFRESH_TOKEN',
+      'No refresh token available'
+    );
     clearTokens();
     return null;
   }
@@ -62,6 +94,10 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     });
 
     if (!response.ok) {
+      lastRefreshError = new TokenRefreshError(
+        'REFRESH_FAILED',
+        `Token refresh failed with status ${response.status}`
+      );
       clearTokens();
       notifySubscribers(null);
       return null;
@@ -73,10 +109,15 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 
     setTokens(newAccessToken, newRefreshToken);
     notifySubscribers(newAccessToken);
+    lastRefreshError = null; // Clear error on success
 
     return newAccessToken;
   } catch (error) {
-    console.error('Token refresh failed:', error);
+    lastRefreshError = new TokenRefreshError(
+      'NETWORK_ERROR',
+      'Network error during token refresh',
+      error
+    );
     clearTokens();
     notifySubscribers(null);
     return null;
@@ -90,4 +131,29 @@ export const refreshAccessToken = async (): Promise<string | null> => {
  */
 export const isRefreshInProgress = (): boolean => {
   return isRefreshing;
+};
+
+/**
+ * Get the last token refresh error.
+ * Returns null if no error occurred or if the last refresh was successful.
+ *
+ * @example
+ * const token = await refreshAccessToken();
+ * if (!token) {
+ *   const error = getLastRefreshError();
+ *   if (error?.code === 'NO_REFRESH_TOKEN') {
+ *     // User needs to log in again
+ *   }
+ * }
+ */
+export const getLastRefreshError = (): TokenRefreshError | null => {
+  return lastRefreshError;
+};
+
+/**
+ * Clear the last refresh error.
+ * Useful for resetting state after handling an error.
+ */
+export const clearLastRefreshError = (): void => {
+  lastRefreshError = null;
 };

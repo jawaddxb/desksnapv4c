@@ -17,6 +17,13 @@ import { useOnboarding, OnboardingStep } from '../hooks/useOnboarding';
 
 type DashboardTab = 'decks' | 'rough-drafts' | 'ideations';
 
+/** Tab descriptions for the "Your Recent Work" section */
+const TAB_DESCRIPTIONS: Record<DashboardTab, string> = {
+    'decks': 'Your finished presentations, ready to present or export',
+    'rough-drafts': 'Review and refine AI-generated slides before creating your final deck',
+    'ideations': 'Your brainstorming sessions — develop ideas before building slides',
+};
+
 interface DashboardProps {
     savedDecks: Presentation[];
     savedIdeations?: IdeationSession[];
@@ -141,6 +148,151 @@ export const Dashboard: React.FC<DashboardProps> = ({
         onIdeate?.();
     };
 
+    /** Render tab content based on active tab - replaces chained ternaries */
+    const renderTabContent = (): React.ReactNode => {
+        switch (activeTab) {
+            case 'decks':
+                return renderDecksContent();
+            case 'rough-drafts':
+                return (
+                    <RoughDraftHistoryPanel
+                        drafts={savedRoughDrafts}
+                        isLoading={isLoadingRoughDrafts}
+                        onSelectDraft={onLoadRoughDraft || (() => {})}
+                        onDeleteDraft={onDeleteRoughDraft || (() => {})}
+                        onApproveDraft={onApproveRoughDraft || (() => {})}
+                    />
+                );
+            case 'ideations':
+                return (
+                    <IdeationHistoryPanel
+                        ideations={savedIdeations}
+                        isLoading={isLoadingIdeations}
+                        onSelectIdeation={onLoadIdeation || (() => {})}
+                        onDeleteIdeation={onDeleteIdeation || (() => {})}
+                        onGenerateDeck={onGenerateDeckFromIdeation || (() => {})}
+                        onViewJournal={onViewJournal}
+                    />
+                );
+        }
+    };
+
+    /** Render decks grid or empty state */
+    const renderDecksContent = (): React.ReactNode => {
+        if (savedDecks.length === 0) {
+            return (
+                <div className="border border-dashed border-white/20 p-16 text-center flex flex-col items-center justify-center bg-black/50">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
+                        <Layers className="w-8 h-8 text-white/40" />
+                    </div>
+                    <h3 className="text-xl font-light text-white mb-2">Ready to create something amazing?</h3>
+                    <p className="text-white/50 mb-8 max-w-md mx-auto">
+                        DeckSnap uses AI to help you build beautiful presentations in minutes.
+                        Choose a creation method above to get started.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <button
+                            onClick={handleCreateNew}
+                            className="bg-white hover:bg-[#c5a47e] text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
+                        >
+                            Create Your First Deck
+                        </button>
+                        {onIdeate && (
+                            <button
+                                onClick={handleIdeate}
+                                className="text-[#c5a47e] hover:text-white transition-colors duration-150 text-sm"
+                            >
+                                Or start by brainstorming ideas →
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {savedDecks.map(deck => {
+                    const theme = THEMES[deck.themeId] || THEMES.neoBrutalist;
+                    const coverSlide = deck.slides?.[0];
+
+                    return (
+                        <div key={deck.id} className="group bg-[#1a1a1a] border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 flex flex-col overflow-hidden relative">
+                            <div className="aspect-video w-full bg-black relative overflow-hidden cursor-pointer" onClick={() => onLoad(deck.id)}>
+                                {/* Using WabiSabi renderer for high fidelity thumbnail */}
+                                {coverSlide ? (
+                                    <div className="w-[800%] h-[800%] origin-top-left transform scale-[0.125] pointer-events-none select-none">
+                                        <WabiSabiStage
+                                            slide={coverSlide}
+                                            theme={theme}
+                                            layoutStyle={deck.wabiSabiLayout}
+                                            printMode={true}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                                        <span className="text-xs uppercase tracking-widest">No slides</span>
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-150 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    <div className="bg-[#c5a47e] text-black px-3 py-1.5 font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-150">
+                                        <Play className="w-2.5 h-2.5" fill="currentColor" /> Edit
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-4 flex flex-col flex-1">
+                                <h3 className="font-bold text-sm text-white line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150 cursor-pointer mb-2" onClick={() => onLoad(deck.id)}>
+                                    {deck.topic}
+                                </h3>
+                                <div className="flex items-center justify-between mt-auto">
+                                    <div className="flex items-center gap-2 text-[9px] text-white/40 font-bold uppercase tracking-widest">
+                                        <span className="flex items-center gap-1">
+                                            <Clock className="w-2.5 h-2.5" />
+                                            {new Date(deck.lastModified).toLocaleDateString()}
+                                        </span>
+                                        <span className="px-1.5 py-0.5 bg-white/5 text-white/50">
+                                            {deck.slides.length}
+                                        </span>
+                                    </div>
+
+                                    {/* Analytics Button */}
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setAnalyticsDeck(deck); }}
+                                        className="p-1.5 text-white/30 hover:text-[#c5a47e] hover:bg-white/5 transition-colors duration-150"
+                                        title="View Analytics"
+                                    >
+                                        <BarChart2 className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Action buttons - top right */}
+                            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-150 z-10">
+                                {onClone && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onClone(deck.id); }}
+                                        className="p-1.5 bg-black/80 text-[#c5a47e] hover:bg-[#c5a47e]/20 hover:text-[#c5a47e] transition-all duration-150"
+                                        title="Clone Deck"
+                                    >
+                                        <Copy className="w-3.5 h-3.5" />
+                                    </button>
+                                )}
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onDelete(deck.id); }}
+                                    className="p-1.5 bg-black/80 text-red-400 hover:bg-red-500/20 hover:text-red-400 transition-all duration-150"
+                                    title="Delete Deck"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
     return (
         <div className="flex-1 h-full overflow-y-auto bg-[#111111] p-8 md:p-12">
             {analyticsDeck && (
@@ -260,145 +412,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                     {/* Tab description */}
                     <p className="text-white/50 text-sm mb-6">
-                        {activeTab === 'decks'
-                            ? 'Your finished presentations, ready to present or export'
-                            : activeTab === 'rough-drafts'
-                            ? 'Review and refine AI-generated slides before creating your final deck'
-                            : 'Your brainstorming sessions — develop ideas before building slides'}
+                        {TAB_DESCRIPTIONS[activeTab]}
                     </p>
                 </div>
 
                 {/* Content based on active tab */}
-                {activeTab === 'decks' ? (
-                    // Decks grid - now 4 per row
-                    savedDecks.length === 0 ? (
-                        <div className="border border-dashed border-white/20 p-16 text-center flex flex-col items-center justify-center bg-black/50">
-                            <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
-                                <Layers className="w-8 h-8 text-white/40" />
-                            </div>
-                            <h3 className="text-xl font-light text-white mb-2">Ready to create something amazing?</h3>
-                            <p className="text-white/50 mb-8 max-w-md mx-auto">
-                                DeckSnap uses AI to help you build beautiful presentations in minutes.
-                                Choose a creation method above to get started.
-                            </p>
-                            <div className="flex flex-col sm:flex-row items-center gap-4">
-                                <button
-                                    onClick={handleCreateNew}
-                                    className="bg-white hover:bg-[#c5a47e] text-black px-6 py-3 font-bold uppercase tracking-wide text-xs transition-all duration-150"
-                                >
-                                    Create Your First Deck
-                                </button>
-                                {onIdeate && (
-                                    <button
-                                        onClick={handleIdeate}
-                                        className="text-[#c5a47e] hover:text-white transition-colors duration-150 text-sm"
-                                    >
-                                        Or start by brainstorming ideas →
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {savedDecks.map(deck => {
-                                const theme = THEMES[deck.themeId] || THEMES.neoBrutalist;
-                                const coverSlide = deck.slides?.[0];
-
-                                return (
-                                    <div key={deck.id} className="group bg-[#1a1a1a] border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 flex flex-col overflow-hidden relative">
-                                        <div className="aspect-video w-full bg-black relative overflow-hidden cursor-pointer" onClick={() => onLoad(deck.id)}>
-                                            {/* Using WabiSabi renderer for high fidelity thumbnail */}
-                                            {coverSlide ? (
-                                                <div className="w-[800%] h-[800%] origin-top-left transform scale-[0.125] pointer-events-none select-none">
-                                                    <WabiSabiStage
-                                                        slide={coverSlide}
-                                                        theme={theme}
-                                                        layoutStyle={deck.wabiSabiLayout}
-                                                        printMode={true}
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                                                    <span className="text-xs uppercase tracking-widest">No slides</span>
-                                                </div>
-                                            )}
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-150 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                <div className="bg-[#c5a47e] text-black px-3 py-1.5 font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-150">
-                                                    <Play className="w-2.5 h-2.5" fill="currentColor" /> Edit
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-4 flex flex-col flex-1">
-                                            <h3 className="font-bold text-sm text-white line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150 cursor-pointer mb-2" onClick={() => onLoad(deck.id)}>
-                                                {deck.topic}
-                                            </h3>
-                                            <div className="flex items-center justify-between mt-auto">
-                                                <div className="flex items-center gap-2 text-[9px] text-white/40 font-bold uppercase tracking-widest">
-                                                    <span className="flex items-center gap-1">
-                                                        <Clock className="w-2.5 h-2.5" />
-                                                        {new Date(deck.lastModified).toLocaleDateString()}
-                                                    </span>
-                                                    <span className="px-1.5 py-0.5 bg-white/5 text-white/50">
-                                                        {deck.slides.length}
-                                                    </span>
-                                                </div>
-
-                                                {/* Analytics Button */}
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); setAnalyticsDeck(deck); }}
-                                                    className="p-1.5 text-white/30 hover:text-[#c5a47e] hover:bg-white/5 transition-colors duration-150"
-                                                    title="View Analytics"
-                                                >
-                                                    <BarChart2 className="w-3.5 h-3.5" />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Action buttons - top right */}
-                                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-150 z-10">
-                                            {onClone && (
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); onClone(deck.id); }}
-                                                    className="p-1.5 bg-black/80 text-[#c5a47e] hover:bg-[#c5a47e]/20 hover:text-[#c5a47e] transition-all duration-150"
-                                                    title="Clone Deck"
-                                                >
-                                                    <Copy className="w-3.5 h-3.5" />
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); onDelete(deck.id); }}
-                                                className="p-1.5 bg-black/80 text-red-400 hover:bg-red-500/20 hover:text-red-400 transition-all duration-150"
-                                                title="Delete Deck"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )
-                ) : activeTab === 'rough-drafts' ? (
-                    // Rough drafts history panel
-                    <RoughDraftHistoryPanel
-                        drafts={savedRoughDrafts}
-                        isLoading={isLoadingRoughDrafts}
-                        onSelectDraft={onLoadRoughDraft || (() => {})}
-                        onDeleteDraft={onDeleteRoughDraft || (() => {})}
-                        onApproveDraft={onApproveRoughDraft || (() => {})}
-                    />
-                ) : (
-                    // Ideations history panel
-                    <IdeationHistoryPanel
-                        ideations={savedIdeations}
-                        isLoading={isLoadingIdeations}
-                        onSelectIdeation={onLoadIdeation || (() => {})}
-                        onDeleteIdeation={onDeleteIdeation || (() => {})}
-                        onGenerateDeck={onGenerateDeckFromIdeation || (() => {})}
-                        onViewJournal={onViewJournal}
-                    />
-                )}
+                {renderTabContent()}
             </div>
         </div>
     );

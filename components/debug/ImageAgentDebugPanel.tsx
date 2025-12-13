@@ -16,7 +16,7 @@ import {
   Eye,
   Sparkles,
 } from 'lucide-react';
-import { AgentLog } from '../../services/agents/types';
+import { AgentLog } from '../../types/agents';
 
 // ============ Types ============
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { ArchetypeInfo } from '../lib/archetypeCategories';
 import { getArchetypeThumbnailPath } from '../services/thumbnailService';
+import { getDecorationConfig } from '../config/archetypeDecorations';
 
 interface ArchetypeCardProps {
   archetype: ArchetypeInfo;
@@ -113,87 +114,103 @@ function getContrastColor(bgColor: string): string {
   return '#ffffff';
 }
 
-// Decorative elements that hint at the archetype style
+/**
+ * Renders archetype-specific decorative elements.
+ * Uses config lookup instead of switch statement for better maintainability.
+ */
 const ArchetypeDecoration: React.FC<{ archetypeId: string; color1: string; color2: string }> = ({
   archetypeId,
   color1,
   color2
 }) => {
+  const config = getDecorationConfig(archetypeId);
+  if (!config) return null;
+
   const contrastColor = getContrastColor(color1);
+  const opacity = config.opacity ?? 0.5;
 
-  // Different decorations for different archetype styles
-  switch (archetypeId) {
-    case 'Bauhaus':
-    case 'Constructivist':
+  switch (config.type) {
+    case 'circle':
       return (
-        <div className="absolute bottom-2 right-2 w-4 h-4 rounded-full opacity-60" style={{ backgroundColor: contrastColor }} />
+        <div
+          className="absolute bottom-2 right-2 w-4 h-4 rounded-full"
+          style={{ backgroundColor: contrastColor, opacity }}
+        />
       );
 
-    case 'Swiss':
-    case 'SwissGrid':
-    case 'Neue':
+    case 'border':
       return (
-        <div className="absolute inset-2 border opacity-20" style={{ borderColor: contrastColor }} />
+        <div
+          className="absolute inset-2 border"
+          style={{ borderColor: contrastColor, opacity }}
+        />
       );
 
-    case 'Bento':
+    case 'grid':
       return (
-        <div className="absolute bottom-2 right-2 grid grid-cols-2 gap-0.5 opacity-40">
+        <div className="absolute bottom-2 right-2 grid grid-cols-2 gap-0.5" style={{ opacity }}>
           <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: contrastColor }} />
           <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: contrastColor }} />
           <div className="w-2 h-4 rounded-sm col-span-2" style={{ backgroundColor: contrastColor }} />
         </div>
       );
 
-    case 'Terminal':
-    case 'CyberDeck':
+    case 'terminal':
       return (
-        <div className="absolute bottom-2 left-2 text-[6px] font-mono opacity-60" style={{ color: contrastColor }}>
+        <div
+          className="absolute bottom-2 left-2 text-[6px] font-mono"
+          style={{ color: contrastColor, opacity }}
+        >
           {'> _'}
         </div>
       );
 
-    case 'Neon':
-    case 'Aurora':
-    case 'Hologram':
+    case 'gradient':
       return (
         <div
-          className="absolute bottom-0 left-0 right-0 h-6 opacity-50"
+          className="absolute bottom-0 left-0 right-0 h-6"
           style={{
-            background: `linear-gradient(90deg, ${color1}, ${color2}, ${color1})`
+            background: `linear-gradient(90deg, ${color1}, ${color2}, ${color1})`,
+            opacity,
           }}
         />
       );
 
-    case 'Kintsugi':
+    case 'gold-line':
       return (
         <div className="absolute bottom-3 right-3">
-          <div className="w-3 h-px rotate-45 opacity-80" style={{ backgroundColor: '#d4af37' }} />
+          <div
+            className="w-3 h-px rotate-45"
+            style={{ backgroundColor: config.color ?? '#d4af37', opacity }}
+          />
         </div>
       );
 
-    case 'Cinematic':
-    case 'Noir':
+    case 'cinema-bars':
       return (
         <>
-          <div className="absolute top-0 left-0 right-0 h-2 bg-black opacity-80" />
-          <div className="absolute bottom-6 left-0 right-0 h-2 bg-black opacity-80" />
+          <div className="absolute top-0 left-0 right-0 h-2 bg-black" style={{ opacity }} />
+          <div className="absolute bottom-6 left-0 right-0 h-2 bg-black" style={{ opacity }} />
         </>
       );
 
-    case 'Memphis':
-    case 'Pop':
+    case 'dots':
+      const colors = config.dotColors ?? ['#facc15', '#f472b6', '#22d3ee'];
       return (
         <div className="absolute top-2 right-2 flex gap-0.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-          <div className="w-1.5 h-1.5 rounded-full bg-pink-400" />
-          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+          {colors.map((dotColor, i) => (
+            <div
+              key={i}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: dotColor }}
+            />
+          ))}
         </div>
       );
 
-    case 'Circuit':
+    case 'circuit-svg':
       return (
-        <div className="absolute bottom-2 right-2 opacity-40">
+        <div className="absolute bottom-2 right-2" style={{ opacity }}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M0 8h6M10 8h6M8 0v6M8 10v6" stroke={contrastColor} strokeWidth="0.5" />
             <circle cx="8" cy="8" r="2" stroke={contrastColor} strokeWidth="0.5" fill="none" />
@@ -201,9 +218,9 @@ const ArchetypeDecoration: React.FC<{ archetypeId: string; color1: string; color
         </div>
       );
 
-    case 'Schematic':
+    case 'schematic-svg':
       return (
-        <div className="absolute bottom-2 right-2 opacity-40">
+        <div className="absolute bottom-2 right-2" style={{ opacity }}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <rect x="1" y="1" width="14" height="14" stroke={contrastColor} strokeWidth="0.5" strokeDasharray="2 1" fill="none" />
           </svg>

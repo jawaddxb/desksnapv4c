@@ -7,7 +7,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { JournalEntry, JournalStage } from '../../types/ideation';
-import { AgentLog } from '../../services/agents/types';
+import { AgentLog } from '../../types/agents';
 
 interface AgentNarrativePanelProps {
   entries: JournalEntry[];

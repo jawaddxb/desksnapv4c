@@ -6,7 +6,7 @@
  */
 
 import type {
-  ResearchResult,
+  ComprehensiveResearch,
   Finding,
   Citation,
   MindMapNode,
@@ -154,7 +154,7 @@ export const buildMindMap = (topic: string, findings: Finding[]): MindMapNode =>
  * Parse Grok's response into structured findings
  * Handles the new /v1/responses API format
  */
-export const parseGrokResponse = (data: any, query: string): ResearchResult => {
+export const parseGrokResponse = (data: any, query: string): ComprehensiveResearch => {
   console.log('[Grok] Parsing response:', {
     hasOutput: !!data.output,
     outputType: typeof data.output,

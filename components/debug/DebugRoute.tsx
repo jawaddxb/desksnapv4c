@@ -29,7 +29,7 @@ import {
   Copy,
   Sparkles,
 } from 'lucide-react';
-import { useDebug } from '../../contexts/DebugContext';
+import { useDebugUI } from '../../contexts/DebugUIContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_BASE_URL } from '../../config';
 import {
@@ -626,7 +626,7 @@ function DebugTools() {
 // ============ Main Component ============
 
 export function DebugRoute() {
-  const { isDebugModeAvailable, isDebugUIEnabled, actions } = useDebug();
+  const { isDebugModeAvailable, isDebugUIEnabled, actions } = useDebugUI();
 
   if (!isDebugModeAvailable) {
     return (

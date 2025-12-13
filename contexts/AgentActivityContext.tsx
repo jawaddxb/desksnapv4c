@@ -4,7 +4,32 @@
  * Manages agent processing state and generated images.
  * Tracks real-time agent activity, progress, and image generation results.
  *
- * Single Responsibility: Agent processing lifecycle and output tracking.
+ * ## Architecture Note: Two Distinct Concerns
+ *
+ * This context intentionally combines two related but distinct concerns:
+ *
+ * ### 1. Persistent Agent Logs (Concern A)
+ * - `agentLogs`: Map<presentationId, AgentLog[]>
+ * - `setAgentLogs`, `getAgentLogs`, `clearAgentLogs`
+ * - **Lifecycle**: Persists across sessions, keyed by presentation ID
+ * - **Purpose**: Historical record of agent reasoning for debugging/review
+ *
+ * ### 2. Real-time Progress Tracking (Concern B)
+ * - `currentAgentActivity`, `isAgentActive`, `agentTotalSlides`, `agentCompletedSlides`
+ * - `agentSlides`, `generatedImages`
+ * - `startAgentProcessing`, `updateAgentProgress`, `stopAgentProcessing`, `recordGeneratedImage`
+ * - **Lifecycle**: Ephemeral, resets after each processing run
+ * - **Purpose**: Real-time UI updates during image generation
+ *
+ * ### Why Combined?
+ * These concerns are kept together because:
+ * 1. They always co-occur (logs are generated during processing)
+ * 2. Components that display progress also need access to logs
+ * 3. Splitting would add indirection without clear benefit
+ *
+ * If splitting becomes necessary in the future, extract:
+ * - `AgentLogsContext` for persistent history
+ * - `AgentProgressContext` for real-time state
  *
  * Usage:
  * 1. Wrap your app with <AgentActivityProvider>
@@ -12,7 +37,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
-import { AgentLog } from '../services/agents/types';
+import { AgentLog } from '../types/agents';
 
 // ============ Types ============
 
@@ -75,10 +100,14 @@ export interface AgentActivityProviderProps {
 }
 
 export const AgentActivityProvider: React.FC<AgentActivityProviderProps> = ({ children }) => {
-  // Agent logs storage
+  // ========================================
+  // CONCERN A: Persistent Agent Logs
+  // ========================================
   const [agentLogs, setAgentLogsState] = useState<Map<string, AgentLog[]>>(new Map());
 
-  // Real-time agent activity state
+  // ========================================
+  // CONCERN B: Real-time Progress Tracking
+  // ========================================
   const [currentAgentActivity, setCurrentAgentActivityState] = useState<AgentLog | null>(null);
   const [isAgentActive, setIsAgentActive] = useState(false);
   const [agentTotalSlides, setAgentTotalSlides] = useState(0);
@@ -86,7 +115,9 @@ export const AgentActivityProvider: React.FC<AgentActivityProviderProps> = ({ ch
   const [agentSlides, setAgentSlides] = useState<SlideInfo[]>([]);
   const [generatedImages, setGeneratedImages] = useState<Map<number, string>>(new Map());
 
-  // Agent logs actions
+  // ========================================
+  // CONCERN A: Agent Logs Actions
+  // ========================================
   const setAgentLogs = useCallback((presentationId: string, logs: AgentLog[]) => {
     setAgentLogsState(prev => {
       const next = new Map(prev);
@@ -107,7 +138,9 @@ export const AgentActivityProvider: React.FC<AgentActivityProviderProps> = ({ ch
     });
   }, []);
 
-  // Real-time agent activity actions
+  // ========================================
+  // CONCERN B: Real-time Progress Actions
+  // ========================================
   const setCurrentActivity = useCallback((log: AgentLog | null) => {
     setCurrentAgentActivityState(log);
   }, []);

@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import { Presentation, Message, GenerationMode } from '../types';
 import { IdeationSession } from '../types/ideation';
 import { RoughDraft } from '../types/roughDraft';
-import { Zap, MessageSquare, ChevronDown, ChevronRight, Sparkles, Clock, ArrowRight, FileText, Lightbulb, FileEdit, LayoutDashboard } from 'lucide-react';
+import { Zap, MessageSquare, Sparkles, Clock, ArrowRight, FileText, Lightbulb, FileEdit, LayoutDashboard } from 'lucide-react';
 import { ChatInterface } from './ChatInterface';
 import { SlideList } from './SlideList';
 import { VersionHistoryPanel } from './VersionHistoryPanel';
 import { RelatedContentPanel } from './RelatedContentPanel';
+import { ExpandableSection } from './shared/ExpandableSection';
 import { IMAGE_STYLES } from '../config/imageStyles';
 import { useVersions } from '../hooks/queries/useVersionQueries';
 import { useCreateVersion, useRestoreVersion, useDeleteVersion } from '../hooks/mutations/useVersionMutations';
@@ -78,9 +79,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     ideationsCount = 0,
     roughDraftsCount = 0,
 }) => {
-    const [ideationsExpanded, setIdeationsExpanded] = useState(true);
-    const [workspaceExpanded, setWorkspaceExpanded] = useState(true);
-
     // Version History hooks
     const { data: versions = [], isLoading: isLoadingVersions } = useVersions(currentPresentation?.id || null);
     const createVersionMutation = useCreateVersion();
@@ -128,67 +126,48 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
                     {/* Recent Ideations Section */}
                     {recentIdeations.length > 0 && onLoadIdeation && (
-                        <div className="border-t border-white/10 bg-black/50">
-                            <button
-                                onClick={() => setIdeationsExpanded(!ideationsExpanded)}
-                                className="w-full px-4 py-3 flex items-center justify-between text-white/60 hover:text-white transition-colors duration-150"
-                            >
-                                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-                                    <Sparkles className="w-4 h-4 text-[#c5a47e]" />
-                                    Recent Ideations
-                                </span>
-                                {ideationsExpanded ? (
-                                    <ChevronDown className="w-4 h-4" />
-                                ) : (
-                                    <ChevronRight className="w-4 h-4" />
-                                )}
-                            </button>
-
-                            {ideationsExpanded && (
-                                <div className="px-4 pb-4 space-y-2">
-                                    {recentIdeations.slice(0, 5).map((ideation) => (
-                                        <button
-                                            key={ideation.id}
-                                            onClick={() => onLoadIdeation(ideation.id)}
-                                            className="w-full p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 text-left group"
-                                        >
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm text-white font-medium line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150">
-                                                        {ideation.topic || 'Untitled Ideation'}
-                                                    </p>
-                                                    <div className="flex items-center gap-2 mt-1 text-[10px] text-white/40">
-                                                        <span className="flex items-center gap-1">
-                                                            <Clock className="w-3 h-3" />
-                                                            {new Date(ideation.lastModified).toLocaleDateString()}
-                                                        </span>
-                                                        <span className="px-1.5 py-0.5 bg-white/5 rounded-sm">
-                                                            {ideation.notes.length} notes
-                                                        </span>
-                                                        {ideation.generatedPresentationIds && ideation.generatedPresentationIds.length > 0 && (
-                                                            <span className="flex items-center gap-1 text-[#c5a47e]">
-                                                                <FileText className="w-3 h-3" />
-                                                                {ideation.generatedPresentationIds.length}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-[#c5a47e] transition-colors duration-150 flex-shrink-0" />
+                        <ExpandableSection title="Recent Ideations" icon={Sparkles}>
+                            {recentIdeations.slice(0, 5).map((ideation) => (
+                                <button
+                                    key={ideation.id}
+                                    onClick={() => onLoadIdeation(ideation.id)}
+                                    className="w-full p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 text-left group"
+                                >
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm text-white font-medium line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150">
+                                                {ideation.topic || 'Untitled Ideation'}
+                                            </p>
+                                            <div className="flex items-center gap-2 mt-1 text-[10px] text-white/40">
+                                                <span className="flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {new Date(ideation.lastModified).toLocaleDateString()}
+                                                </span>
+                                                <span className="px-1.5 py-0.5 bg-white/5 rounded-sm">
+                                                    {ideation.notes.length} notes
+                                                </span>
+                                                {ideation.generatedPresentationIds && ideation.generatedPresentationIds.length > 0 && (
+                                                    <span className="flex items-center gap-1 text-[#c5a47e]">
+                                                        <FileText className="w-3 h-3" />
+                                                        {ideation.generatedPresentationIds.length}
+                                                    </span>
+                                                )}
                                             </div>
-                                        </button>
-                                    ))}
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-[#c5a47e] transition-colors duration-150 flex-shrink-0" />
+                                    </div>
+                                </button>
+                            ))}
 
-                                    {onViewAllIdeations && (
-                                        <button
-                                            onClick={onViewAllIdeations}
-                                            className="w-full py-2 text-[10px] font-bold uppercase tracking-widest text-[#c5a47e] hover:text-white transition-colors duration-150"
-                                        >
-                                            View All Ideations &rarr;
-                                        </button>
-                                    )}
-                                </div>
+                            {onViewAllIdeations && (
+                                <button
+                                    onClick={onViewAllIdeations}
+                                    className="w-full py-2 text-[10px] font-bold uppercase tracking-widest text-[#c5a47e] hover:text-white transition-colors duration-150"
+                                >
+                                    View All Ideations &rarr;
+                                </button>
                             )}
-                        </div>
+                        </ExpandableSection>
                     )}
                 </div>
             ) : (
@@ -230,75 +209,56 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     />
 
                     {/* Workspace Navigation Panel */}
-                    <div className="border-t border-white/10 bg-black/50">
-                        <button
-                            onClick={() => setWorkspaceExpanded(!workspaceExpanded)}
-                            className="w-full px-4 py-3 flex items-center justify-between text-white/60 hover:text-white transition-colors duration-150"
-                        >
-                            <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-                                <Sparkles className="w-4 h-4 text-[#c5a47e]" />
-                                Workspace
-                            </span>
-                            {workspaceExpanded ? (
-                                <ChevronDown className="w-4 h-4" />
-                            ) : (
-                                <ChevronRight className="w-4 h-4" />
-                            )}
-                        </button>
-
-                        {workspaceExpanded && (
-                            <div className="px-4 pb-4 space-y-2">
-                                {/* New Ideation Button */}
-                                {onIdeate && (
-                                    <button
-                                        onClick={onIdeate}
-                                        className="w-full p-3 bg-[#c5a47e]/10 hover:bg-[#c5a47e]/20 border border-[#c5a47e]/30 hover:border-[#c5a47e]/50 transition-all duration-150 text-left group flex items-center gap-3"
-                                    >
-                                        <div className="w-8 h-8 bg-[#c5a47e]/20 flex items-center justify-center flex-shrink-0">
-                                            <Lightbulb className="w-4 h-4 text-[#c5a47e]" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-[#c5a47e] font-medium">New Ideation</p>
-                                            <p className="text-[10px] text-white/40">Brainstorm your next deck</p>
-                                        </div>
-                                    </button>
-                                )}
-
-                                {/* Go to Dashboard Button */}
-                                {onGoToDashboard && (
-                                    <button
-                                        onClick={onGoToDashboard}
-                                        className="w-full p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-150 text-left group flex items-center gap-3"
-                                    >
-                                        <div className="w-8 h-8 bg-white/10 flex items-center justify-center flex-shrink-0">
-                                            <LayoutDashboard className="w-4 h-4 text-white/60" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-white font-medium group-hover:text-[#c5a47e] transition-colors duration-150">Dashboard</p>
-                                            <div className="flex items-center gap-2 text-[10px] text-white/40">
-                                                {ideationsCount > 0 && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Lightbulb className="w-3 h-3" />
-                                                        {ideationsCount} ideations
-                                                    </span>
-                                                )}
-                                                {roughDraftsCount > 0 && (
-                                                    <span className="flex items-center gap-1">
-                                                        <FileEdit className="w-3 h-3" />
-                                                        {roughDraftsCount} drafts
-                                                    </span>
-                                                )}
-                                                {ideationsCount === 0 && roughDraftsCount === 0 && (
-                                                    <span>View all your work</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-[#c5a47e] transition-colors duration-150 flex-shrink-0" />
-                                    </button>
-                                )}
-                            </div>
+                    <ExpandableSection title="Workspace" icon={Sparkles}>
+                        {/* New Ideation Button */}
+                        {onIdeate && (
+                            <button
+                                onClick={onIdeate}
+                                className="w-full p-3 bg-[#c5a47e]/10 hover:bg-[#c5a47e]/20 border border-[#c5a47e]/30 hover:border-[#c5a47e]/50 transition-all duration-150 text-left group flex items-center gap-3"
+                            >
+                                <div className="w-8 h-8 bg-[#c5a47e]/20 flex items-center justify-center flex-shrink-0">
+                                    <Lightbulb className="w-4 h-4 text-[#c5a47e]" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm text-[#c5a47e] font-medium">New Ideation</p>
+                                    <p className="text-[10px] text-white/40">Brainstorm your next deck</p>
+                                </div>
+                            </button>
                         )}
-                    </div>
+
+                        {/* Go to Dashboard Button */}
+                        {onGoToDashboard && (
+                            <button
+                                onClick={onGoToDashboard}
+                                className="w-full p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-150 text-left group flex items-center gap-3"
+                            >
+                                <div className="w-8 h-8 bg-white/10 flex items-center justify-center flex-shrink-0">
+                                    <LayoutDashboard className="w-4 h-4 text-white/60" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm text-white font-medium group-hover:text-[#c5a47e] transition-colors duration-150">Dashboard</p>
+                                    <div className="flex items-center gap-2 text-[10px] text-white/40">
+                                        {ideationsCount > 0 && (
+                                            <span className="flex items-center gap-1">
+                                                <Lightbulb className="w-3 h-3" />
+                                                {ideationsCount} ideations
+                                            </span>
+                                        )}
+                                        {roughDraftsCount > 0 && (
+                                            <span className="flex items-center gap-1">
+                                                <FileEdit className="w-3 h-3" />
+                                                {roughDraftsCount} drafts
+                                            </span>
+                                        )}
+                                        {ideationsCount === 0 && roughDraftsCount === 0 && (
+                                            <span>View all your work</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-[#c5a47e] transition-colors duration-150 flex-shrink-0" />
+                            </button>
+                        )}
+                    </ExpandableSection>
                 </div>
             )}
         </div>

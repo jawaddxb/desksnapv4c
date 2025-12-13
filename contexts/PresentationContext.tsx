@@ -1,6 +1,10 @@
 /**
  * PresentationContext
  *
+ * @deprecated This context is not used in the application.
+ * Use TanStack Query hooks from hooks/queries/usePresentationQueries.ts instead.
+ * Kept for reference but may be removed in a future cleanup.
+ *
  * Centralized state management for presentation editing.
  * Eliminates prop drilling by providing slide, theme, and actions via context.
  *

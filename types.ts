@@ -10,6 +10,11 @@ export const FONT_SCALES = ['auto', 'compact', 'hero', 'classic', 'modern'] as c
 export type FontScale = typeof FONT_SCALES[number];
 
 export const LAYOUT_VARIANTS = ['default', 'inverted'] as const;
+/**
+ * Layout variant - either a preset name or a numeric seed for randomization.
+ * - 'default' | 'inverted': Named presets with fixed layouts
+ * - number: Seed for deterministic random layout generation
+ */
 export type LayoutVariant = typeof LAYOUT_VARIANTS[number] | number;
 
 // Presentation workflow status
@@ -139,12 +144,6 @@ export interface SlideWorkflow {
  */
 export type Slide = SlideCore & SlideImageState & SlideLayout & SlideStyles & SlideWorkflow;
 
-/**
- * Legacy interface for backwards compatibility.
- * @deprecated Use Slide type (intersection) instead.
- */
-export interface SlideInterface extends SlideCore, SlideImageState, SlideLayout, SlideStyles, SlideWorkflow {}
-
 export interface AnalyticsSession {
   id: string;
   timestamp: number;
@@ -182,15 +181,17 @@ export interface Presentation {
   sourceRoughDraftId?: string;
 }
 
-export enum MessageRole {
-  USER = 'user',
-  MODEL = 'model',
-  SYSTEM = 'system'
-}
+export const MessageRole = {
+  USER: 'user',
+  MODEL: 'model',
+  SYSTEM: 'system',
+} as const;
+
+export type MessageRoleType = typeof MessageRole[keyof typeof MessageRole];
 
 export interface Message {
   id: string;
-  role: MessageRole;
+  role: MessageRoleType;
   text: string;
   timestamp: number;
 }
@@ -318,14 +319,19 @@ export interface ProgressUpdate {
   finding?: Finding;
 }
 
-// Complete research result
-export interface ResearchResult {
+// Complete research result with findings, citations, and synthesis
+export interface ComprehensiveResearch {
   findings: Finding[];
   citations: Citation[];
   xTrends?: XTrend[];
   synthesis?: string;        // AI-generated summary
   mindMapData?: MindMapNode;
 }
+
+/**
+ * @deprecated Use ComprehensiveResearch instead
+ */
+export type ResearchResult = ComprehensiveResearch;
 
 // Mind map node structure for visualization
 export interface MindMapNode {

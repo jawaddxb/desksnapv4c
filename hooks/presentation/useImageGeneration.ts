@@ -15,7 +15,7 @@ import {
   RefinementFocus,
 } from '../../services/geminiService';
 import { hasTokens } from '../../services/api/tokenManager';
-import { AgentLog } from '../../services/agents/types';
+import { AgentLog } from '../../types/agents';
 import {
   imageGenerationMode as IMAGE_GENERATION_MODE,
   useAgentMode as USE_AGENT_MODE,

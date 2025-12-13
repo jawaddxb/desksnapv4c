@@ -54,26 +54,85 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
   const [showPPTRenderer, setShowPPTRenderer] = useState(false);
   const [showPPTPreviewDialog, setShowPPTPreviewDialog] = useState(false);
 
-  const handleExportPDF = async () => {
+  // ============ Export Handler Factory ============
+
+  interface ExportConfig {
+    type: ExportType;
+    initialMessage?: string;
+    showRenderer?: 'pdf' | 'ppt';
+    exportFn: () => Promise<{ url?: string } | void>;
+    onFinally?: () => void;
+    successMessage: string;
+    errorMessage: string;
+  }
+
+  const createExportHandler = (config: ExportConfig) => async () => {
     if (!presentation) return;
 
+    // Common setup
     setIsOpen(false);
-    setExportType('pdf');
+    setExportType(config.type);
     setIsExporting(true);
-    setShowRenderer(true);
     setResultUrl(undefined);
+
+    if (config.showRenderer === 'pdf') setShowRenderer(true);
+    if (config.showRenderer === 'ppt') setShowPPTRenderer(true);
+
     setProgress({
       currentSlide: 0,
       totalSlides: presentation.slides.length,
       phase: 'preparing',
+      message: config.initialMessage,
     });
 
-    // Wait for React to render the ExportRenderer component and mount the DOM element
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Wait for renderer to mount if needed
+    if (config.showRenderer) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
 
     try {
+      const result = await config.exportFn();
+
+      if (result?.url) {
+        setResultUrl(result.url);
+      }
+
+      setProgress({
+        currentSlide: presentation.slides.length,
+        totalSlides: presentation.slides.length,
+        phase: 'complete',
+        message: config.successMessage,
+      });
+    } catch (error) {
+      console.error(`${config.type} export failed:`, error);
+      setProgress({
+        currentSlide: 0,
+        totalSlides: presentation.slides.length,
+        phase: 'error',
+        message: error instanceof Error ? error.message : config.errorMessage,
+      });
+    } finally {
+      config.onFinally?.();
+      if (config.showRenderer === 'pdf') {
+        window.dispatchEvent(new CustomEvent('pdf-export-complete'));
+        setShowRenderer(false);
+      }
+      if (config.showRenderer === 'ppt') {
+        setShowPPTRenderer(false);
+      }
+    }
+  };
+
+  // ============ Export Handlers ============
+
+  const handleExportPDF = createExportHandler({
+    type: 'pdf',
+    showRenderer: 'pdf',
+    successMessage: 'PDF exported successfully!',
+    errorMessage: 'PDF export failed',
+    exportFn: async () => {
       await generatePDF(
-        presentation,
+        presentation!,
         theme,
         viewMode,
         wabiSabiLayout,
@@ -86,38 +145,17 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
           });
         }
       );
-    } catch (error) {
-      console.error('PDF export failed:', error);
-      setProgress({
-        currentSlide: 0,
-        totalSlides: presentation.slides.length,
-        phase: 'error',
-        message: error instanceof Error ? error.message : 'PDF export failed',
-      });
-    } finally {
-      // Signal export complete to renderer
-      window.dispatchEvent(new CustomEvent('pdf-export-complete'));
-      setShowRenderer(false);
-    }
-  };
+    },
+  });
 
-  const handleExportPPT = async () => {
-    if (!presentation) return;
-
-    setIsOpen(false);
-    setExportType('pptx');
-    setIsExporting(true);
-    setShowPPTRenderer(true);
-    setResultUrl(undefined);
-    setProgress({
-      currentSlide: 0,
-      totalSlides: presentation.slides.length,
-      phase: 'preparing',
-      message: 'Preparing slides for export...',
-    });
-
-    try {
-      await generatePPT(presentation, theme, {
+  const handleExportPPT = createExportHandler({
+    type: 'pptx',
+    showRenderer: 'ppt',
+    initialMessage: 'Preparing slides for export...',
+    successMessage: 'PowerPoint exported successfully!',
+    errorMessage: 'Could not export PowerPoint. Please try again.',
+    exportFn: async () => {
+      await generatePPT(presentation!, theme, {
         viewMode,
         wabiSabiLayout,
         onProgress: (pptProgress: PPTExportProgress) => {
@@ -129,43 +167,17 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
           });
         },
       });
+    },
+  });
 
-      setProgress({
-        currentSlide: presentation.slides.length,
-        totalSlides: presentation.slides.length,
-        phase: 'complete',
-        message: 'PowerPoint exported successfully!',
-      });
-    } catch (error) {
-      console.error('PowerPoint export failed:', error);
-      setProgress({
-        currentSlide: 0,
-        totalSlides: presentation.slides.length,
-        phase: 'error',
-        message: error instanceof Error ? error.message : 'Could not export PowerPoint. Please try again.',
-      });
-    } finally {
-      setShowPPTRenderer(false);
-    }
-  };
-
-  const handleExportGoogleSlides = async () => {
-    if (!presentation) return;
-
-    setIsOpen(false);
-    setExportType('google-slides');
-    setIsExporting(true);
-    setResultUrl(undefined);
-    setProgress({
-      currentSlide: 0,
-      totalSlides: presentation.slides.length,
-      phase: 'preparing',
-      message: 'Connecting to Google...',
-    });
-
-    try {
+  const handleExportGoogleSlides = createExportHandler({
+    type: 'google-slides',
+    initialMessage: 'Connecting to Google...',
+    successMessage: 'Google Slides created successfully!',
+    errorMessage: 'Google Slides export failed',
+    exportFn: async () => {
       const result = await exportToGoogleSlides(
-        presentation,
+        presentation!,
         theme,
         (slideProgress) => {
           setProgress({
@@ -176,24 +188,9 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
           });
         }
       );
-
-      setResultUrl(result.url);
-      setProgress({
-        currentSlide: presentation.slides.length,
-        totalSlides: presentation.slides.length,
-        phase: 'complete',
-        message: 'Google Slides created successfully!',
-      });
-    } catch (error) {
-      console.error('Google Slides export failed:', error);
-      setProgress({
-        currentSlide: 0,
-        totalSlides: presentation.slides.length,
-        phase: 'error',
-        message: error instanceof Error ? error.message : 'Google Slides export failed',
-      });
-    }
-  };
+      return { url: result.url };
+    },
+  });
 
   const handleRetry = () => {
     if (exportType === 'pdf') {

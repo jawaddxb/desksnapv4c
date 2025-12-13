@@ -17,7 +17,8 @@ export {
   regenerateSlideWithAgent,
   type RoughDraftInput,
   type RoughDraftResult,
-  type RoughDraftSlide,
+  type RoughDraftWorkingSlide,
+  type RoughDraftSlide, // Deprecated alias for RoughDraftWorkingSlide
   type RoughDraftAgentCallbacks,
   type RoughDraftAgentOptions,
   type SlideContent,

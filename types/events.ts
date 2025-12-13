@@ -5,7 +5,7 @@
  * This reduces prop drilling and makes event handling more consistent.
  */
 
-import { AgentLog } from '../services/agents/types';
+import { AgentLog } from './agents';
 
 // ============================================
 // Image Generation Events

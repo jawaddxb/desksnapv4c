@@ -13,7 +13,7 @@ import {
   ensureApiKeySelection,
   generatePresentationImagesWithAgent,
 } from '../../services/geminiService';
-import { AgentLog } from '../../services/agents/types';
+import { AgentLog } from '../../types/agents';
 import { useAgentMode as USE_AGENT_MODE } from '../../config/featureFlags';
 import { createSlideIndexMap, getOriginalIndex, slidesNeedingImages, updateSlidesWhere } from '../../utils';
 

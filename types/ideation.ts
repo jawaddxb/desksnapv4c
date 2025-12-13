@@ -223,14 +223,19 @@ export interface ToolCall {
 }
 
 /**
- * Research result from web search
+ * Result from web search query
  */
-export interface ResearchResult {
+export interface WebSearchResult {
   title: string;
   url: string;
   snippet: string;
   relevance: string;              // Why this is relevant
 }
+
+/**
+ * @deprecated Use WebSearchResult instead
+ */
+export type ResearchResult = WebSearchResult;
 
 /**
  * Deck plan preview before building
@@ -296,9 +301,17 @@ export interface CreativeJournal {
 // ============================================================================
 // BACKEND API TYPES (snake_case for API communication)
 // ============================================================================
+//
+// Transformation functions for these types are in:
+// - services/api/ideationService.ts (backendToFrontend, frontendToBackend*)
+//
+// Nested types (BackendSource, BackendProofLink) are transformed inline
+// within their parent type transformers (backendNoteToFrontend, etc.)
+// ============================================================================
 
 /**
  * Backend representation of Source
+ * @see ideationService.ts - transformed inline within parent transformers
  */
 export interface BackendSource {
   id: string;

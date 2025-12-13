@@ -34,6 +34,89 @@ export interface BatchImageGenerationResponse {
 
 const API_PREFIX = '/api/v1/presentations';
 
+// ============================================================================
+// Generic Polling Factory
+// ============================================================================
+
+interface PollingOptions<T> {
+  /** Function that fetches the status */
+  fetchStatus: () => Promise<T>;
+  /** Called with each status update */
+  onStatusUpdate: (status: T) => void;
+  /** Returns true if polling should stop */
+  isComplete: (status: T) => boolean;
+  /** Base interval between polls in ms (default: 3000) */
+  pollInterval?: number;
+  /** Maximum consecutive errors before stopping (default: 5) */
+  maxErrors?: number;
+  /** Use exponential backoff on errors (default: true) */
+  exponentialBackoff?: boolean;
+}
+
+interface PollHandle {
+  stop: () => void;
+}
+
+/**
+ * Generic polling factory for async task tracking.
+ * Handles polling lifecycle, error recovery, and exponential backoff.
+ */
+export const createPoller = <T>(options: PollingOptions<T>): PollHandle => {
+  const {
+    fetchStatus,
+    onStatusUpdate,
+    isComplete,
+    pollInterval = 3000,
+    maxErrors = 5,
+    exponentialBackoff = true,
+  } = options;
+
+  let active = true;
+  let errorCount = 0;
+
+  const poll = async () => {
+    if (!active) return;
+
+    try {
+      const status = await fetchStatus();
+      onStatusUpdate(status);
+      errorCount = 0; // Reset on success
+
+      if (!isComplete(status) && active) {
+        setTimeout(poll, pollInterval);
+      }
+    } catch (error) {
+      console.error('Poll error:', error);
+      errorCount++;
+
+      if (errorCount >= maxErrors) {
+        console.error('Max poll errors reached, stopping');
+        return;
+      }
+
+      if (active) {
+        const nextInterval = exponentialBackoff
+          ? pollInterval * Math.pow(2, errorCount)
+          : pollInterval * 2;
+        setTimeout(poll, nextInterval);
+      }
+    }
+  };
+
+  // Start polling
+  poll();
+
+  return {
+    stop: () => {
+      active = false;
+    },
+  };
+};
+
+// ============================================================================
+// Image Generation API
+// ============================================================================
+
 /**
  * Generate image for a single slide.
  * Returns immediately with task_id - use polling to track progress.
@@ -102,46 +185,15 @@ export const pollImageGeneration = (
   presentationId: string,
   onStatusUpdate: (status: BatchStatusResponse) => void,
   pollInterval = 3000
-): { stop: () => void } => {
-  let active = true;
-  let errorCount = 0;
-  const maxErrors = 5;
-
-  const poll = async () => {
-    if (!active) return;
-
-    try {
-      const status = await getPresentationImageStatus(presentationId);
-      onStatusUpdate(status);
-      errorCount = 0; // Reset on success
-
-      if (!status.all_complete && active) {
-        setTimeout(poll, pollInterval);
-      }
-    } catch (error) {
-      console.error('Poll error:', error);
-      errorCount++;
-
-      if (errorCount >= maxErrors) {
-        console.error('Max poll errors reached, stopping');
-        return;
-      }
-
-      if (active) {
-        // Exponential backoff on error
-        setTimeout(poll, pollInterval * Math.pow(2, errorCount));
-      }
-    }
-  };
-
-  // Start polling
-  poll();
-
-  return {
-    stop: () => {
-      active = false;
-    },
-  };
+): PollHandle => {
+  return createPoller<BatchStatusResponse>({
+    fetchStatus: () => getPresentationImageStatus(presentationId),
+    onStatusUpdate,
+    isComplete: (status) => status.all_complete,
+    pollInterval,
+    maxErrors: 5,
+    exponentialBackoff: true,
+  });
 };
 
 /**
@@ -156,33 +208,13 @@ export const pollSingleTask = (
   taskId: string,
   onStatusUpdate: (status: ImageTaskStatus) => void,
   pollInterval = 2000
-): { stop: () => void } => {
-  let active = true;
-
-  const poll = async () => {
-    if (!active) return;
-
-    try {
-      const status = await getTaskStatus(taskId);
-      onStatusUpdate(status);
-
-      const isComplete = status.status === 'SUCCESS' || status.status === 'FAILURE';
-      if (!isComplete && active) {
-        setTimeout(poll, pollInterval);
-      }
-    } catch (error) {
-      console.error('Poll error:', error);
-      if (active) {
-        setTimeout(poll, pollInterval * 2);
-      }
-    }
-  };
-
-  poll();
-
-  return {
-    stop: () => {
-      active = false;
-    },
-  };
+): PollHandle => {
+  return createPoller<ImageTaskStatus>({
+    fetchStatus: () => getTaskStatus(taskId),
+    onStatusUpdate,
+    isComplete: (status) => status.status === 'SUCCESS' || status.status === 'FAILURE',
+    pollInterval,
+    maxErrors: 5,
+    exponentialBackoff: false, // Original used simple doubling, not exponential
+  });
 };

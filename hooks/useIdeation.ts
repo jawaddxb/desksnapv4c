@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Message, MessageRole } from '../types';
+import { Message, MessageRole, MessageRoleType } from '../types';
 import {
   IdeationSession,
   IdeaNote,
@@ -65,7 +65,7 @@ export interface UseIdeationReturn {
   disconnectNotes: (fromId: string, toId: string) => void;
 
   // Message operations
-  addMessage: (role: MessageRole, text: string) => void;
+  addMessage: (role: MessageRoleType, text: string) => void;
 
   // Stage operations
   setStage: (stage: IdeationStage) => void;
@@ -123,12 +123,17 @@ export function useIdeation(): UseIdeationReturn {
       setLocalSession(prev => {
         // If we already have local state, merge carefully
         if (prev && prev.id === fetchedSession.id) {
-          // Preserve local changes that haven't synced yet
+          // Use timestamp comparison instead of array length (more reliable)
+          // If local session was modified after the fetch, preserve local changes
+          const localIsNewer = prev.lastModified > fetchedSession.lastModified;
           return {
             ...fetchedSession,
-            notes: prev.notes.length > fetchedSession.notes.length ? prev.notes : fetchedSession.notes,
-            messages: prev.messages.length > fetchedSession.messages.length ? prev.messages : fetchedSession.messages,
+            // Preserve local data if it's newer (user edited during fetch)
+            notes: localIsNewer ? prev.notes : fetchedSession.notes,
+            messages: localIsNewer ? prev.messages : fetchedSession.messages,
             creativeJournal: prev.creativeJournal || fetchedSession.creativeJournal,
+            // Keep the later modification time
+            lastModified: Math.max(prev.lastModified, fetchedSession.lastModified),
           };
         }
         return fetchedSession;
@@ -209,7 +214,7 @@ export function useIdeation(): UseIdeationReturn {
 
   // ============ MESSAGE OPERATIONS ============
 
-  const addMessage = useCallback((role: MessageRole, text: string) => {
+  const addMessage = useCallback((role: MessageRoleType, text: string) => {
     const message: Message = {
       id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       role,

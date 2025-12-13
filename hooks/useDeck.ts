@@ -44,14 +44,14 @@ import {
   parseImportedDeck,
 } from './presentation';
 
-// Debug context for agent logs
-import { useDebugSafe } from '../contexts/DebugContext';
+// Agent activity context for agent logs
+import { useAgentActivitySafe } from '../contexts/AgentActivityContext';
 
 export const useDeck = () => {
   const queryClient = useQueryClient();
 
-  // Debug context for agent activity display (safe - returns null if no provider)
-  const debugContext = useDebugSafe();
+  // Agent activity context for activity display (safe - returns null if no provider)
+  const agentContext = useAgentActivitySafe();
 
   // ============ Query-Based State ============
 
@@ -174,30 +174,30 @@ export const useDeck = () => {
     updateSlide: slideUpdater.updateSlide,
     presentationId: currentPresentationId,
     updateSlideMutation,
-    // Wire agent logs to debug context for history/debugging
+    // Wire agent logs to activity context for history/debugging
     onAgentLogs: (logs) => {
-      if (currentPresentationId && debugContext) {
-        debugContext.actions.setAgentLogs(currentPresentationId, logs);
+      if (currentPresentationId && agentContext) {
+        agentContext.actions.setAgentLogs(currentPresentationId, logs);
       }
     },
     // Wire real-time agent activity for live UI display
     onAgentActivity: (log) => {
-      debugContext?.actions.setCurrentActivity(log);
+      agentContext?.actions.setCurrentActivity(log);
     },
     onAgentStart: (totalSlides) => {
-      // Pass slide titles to debug context for panel display
+      // Pass slide titles to activity context for panel display
       const slideInfo = currentPresentation?.slides.map((s, i) => ({
         index: i,
         title: s.title,
       })) || [];
-      debugContext?.actions.startAgentProcessing(totalSlides, slideInfo);
+      agentContext?.actions.startAgentProcessing(totalSlides, slideInfo);
     },
     onAgentComplete: () => {
-      debugContext?.actions.stopAgentProcessing();
+      agentContext?.actions.stopAgentProcessing();
     },
-    // Wire image generation to debug context for thumbnail display
+    // Wire image generation to activity context for thumbnail display
     onImageGenerated: (slideIndex, imageUrl) => {
-      debugContext?.actions.recordGeneratedImage(slideIndex, imageUrl);
+      agentContext?.actions.recordGeneratedImage(slideIndex, imageUrl);
     },
   });
 
@@ -211,6 +211,64 @@ export const useDeck = () => {
 
   // ============ Deck CRUD Operations ============
 
+  /**
+   * Internal helper to create and persist a presentation.
+   * Consolidates common logic: theme resolution, layout selection,
+   * presentation creation, API save, and state setup.
+   */
+  interface CreateDeckInternalOptions {
+    slides: Slide[];
+    topic: string;
+    themeId?: string;
+    visualStyle?: string;
+    skipImageGeneration?: boolean;
+  }
+
+  const createDeckInternal = async (options: CreateDeckInternalOptions): Promise<Presentation> => {
+    const { slides, topic, themeId, visualStyle, skipImageGeneration } = options;
+
+    // 1. Resolve theme with fallback
+    const resolvedThemeId = themeId && THEMES[themeId] ? themeId : 'neoBrutalist';
+    const theme = THEMES[resolvedThemeId];
+    setActiveTheme(theme);
+
+    // 2. Select random wabi-sabi layout
+    const startLayout = WABI_SABI_LAYOUT_NAMES[
+      Math.floor(Math.random() * WABI_SABI_LAYOUT_NAMES.length)
+    ];
+    setActiveWabiSabiLayout(startLayout);
+
+    // 3. Resolve visual style
+    const resolvedVisualStyle = visualStyle || theme.imageStyle || 'Professional photography';
+
+    // 4. Create presentation object
+    const newDeck = createPresentation(
+      topic,
+      slides,
+      resolvedThemeId,
+      resolvedVisualStyle,
+      startLayout
+    );
+
+    // 5. Save to API
+    const savedDeck = await createMutation.mutateAsync(newDeck);
+
+    // 6. Update state
+    setCurrentPresentationId(savedDeck.id);
+    setLocalPresentation(savedDeck);
+    setActiveSlideIndex(0);
+
+    // 7. Refresh deck list
+    refreshDeckList();
+
+    // 8. Start image generation (optional)
+    if (!skipImageGeneration) {
+      imageGen.generateAllImages(savedDeck.slides, resolvedVisualStyle, undefined, savedDeck);
+    }
+
+    return savedDeck;
+  };
+
   const createDeck = async (
     topic: string,
     imageStyleOverride: typeof IMAGE_STYLES[0],
@@ -221,39 +279,14 @@ export const useDeck = () => {
       await ensureApiKeySelection();
       const imageStyleToPass = imageStyleOverride.id !== 'auto' ? imageStyleOverride : undefined;
       const plan = await generatePresentationPlan(topic, imageStyleToPass, generationMode);
+      const slides = createSlidesFromPlan(plan.slides);
 
-      const newSlides = createSlidesFromPlan(plan.slides);
-
-      // Set theme
-      const themeId = plan.themeId && THEMES[plan.themeId] ? plan.themeId : 'neoBrutalist';
-      setActiveTheme(THEMES[themeId]);
-
-      // Set random wabi-sabi layout
-      const startLayout = WABI_SABI_LAYOUT_NAMES[Math.floor(Math.random() * WABI_SABI_LAYOUT_NAMES.length)];
-      setActiveWabiSabiLayout(startLayout);
-
-      // Create presentation object
-      const newDeck = createPresentation(
-        plan.topic,
-        newSlides,
-        themeId,
-        plan.visualStyle,
-        startLayout
-      );
-
-      // Save to API
-      const savedDeck = await createMutation.mutateAsync(newDeck);
-
-      // Set as current presentation
-      setCurrentPresentationId(savedDeck.id);
-      setLocalPresentation(savedDeck);
-      setActiveSlideIndex(0);
-
-      // Refresh deck list
-      refreshDeckList();
-
-      // Start background image generation (pass savedDeck to avoid stale closure issue)
-      imageGen.generateAllImages(savedDeck.slides, plan.visualStyle, undefined, savedDeck);
+      const savedDeck = await createDeckInternal({
+        slides,
+        topic: plan.topic,
+        themeId: plan.themeId,
+        visualStyle: plan.visualStyle,
+      });
 
       return savedDeck.slides;
     } finally {
@@ -276,38 +309,14 @@ export const useDeck = () => {
   }): Promise<Slide[]> => {
     setIsGenerating(true);
     try {
-      const newSlides = createSlidesFromPlan(plan.slides);
+      const slides = createSlidesFromPlan(plan.slides);
 
-      // Set theme
-      const themeId = plan.themeId && THEMES[plan.themeId] ? plan.themeId : 'neoBrutalist';
-      setActiveTheme(THEMES[themeId]);
-
-      // Set random wabi-sabi layout
-      const startLayout = WABI_SABI_LAYOUT_NAMES[Math.floor(Math.random() * WABI_SABI_LAYOUT_NAMES.length)];
-      setActiveWabiSabiLayout(startLayout);
-
-      const visualStyle = plan.visualStyle || THEMES[themeId]?.imageStyle || 'Professional photography';
-      const newDeck = createPresentation(
-        plan.topic,
-        newSlides,
-        themeId,
-        visualStyle,
-        startLayout
-      );
-
-      // Save to API
-      const savedDeck = await createMutation.mutateAsync(newDeck);
-
-      // Set as current presentation
-      setCurrentPresentationId(savedDeck.id);
-      setLocalPresentation(savedDeck);
-      setActiveSlideIndex(0);
-
-      // Refresh deck list
-      refreshDeckList();
-
-      // Start background image generation (pass savedDeck to avoid stale closure issue)
-      imageGen.generateAllImages(savedDeck.slides, visualStyle, undefined, savedDeck);
+      const savedDeck = await createDeckInternal({
+        slides,
+        topic: plan.topic,
+        themeId: plan.themeId,
+        visualStyle: plan.visualStyle,
+      });
 
       return savedDeck.slides;
     } finally {
@@ -326,37 +335,12 @@ export const useDeck = () => {
   ): Promise<Presentation> => {
     setIsGenerating(true);
     try {
-      // Resolve theme
-      const resolvedThemeId = themeId && THEMES[themeId] ? themeId : 'neoBrutalist';
-      const theme = THEMES[resolvedThemeId];
-      setActiveTheme(theme);
-
-      // Set random wabi-sabi layout
-      const startLayout = WABI_SABI_LAYOUT_NAMES[Math.floor(Math.random() * WABI_SABI_LAYOUT_NAMES.length)];
-      setActiveWabiSabiLayout(startLayout);
-
-      // Create presentation object
-      const visualStyle = theme.imageStyle || 'Professional photography';
-      const newDeck = createPresentation(
-        topic || 'Beautified Deck',
+      return await createDeckInternal({
         slides,
-        resolvedThemeId,
-        visualStyle,
-        startLayout
-      );
-
-      // Save to API
-      const savedDeck = await createMutation.mutateAsync(newDeck);
-
-      // Set as current presentation
-      setCurrentPresentationId(savedDeck.id);
-      setLocalPresentation(savedDeck);
-      setActiveSlideIndex(0);
-
-      // Refresh deck list
-      refreshDeckList();
-
-      return savedDeck;
+        topic: topic || 'Beautified Deck',
+        themeId,
+        skipImageGeneration: true,
+      });
     } finally {
       setIsGenerating(false);
     }

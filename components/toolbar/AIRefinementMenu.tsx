@@ -37,6 +37,48 @@ const TONE_OPTIONS: ToneType[] = ['professional', 'casual', 'technical', 'persua
 const CONTENT_OPTIONS: ContentRefinementType[] = ['expand', 'simplify', 'clarify', 'storytelling'];
 const VISUAL_PRESETS: ImageStylePreset[] = ['vivid', 'muted', 'high-contrast', 'soft'];
 
+// ============ Shared Submenu Components ============
+
+/** Back button for submenu navigation */
+const SubmenuBackButton: React.FC<{ onBack: () => void }> = ({ onBack }) => (
+  <button
+    onClick={onBack}
+    className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-600"
+  >
+    <ChevronLeft className="w-3 h-3" /> Back
+  </button>
+);
+
+/** Generic option list for simple submenus */
+interface SubmenuOptionListProps<T extends string> {
+  options: T[];
+  onSelect: (option: T) => void;
+  formatLabel?: (option: T) => string;
+  icon?: React.ReactNode;
+}
+
+function SubmenuOptionList<T extends string>({
+  options,
+  onSelect,
+  formatLabel = (o) => o.charAt(0).toUpperCase() + o.slice(1),
+  icon,
+}: SubmenuOptionListProps<T>) {
+  return (
+    <>
+      {options.map((option) => (
+        <button
+          key={option}
+          onClick={() => onSelect(option)}
+          className="w-full px-3 py-2 text-left text-xs font-medium text-zinc-700 rounded-lg hover:bg-zinc-50 capitalize flex items-center gap-2"
+        >
+          {icon}
+          {formatLabel(option)}
+        </button>
+      ))}
+    </>
+  );
+}
+
 export const AIRefinementMenu: React.FC<AIRefinementMenuProps> = ({
   slide,
   onUpdateSlide,
@@ -156,54 +198,30 @@ export const AIRefinementMenu: React.FC<AIRefinementMenuProps> = ({
             {/* Tone Submenu */}
             {activeSubmenu === 'tone' && (
               <div className="p-2">
-                <button
-                  onClick={() => setActiveSubmenu(null)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-600"
-                >
-                  <ChevronLeft className="w-3 h-3" /> Back
-                </button>
-                {TONE_OPTIONS.map((tone) => (
-                  <button
-                    key={tone}
-                    onClick={() => handleToneSelect(tone)}
-                    className="w-full px-3 py-2 text-left text-xs font-medium text-zinc-700 rounded-lg hover:bg-zinc-50 capitalize"
-                  >
-                    {tone}
-                  </button>
-                ))}
+                <SubmenuBackButton onBack={() => setActiveSubmenu(null)} />
+                <SubmenuOptionList
+                  options={TONE_OPTIONS}
+                  onSelect={handleToneSelect}
+                />
               </div>
             )}
 
             {/* Content Submenu */}
             {activeSubmenu === 'content' && (
               <div className="p-2">
-                <button
-                  onClick={() => setActiveSubmenu(null)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-600"
-                >
-                  <ChevronLeft className="w-3 h-3" /> Back
-                </button>
-                {CONTENT_OPTIONS.map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => handleContentSelect(type)}
-                    className="w-full px-3 py-2 text-left text-xs font-medium text-zinc-700 rounded-lg hover:bg-zinc-50 capitalize"
-                  >
-                    {formatContentType(type)}
-                  </button>
-                ))}
+                <SubmenuBackButton onBack={() => setActiveSubmenu(null)} />
+                <SubmenuOptionList
+                  options={CONTENT_OPTIONS}
+                  onSelect={handleContentSelect}
+                  formatLabel={formatContentType}
+                />
               </div>
             )}
 
             {/* Visual Submenu */}
             {activeSubmenu === 'visual' && (
               <div className="p-2">
-                <button
-                  onClick={() => setActiveSubmenu(null)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-600"
-                >
-                  <ChevronLeft className="w-3 h-3" /> Back
-                </button>
+                <SubmenuBackButton onBack={() => setActiveSubmenu(null)} />
 
                 {/* CSS Filter Sliders */}
                 <div className="px-3 py-2 space-y-3 border-b border-zinc-100 mb-2">
@@ -246,16 +264,12 @@ export const AIRefinementMenu: React.FC<AIRefinementMenuProps> = ({
                 <label className="px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-400 block mb-2">
                   AI Style Presets
                 </label>
-                {VISUAL_PRESETS.map((preset) => (
-                  <button
-                    key={preset}
-                    onClick={() => handleVisualPreset(preset)}
-                    className="w-full px-3 py-2 text-left text-xs font-medium text-zinc-700 rounded-lg hover:bg-zinc-50 capitalize flex items-center gap-2"
-                  >
-                    <Sparkles className="w-3 h-3 text-purple-400" />
-                    {preset.replace('-', ' ')}
-                  </button>
-                ))}
+                <SubmenuOptionList
+                  options={VISUAL_PRESETS}
+                  onSelect={handleVisualPreset}
+                  formatLabel={(preset) => preset.replace('-', ' ')}
+                  icon={<Sparkles className="w-3 h-3 text-purple-400" />}
+                />
               </div>
             )}
           </div>

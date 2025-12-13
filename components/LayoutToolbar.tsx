@@ -6,17 +6,52 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Slide, ImageStylePreset } from '../types';
+import { Slide, ImageStylePreset, Presentation } from '../types';
 import {
   Columns, Maximize2, Type, LayoutTemplate,
   AlignLeft, AlignCenter, AlignRight,
   Smartphone, Square, Rows,
   Bold, Italic, Plus, Minus, Image as ImageIcon,
   X, GripHorizontal, FileText,
+  LucideIcon,
 } from 'lucide-react';
 import { useDraggable, useSlideStyles, AIRefinementMenu, ToolbarButton, ImagePromptMenu, ContentTypeSelector } from './toolbar';
 import { Divider } from './ui';
-import { Presentation } from '../types';
+
+// ============ Button Configuration Types ============
+
+interface ButtonConfig {
+  id: string;
+  icon?: LucideIcon;
+  text?: string;
+  label: string;
+  isActive: (slide: Slide) => boolean;
+  getUpdate: () => Partial<Slide>;
+}
+
+// ============ Layout Button Configurations ============
+
+const LAYOUT_BUTTONS: ButtonConfig[] = [
+  { id: 'split', icon: Columns, label: 'Split Layout', isActive: (s) => s.layoutType === 'split', getUpdate: () => ({ layoutType: 'split' }) },
+  { id: 'magazine', icon: Smartphone, label: 'Magazine Column', isActive: (s) => s.layoutType === 'magazine', getUpdate: () => ({ layoutType: 'magazine' }) },
+  { id: 'horizontal', icon: Rows, label: 'Horizontal Split', isActive: (s) => s.layoutType === 'horizontal', getUpdate: () => ({ layoutType: 'horizontal' }) },
+  { id: 'card', icon: Square, label: 'Floating Card', isActive: (s) => s.layoutType === 'card', getUpdate: () => ({ layoutType: 'card' }) },
+  { id: 'full-bleed', icon: Maximize2, label: 'Full Bleed', isActive: (s) => s.layoutType === 'full-bleed', getUpdate: () => ({ layoutType: 'full-bleed' }) },
+  { id: 'statement', icon: Type, label: 'Statement', isActive: (s) => s.layoutType === 'statement', getUpdate: () => ({ layoutType: 'statement' }) },
+  { id: 'gallery', icon: LayoutTemplate, label: 'Gallery Grid', isActive: (s) => s.layoutType === 'gallery', getUpdate: () => ({ layoutType: 'gallery' }) },
+];
+
+const ALIGNMENT_BUTTONS: ButtonConfig[] = [
+  { id: 'left', icon: AlignLeft, label: 'Align Left', isActive: (s) => s.alignment === 'left', getUpdate: () => ({ alignment: 'left' }) },
+  { id: 'center', icon: AlignCenter, label: 'Align Center', isActive: (s) => s.alignment === 'center', getUpdate: () => ({ alignment: 'center' }) },
+  { id: 'right', icon: AlignRight, label: 'Align Right', isActive: (s) => s.alignment === 'right', getUpdate: () => ({ alignment: 'right' }) },
+];
+
+const TYPOGRAPHY_BUTTONS: ButtonConfig[] = [
+  { id: 'compact', text: 'S', label: 'Compact Text', isActive: (s) => s.fontScale === 'compact', getUpdate: () => ({ fontScale: 'compact' }) },
+  { id: 'auto', text: 'M', label: 'Auto Scale', isActive: (s) => !s.fontScale || s.fontScale === 'auto', getUpdate: () => ({ fontScale: 'auto' }) },
+  { id: 'hero', text: 'L', label: 'Hero Text', isActive: (s) => s.fontScale === 'hero', getUpdate: () => ({ fontScale: 'hero' }) },
+];
 
 interface LayoutToolbarProps {
   slide: Slide;
@@ -134,72 +169,30 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
         {!isWabiSabi && (
           <>
             <div className="flex gap-1">
-              <Button
-                active={slide.layoutType === 'split'}
-                onClick={() => onUpdateSlide({ layoutType: 'split' })}
-                icon={Columns}
-                label="Split Layout"
-              />
-              <Button
-                active={slide.layoutType === 'magazine'}
-                onClick={() => onUpdateSlide({ layoutType: 'magazine' })}
-                icon={Smartphone}
-                label="Magazine Column"
-              />
-              <Button
-                active={slide.layoutType === 'horizontal'}
-                onClick={() => onUpdateSlide({ layoutType: 'horizontal' })}
-                icon={Rows}
-                label="Horizontal Split"
-              />
-              <Button
-                active={slide.layoutType === 'card'}
-                onClick={() => onUpdateSlide({ layoutType: 'card' })}
-                icon={Square}
-                label="Floating Card"
-              />
-              <Button
-                active={slide.layoutType === 'full-bleed'}
-                onClick={() => onUpdateSlide({ layoutType: 'full-bleed' })}
-                icon={Maximize2}
-                label="Full Bleed"
-              />
-              <Button
-                active={slide.layoutType === 'statement'}
-                onClick={() => onUpdateSlide({ layoutType: 'statement' })}
-                icon={Type}
-                label="Statement"
-              />
-              <Button
-                active={slide.layoutType === 'gallery'}
-                onClick={() => onUpdateSlide({ layoutType: 'gallery' })}
-                icon={LayoutTemplate}
-                label="Gallery Grid"
-              />
+              {LAYOUT_BUTTONS.map((btn) => (
+                <Button
+                  key={btn.id}
+                  active={btn.isActive(slide)}
+                  onClick={() => onUpdateSlide(btn.getUpdate())}
+                  icon={btn.icon}
+                  label={btn.label}
+                />
+              ))}
             </div>
 
             <Divider orientation="vertical" className="h-6 mx-1" />
 
             {/* ALIGNMENT GROUP - Standard mode only */}
             <div className="flex gap-1">
-              <Button
-                active={slide.alignment === 'left'}
-                onClick={() => onUpdateSlide({ alignment: 'left' })}
-                icon={AlignLeft}
-                label="Align Left"
-              />
-              <Button
-                active={slide.alignment === 'center'}
-                onClick={() => onUpdateSlide({ alignment: 'center' })}
-                icon={AlignCenter}
-                label="Align Center"
-              />
-              <Button
-                active={slide.alignment === 'right'}
-                onClick={() => onUpdateSlide({ alignment: 'right' })}
-                icon={AlignRight}
-                label="Align Right"
-              />
+              {ALIGNMENT_BUTTONS.map((btn) => (
+                <Button
+                  key={btn.id}
+                  active={btn.isActive(slide)}
+                  onClick={() => onUpdateSlide(btn.getUpdate())}
+                  icon={btn.icon}
+                  label={btn.label}
+                />
+              ))}
             </div>
 
             <Divider orientation="vertical" className="h-6 mx-1" />
@@ -208,24 +201,15 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
 
         {/* TYPOGRAPHY GROUP */}
         <div className="flex gap-1">
-          <Button
-            active={slide.fontScale === 'compact'}
-            onClick={() => onUpdateSlide({ fontScale: 'compact' })}
-            text="S"
-            label="Compact Text"
-          />
-          <Button
-            active={!slide.fontScale || slide.fontScale === 'auto'}
-            onClick={() => onUpdateSlide({ fontScale: 'auto' })}
-            text="M"
-            label="Auto Scale"
-          />
-          <Button
-            active={slide.fontScale === 'hero'}
-            onClick={() => onUpdateSlide({ fontScale: 'hero' })}
-            text="L"
-            label="Hero Text"
-          />
+          {TYPOGRAPHY_BUTTONS.map((btn) => (
+            <Button
+              key={btn.id}
+              active={btn.isActive(slide)}
+              onClick={() => onUpdateSlide(btn.getUpdate())}
+              text={btn.text}
+              label={btn.label}
+            />
+          ))}
         </div>
 
         <Divider orientation="vertical" className="h-6 mx-1" />

@@ -8,7 +8,7 @@
  */
 
 import { useCallback } from 'react';
-import { Message, MessageRole } from '../../types';
+import { Message, MessageRole, MessageRoleType } from '../../types';
 import {
   IdeationSession,
   IdeationStage,
@@ -30,7 +30,7 @@ export interface UseIdeationToolsOptions {
   /** Move a note */
   moveNote: (noteId: string, column: number, row: number) => void;
   /** Add a chat message */
-  addMessage: (role: MessageRole, text: string) => void;
+  addMessage: (role: MessageRoleType, text: string) => void;
   /** Set the ideation stage */
   setStage: (stage: IdeationStage) => void;
   /** Update the topic */

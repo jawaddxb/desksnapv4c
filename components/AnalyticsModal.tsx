@@ -2,6 +2,7 @@
 import React from 'react';
 import { Presentation, AnalyticsSession } from '../types';
 import { X, Clock, Activity, BarChart3, TrendingUp, Eye, Share2 } from 'lucide-react';
+import { StatCard } from './shared/StatCard';
 
 interface AnalyticsModalProps {
     presentation: Presentation;
@@ -54,24 +55,9 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ presentation, on
                 <div className="flex-1 overflow-y-auto p-8">
                     {/* Top Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-zinc-50 p-6 rounded-xl border border-zinc-100">
-                            <div className="flex items-center gap-2 mb-2 text-zinc-400 text-xs font-bold uppercase tracking-widest">
-                                <Eye className="w-4 h-4" /> Total Sessions
-                            </div>
-                            <div className="text-4xl font-black text-zinc-900">{totalSessions}</div>
-                        </div>
-                        <div className="bg-zinc-50 p-6 rounded-xl border border-zinc-100">
-                            <div className="flex items-center gap-2 mb-2 text-zinc-400 text-xs font-bold uppercase tracking-widest">
-                                <Clock className="w-4 h-4" /> Total Time
-                            </div>
-                            <div className="text-4xl font-black text-zinc-900">{formatTime(totalTime)}</div>
-                        </div>
-                        <div className="bg-zinc-50 p-6 rounded-xl border border-zinc-100">
-                            <div className="flex items-center gap-2 mb-2 text-zinc-400 text-xs font-bold uppercase tracking-widest">
-                                <TrendingUp className="w-4 h-4" /> Avg. Duration
-                            </div>
-                            <div className="text-4xl font-black text-zinc-900">{formatTime(avgDuration)}</div>
-                        </div>
+                        <StatCard icon={Eye} label="Total Sessions" value={totalSessions} />
+                        <StatCard icon={Clock} label="Total Time" value={formatTime(totalTime)} />
+                        <StatCard icon={TrendingUp} label="Avg. Duration" value={formatTime(avgDuration)} />
                     </div>
                     
                     {/* Pro Tip Box */}

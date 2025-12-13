@@ -16,7 +16,7 @@ import {
   regenerateSlideWithAgent,
 } from '../../services/agents/roughDraftAgent';
 import { JournalEntry } from '../../types/ideation';
-import { AgentLog } from '../../services/agents/types';
+import { AgentLog } from '../../types/agents';
 import { THEMES, getTextModel } from '../../config';
 import { RoughDraftSlideCard } from './RoughDraftSlideCard';
 import { AgentNarrativePanel } from './AgentNarrativePanel';
