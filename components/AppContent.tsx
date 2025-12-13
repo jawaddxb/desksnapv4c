@@ -12,6 +12,7 @@ import { WorkspaceRenderer } from './WorkspaceRenderer';
 import { PrintView } from './PrintView';
 import { IdeationResumePrompt } from './ideation/IdeationResumePrompt';
 import { WelcomeModal } from './onboarding';
+import { ErrorBoundary } from './shared/ErrorBoundary';
 import {
   ChatCoordinator,
   DeckViewCoordinator,
@@ -198,18 +199,20 @@ export function AppContent() {
   // Overlay workspaces (ideation, rough draft, beautify, sources)
   if (isIdeation || isRoughDraft || isBeautify || isSources) {
     return (
-      <WorkspaceRenderer
-        ideationProps={{
-          onBuildDeck: handleBuildDeckFromIdeation,
-          onSessionClose: (sessionId) => {
-            if (sessionId) setLastIdeationSessionId(sessionId);
-          },
-        }}
-        beautifyProps={{
-          onComplete: handleBeautifyComplete,
-        }}
-        onApproveRoughDraft={handleApproveRoughDraft}
-      />
+      <ErrorBoundary name="Workspace" showRetry>
+        <WorkspaceRenderer
+          ideationProps={{
+            onBuildDeck: handleBuildDeckFromIdeation,
+            onSessionClose: (sessionId) => {
+              if (sessionId) setLastIdeationSessionId(sessionId);
+            },
+          }}
+          beautifyProps={{
+            onComplete: handleBeautifyComplete,
+          }}
+          onApproveRoughDraft={handleApproveRoughDraft}
+        />
+      </ErrorBoundary>
     );
   }
 
@@ -230,55 +233,59 @@ export function AppContent() {
 
         {/* PRESENTATION MODE */}
         {isPresenting && currentPresentation ? (
-          <PresentationModeCoordinator
-            presentation={currentPresentation}
-            activeSlideIndex={activeSlideIndex}
-            activeTheme={activeTheme}
-            activeWabiSabiLayout={activeWabiSabiLayout}
-            viewMode={viewMode}
-            onPreviousSlide={goToPreviousSlide}
-            onNextSlide={goToNextSlide}
-            onExit={stopPresenting}
-          />
+          <ErrorBoundary name="PresentationMode" showRetry>
+            <PresentationModeCoordinator
+              presentation={currentPresentation}
+              activeSlideIndex={activeSlideIndex}
+              activeTheme={activeTheme}
+              activeWabiSabiLayout={activeWabiSabiLayout}
+              viewMode={viewMode}
+              onPreviousSlide={goToPreviousSlide}
+              onNextSlide={goToNextSlide}
+              onExit={stopPresenting}
+            />
+          </ErrorBoundary>
         ) : (
           /* DECK VIEW MODE */
-          <DeckViewCoordinator
-            currentPresentation={currentPresentation}
-            savedDecks={savedDecks}
-            activeSlideIndex={activeSlideIndex}
-            setActiveSlideIndex={setActiveSlideIndex}
-            isGenerating={isGenerating}
-            isRefining={isRefining}
-            activeTheme={activeTheme}
-            activeWabiSabiLayout={activeWabiSabiLayout}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            saveStatus={saveStatus}
-            actions={actions}
-            messages={chat.messages}
-            sidebarScrollRef={chat.sidebarScrollRef}
-            savedIdeations={savedIdeations}
-            isLoadingIdeations={isLoadingIdeations}
-            savedRoughDrafts={savedRoughDrafts}
-            isLoadingRoughDrafts={isLoadingRoughDrafts}
-            sourceIdeation={sourceIdeation}
-            sourceRoughDraft={sourceRoughDraft}
-            onSendMessage={handleSendMessage}
-            onCreateDeck={handleCreateNew}
-            onIdeate={workspaceHandlers.handleIdeate}
-            onLoadIdeation={workspaceHandlers.handleLoadIdeation}
-            onDeleteIdeation={workspaceHandlers.handleDeleteIdeation}
-            onLoadRoughDraft={workspaceHandlers.handleLoadRoughDraft}
-            onDeleteRoughDraft={workspaceHandlers.handleDeleteRoughDraft}
-            onApproveRoughDraft={workspaceHandlers.handleApproveRoughDraftFromDashboard}
-            onCloneDeck={handleCloneDeck}
-            onCloneCurrentDeck={handleCloneCurrentDeck}
-            onOpenSources={workspaceHandlers.handleOpenSources}
-            onOpenBeautify={workspaceHandlers.handleOpenBeautify}
-            onViewSourceIdeation={workspaceHandlers.handleViewSourceIdeation}
-            onViewSourceRoughDraft={workspaceHandlers.handleViewSourceRoughDraft}
-            onStartPresenting={startPresenting}
-          />
+          <ErrorBoundary name="DeckView" showRetry>
+            <DeckViewCoordinator
+              currentPresentation={currentPresentation}
+              savedDecks={savedDecks}
+              activeSlideIndex={activeSlideIndex}
+              setActiveSlideIndex={setActiveSlideIndex}
+              isGenerating={isGenerating}
+              isRefining={isRefining}
+              activeTheme={activeTheme}
+              activeWabiSabiLayout={activeWabiSabiLayout}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              saveStatus={saveStatus}
+              actions={actions}
+              messages={chat.messages}
+              sidebarScrollRef={chat.sidebarScrollRef}
+              savedIdeations={savedIdeations}
+              isLoadingIdeations={isLoadingIdeations}
+              savedRoughDrafts={savedRoughDrafts}
+              isLoadingRoughDrafts={isLoadingRoughDrafts}
+              sourceIdeation={sourceIdeation}
+              sourceRoughDraft={sourceRoughDraft}
+              onSendMessage={handleSendMessage}
+              onCreateDeck={handleCreateNew}
+              onIdeate={workspaceHandlers.handleIdeate}
+              onLoadIdeation={workspaceHandlers.handleLoadIdeation}
+              onDeleteIdeation={workspaceHandlers.handleDeleteIdeation}
+              onLoadRoughDraft={workspaceHandlers.handleLoadRoughDraft}
+              onDeleteRoughDraft={workspaceHandlers.handleDeleteRoughDraft}
+              onApproveRoughDraft={workspaceHandlers.handleApproveRoughDraftFromDashboard}
+              onCloneDeck={handleCloneDeck}
+              onCloneCurrentDeck={handleCloneCurrentDeck}
+              onOpenSources={workspaceHandlers.handleOpenSources}
+              onOpenBeautify={workspaceHandlers.handleOpenBeautify}
+              onViewSourceIdeation={workspaceHandlers.handleViewSourceIdeation}
+              onViewSourceRoughDraft={workspaceHandlers.handleViewSourceRoughDraft}
+              onStartPresenting={startPresenting}
+            />
+          </ErrorBoundary>
         )}
       </div>
 

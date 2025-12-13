@@ -18,6 +18,7 @@ import {
   CONTENT_DECONSTRUCTION_PROMPT,
   CONTENT_DECONSTRUCTION_SCHEMA,
 } from '../lib/prompts';
+import { generateId } from '@/utils/idGenerator';
 import { getTextModel } from '@/config';
 
 /**
@@ -109,14 +110,14 @@ Analyze this content and return the structured JSON response.`,
   const connections: NoteConnection[] = rawResult.connections
     .filter((conn) => conn.fromIndex < notes.length && conn.toIndex < notes.length)
     .map((conn) => ({
-      id: `conn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: generateId('conn'),
       fromId: notes[conn.fromIndex].id,
       toId: notes[conn.toIndex].id,
     }));
 
   // Create the journal entry
   const journalEntry: JournalEntry = {
-    id: `journal-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: generateId('journal'),
     timestamp: Date.now(),
     stage: (rawResult.journalEntry.stage as JournalStage) || 'analyzing',
     title: rawResult.journalEntry.title,

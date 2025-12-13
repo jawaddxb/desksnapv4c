@@ -19,10 +19,11 @@ import {
   createSourcesSession,
 } from '@/types/ideation';
 import { runSourcesAgentLoop } from '@/services/sourcesAgent';
-import { AgentResponse } from '@/services/copilotAgent';
+import { AgentResponse } from '@/services/copilot';
 import { createIdeationSession, updateIdeationSession } from '@/services/api/ideationService';
 import { ideationKeys } from '@/hooks/queries/useIdeationQueries';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { generateId } from '@/utils/idGenerator';
 import { FlowCanvas } from '../ideation/FlowCanvas';
 import { CollapsibleSourcesList } from './CollapsibleSourcesList';
 import { ProofSidebar } from './ProofSidebar';
@@ -268,7 +269,7 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
 
   const handleAddNote = useCallback((column: number) => {
     const note: IdeaNote = {
-      id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: generateId('note'),
       content: 'New note...',
       type: 'user',
       column,

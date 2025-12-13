@@ -6,6 +6,7 @@
  */
 
 import { JournalEntry, JournalStage } from '@/types/ideation';
+import { generateId } from '@/utils/idGenerator';
 
 export interface JournalEntryOptions {
   decision?: string;
@@ -26,7 +27,7 @@ export function createJournalEntry(
   options?: JournalEntryOptions
 ): JournalEntry {
   return {
-    id: `journal-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: generateId('journal'),
     timestamp: Date.now(),
     stage,
     title,

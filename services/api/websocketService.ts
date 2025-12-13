@@ -9,6 +9,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { getAccessToken } from './tokenManager';
 import { Presentation, Slide } from '@/types';
 import { WS_BASE_URL } from '@/config';
+import { generateId } from '@/utils/idGenerator';
 
 // WebSocket message types (must match backend)
 export type MessageType =
@@ -90,7 +91,7 @@ class WebSocketService {
 
   // Generate unique message ID
   private generateMessageId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    return generateId('ws');
   }
 
   // Set query client for cache updates

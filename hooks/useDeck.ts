@@ -13,7 +13,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession } from '@/types';
-import { generatePresentationPlan, ensureApiKeySelection } from '@/services/geminiService';
+import { generatePresentationPlan } from '@/services/presentationPlanService';
+import { ensureApiKeySelection } from '@/services/ensureApiKeySelection';
 import { THEMES } from '@/config/themes';
 import { IMAGE_STYLES } from '@/config/imageStyles';
 import { WABI_SABI_LAYOUT_NAMES } from '@/config/layoutConstants';

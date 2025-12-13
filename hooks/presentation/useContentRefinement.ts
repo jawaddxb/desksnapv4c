@@ -9,8 +9,8 @@ import { Presentation, Slide, ToneType, ContentRefinementType, ImageStylePreset 
 import {
   refineSlideContent as refineSlideContentApi,
   refineSlideContentByType,
-  enhanceImagePrompt,
-} from '@/services/geminiService';
+} from '@/services/contentRefinementService';
+import { enhanceImagePrompt } from '@/services/imagePromptService';
 
 export interface UseContentRefinementOptions {
   /** Current presentation */

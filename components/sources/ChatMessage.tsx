@@ -92,8 +92,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           }`}
         >
           <MarkdownErrorBoundary fallback={messageText}>
+          <div className="text-sm leading-relaxed">
           <ReactMarkdown
-            className="text-sm leading-relaxed"
             components={{
               // Headings
               h1: ({ children }) => (
@@ -195,6 +195,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           >
             {messageText}
           </ReactMarkdown>
+          </div>
           </MarkdownErrorBoundary>
         </div>
 

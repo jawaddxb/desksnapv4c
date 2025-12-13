@@ -16,6 +16,7 @@ import {
   JournalEntry,
   createSession,
 } from '@/types/ideation';
+import { generateId } from '@/utils/idGenerator';
 import { useSavedIdeations, useIdeationSession } from './queries/useIdeationQueries';
 import {
   useCreateIdeation,
@@ -216,7 +217,7 @@ export function useIdeation(): UseIdeationReturn {
 
   const addMessage = useCallback((role: MessageRoleType, text: string) => {
     const message: Message = {
-      id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: generateId('msg'),
       role,
       text,
       timestamp: Date.now(),
@@ -256,7 +257,7 @@ export function useIdeation(): UseIdeationReturn {
   const addJournalEntry = useCallback((entry: Omit<JournalEntry, 'id' | 'timestamp'>) => {
     const fullEntry: JournalEntry = {
       ...entry,
-      id: `journal-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: generateId('journal'),
       timestamp: Date.now(),
     };
 

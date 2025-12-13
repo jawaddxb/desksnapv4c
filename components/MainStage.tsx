@@ -8,7 +8,7 @@ import { SlideContentEditor } from './SlideContentEditor';
 import { LayoutToolbar } from './LayoutToolbar';
 import { Dashboard } from './Dashboard';
 import { SpeakerNotesPanel } from './SpeakerNotesPanel';
-import { generateHolisticImageSuggestions } from '@/services/geminiService';
+import { generateHolisticImageSuggestions } from '@/services/presentationPlanService';
 import type { MainStageProps } from '@/types/mainStage';
 
 // Re-export domain interfaces for consumers that need specific subsets

@@ -9,6 +9,7 @@
 
 import { useCallback } from 'react';
 import { IdeationSession, NoteConnection } from '@/types/ideation';
+import { generateId } from '@/utils/idGenerator';
 
 export interface UseIdeationConnectionsOptions {
   /** Setter for local session state */
@@ -40,7 +41,7 @@ export function useIdeationConnections({
       if (exists) return prev;
 
       const connection: NoteConnection = {
-        id: `conn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        id: generateId('conn'),
         fromId,
         toId,
       };

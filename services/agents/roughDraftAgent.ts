@@ -7,7 +7,7 @@
  *
  * Reuses:
  * - `runImagePromptAgent` for image prompt refinement
- * - `generateSlideImage` from geminiService
+ * - `generateSlideImage` from imageGenerationService
  * - `JournalEntry` type for narrative
  * - `AgentLog` type for activity tracking
  */
@@ -18,10 +18,11 @@ import { IdeaNote, JournalEntry, JournalStage, COLUMNS } from '@/types/ideation'
 import { THEMES } from '@/config/themes';
 import { runImagePromptAgent } from './imagePromptAgent';
 import { AgentLog, AgentContext } from './types';
-import { generateSlideImage } from '../geminiService';
+import { generateSlideImage } from '../imageGenerationService';
 import { getTextModel } from '@/config';
 import { safeJsonParse } from '@/lib/jsonUtils';
 import { createJournalEntry } from '../copilot/journalHelpers';
+import { generateId } from '@/utils/idGenerator';
 
 // ============ Types ============
 
@@ -106,8 +107,8 @@ export interface RoughDraftAgentOptions {
 
 // ============ Helper Functions ============
 
-function generateId(): string {
-  return `slide-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+function generateSlideId(): string {
+  return generateId('slide');
 }
 
 // ============ Content Generation ============
@@ -206,7 +207,7 @@ Return as JSON with structure:
     contents: prompt,
     config: {
       responseMimeType: 'application/json',
-      maxOutputTokens: 8192, // Ensure enough tokens for full JSON response
+      maxOutputTokens: 16384, // Increased from 8192 to prevent truncation on larger decks
     },
   });
 
@@ -305,7 +306,7 @@ export async function runRoughDraftAgent(
   // Initialize slides with content
   const slides: RoughDraftWorkingSlide[] = slideContents.map((content, index) => ({
     ...content,
-    id: generateId(),
+    id: generateSlideId(),
     isImageLoading: !opts.skipImageGeneration,
     approvalState: 'pending' as const,
   }));

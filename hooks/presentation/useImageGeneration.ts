@@ -9,11 +9,8 @@ import { useCallback } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
 import { Presentation, Slide } from '@/types';
 import { THEMES } from '@/config/themes';
-import {
-  refineImagePrompt,
-  ensureApiKeySelection,
-  RefinementFocus,
-} from '@/services/geminiService';
+import { refineImagePrompt, RefinementFocus } from '@/services/imagePromptService';
+import { ensureApiKeySelection } from '@/services/ensureApiKeySelection';
 import { hasTokens } from '@/services/api/tokenManager';
 import { AgentLog } from '@/types/agents';
 import {

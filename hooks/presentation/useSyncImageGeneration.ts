@@ -10,9 +10,9 @@ import { UseMutationResult } from '@tanstack/react-query';
 import { Presentation, Slide } from '@/types';
 import {
   generateSlideImage as generateSlideImageFrontend,
-  ensureApiKeySelection,
   generatePresentationImagesWithAgent,
-} from '@/services/geminiService';
+} from '@/services/imageGenerationService';
+import { ensureApiKeySelection } from '@/services/ensureApiKeySelection';
 import { AgentLog } from '@/types/agents';
 import { useAgentMode as USE_AGENT_MODE } from '@/config/featureFlags';
 import { createSlideIndexMap, getOriginalIndex, slidesNeedingImages, updateSlidesWhere } from '@/utils';

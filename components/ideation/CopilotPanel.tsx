@@ -12,7 +12,7 @@ import { IdeationStage, ThemeSuggestion, IdeaNote } from '@/types/ideation';
 import { ThemePreviewPanel } from './ThemePreviewPanel';
 import { EnhancedModePanel } from './EnhancedModePanel';
 import { IdeationProgressBar } from './IdeationProgressBar';
-import { CompletionQuestion } from '@/services/copilotAgent';
+import { CompletionQuestion } from '@/services/copilot';
 
 interface CopilotPanelProps {
   messages: Message[];

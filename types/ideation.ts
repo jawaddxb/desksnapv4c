@@ -6,6 +6,7 @@
  */
 
 import { Message } from '@/types';
+import { generateId } from '@/utils/idGenerator';
 
 // Swimlane column names (presentation narrative flow) - default for pitch/persuasion
 export const COLUMNS = ['Hook', 'Problem', 'Solution', 'Proof', 'CTA'] as const;
@@ -503,7 +504,7 @@ export function createNote(
   parentId?: string
 ): IdeaNote {
   return {
-    id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: generateId('note'),
     content,
     type,
     column,
@@ -517,7 +518,7 @@ export function createNote(
 
 export function createSession(topic: string): IdeationSession {
   return {
-    id: `session-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: generateId('session'),
     topic,
     notes: [],
     connections: [],
@@ -544,7 +545,7 @@ export function createSource(
   type: SourceType
 ): Source {
   return {
-    id: `source-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: generateId('source'),
     type,
     url,
     status: 'pending',
@@ -558,7 +559,7 @@ export function createSourcesSession(
   recipe: DeckRecipe
 ): IdeationSession {
   return {
-    id: `sources-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: generateId('sources'),
     topic,
     notes: [],
     connections: [],
@@ -580,7 +581,7 @@ export function createKnowledgeNote(
   tags?: { theme?: string; noteCategory?: NoteCategory }
 ): IdeaNote {
   return {
-    id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: generateId('note'),
     content,
     type: 'ai',
     column,

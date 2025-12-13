@@ -6,7 +6,7 @@
 
 import { IdeationSession, IdeaNote } from '@/types/ideation';
 import { SourcesToolName } from '@/lib/sourcesTools';
-import { ToolExecutor } from '../copilotAgent';
+import { ToolExecutor } from '../copilot';
 import {
   handleAddSource,
   handleRemoveSource,
