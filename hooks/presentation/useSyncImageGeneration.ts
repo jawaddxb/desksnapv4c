@@ -15,7 +15,7 @@ import {
 } from '../../services/geminiService';
 import { AgentLog } from '../../services/agents/types';
 import { useAgentMode as USE_AGENT_MODE } from '../../config/featureFlags';
-import { createSlideIndexMap, getOriginalIndex, slidesNeedingImages } from '../../utils/slideIndexMapping';
+import { createSlideIndexMap, getOriginalIndex, slidesNeedingImages, updateSlidesWhere } from '../../utils';
 
 /** Type for the updateSlide mutation */
 type UpdateSlideMutation = UseMutationResult<
@@ -174,16 +174,11 @@ export function useSyncImageGeneration({
 
         // Set only slides that need images to loading
         setPresentation((prev) =>
-          prev
-            ? {
-                ...prev,
-                slides: prev.slides.map((s) =>
-                  slidesToGenerate.some(sni => sni.id === s.id)
-                    ? { ...s, isImageLoading: true }
-                    : s
-                ),
-              }
-            : null
+          updateSlidesWhere(
+            prev,
+            (s) => slidesToGenerate.some(sni => sni.id === s.id),
+            { isImageLoading: true }
+          )
         );
 
         // Run agent-based generation
@@ -247,16 +242,11 @@ export function useSyncImageGeneration({
         onAgentComplete?.();
         // Reset loading states
         setPresentation((prev) =>
-          prev
-            ? {
-                ...prev,
-                slides: prev.slides.map((s) =>
-                  slidesToGenerate.some(sni => sni.id === s.id)
-                    ? { ...s, isImageLoading: false, imageError: 'Failed to generate images' }
-                    : s
-                ),
-              }
-            : null
+          updateSlidesWhere(
+            prev,
+            (s) => slidesToGenerate.some(sni => sni.id === s.id),
+            { isImageLoading: false, imageError: 'Failed to generate images' }
+          )
         );
       }
     },

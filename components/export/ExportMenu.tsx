@@ -15,7 +15,6 @@ import { generatePPT, PPTExportProgress } from '../../services/pptService';
 import { exportToGoogleSlides, isGoogleAuthenticated, isGoogleConfigured } from '../../services/googleSlidesService';
 import { ExportProgressModal, ExportType, ExportProgress } from './ExportProgressModal';
 import { ExportRenderer } from './ExportRenderer';
-import { PPTExportRenderer } from './PPTExportRenderer';
 import { ExportPreviewDialog } from './ExportPreviewDialog';
 import { isPptxSafe } from '../../lib/fontCompatibility';
 
@@ -303,10 +302,10 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
       </div>
 
       {/* Export Renderer (hidden, used for PDF capture) */}
-      {showRenderer && <ExportRenderer />}
+      {showRenderer && <ExportRenderer type="pdf" />}
 
-      {/* PPT Export Renderer (hidden, used for PowerPoint capture) */}
-      {showPPTRenderer && <PPTExportRenderer />}
+      {/* Export Renderer (hidden, used for PowerPoint capture) */}
+      {showPPTRenderer && <ExportRenderer type="ppt" />}
 
       {/* Progress Modal */}
       <ExportProgressModal

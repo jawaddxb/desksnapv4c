@@ -7,21 +7,21 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { ContentType } from '../../types/ideation';
+import { NoteCategory } from '../../types/ideation';
 import { Check, Filter, ArrowRight, Sparkles } from 'lucide-react';
 
 interface TopicPillsPanelProps {
   themes: string[];
-  types: ContentType[];
+  types: NoteCategory[];
   noteCount: number;
   title: string;
   onAcceptAll: () => void;
-  onFilteredAccept: (selectedThemes: string[], selectedTypes: ContentType[]) => void;
+  onFilteredAccept: (selectedThemes: string[], selectedTypes: NoteCategory[]) => void;
   onCancel?: () => void;
 }
 
-// Pill colors for different content types
-const TYPE_COLORS: Record<ContentType, string> = {
+// Pill colors for different note categories
+const TYPE_COLORS: Record<NoteCategory, string> = {
   statistic: 'bg-blue-500/20 border-blue-500/40 text-blue-300',
   quote: 'bg-purple-500/20 border-purple-500/40 text-purple-300',
   framework: 'bg-green-500/20 border-green-500/40 text-green-300',
@@ -32,8 +32,8 @@ const TYPE_COLORS: Record<ContentType, string> = {
   comparison: 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300',
 };
 
-// Type labels for display
-const TYPE_LABELS: Record<ContentType, string> = {
+// Category labels for display
+const TYPE_LABELS: Record<NoteCategory, string> = {
   statistic: 'Statistics',
   quote: 'Quotes',
   framework: 'Frameworks',
@@ -54,7 +54,7 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
   onCancel,
 }) => {
   const [selectedThemes, setSelectedThemes] = useState<Set<string>>(new Set());
-  const [selectedTypes, setSelectedTypes] = useState<Set<ContentType>>(new Set());
+  const [selectedTypes, setSelectedTypes] = useState<Set<NoteCategory>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
 
   // Check if any filters are active
@@ -74,7 +74,7 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
   };
 
   // Toggle type selection
-  const toggleType = (type: ContentType) => {
+  const toggleType = (type: NoteCategory) => {
     setSelectedTypes(prev => {
       const next = new Set(prev);
       if (next.has(type)) {

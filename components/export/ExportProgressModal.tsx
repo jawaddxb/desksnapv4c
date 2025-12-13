@@ -7,15 +7,10 @@
 
 import React from 'react';
 import { FileText, Download, Presentation, Loader2, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
+import type { ExportProgress, ExportType } from '../../types/export';
 
-export type ExportType = 'pdf' | 'pptx' | 'google-slides';
-
-export interface ExportProgress {
-  currentSlide: number;
-  totalSlides: number;
-  phase: 'preparing' | 'rendering' | 'compiling' | 'uploading' | 'complete' | 'error';
-  message?: string;
-}
+// Re-export for backwards compatibility
+export type { ExportProgress, ExportType } from '../../types/export';
 
 interface ExportProgressModalProps {
   isOpen: boolean;
@@ -96,6 +91,8 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
                 {progress.phase === 'preparing' ? 'Preparing...' :
                  progress.phase === 'rendering' ? `Slide ${progress.currentSlide} of ${progress.totalSlides}` :
                  progress.phase === 'compiling' ? 'Compiling...' :
+                 progress.phase === 'converting' ? 'Converting...' :
+                 progress.phase === 'adding-notes' ? 'Adding notes...' :
                  progress.phase === 'uploading' ? 'Uploading...' : 'Processing...'}
               </span>
               <span>{percentage}%</span>

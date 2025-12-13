@@ -1,32 +1,29 @@
+/**
+ * Archetype Contrast Configuration
+ *
+ * Uses config/archetypeRegistry.ts for base custom contrast definitions.
+ * This file handles special cases like conditional contrasts that depend on theme.
+ */
+
 import { Theme } from '../types';
 import { ContrastConfig } from './contrast';
+import { getArchetypeCustomContrast } from '../config/archetypeRegistry';
 
 // Re-export for convenience
 export type { ContrastConfig } from './contrast';
 
-// Archetypes with custom contrast configurations
-// Most archetypes use theme defaults - only overrides are listed here
-const CUSTOM_CONTRASTS: Record<string, ContrastConfig> = {
-  CyberDeck: {
-    bg: '#050505',
-    text: '#22d3ee',
-    accent: '#22d3ee',
-    secondary: '#22d3ee',
-    border: '#164e63',
-    mode: 'terminal'
-  },
-  Receipt: {
-    bg: '#ffffff',
-    text: '#18181b',
-    accent: '#000000',
-    secondary: '#18181b',
-    border: '#e4e4e7',
-    mode: 'paper'
-  },
-};
+// =============================================================================
+// CONDITIONAL CONTRAST HANDLERS
+// Special cases that depend on runtime theme values
+// =============================================================================
 
-// Special case handlers for archetypes with conditional contrast
-const CONDITIONAL_CONTRASTS: Record<string, (theme: Theme) => ContrastConfig | null> = {
+/**
+ * Conditional contrast handlers for archetypes with theme-dependent contrast
+ */
+const CONDITIONAL_CONTRASTS: Record<
+  string,
+  (theme: Theme) => ContrastConfig | null
+> = {
   Schematic: (theme) => {
     if (theme.colors.background === '#ffffff') {
       return {
@@ -35,21 +32,29 @@ const CONDITIONAL_CONTRASTS: Record<string, (theme: Theme) => ContrastConfig | n
         accent: theme.colors.accent,
         secondary: theme.colors.secondary,
         border: theme.colors.border,
-        mode: 'blueprint'
+        mode: 'blueprint',
       };
     }
     return null; // Use default theme colors
   },
 };
 
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
 /**
  * Get the contrast configuration for an archetype
  * Returns custom contrast if defined, otherwise uses theme colors
  */
-export const getArchetypeContrast = (archetype: string, theme: Theme): ContrastConfig => {
-  // Check for static custom contrast
-  if (CUSTOM_CONTRASTS[archetype]) {
-    return CUSTOM_CONTRASTS[archetype];
+export const getArchetypeContrast = (
+  archetype: string,
+  theme: Theme
+): ContrastConfig => {
+  // Check for static custom contrast from registry
+  const customContrast = getArchetypeCustomContrast(archetype);
+  if (customContrast) {
+    return customContrast;
   }
 
   // Check for conditional contrast
@@ -65,7 +70,7 @@ export const getArchetypeContrast = (archetype: string, theme: Theme): ContrastC
     accent: theme.colors.accent,
     secondary: theme.colors.secondary,
     border: theme.colors.border,
-    mode: 'theme'
+    mode: 'theme',
   };
 };
 

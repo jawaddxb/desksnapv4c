@@ -5,7 +5,7 @@
  * Extracted from copilotAgent.ts for better SRP.
  */
 
-import { GoogleGenAI } from '@google/genai';
+import { getAIClient } from '../aiClient';
 import { IdeationSession, ThemeSuggestion, COLUMNS, JournalEntry } from '../../types/ideation';
 import { THEMES, THEME_CATEGORIES } from '../../config/themes';
 import { getTextModel } from '../../config';
@@ -26,7 +26,7 @@ export interface ThemeSuggestionWithJournal extends ThemeSuggestion {
 export async function suggestThemeForSession(
   session: IdeationSession
 ): Promise<ThemeSuggestionWithJournal> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
 
   // Build context from notes organized by column
   const notesContext = session.notes

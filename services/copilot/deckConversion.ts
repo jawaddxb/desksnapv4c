@@ -5,7 +5,8 @@
  * Extracted from copilotAgent.ts for better SRP.
  */
 
-import { GoogleGenAI, Type } from '@google/genai';
+import { Type } from '@google/genai';
+import { getAIClient } from '../aiClient';
 import { parseAIJsonResponse } from '../ai/parseJson';
 import { PresentationPlanResponse } from '../../types';
 import { IdeationSession, COLUMNS, JournalEntry } from '../../types/ideation';
@@ -82,7 +83,7 @@ export interface DeckPlanWithJournal extends DeckPlan {
 export async function convertSessionToDeckPlan(
   session: IdeationSession
 ): Promise<DeckPlan> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
 
   // Build context from all notes
   const notesContext = session.notes
@@ -131,7 +132,7 @@ export async function convertSessionToDeckPlanWithTheme(
   session: IdeationSession,
   themeId: string
 ): Promise<DeckPlanWithJournal> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
 
   // Get theme's bundled visual style
   const theme = THEMES[themeId] || THEMES.executive;

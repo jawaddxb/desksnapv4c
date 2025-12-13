@@ -6,10 +6,9 @@
  */
 
 import React, { useState } from 'react';
-import { X, Shuffle, Check, FileSpreadsheet } from 'lucide-react';
+import { X, Shuffle } from 'lucide-react';
 import { THEMES } from '../config/themes';
-import { isPptxSafe } from '../lib/fontCompatibility';
-import { getThemeThumbnailPath } from '../services/thumbnailService';
+import { ThemePicker } from './shared/ThemePicker';
 
 export interface RemixDialogProps {
   isOpen: boolean;
@@ -93,79 +92,14 @@ export const RemixDialog: React.FC<RemixDialogProps> = ({
           </div>
 
           {/* Theme Grid */}
-          <div className="grid grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto p-1">
-            {Object.values(THEMES).map((theme) => (
-              <button
-                key={theme.id}
-                onClick={() => setSelectedThemeId(theme.id)}
-                className={`group relative flex flex-col items-start text-left transition-all duration-150 p-1 ${
-                  selectedThemeId === theme.id
-                    ? 'bg-white/10 ring-1 ring-[#c5a47e]'
-                    : 'hover:bg-white/5'
-                }`}
-              >
-                <div
-                  className="w-full h-24 mb-2 relative overflow-hidden shadow-sm transition-transform duration-150 group-hover:scale-[1.01]"
-                  style={{
-                    background: theme.colors.background,
-                    border: `${theme.layout.borderWidth} solid ${theme.colors.border}`,
-                    borderRadius: theme.layout.radius,
-                  }}
-                >
-                  {/* Thumbnail image with fallback */}
-                  <img
-                    src={getThemeThumbnailPath(theme.id)}
-                    alt={theme.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'flex';
-                    }}
-                  />
-                  {/* Fallback: inline color preview */}
-                  <div
-                    className="hidden absolute inset-0 flex-col p-3"
-                    style={{ background: theme.colors.background }}
-                  >
-                    <div className="relative z-10 mt-auto">
-                      <div
-                        className="text-xl leading-none"
-                        style={{ fontFamily: theme.fonts.heading, color: theme.colors.text }}
-                      >
-                        Aa
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Selected indicator */}
-                  {selectedThemeId === theme.id && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-[#c5a47e] text-black flex items-center justify-center shadow-md z-20">
-                      <Check className="w-3 h-3" strokeWidth={3} />
-                    </div>
-                  )}
-
-                  {/* Current theme badge */}
-                  {currentThemeId === theme.id && selectedThemeId !== theme.id && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-white/20 text-white text-[8px] font-bold uppercase tracking-wider z-20">
-                      Current
-                    </div>
-                  )}
-
-                  {/* PowerPoint Safe Badge */}
-                  {isPptxSafe(theme) && (
-                    <div className="absolute bottom-1 left-1 px-1 py-0.5 bg-emerald-500/90 text-white text-[7px] font-bold uppercase tracking-wider flex items-center gap-0.5 z-20">
-                      <FileSpreadsheet className="w-2 h-2" />
-                      PPT
-                    </div>
-                  )}
-                </div>
-                <div className="px-1 w-full">
-                  <span className="text-xs font-bold text-white">{theme.name}</span>
-                </div>
-              </button>
-            ))}
-          </div>
+          <ThemePicker
+            selectedThemeId={selectedThemeId}
+            onSelect={setSelectedThemeId}
+            currentThemeId={currentThemeId}
+            size="compact"
+            gap="compact"
+            maxHeight="40vh"
+          />
         </div>
 
         {/* Actions */}

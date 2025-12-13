@@ -5,7 +5,7 @@
  * Extracted from copilotAgent.ts for better SRP.
  */
 
-import { GoogleGenAI } from '@google/genai';
+import { getAIClient } from '../aiClient';
 import { ResearchResult } from '../../types/ideation';
 import { getTextModel } from '../../config';
 
@@ -17,7 +17,7 @@ export async function performResearch(
   query: string,
   purpose: string
 ): Promise<ResearchResult[]> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
 
   try {
     // Use Gemini to simulate research (in production, use actual search API)

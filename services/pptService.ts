@@ -5,23 +5,30 @@
  * Renders actual slide components and converts them to PPTX.
  */
 
-import type { Presentation, Theme, Slide } from '../types';
+import type { Presentation, Theme } from '../types';
+import type { ExportProgress, PPTExportOptions as BasePPTExportOptions } from '../types/export';
+import { waitForImages, waitForFonts } from '../utils/exportHelpers';
+import { sanitizeFilename } from '../lib/fileUtils';
+import {
+  SLIDE_DIMENSIONS,
+  EXPORT_EVENTS,
+  EXPORT_ELEMENT_IDS,
+  EXPORT_TIMING,
+} from '../config/exportConstants';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
-export interface PPTExportProgress {
-  currentSlide: number;
-  totalSlides: number;
-  phase: 'preparing' | 'rendering' | 'converting' | 'adding-notes' | 'complete' | 'error';
-  message?: string;
-}
+/**
+ * @deprecated Use ExportProgress from types/export.ts instead
+ */
+export type PPTExportProgress = ExportProgress;
 
 export interface PPTExportOptions {
   viewMode: 'standard' | 'wabi-sabi';
   wabiSabiLayout?: string;
-  onProgress?: (progress: PPTExportProgress) => void;
+  onProgress?: (progress: ExportProgress) => void;
 }
 
 // =============================================================================
@@ -39,38 +46,6 @@ const waitForFrame = (): Promise<void> => {
   });
 };
 
-/**
- * Wait for all images in a container to load
- */
-const waitForImages = async (container: HTMLElement): Promise<void> => {
-  const images = container.querySelectorAll('img');
-  const promises = Array.from(images).map((img) => {
-    if (img.complete) return Promise.resolve();
-    return new Promise<void>((resolve) => {
-      img.onload = () => resolve();
-      img.onerror = () => resolve(); // Continue even if image fails
-    });
-  });
-  await Promise.all(promises);
-};
-
-/**
- * Wait for fonts to be ready
- */
-const waitForFonts = async (): Promise<void> => {
-  if (document.fonts && document.fonts.ready) {
-    await document.fonts.ready;
-  }
-  // Additional delay to ensure fonts are painted
-  await new Promise((resolve) => setTimeout(resolve, 100));
-};
-
-/**
- * Sanitize filename for safe download
- */
-const sanitizeFilename = (name: string): string => {
-  return name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-};
 
 // =============================================================================
 // SLIDE RENDERING
@@ -88,7 +63,7 @@ const renderSlide = async (
 ): Promise<void> => {
   // Dispatch event to render the slide
   window.dispatchEvent(
-    new CustomEvent('render-slide-for-ppt', {
+    new CustomEvent(EXPORT_EVENTS.PPT_RENDER, {
       detail: { slideIndex, presentation, theme, viewMode, wabiSabiLayout },
     })
   );
@@ -98,20 +73,20 @@ const renderSlide = async (
   await waitForFonts();
 
   // Get the rendered container and wait for images
-  const container = document.getElementById('ppt-slide-content');
+  const container = document.getElementById(EXPORT_ELEMENT_IDS.PPT_SLIDE_CONTENT);
   if (container) {
     await waitForImages(container);
   }
 
   // Extra delay for any CSS transitions/animations
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  await new Promise((resolve) => setTimeout(resolve, EXPORT_TIMING.RENDER_DELAY_MS));
 };
 
 /**
  * Get the rendered slide element
  */
 const getSlideElement = (): HTMLElement | null => {
-  return document.getElementById('ppt-slide-content');
+  return document.getElementById(EXPORT_ELEMENT_IDS.PPT_SLIDE_CONTENT);
 };
 
 // =============================================================================
@@ -122,7 +97,7 @@ const getSlideElement = (): HTMLElement | null => {
  * Generate PowerPoint from presentation using dom-to-pptx
  *
  * This function:
- * 1. Renders each slide to the DOM via PPTExportRenderer
+ * 1. Renders each slide to the DOM via ExportRenderer (type="ppt")
  * 2. Uses dom-to-pptx to convert DOM elements to PPTX
  * 3. Adds speaker notes via pptxgenjs post-processing
  */
@@ -183,8 +158,8 @@ export const generatePPT = async (
 
     // Add cloned elements to temp container
     slideElements.forEach((el) => {
-      el.style.width = '1920px';
-      el.style.height = '1080px';
+      el.style.width = `${SLIDE_DIMENSIONS.width}px`;
+      el.style.height = `${SLIDE_DIMENSIONS.height}px`;
       tempContainer.appendChild(el);
     });
 
@@ -210,7 +185,7 @@ export const generatePPT = async (
     }
 
     // Signal export complete
-    window.dispatchEvent(new CustomEvent('ppt-export-complete'));
+    window.dispatchEvent(new CustomEvent(EXPORT_EVENTS.PPT_COMPLETE));
 
     onProgress?.({
       currentSlide: presentation.slides.length,
@@ -220,7 +195,7 @@ export const generatePPT = async (
     });
   } catch (error) {
     // Signal export complete even on error
-    window.dispatchEvent(new CustomEvent('ppt-export-complete'));
+    window.dispatchEvent(new CustomEvent(EXPORT_EVENTS.PPT_COMPLETE));
 
     onProgress?.({
       currentSlide: 0,

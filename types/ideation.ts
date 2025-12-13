@@ -28,8 +28,9 @@ export type NoteType = 'user' | 'ai' | 'research';
 // Knowledge note types (for sources mode)
 export type KnowledgeNoteType = 'idea' | 'concept' | 'framework' | 'claim' | 'example' | 'exercise' | 'quiz';
 
-// Content types for categorization (used by topic pills)
-export type ContentType =
+// Note categories for knowledge categorization (used by topic pills in sources mode)
+// Renamed from ContentType to avoid collision with types.ts ContentType (display format)
+export type NoteCategory =
   | 'statistic'    // Numbers, percentages, data points
   | 'quote'        // Expert quotes, testimonials
   | 'framework'    // Models, processes, methodologies
@@ -87,7 +88,7 @@ export interface Source {
   createdAt: number;
   // Comprehensive extraction fields (for topic pills)
   detectedThemes?: string[];         // e.g., "AI Trends", "Market Data"
-  detectedTypes?: ContentType[];     // e.g., "statistic", "quote", "framework"
+  detectedTypes?: NoteCategory[];     // e.g., "statistic", "quote", "framework"
   fullMarkdown?: string;             // Complete extracted content
 }
 
@@ -161,7 +162,7 @@ export interface IdeaNote {
   proofLinks?: ProofLink[];           // Links to source evidence
   // Topic categorization (for filtering with pills)
   theme?: string;                     // e.g., "AI Trends", "Market Data"
-  contentType?: ContentType;          // e.g., "statistic", "quote"
+  noteCategory?: NoteCategory;        // e.g., "statistic", "quote"
 }
 
 /**
@@ -563,7 +564,7 @@ export function createKnowledgeNote(
   column: number,
   knowledgeType: KnowledgeNoteType,
   proofLinks: ProofLink[] = [],
-  tags?: { theme?: string; contentType?: ContentType }
+  tags?: { theme?: string; noteCategory?: NoteCategory }
 ): IdeaNote {
   return {
     id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -577,7 +578,7 @@ export function createKnowledgeNote(
     knowledgeType,
     proofLinks,
     theme: tags?.theme,
-    contentType: tags?.contentType,
+    noteCategory: tags?.noteCategory,
   };
 }
 

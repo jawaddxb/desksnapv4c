@@ -5,12 +5,14 @@
  * Matches the backend API schema.
  */
 
-import { LayoutType, Alignment } from '../types';
+import { LayoutType, Alignment, SlideApprovalState } from '../types';
 
 // ============ Frontend Types ============
 
 export type RoughDraftStatus = 'in_progress' | 'ready' | 'approved' | 'discarded';
-export type ApprovalState = 'pending' | 'approved' | 'modified';
+
+// Use the canonical SlideApprovalState from types.ts (DRY compliance)
+export type ApprovalState = SlideApprovalState;
 export type GenerationPhase = 'initializing' | 'generating-content' | 'refining-prompts' | 'generating-images' | 'complete';
 
 export interface RoughDraftSlide {

@@ -11,6 +11,7 @@
 
 import PptxGenJS from 'pptxgenjs';
 import type { Presentation, Theme, Slide, ExportMode, ContentType } from '../types';
+import type { ExportProgress, PPTStrategyOptions } from '../types/export';
 import { getThemeCompatibility, getFontMapping, extractFontName } from '../lib/fontCompatibility';
 import { downloadBlob } from '../lib/fileUtils';
 
@@ -18,12 +19,8 @@ import { downloadBlob } from '../lib/fileUtils';
 // TYPES
 // =============================================================================
 
-export interface ExportProgress {
-  currentSlide: number;
-  totalSlides: number;
-  phase: 'preparing' | 'rendering' | 'converting' | 'adding-notes' | 'complete' | 'error';
-  message?: string;
-}
+// Re-export for backwards compatibility
+export type { ExportProgress } from '../types/export';
 
 export interface ExportStrategyOptions {
   includeNotes: boolean;

@@ -6,52 +6,29 @@
  */
 
 import type { Presentation, Theme } from '../types';
+import type { ExportProgress, PDFExportOptions } from '../types/export';
+import { waitForImages, waitForFonts } from '../utils/exportHelpers';
+import {
+  SLIDE_DIMENSIONS,
+  EXPORT_EVENTS,
+  EXPORT_ELEMENT_IDS,
+  EXPORT_TIMING,
+  EXPORT_QUALITY,
+} from '../config/exportConstants';
 
-export interface PDFExportProgress {
-  currentSlide: number;
-  totalSlides: number;
-  phase: 'preparing' | 'rendering' | 'compiling' | 'complete' | 'error';
-  message?: string;
-}
+/**
+ * @deprecated Use ExportProgress from types/export.ts instead
+ */
+export type PDFExportProgress = ExportProgress;
 
-export interface PDFExportOptions {
-  width?: number;
-  height?: number;
-  quality?: number;
-  filename?: string;
-}
+// Re-export PDFExportOptions for backwards compatibility
+export type { PDFExportOptions } from '../types/export';
 
-const DEFAULT_OPTIONS: Required<Omit<PDFExportOptions, 'filename'>> = {
-  width: 1920,
-  height: 1080,
-  quality: 0.92,
+const DEFAULT_OPTIONS: Required<Omit<PDFExportOptions, 'filename' | 'onProgress'>> = {
+  width: SLIDE_DIMENSIONS.width,
+  height: SLIDE_DIMENSIONS.height,
+  quality: EXPORT_QUALITY.PDF_JPEG_QUALITY,
 };
-
-/**
- * Wait for all images in a container to load
- */
-async function waitForImages(container: HTMLElement): Promise<void> {
-  const images = container.querySelectorAll('img');
-  const promises = Array.from(images).map((img) => {
-    if (img.complete) return Promise.resolve();
-    return new Promise<void>((resolve) => {
-      img.onload = () => resolve();
-      img.onerror = () => resolve(); // Continue even if image fails
-    });
-  });
-  await Promise.all(promises);
-}
-
-/**
- * Wait for fonts to be ready
- */
-async function waitForFonts(): Promise<void> {
-  if (document.fonts && document.fonts.ready) {
-    await document.fonts.ready;
-  }
-  // Additional delay to ensure fonts are painted
-  await new Promise((resolve) => setTimeout(resolve, 100));
-}
 
 /**
  * Capture a slide container to canvas at specified resolution
@@ -78,7 +55,7 @@ async function captureSlideToCanvas(
     allowTaint: true,
     backgroundColor: null,
     logging: false,
-    imageTimeout: 15000,
+    imageTimeout: EXPORT_TIMING.IMAGE_TIMEOUT_MS,
     // Enforce explicit pixel widths on cloned elements to ensure text wrapping works
     onclone: (_clonedDoc: Document, element: HTMLElement) => {
       // Convert textareas to styled divs for consistent PDF text rendering
@@ -167,7 +144,7 @@ export async function generatePDF(
     });
 
     // Get the render container (created by ExportMenu)
-    const renderContainer = document.getElementById('pdf-export-renderer');
+    const renderContainer = document.getElementById(EXPORT_ELEMENT_IDS.PDF_RENDERER);
     if (!renderContainer) {
       throw new Error('Export renderer not found. Please try again.');
     }
@@ -182,7 +159,7 @@ export async function generatePDF(
       });
 
       // Dispatch custom event to update the renderer with current slide
-      const slideEvent = new CustomEvent('render-slide-for-pdf', {
+      const slideEvent = new CustomEvent(EXPORT_EVENTS.PDF_RENDER, {
         detail: {
           slideIndex: i,
           presentation,
@@ -194,7 +171,7 @@ export async function generatePDF(
       window.dispatchEvent(slideEvent);
 
       // Wait for render to complete
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, EXPORT_TIMING.SLIDE_WAIT_MS));
 
       // Capture the slide
       const canvas = await captureSlideToCanvas(renderContainer, width, height);

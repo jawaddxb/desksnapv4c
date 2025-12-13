@@ -9,8 +9,8 @@ import { ExportMenu } from './export';
 import { ModeSwitcher } from './ModeSwitcher';
 import { ArchetypePicker } from './ArchetypePicker';
 import { UserMenu } from './auth';
-import { getThemeThumbnailPath } from '../services/thumbnailService';
 import { RemixDialog } from './RemixDialog';
+import { ThemePicker } from './shared/ThemePicker';
 
 interface AppHeaderProps {
     currentPresentation: Presentation | null;
@@ -225,38 +225,14 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                                 <>
                                 <div className="fixed inset-0 z-40" onClick={() => setIsThemeMenuOpen(false)} />
                                 <div className="absolute top-full right-0 mt-4 w-[600px] bg-[#111111] border border-white/20 shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150 origin-top-right">
-                                    <div className="p-4 grid grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
-                                        {Object.values(THEMES).map(theme => (
-                                            <button key={theme.id} onClick={() => onApplyTheme(theme.id)} className={`group relative flex flex-col items-start text-left transition-all duration-150 p-1 ${activeTheme.id === theme.id ? 'bg-white/10 ring-1 ring-[#c5a47e]' : 'hover:bg-white/5'}`}>
-                                                <div className="w-full h-32 mb-3 relative overflow-hidden shadow-sm transition-transform duration-150 group-hover:scale-[1.01]" style={{ background: theme.colors.background, border: `${theme.layout.borderWidth} solid ${theme.colors.border}`, borderRadius: theme.layout.radius }}>
-                                                    {/* Thumbnail image with fallback to inline preview */}
-                                                    <img
-                                                        src={getThemeThumbnailPath(theme.id)}
-                                                        alt={theme.name}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            // Hide image and show fallback
-                                                            e.currentTarget.style.display = 'none';
-                                                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                                                            if (fallback) fallback.style.display = 'flex';
-                                                        }}
-                                                    />
-                                                    {/* Fallback: inline color preview (hidden by default when thumbnail loads) */}
-                                                    <div className="hidden absolute inset-0 flex-col p-4" style={{ background: theme.colors.background }}>
-                                                        <div className="relative z-10 mt-auto"><div className="text-2xl leading-none mb-2" style={{ fontFamily: theme.fonts.heading, color: theme.colors.text }}>Aa</div></div>
-                                                    </div>
-                                                    {activeTheme.id === theme.id && <div className="absolute top-3 right-3 w-6 h-6 bg-[#c5a47e] text-black flex items-center justify-center shadow-md z-20"><Check className="w-3.5 h-3.5" strokeWidth={3} /></div>}
-                                                    {/* PowerPoint Safe Badge */}
-                                                    {isPptxSafe(theme) && (
-                                                        <div className="absolute bottom-2 left-2 px-1.5 py-0.5 bg-emerald-500/90 text-white text-[8px] font-bold uppercase tracking-wider flex items-center gap-1 z-20">
-                                                            <FileSpreadsheet className="w-2.5 h-2.5" />
-                                                            PPT
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="px-2 pb-2 w-full"><span className="text-sm font-bold text-white">{theme.name}</span></div>
-                                            </button>
-                                        ))}
+                                    <div className="p-4">
+                                        <ThemePicker
+                                            selectedThemeId={activeTheme.id}
+                                            onSelect={onApplyTheme}
+                                            size="default"
+                                            gap="default"
+                                            maxHeight="60vh"
+                                        />
                                     </div>
                                     <div className="p-4 border-t border-white/10 bg-black/50 flex gap-2">
                                         <button onClick={() => { onRegenerateAllImages(); setIsThemeMenuOpen(false); }} className="flex-1 flex items-center justify-center gap-2 py-3 px-3 bg-[#c5a47e] text-black hover:bg-white font-bold uppercase text-xs tracking-widest transition-all duration-150"><Sparkles className="w-3.5 h-3.5" />Apply Style to Visuals</button>

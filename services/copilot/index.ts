@@ -4,6 +4,26 @@
  * Focused services for the copilot agent functionality.
  */
 
+// Types
+export type {
+  AgentResponse,
+  ProcessedToolCall,
+  ToolExecutor,
+  CompletionQuestion,
+  EnhancedModeOptions,
+  AgentLoopOptions,
+} from './types';
+
+// Agent loop
+export { runAgentLoop } from './agentLoop';
+
+// Completion helpers
+export {
+  generateCompletionQuestion,
+  summarizeToolCalls,
+  checkCanvasCompletion,
+} from './completionHelpers';
+
 // Journal helpers
 export { createJournalEntry } from './journalHelpers';
 export type { JournalEntryOptions } from './journalHelpers';

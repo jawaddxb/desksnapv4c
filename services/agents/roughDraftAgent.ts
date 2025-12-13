@@ -12,7 +12,7 @@
  * - `AgentLog` type for activity tracking
  */
 
-import { GoogleGenAI } from '@google/genai';
+import { getAIClient } from '../aiClient';
 import { Slide, PresentationPlanResponse, LayoutType, Alignment } from '../../types';
 import { IdeaNote, JournalEntry, JournalStage, COLUMNS } from '../../types/ideation';
 import { THEMES } from '../../config/themes';
@@ -112,7 +112,7 @@ async function generateSlideContent(
   input: RoughDraftInput,
   callbacks?: RoughDraftAgentCallbacks
 ): Promise<{ slides: SlideContent[]; journalEntries: JournalEntry[] }> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = getAIClient();
   const theme = THEMES[input.themeId] || THEMES.executive;
   const journalEntries: JournalEntry[] = [];
 

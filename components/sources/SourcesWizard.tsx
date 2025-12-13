@@ -14,7 +14,7 @@ import {
   IdeaNote,
   Source,
   DeckRecipe,
-  ContentType,
+  NoteCategory,
   RECIPE_COLUMNS,
   createSourcesSession,
 } from '../../types/ideation';
@@ -341,12 +341,12 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
   // Handle filtered accept from pills
   const handlePillsFilteredAccept = useCallback((
     selectedThemes: string[],
-    selectedTypes: ContentType[]
+    selectedTypes: NoteCategory[]
   ) => {
     // Filter notes based on selection
     const filteredNotes = session.notes.filter(note => {
       const themeMatch = selectedThemes.length === 0 || (note.theme && selectedThemes.includes(note.theme));
-      const typeMatch = selectedTypes.length === 0 || (note.contentType && selectedTypes.includes(note.contentType));
+      const typeMatch = selectedTypes.length === 0 || (note.noteCategory && selectedTypes.includes(note.noteCategory));
       return themeMatch && typeMatch;
     });
 
