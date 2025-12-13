@@ -16,9 +16,3 @@ export type { BeautifyWorkspaceProps } from './BeautifyWorkspace';
 
 export { SourcesWorkspace } from './SourcesWorkspace';
 export type { SourcesWorkspaceProps } from './SourcesWorkspace';
-
-export { PresentingOverlay } from './PresentingOverlay';
-export type { PresentingOverlayProps } from './PresentingOverlay';
-
-export { DeckWorkspace } from './DeckWorkspace';
-export type { DeckWorkspaceProps } from './DeckWorkspace';

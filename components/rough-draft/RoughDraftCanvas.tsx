@@ -27,7 +27,7 @@ import {
   updateSlide as apiUpdateSlide,
   approveRoughDraft,
 } from '../../services/api/roughDraftService';
-import { RoughDraft } from '../../types/roughDraft';
+import { RoughDraft, GenerationPhase } from '../../types/roughDraft';
 import { useRoughDraft } from '../../hooks/queries/useRoughDraftQueries';
 
 /**
@@ -46,7 +46,7 @@ interface RoughDraftCanvasProps {
   /** ID of an existing draft to load (mutually exclusive with input) */
   existingDraftId?: string;
   /** Source of the draft request */
-  source: 'ideation' | 'copilot' | 'existing';
+  source: 'ideation' | 'copilot' | 'existing' | 'sources';
   /** Optional ideation session ID for back navigation */
   ideationSessionId?: string;
   /** Called when user approves the draft */
@@ -56,8 +56,6 @@ interface RoughDraftCanvasProps {
   /** Called when user discards the draft */
   onDiscard: () => void;
 }
-
-type GenerationPhase = 'initializing' | 'generating-content' | 'refining-prompts' | 'generating-images' | 'complete';
 
 export const RoughDraftCanvas: React.FC<RoughDraftCanvasProps> = ({
   input,

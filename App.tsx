@@ -8,10 +8,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { GenerationMode, PresentationPlanResponse } from './types';
-import { IdeationSession } from './types/ideation';
-import { RoughDraftInput, RoughDraftResult } from './services/agents';
-import { RoughDraftCanvas } from './components/rough-draft';
+import { GenerationMode } from './types';
+import { RoughDraftResult } from './services/agents';
 import { IMAGE_STYLES } from './lib/themes';
 import { MainStage } from './components/MainStage';
 import { ChatInterface } from './components/ChatInterface';
@@ -23,10 +21,8 @@ import { useDuplicatePresentation } from './hooks/mutations/usePresentationMutat
 import { useAnalytics } from './hooks/useAnalytics';
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import { useChat } from './hooks/useChat';
-import { IdeationCopilot } from './components/ideation/IdeationCopilot';
 import { IdeationResumePrompt } from './components/ideation/IdeationResumePrompt';
-import { SourcesWizard } from './components/sources';
-import { BeautifyWizard } from './components/beautify/BeautifyWizard';
+import { WorkspaceRenderer } from './components/WorkspaceRenderer';
 import { AgentActivityPanel } from './components/AgentActivityPanel';
 import { ArchetypeChangeDialog } from './components/ArchetypeChangeDialog';
 import { getArchetypeVisualStyle } from './lib/archetypeVisualStyles';
@@ -60,16 +56,31 @@ import { deleteIdeationSession } from './services/api/ideationService';
 // ============ Protected App Content ============
 
 function AppContent() {
-  // UI State
+  // ============ Workspace Mode (from context) ============
+  const {
+    isPresenting,
+    isIdeation,
+    isRoughDraft,
+    isBeautify,
+    isSources,
+    goToDashboard,
+    goToIdeation,
+    goToRoughDraft,
+    goToBeautify,
+    goToSources,
+    startPresenting,
+    stopPresenting,
+    getRoughDraftState,
+  } = useWorkspaceMode();
+
+  // ============ UI State (local) ============
   const [inputValue, setInputValue] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [selectedImageStyle, setSelectedImageStyle] = useState(IMAGE_STYLES[0]);
   const [generationMode, setGenerationMode] = useState<GenerationMode>('balanced');
-  const [isPresenting, setIsPresenting] = useState(false);
   const [showCreateChat, setShowCreateChat] = useState(false);
-  const [isIdeating, setIsIdeating] = useState(false);
-  const [ideationSessionIdToLoad, setIdeationSessionIdToLoad] = useState<string | null>(null);
   const [enableDraftPreview, setEnableDraftPreview] = useState(false);
+
   // Session resumption state
   const [lastIdeationSessionId, setLastIdeationSessionId] = useState<string | null>(null);
   const [showIdeationResumePrompt, setShowIdeationResumePrompt] = useState(false);
@@ -80,33 +91,13 @@ function AppContent() {
     isFirstTimeUser,
     markWelcomeSeen,
   } = useOnboarding();
-  // Sources mode state (VideoDeck / Research & Present)
-  const [sourcesMode, setSourcesMode] = useState<{
-    isOpen: boolean;
-    preset: 'video' | 'web' | 'mixed';
-    recipe: 'training' | 'explainer' | 'brief' | 'pitch';
-  } | null>(null);
-  // Beautify mode state (Make My Ugly Deck Beautiful)
-  const [isBeautifying, setIsBeautifying] = useState(false);
+
   // Archetype change dialog state
   const [archetypeChangeDialog, setArchetypeChangeDialog] = useState<{
     isOpen: boolean;
     previousArchetype: string;
     newArchetype: string;
   }>({ isOpen: false, previousArchetype: '', newArchetype: '' });
-
-  // Rough draft state - holds data for the rough draft view
-  const [roughDraftState, setRoughDraftState] = useState<{
-    isOpen: boolean;
-    source: 'ideation' | 'copilot' | 'existing' | 'sources';
-    input?: RoughDraftInput;
-    ideationSessionId?: string;
-    existingDraftId?: string;
-    sourcesSessionId?: string;
-    // Preserve sources wizard state for navigation back
-    sourcesPreset?: 'video' | 'web' | 'mixed';
-    sourcesRecipe?: 'training' | 'explainer' | 'brief' | 'pitch';
-  } | null>(null);
 
   // Main deck hook
   const {
@@ -165,7 +156,7 @@ function AppContent() {
     presentation: currentPresentation,
     activeSlideIndex,
     setActiveSlideIndex,
-    onExitPresentation: useCallback(() => setIsPresenting(false), []),
+    onExitPresentation: stopPresenting,
   });
 
   // Preload common fonts in the background after initial render
@@ -203,9 +194,7 @@ function AppContent() {
         addMessage(createSystemMessage('Preparing rough draft preview...'));
 
         // Enter rough draft mode with the topic
-        setRoughDraftState({
-          isOpen: true,
-          source: 'copilot',
+        goToRoughDraft('copilot', {
           input: {
             topic,
             themeId: 'executive', // Default theme, agent will pick appropriate one
@@ -241,69 +230,35 @@ function AppContent() {
     if (lastIdeationSessionId) {
       setShowIdeationResumePrompt(true);
     } else {
-      setIsIdeating(true);
+      goToIdeation();
     }
   };
 
   // Sources mode handlers (VideoDeck / Research & Present)
   const handleOpenSources = useCallback((preset: 'video' | 'web' | 'mixed', recipe: 'training' | 'explainer' | 'brief' | 'pitch' = 'training') => {
-    setSourcesMode({ isOpen: true, preset, recipe });
-  }, []);
-
-  const handleCloseSources = useCallback(() => {
-    setSourcesMode(null);
-  }, []);
-
-  const handleBuildDeckFromSources = useCallback(async (session: IdeationSession) => {
-    // Derive topic from session or sources
-    const topic = session.topic || session.sources?.[0]?.title || 'Untitled';
-
-    // Route to Rough Draft preview with extracted notes
-    // Preserve sources wizard state for "Back" navigation
-    setRoughDraftState({
-      isOpen: true,
-      source: 'sources',
-      input: {
-        topic,
-        themeId: 'executive', // Default theme, agent can suggest better
-        visualStyle: 'professional photography with clean backgrounds',
-        ideationNotes: session.notes, // Include all notes - no filter
-        source: 'sources', // Pass source type to agent for content preservation
-      },
-      sourcesSessionId: session.id,
-      sourcesPreset: sourcesMode?.preset,
-      sourcesRecipe: sourcesMode?.recipe,
-    });
-
-    // Close sources wizard
-    setSourcesMode(null);
-  }, [sourcesMode]);
+    goToSources(preset, recipe);
+  }, [goToSources]);
 
   // Beautify mode handlers
   const handleOpenBeautify = useCallback(() => {
-    setIsBeautifying(true);
-  }, []);
-
-  const handleCloseBeautify = useCallback(() => {
-    setIsBeautifying(false);
-  }, []);
+    goToBeautify();
+  }, [goToBeautify]);
 
   const handleBeautifyComplete = useCallback(async (slides: any[], themeId: string) => {
     // Create a new presentation from the beautified slides
     try {
       await actions.createPresentationFromSlides(slides, themeId);
-      setIsBeautifying(false);
+      goToDashboard();
     } catch (error) {
       console.error('Failed to create presentation from beautified slides:', error);
       // Keep the wizard open so user can try again or export manually
     }
-  }, [actions]);
+  }, [actions, goToDashboard]);
 
   // Ideation handlers
   const handleLoadIdeation = useCallback((id: string) => {
-    setIdeationSessionIdToLoad(id);
-    setIsIdeating(true);
-  }, []);
+    goToIdeation(id);
+  }, [goToIdeation]);
 
   const handleDeleteIdeation = useCallback(async (id: string) => {
     try {
@@ -314,24 +269,10 @@ function AppContent() {
     }
   }, [refetchIdeations]);
 
-  const handleGenerateDeckFromIdeation = useCallback((id: string) => {
-    // TODO: Load ideation and trigger rough draft generation
-    console.log('Generate deck from ideation:', id);
-  }, []);
-
-  const handleViewJournal = useCallback((id: string) => {
-    // TODO: Show journal modal for the ideation
-    console.log('View journal for ideation:', id);
-  }, []);
-
   // Rough draft handlers
   const handleLoadRoughDraft = useCallback((id: string) => {
-    setRoughDraftState({
-      isOpen: true,
-      source: 'existing',
-      existingDraftId: id,
-    });
-  }, []);
+    goToRoughDraft('existing', { existingDraftId: id });
+  }, [goToRoughDraft]);
 
   const handleDeleteRoughDraft = useCallback((id: string) => {
     deleteRoughDraftMutation.mutate(id);
@@ -351,26 +292,12 @@ function AppContent() {
 
   // Handlers for viewing source content from sidebar
   const handleViewSourceIdeation = useCallback((id: string) => {
-    setIdeationSessionIdToLoad(id);
-    setIsIdeating(true);
-  }, []);
+    goToIdeation(id);
+  }, [goToIdeation]);
 
   const handleViewSourceRoughDraft = useCallback((id: string) => {
-    setRoughDraftState({
-      isOpen: true,
-      source: 'existing',
-      existingDraftId: id,
-    });
-  }, []);
-
-  const handleCloseIdeation = useCallback((sessionId?: string) => {
-    // Preserve the session ID so user can resume later
-    if (sessionId) {
-      setLastIdeationSessionId(sessionId);
-    }
-    setIsIdeating(false);
-    setIdeationSessionIdToLoad(null);
-  }, []);
+    goToRoughDraft('existing', { existingDraftId: id });
+  }, [goToRoughDraft]);
 
   const handleCloneDeck = useCallback((id: string) => {
     duplicateMutation.mutate(id, {
@@ -387,7 +314,7 @@ function AppContent() {
     }
   }, [currentPresentation, handleCloneDeck]);
 
-  const handleBuildDeckFromIdeation = async (deckPlan: {
+  const handleBuildDeckFromIdeation = useCallback(async (deckPlan: {
     topic: string;
     slides: Array<{
       title: string;
@@ -400,7 +327,7 @@ function AppContent() {
     themeId: string;
     visualStyle: string;
   }) => {
-    setIsIdeating(false);
+    goToDashboard();
     const topic = deckPlan.topic;
     addMessage(createSystemMessage(`Building deck from ideation: "${topic}"...`));
 
@@ -411,45 +338,15 @@ function AppContent() {
       console.error('Error building deck from ideation:', error);
       addMessage(createSystemMessage('Error building deck from ideation plan.'));
     }
-  };
+  }, [goToDashboard, addMessage, createSystemMessage, createModelMessage, actions]);
 
   // ============ Rough Draft Handlers ============
-
-  /**
-   * Enter rough draft mode from ideation (with notes and theme)
-   */
-  const handleRoughDraftFromIdeation = useCallback((
-    deckPlan: PresentationPlanResponse,
-    sessionId: string,
-    notes?: Array<{ content: string; column: number }>
-  ) => {
-    setRoughDraftState({
-      isOpen: true,
-      source: 'ideation',
-      input: {
-        ideationNotes: notes?.map((n, i) => ({
-          id: `note-${i}`,
-          content: n.content,
-          type: 'user' as const,
-          column: n.column,
-          row: 0,
-          color: 'yellow' as const,
-          approved: true,
-          createdAt: Date.now(),
-        })),
-        topic: deckPlan.topic,
-        themeId: deckPlan.themeId,
-        visualStyle: deckPlan.visualStyle,
-      },
-      ideationSessionId: sessionId,
-    });
-    // Keep ideation open in the background so user can go back
-  }, []);
 
   /**
    * Approve the rough draft and create the final deck
    */
   const handleApproveRoughDraft = useCallback(async (result: RoughDraftResult) => {
+    const roughDraftState = getRoughDraftState();
     if (!roughDraftState) return;
 
     const deckPlan = {
@@ -476,38 +373,9 @@ function AppContent() {
       addMessage(createSystemMessage('Error creating deck from rough draft.'));
     }
 
-    // Close rough draft view
-    setRoughDraftState(null);
-    setIsIdeating(false);
-  }, [roughDraftState, actions, addMessage, createModelMessage, createSystemMessage]);
-
-  /**
-   * Go back from rough draft to previous view
-   */
-  const handleBackFromRoughDraft = useCallback(() => {
-    if (roughDraftState?.source === 'ideation') {
-      // Return to ideation - keep session open
-      setRoughDraftState(null);
-      // Ideation is still open since we didn't close it
-    } else if (roughDraftState?.source === 'sources') {
-      // Return to sources wizard - reopen with preserved state
-      const preset = roughDraftState.sourcesPreset || 'video';
-      const recipe = roughDraftState.sourcesRecipe || 'training';
-      setRoughDraftState(null);
-      setSourcesMode({ isOpen: true, preset, recipe });
-    } else {
-      // From copilot or existing - close and return to dashboard
-      setRoughDraftState(null);
-    }
-  }, [roughDraftState]);
-
-  /**
-   * Discard rough draft and return to dashboard
-   */
-  const handleDiscardRoughDraft = useCallback(() => {
-    setRoughDraftState(null);
-    setIsIdeating(false);
-  }, []);
+    // Close rough draft view and return to dashboard
+    goToDashboard();
+  }, [getRoughDraftState, actions, addMessage, createModelMessage, createSystemMessage, goToDashboard]);
 
   // ============ Welcome Modal Handlers ============
 
@@ -518,13 +386,13 @@ function AppContent() {
         handleCreateNew();
         break;
       case 'ideate':
-        setIsIdeating(true);
+        goToIdeation();
         break;
       case 'beautify':
-        setIsBeautifying(true);
+        goToBeautify();
         break;
     }
-  }, [markWelcomeSeen]);
+  }, [markWelcomeSeen, goToIdeation, goToBeautify, handleCreateNew]);
 
   const handleWelcomeSkip = useCallback(() => {
     markWelcomeSeen();
@@ -535,16 +403,17 @@ function AppContent() {
   const handleResumeLastSession = useCallback(() => {
     setShowIdeationResumePrompt(false);
     if (lastIdeationSessionId) {
-      setIdeationSessionIdToLoad(lastIdeationSessionId);
+      goToIdeation(lastIdeationSessionId);
+    } else {
+      goToIdeation();
     }
-    setIsIdeating(true);
-  }, [lastIdeationSessionId]);
+  }, [lastIdeationSessionId, goToIdeation]);
 
   const handleStartFreshSession = useCallback(() => {
     setShowIdeationResumePrompt(false);
     setLastIdeationSessionId(null);
-    setIsIdeating(true);
-  }, []);
+    goToIdeation();
+  }, [goToIdeation]);
 
   const handleChooseFromSaved = useCallback(() => {
     setShowIdeationResumePrompt(false);
@@ -598,51 +467,21 @@ function AppContent() {
 
   // ============ Render ============
 
-  // Rough Draft Mode - Full screen canvas for reviewing/editing draft
-  if (roughDraftState?.isOpen) {
+  // Overlay workspaces (ideation, rough draft, beautify, sources)
+  // WorkspaceRenderer returns null for deck/dashboard/presenting modes
+  if (isIdeation || isRoughDraft || isBeautify || isSources) {
     return (
-      <RoughDraftCanvas
-        input={roughDraftState.input}
-        existingDraftId={roughDraftState.existingDraftId}
-        source={roughDraftState.source}
-        ideationSessionId={roughDraftState.ideationSessionId}
-        onApprove={handleApproveRoughDraft}
-        onBack={handleBackFromRoughDraft}
-        onDiscard={handleDiscardRoughDraft}
-      />
-    );
-  }
-
-  // Beautify Mode - Full screen wizard (Make My Ugly Deck Beautiful)
-  if (isBeautifying) {
-    return (
-      <BeautifyWizard
-        onClose={handleCloseBeautify}
-        onComplete={handleBeautifyComplete}
-      />
-    );
-  }
-
-  // Sources Mode - Full screen wizard (VideoDeck / Research & Present)
-  if (sourcesMode?.isOpen) {
-    return (
-      <SourcesWizard
-        preset={sourcesMode.preset}
-        recipe={sourcesMode.recipe}
-        onClose={handleCloseSources}
-        onBuildDeck={handleBuildDeckFromSources}
-      />
-    );
-  }
-
-  // Ideation Mode - Full screen copilot
-  if (isIdeating) {
-    return (
-      <IdeationCopilot
-        sessionId={ideationSessionIdToLoad || undefined}
-        onClose={handleCloseIdeation}
-        onBuildDeck={handleBuildDeckFromIdeation}
-        onRoughDraft={handleRoughDraftFromIdeation}
+      <WorkspaceRenderer
+        ideationProps={{
+          onBuildDeck: handleBuildDeckFromIdeation,
+          onSessionClose: (sessionId) => {
+            if (sessionId) setLastIdeationSessionId(sessionId);
+          },
+        }}
+        beautifyProps={{
+          onComplete: handleBeautifyComplete,
+        }}
+        onApproveRoughDraft={handleApproveRoughDraft}
       />
     );
   }
@@ -742,7 +581,7 @@ function AppContent() {
               onCycleWabiSabiLayout={actions.cycleWabiSabiLayout}
               onRegenerateAllImages={actions.regenerateAllImages}
               onRemixDeck={actions.remixDeck}
-              setIsPresenting={setIsPresenting}
+              setIsPresenting={() => startPresenting()}
               onSave={actions.saveDeck}
               onClose={actions.closeDeck}
               onClone={handleCloneCurrentDeck}
@@ -757,7 +596,7 @@ function AppContent() {
             <>
               {/* Close Button */}
               <button
-                onClick={() => setIsPresenting(false)}
+                onClick={stopPresenting}
                 className="absolute top-6 right-6 z-[1000] p-3 bg-black/70 hover:bg-[#c5a47e] text-white hover:text-black backdrop-blur-md transition-all duration-150 cursor-pointer shadow-lg"
               >
                 <X className="w-6 h-6" />
@@ -817,8 +656,6 @@ function AppContent() {
             isLoadingIdeations={isLoadingIdeations}
             onLoadIdeation={handleLoadIdeation}
             onDeleteIdeation={handleDeleteIdeation}
-            onGenerateDeckFromIdeation={handleGenerateDeckFromIdeation}
-            onViewJournal={handleViewJournal}
             // Rough draft props
             savedRoughDrafts={savedRoughDrafts}
             isLoadingRoughDrafts={isLoadingRoughDrafts}

@@ -1,52 +1,44 @@
 /**
  * WorkspaceRenderer Component
  *
- * Central component for rendering the active workspace.
- * Uses discriminated union pattern for type-safe mode switching.
+ * Central component for rendering overlay workspaces (ideation, rough draft, etc).
+ * Returns null for deck/dashboard modes - App.tsx handles those directly.
  *
- * SRP: Single responsibility - workspace routing.
+ * SRP: Single responsibility - workspace routing for overlay modes.
  */
 
 import React from 'react';
-import { useWorkspaceMode, WorkspaceMode } from '../contexts/WorkspaceModeContext';
+import { useWorkspaceMode } from '../contexts/WorkspaceModeContext';
 import {
   IdeationWorkspace,
   RoughDraftWorkspace,
   BeautifyWorkspace,
   SourcesWorkspace,
-  DeckWorkspace,
 } from './workspaces';
-import { DeckWorkspaceProps } from './workspaces/DeckWorkspace';
 import { IdeationWorkspaceProps } from './workspaces/IdeationWorkspace';
 import { BeautifyWorkspaceProps } from './workspaces/BeautifyWorkspace';
-import { SourcesWorkspaceProps } from './workspaces/SourcesWorkspace';
 import { RoughDraftResult } from '../services/agents';
 
 /**
  * Props for the WorkspaceRenderer.
- * Collects all props needed by the various workspaces.
+ * Only includes props for overlay workspaces (not deck/dashboard).
  */
 export interface WorkspaceRendererProps {
-  /** Props for DeckWorkspace (dashboard/deck editing) */
-  deckProps: DeckWorkspaceProps;
   /** Props for IdeationWorkspace */
   ideationProps: Omit<IdeationWorkspaceProps, 'sessionId'>;
   /** Props for BeautifyWorkspace */
   beautifyProps: BeautifyWorkspaceProps;
-  /** Props for SourcesWorkspace */
-  sourcesProps: Omit<SourcesWorkspaceProps, 'preset' | 'recipe'>;
   /** Callback when rough draft is approved */
   onApproveRoughDraft: (result: RoughDraftResult) => Promise<void>;
 }
 
 /**
- * Renders the appropriate workspace based on current mode.
+ * Renders the appropriate overlay workspace based on current mode.
+ * Returns null for deck/dashboard/presenting modes - App.tsx handles those.
  */
 export const WorkspaceRenderer: React.FC<WorkspaceRendererProps> = ({
-  deckProps,
   ideationProps,
   beautifyProps,
-  sourcesProps,
   onApproveRoughDraft,
 }) => {
   const { mode } = useWorkspaceMode();
@@ -83,19 +75,16 @@ export const WorkspaceRenderer: React.FC<WorkspaceRendererProps> = ({
         <SourcesWorkspace
           preset={mode.preset}
           recipe={mode.recipe}
-          {...sourcesProps}
         />
       );
 
+    // Deck, dashboard, and presenting modes return null
+    // App.tsx handles these directly to avoid massive prop drilling
     case 'presenting':
-      // Presenting is an overlay on deck workspace
-      // The DeckWorkspace handles the presenting overlay internally
-      return <DeckWorkspace {...deckProps} />;
-
     case 'deck':
     case 'dashboard':
     default:
-      return <DeckWorkspace {...deckProps} />;
+      return null;
   }
 };
 

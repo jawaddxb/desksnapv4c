@@ -178,21 +178,30 @@ export function WorkspaceModeProvider({
   const stopPresenting = useCallback(() => {
     setMode(current => {
       if (current.type === 'presenting') {
-        return current.previousMode;
+        // Validate previousMode exists and has valid type
+        const prev = current.previousMode;
+        if (prev && prev.type && prev.type !== 'presenting') {
+          return prev;
+        }
+        // Fallback to dashboard if previousMode is invalid
+        return { type: 'dashboard' };
       }
       return current;
     });
   }, []);
 
-  // History navigation
-  const canGoBack = historyRef.current.length > 0;
-
+  // History navigation - use state callback for atomicity (prevents race conditions)
   const goBack = useCallback(() => {
-    const previous = historyRef.current.pop();
-    if (previous) {
-      setMode(previous);
-    }
+    setMode(current => {
+      const history = historyRef.current;
+      if (history.length === 0) return current;
+      const previous = history.pop()!;
+      return previous;
+    });
   }, []);
+
+  // canGoBack is a getter since historyRef doesn't trigger re-renders
+  const canGoBack = historyRef.current.length > 0;
 
   // Type-safe getters
   const getPresentationId = useCallback((): string | null => {
@@ -241,14 +250,8 @@ export function WorkspaceModeProvider({
     getRoughDraftState,
     getSourcesState,
   }), [
+    // Only include mode and stable callbacks - derived booleans are computed from mode
     mode,
-    isDashboard,
-    isDeck,
-    isIdeation,
-    isRoughDraft,
-    isBeautify,
-    isSources,
-    isPresenting,
     goToDashboard,
     goToDeck,
     goToIdeation,
@@ -258,7 +261,6 @@ export function WorkspaceModeProvider({
     startPresenting,
     stopPresenting,
     goBack,
-    canGoBack,
     getPresentationId,
     getIdeationSessionId,
     getRoughDraftState,

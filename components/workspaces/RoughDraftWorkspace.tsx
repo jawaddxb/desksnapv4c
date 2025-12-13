@@ -7,7 +7,7 @@
  * SRP: Single responsibility - rough draft workspace UI.
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { RoughDraftCanvas } from '../rough-draft';
 import { useWorkspaceMode, RoughDraftSource, SourcesPreset, SourcesRecipe } from '../../contexts/WorkspaceModeContext';
 import { RoughDraftInput, RoughDraftResult } from '../../services/agents';
@@ -43,6 +43,16 @@ export const RoughDraftWorkspace: React.FC<RoughDraftWorkspaceProps> = ({
 }) => {
   const { goToDashboard, goToIdeation, goToSources } = useWorkspaceMode();
 
+  // Warn if sources navigation props are missing
+  useEffect(() => {
+    if (source === 'sources' && (!sourcesPreset || !sourcesRecipe)) {
+      console.warn(
+        '[RoughDraftWorkspace] source is "sources" but sourcesPreset/sourcesRecipe missing. ' +
+        'Back navigation to Sources wizard will fall back to dashboard.'
+      );
+    }
+  }, [source, sourcesPreset, sourcesRecipe]);
+
   /**
    * Handle approving the draft.
    */
@@ -75,7 +85,7 @@ export const RoughDraftWorkspace: React.FC<RoughDraftWorkspaceProps> = ({
     <RoughDraftCanvas
       input={input}
       existingDraftId={existingDraftId}
-      source={source === 'sources' ? 'copilot' : source}
+      source={source}
       ideationSessionId={ideationSessionId}
       onApprove={handleApprove}
       onBack={handleBack}

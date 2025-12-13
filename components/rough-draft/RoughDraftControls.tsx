@@ -16,7 +16,7 @@ export interface RoughDraftControlsProps {
   /** Number of slides */
   slideCount: number;
   /** Source of the draft */
-  source: 'ideation' | 'copilot' | 'existing';
+  source: 'ideation' | 'copilot' | 'existing' | 'sources';
   /** Called when user discards the draft */
   onDiscard: () => void;
   /** Called when user goes back */
@@ -33,7 +33,10 @@ export const RoughDraftControls: React.FC<RoughDraftControlsProps> = ({
   onBack,
   onApproveAll,
 }) => {
-  const sourceLabel = source === 'ideation' ? 'Ideation' : source === 'copilot' ? 'Copilot' : 'Drafts';
+  const sourceLabel = source === 'ideation' ? 'Ideation'
+    : source === 'copilot' ? 'Copilot'
+    : source === 'sources' ? 'Sources'
+    : 'Drafts';
 
   return (
     <div className="h-16 bg-black border-t border-white/10 flex items-center justify-between px-4">
