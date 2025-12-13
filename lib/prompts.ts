@@ -1,5 +1,5 @@
 
-import { THEMES } from './themes';
+import { THEMES } from '../config/themes';
 import { Type } from "@google/genai";
 import { GenerationMode } from '../types';
 
