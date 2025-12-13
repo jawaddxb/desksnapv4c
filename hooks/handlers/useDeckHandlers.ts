@@ -6,8 +6,8 @@
  */
 
 import { useCallback } from 'react';
-import { Slide, Message } from '../../types';
-import { RoughDraftResult } from '../../services/agents';
+import { Slide, Message } from '@/types';
+import { RoughDraftResult } from '@/services/agents';
 
 // Type for deck plan from ideation
 export interface DeckPlan {

@@ -1,6 +1,6 @@
 import React from 'react';
-import type { Theme, ContentType, ThemeContentStyle } from '../../types';
-import { DEFAULT_CONTENT_STYLE } from '../../config/contentStyles';
+import type { Theme, ContentType, ThemeContentStyle } from '@/types';
+import { DEFAULT_CONTENT_STYLE } from '@/config/contentStyles';
 import { BulletRenderer } from './BulletRenderer';
 
 interface ContentItemProps {

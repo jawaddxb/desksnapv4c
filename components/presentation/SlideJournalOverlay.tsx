@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { JournalEntry, JournalStage } from '../../types/ideation';
+import { JournalEntry, JournalStage } from '@/types/ideation';
 import { X, Lightbulb, Paintbrush, Image, Type, Layout, Check } from 'lucide-react';
 
 interface SlideJournalOverlayProps {

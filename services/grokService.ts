@@ -13,8 +13,8 @@ import type {
   ResearchPreferences,
   ComprehensiveResearch,
   ProgressUpdate,
-} from '../types';
-import { getExternalModel } from '../config';
+} from '@/types';
+import { getExternalModel } from '@/config';
 import { parseGrokResponse } from './grok/grokParser';
 
 // Constants

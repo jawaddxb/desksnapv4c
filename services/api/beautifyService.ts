@@ -6,8 +6,8 @@
  */
 
 import { api } from './apiClient';
-import { API_BASE_URL } from '../../config';
-import type { Slide } from '../../types';
+import { API_BASE_URL } from '@/config';
+import type { Slide } from '@/types';
 import type {
   BeautifySession,
   SlideIR,
@@ -16,7 +16,7 @@ import type {
   TransformResponse,
   ShareResponse,
   ShareViewData,
-} from '../../types/beautify';
+} from '@/types/beautify';
 
 // =============================================================================
 // BACKEND TYPES (snake_case)

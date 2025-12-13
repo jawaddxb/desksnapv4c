@@ -7,15 +7,15 @@
 
 import { useCallback, useState } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
-import { Presentation, Slide } from '../../types';
+import { Presentation, Slide } from '@/types';
 import {
   generateSlideImage as generateSlideImageFrontend,
   ensureApiKeySelection,
   generatePresentationImagesWithAgent,
-} from '../../services/geminiService';
-import { AgentLog } from '../../types/agents';
-import { useAgentMode as USE_AGENT_MODE } from '../../config/featureFlags';
-import { createSlideIndexMap, getOriginalIndex, slidesNeedingImages, updateSlidesWhere } from '../../utils';
+} from '@/services/geminiService';
+import { AgentLog } from '@/types/agents';
+import { useAgentMode as USE_AGENT_MODE } from '@/config/featureFlags';
+import { createSlideIndexMap, getOriginalIndex, slidesNeedingImages, updateSlidesWhere } from '@/utils';
 
 /** Type for the updateSlide mutation */
 type UpdateSlideMutation = UseMutationResult<

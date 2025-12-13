@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { GenerationPhase } from '../../types/roughDraft';
+import { GenerationPhase } from '@/types/roughDraft';
 
 export interface RoughDraftControlsProps {
   /** Current generation phase */

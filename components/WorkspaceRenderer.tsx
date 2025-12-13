@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { useWorkspaceMode } from '../contexts/WorkspaceModeContext';
+import { useWorkspaceMode } from '@/contexts/WorkspaceModeContext';
 import {
   IdeationWorkspace,
   RoughDraftWorkspace,
@@ -17,7 +17,7 @@ import {
 } from './workspaces';
 import { IdeationWorkspaceProps } from './workspaces/IdeationWorkspace';
 import { BeautifyWorkspaceProps } from './workspaces/BeautifyWorkspace';
-import { RoughDraftResult } from '../services/agents';
+import { RoughDraftResult } from '@/services/agents';
 
 /**
  * Props for the WorkspaceRenderer.

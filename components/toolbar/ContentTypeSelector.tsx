@@ -6,7 +6,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { List, ListOrdered, CheckSquare, Quote, Type, ChevronDown } from 'lucide-react';
-import type { ContentType } from '../../types';
+import type { ContentType } from '@/types';
 
 interface ContentTypeSelectorProps {
   /** Current content type */

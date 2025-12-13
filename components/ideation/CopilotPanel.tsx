@@ -7,12 +7,12 @@
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Message, MessageRole, ResearchPreferences, ProgressState, Finding } from '../../types';
-import { IdeationStage, ThemeSuggestion, IdeaNote } from '../../types/ideation';
+import { Message, MessageRole, ResearchPreferences, ProgressState, Finding } from '@/types';
+import { IdeationStage, ThemeSuggestion, IdeaNote } from '@/types/ideation';
 import { ThemePreviewPanel } from './ThemePreviewPanel';
 import { EnhancedModePanel } from './EnhancedModePanel';
 import { IdeationProgressBar } from './IdeationProgressBar';
-import { CompletionQuestion } from '../../services/copilotAgent';
+import { CompletionQuestion } from '@/services/copilotAgent';
 
 interface CopilotPanelProps {
   messages: Message[];

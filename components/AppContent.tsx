@@ -16,22 +16,22 @@ import {
   ChatCoordinator,
   DeckViewCoordinator,
   PresentationModeCoordinator,
-} from '../coordinators';
-import { useWorkspaceMode } from '../contexts/WorkspaceModeContext';
-import { useChatUI } from '../contexts/ChatUIContext';
-import { useDeck } from '../hooks/useDeck';
-import { useDuplicatePresentation } from '../hooks/mutations/usePresentationMutations';
-import { useAnalytics } from '../hooks/useAnalytics';
-import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
-import { useChat } from '../hooks/useChat';
-import { useOnboarding } from '../hooks/useOnboarding';
-import { useSavedIdeations, useIdeationSession } from '../hooks/queries/useIdeationQueries';
-import { useSavedRoughDrafts, useDeleteRoughDraft, useApproveRoughDraft, useRoughDraft } from '../hooks/queries/useRoughDraftQueries';
-import { preloadCommonFonts } from '../lib/fonts';
-import { migrateIdeationSessions, isMigrationComplete } from '../services/migration/ideationMigration';
+} from '@/coordinators';
+import { useWorkspaceMode } from '@/contexts/WorkspaceModeContext';
+import { useChatUI } from '@/contexts/ChatUIContext';
+import { useDeck } from '@/hooks/useDeck';
+import { useDuplicatePresentation } from '@/hooks/mutations/usePresentationMutations';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
+import { useChat } from '@/hooks/useChat';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { useSavedIdeations, useIdeationSession } from '@/hooks/queries/useIdeationQueries';
+import { useSavedRoughDrafts, useDeleteRoughDraft, useApproveRoughDraft, useRoughDraft } from '@/hooks/queries/useRoughDraftQueries';
+import { preloadCommonFonts } from '@/lib/fonts';
+import { migrateIdeationSessions, isMigrationComplete } from '@/services/migration/ideationMigration';
 
 // Handler hooks
-import { useChatHandlers, useDeckHandlers, useWorkspaceHandlers } from '../hooks/handlers';
+import { useChatHandlers, useDeckHandlers, useWorkspaceHandlers } from '@/hooks/handlers';
 
 export function AppContent() {
   // ============ Workspace Mode (from context) ============

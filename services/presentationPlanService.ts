@@ -5,7 +5,7 @@
  * Single responsibility: Create structured presentation plans and holistic suggestions.
  */
 
-import { PresentationPlanResponse, GenerationMode, Presentation } from '../types';
+import { PresentationPlanResponse, GenerationMode, Presentation } from '@/types';
 import { getAIClient } from './aiClient';
 import { parseAIJsonResponse } from './ai/parseJson';
 import {
@@ -14,7 +14,7 @@ import {
   PRESENTATION_SCHEMA,
   getGenerationModeInstruction,
 } from '../lib/prompts';
-import { getTextModel } from '../config';
+import { getTextModel } from '@/config';
 
 /**
  * Image style override configuration.

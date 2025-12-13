@@ -4,8 +4,8 @@
  * Creates the tool executor for the sources agent.
  */
 
-import { IdeationSession, IdeaNote } from '../../types/ideation';
-import { SourcesToolName } from '../../lib/sourcesTools';
+import { IdeationSession, IdeaNote } from '@/types/ideation';
+import { SourcesToolName } from '@/lib/sourcesTools';
 import { ToolExecutor } from '../copilotAgent';
 import {
   handleAddSource,

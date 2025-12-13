@@ -8,7 +8,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode, useRef } from 'react';
-import { RoughDraftInput } from '../services/agents';
+import { RoughDraftInput } from '@/services/agents';
 
 /**
  * Source of rough draft content.

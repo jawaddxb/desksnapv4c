@@ -29,9 +29,9 @@ import {
   Copy,
   Sparkles,
 } from 'lucide-react';
-import { useDebugUI } from '../../contexts/DebugUIContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { API_BASE_URL } from '../../config';
+import { useDebugUI } from '@/contexts/DebugUIContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { API_BASE_URL } from '@/config';
 import {
   getDebugMe,
   getDebugUsers,
@@ -43,7 +43,7 @@ import {
   DebugPresentationsResponse,
   DebugStatsResponse,
   DebugLookupResponse,
-} from '../../services/api/debugService';
+} from '@/services/api/debugService';
 
 // ============ System Info ============
 

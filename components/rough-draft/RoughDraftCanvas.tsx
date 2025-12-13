@@ -14,21 +14,21 @@ import {
   RoughDraftResult,
   SlideContent,
   regenerateSlideWithAgent,
-} from '../../services/agents/roughDraftAgent';
-import { JournalEntry } from '../../types/ideation';
-import { AgentLog } from '../../types/agents';
-import { THEMES, getTextModel } from '../../config';
+} from '@/services/agents/roughDraftAgent';
+import { JournalEntry } from '@/types/ideation';
+import { AgentLog } from '@/types/agents';
+import { THEMES, getTextModel } from '@/config';
 import { RoughDraftSlideCard } from './RoughDraftSlideCard';
 import { AgentNarrativePanel } from './AgentNarrativePanel';
-import { getAIClient } from '../../services/aiClient';
+import { getAIClient } from '@/services/aiClient';
 import {
   createRoughDraft,
   updateRoughDraft,
   updateSlide as apiUpdateSlide,
   approveRoughDraft,
-} from '../../services/api/roughDraftService';
-import { RoughDraft, GenerationPhase } from '../../types/roughDraft';
-import { useRoughDraft } from '../../hooks/queries/useRoughDraftQueries';
+} from '@/services/api/roughDraftService';
+import { RoughDraft, GenerationPhase } from '@/types/roughDraft';
+import { useRoughDraft } from '@/hooks/queries/useRoughDraftQueries';
 
 /**
  * Check if a string is a valid UUID (v4 format)

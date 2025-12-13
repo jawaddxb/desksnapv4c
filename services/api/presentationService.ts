@@ -6,7 +6,7 @@
  */
 
 import { api } from './apiClient';
-import { Presentation, Slide } from '../../types';
+import { Presentation, Slide } from '@/types';
 
 // ============ Backend Types (snake_case) ============
 

@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { IdeaNote, Source, ProofLink } from '../../types/ideation';
+import { IdeaNote, Source, ProofLink } from '@/types/ideation';
 
 interface ProofSidebarProps {
   note: IdeaNote;

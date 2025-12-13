@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { IdeationSession, COLUMNS } from '../../types/ideation';
+import { IdeationSession, COLUMNS } from '@/types/ideation';
 import { Lightbulb, Trash2, Clock, FileText, ArrowRight, BookOpen } from 'lucide-react';
 
 interface IdeationHistoryPanelProps {

@@ -4,7 +4,7 @@
  * System prompts for the sources agent based on recipe type.
  */
 
-import { IdeationSession, DeckRecipe, getRecipeColumns } from '../../types/ideation';
+import { IdeationSession, DeckRecipe, getRecipeColumns } from '@/types/ideation';
 
 /**
  * Build system prompt for sources agent based on recipe type

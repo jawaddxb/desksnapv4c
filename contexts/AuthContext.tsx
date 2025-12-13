@@ -18,8 +18,8 @@ import {
   checkAuth,
   RegisterData,
   LoginData,
-} from '../services/api/authService';
-import { isAuthenticated, clearTokens } from '../services/api/apiClient';
+} from '@/services/api/authService';
+import { isAuthenticated, clearTokens } from '@/services/api/apiClient';
 
 // ============ Types ============
 

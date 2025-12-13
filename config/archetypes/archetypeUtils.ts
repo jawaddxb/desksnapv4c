@@ -4,7 +4,7 @@
  * Helpers for searching, filtering, and accessing archetypes.
  */
 
-import type { ContrastConfig } from '../../lib/contrast';
+import type { ContrastConfig } from '@/lib/contrast';
 import type { ArchetypeDefinition, ArchetypeCategoryDefinition } from './archetypeTypes';
 import { ARCHETYPE_REGISTRY } from './archetypeData';
 import { ARCHETYPE_CATEGORY_DEFINITIONS } from './archetypeCategories';

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Presentation, Theme } from '../types';
+import { Presentation, Theme } from '@/types';
 import { MainStage } from './MainStage';
 
 interface PrintViewProps {

@@ -14,7 +14,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
-import { Slide, Theme, Presentation, ImageStylePreset } from '../types';
+import { Slide, Theme, Presentation, ImageStylePreset } from '@/types';
 
 // ============ Types ============
 

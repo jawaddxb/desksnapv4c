@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { ArchetypeConfig, ArchetypeContext } from '../createArchetype';
-import { LayoutLayer } from '../../../config';
+import { LayoutLayer } from '@/config';
 import { EditableTitle, EditableContent } from '../../WabiSabiComponents';
 import { ImageContainer } from '../../StandardLayouts';
 

@@ -8,7 +8,7 @@
 import React from 'react';
 import { Receipt as ReceiptIcon, Quote } from 'lucide-react';
 import { ArchetypeConfig } from '../createArchetype';
-import { LayoutLayer } from '../../../config';
+import { LayoutLayer } from '@/config';
 import { EditableTitle, EditableContent, MagazineLayout } from '../../WabiSabiComponents';
 import { ImageContainer } from '../../StandardLayouts';
 import { SmartText } from '../../SmartText';

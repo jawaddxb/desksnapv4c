@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { IdeaNote, NoteConnection, COLUMNS } from '../../types/ideation';
+import { IdeaNote, NoteConnection, COLUMNS } from '@/types/ideation';
 import { StickyNote } from './StickyNote';
 import { ConnectorLayer } from './ConnectorLayer';
 import { ColumnHeader } from './ColumnHeader';

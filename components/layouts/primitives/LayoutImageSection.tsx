@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Slide, Theme } from '../../../types';
+import { Slide, Theme } from '@/types';
 import { ImageContainer } from '../../StandardLayouts';
 
 export type ImageSectionVariant =

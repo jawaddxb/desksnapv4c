@@ -37,7 +37,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
-import { AgentLog } from '../types/agents';
+import { AgentLog } from '@/types/agents';
 
 // ============ Types ============
 

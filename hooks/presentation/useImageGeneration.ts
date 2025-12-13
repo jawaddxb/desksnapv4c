@@ -7,19 +7,19 @@
 
 import { useCallback } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
-import { Presentation, Slide } from '../../types';
-import { THEMES } from '../../config/themes';
+import { Presentation, Slide } from '@/types';
+import { THEMES } from '@/config/themes';
 import {
   refineImagePrompt,
   ensureApiKeySelection,
   RefinementFocus,
-} from '../../services/geminiService';
-import { hasTokens } from '../../services/api/tokenManager';
-import { AgentLog } from '../../types/agents';
+} from '@/services/geminiService';
+import { hasTokens } from '@/services/api/tokenManager';
+import { AgentLog } from '@/types/agents';
 import {
   imageGenerationMode as IMAGE_GENERATION_MODE,
   useAgentMode as USE_AGENT_MODE,
-} from '../../config/featureFlags';
+} from '@/config/featureFlags';
 import { useSyncImageGeneration } from './useSyncImageGeneration';
 import { useAsyncImageGeneration } from './useAsyncImageGeneration';
 

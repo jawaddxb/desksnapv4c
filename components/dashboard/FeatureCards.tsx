@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, Lightbulb, Globe, Video, Wand2, Upload, ArrowRight } from 'lucide-react';
-import { DeckRecipe } from '../../types/ideation';
+import { DeckRecipe } from '@/types/ideation';
 
 interface FeatureCardsProps {
   onCreateNew: () => void;

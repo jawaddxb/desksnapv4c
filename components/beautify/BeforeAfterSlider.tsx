@@ -6,9 +6,9 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import type { Slide } from '../../types';
-import type { SlideIR } from '../../types/beautify';
-import { THEMES } from '../../config/themes';
+import type { Slide } from '@/types';
+import type { SlideIR } from '@/types/beautify';
+import { THEMES } from '@/config/themes';
 
 // =============================================================================
 // TYPES

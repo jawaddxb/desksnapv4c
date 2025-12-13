@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Slide, Theme, ContentType } from '../types';
+import { Slide, Theme, ContentType } from '@/types';
 import { SmartText } from './SmartText';
-import { applyFontScale } from '../lib/textPresets';
+import { applyFontScale } from '@/lib/textPresets';
 import { ContentItem } from './content';
-import { DEFAULT_CONTENT_STYLE } from '../config/contentStyles';
+import { DEFAULT_CONTENT_STYLE } from '@/config/contentStyles';
 
 interface SlideContentEditorProps {
     slide: Slide;

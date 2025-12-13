@@ -5,7 +5,7 @@
  * Import from './index' for the merged THEMES object.
  */
 
-import { Theme } from '../../types';
+import { Theme } from '@/types';
 import { PATTERNS } from '../patterns';
 import { CONTENT_STYLE_PRESETS } from '../contentStyles';
 

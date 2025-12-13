@@ -6,9 +6,9 @@
  */
 
 import React, { useState } from 'react';
-import { Theme } from '../../types';
-import { ThemeSuggestion } from '../../types/ideation';
-import { THEMES, THEME_CATEGORIES, getThemesByCategory } from '../../config/themes';
+import { Theme } from '@/types';
+import { ThemeSuggestion } from '@/types/ideation';
+import { THEMES, THEME_CATEGORIES, getThemesByCategory } from '@/config/themes';
 
 interface ThemePreviewPanelProps {
   suggestion: ThemeSuggestion;

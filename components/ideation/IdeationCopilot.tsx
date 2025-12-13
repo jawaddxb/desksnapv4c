@@ -6,11 +6,11 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MessageRole, ResearchPreferences, ProgressState, Finding, ProgressUpdate, Citation } from '../../types';
-import { COLUMNS, ThemeSuggestion } from '../../types/ideation';
-import { useIdeation } from '../../hooks/useIdeation';
-import { runAgentLoop, convertSessionToDeckPlan, suggestThemeForSession, convertSessionToDeckPlanWithTheme, AgentResponse, CompletionQuestion } from '../../services/copilotAgent';
-import { performGrokResearch, hasGrokApiKey } from '../../services/grokService';
+import { MessageRole, ResearchPreferences, ProgressState, Finding, ProgressUpdate, Citation } from '@/types';
+import { COLUMNS, ThemeSuggestion } from '@/types/ideation';
+import { useIdeation } from '@/hooks/useIdeation';
+import { runAgentLoop, convertSessionToDeckPlan, suggestThemeForSession, convertSessionToDeckPlanWithTheme, AgentResponse, CompletionQuestion } from '@/services/copilotAgent';
+import { performGrokResearch, hasGrokApiKey } from '@/services/grokService';
 import { FlowCanvas } from './FlowCanvas';
 import { CopilotPanel } from './CopilotPanel';
 import { ResearchModal } from './ResearchModal';

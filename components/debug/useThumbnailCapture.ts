@@ -7,7 +7,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import html2canvas from 'html2canvas-pro';
-import { downloadBlob, canvasToBlob } from '../../services/thumbnailService';
+import { downloadBlob, canvasToBlob } from '@/services/thumbnailService';
 
 // ============ Types ============
 

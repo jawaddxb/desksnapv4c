@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { X, Search, RefreshCw } from 'lucide-react';
-import { ARCHETYPE_CATEGORIES } from '../lib/archetypeCategories';
+import { ARCHETYPE_CATEGORIES } from '@/lib/archetypeCategories';
 import { ArchetypeCard } from './ArchetypeCard';
 
 interface ArchetypePickerProps {

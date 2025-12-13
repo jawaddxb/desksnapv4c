@@ -6,7 +6,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { API_BASE_URL } from '../config';
+import { API_BASE_URL } from '@/config';
 
 interface NetworkState {
   isOnline: boolean;

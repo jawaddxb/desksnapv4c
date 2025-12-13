@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   Loader2,
 } from 'lucide-react';
-import { Slide, ToneType, ContentRefinementType, ImageStylePreset } from '../../types';
+import { Slide, ToneType, ContentRefinementType, ImageStylePreset } from '@/types';
 import { IconButton } from '../ui/IconButton';
 import { Slider } from '../ui/Slider';
 

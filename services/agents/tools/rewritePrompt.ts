@@ -5,9 +5,9 @@
  * while preserving the visual style and aesthetic.
  */
 
-import { getAIClient } from '../../aiClient';
-import { parseAIJsonResponse } from '../../ai/parseJson';
-import { RewritePromptParams, RewritePromptResult } from '../types';
+import { getAIClient } from '@/services/aiClient';
+import { parseAIJsonResponse } from '@/services/ai/parseJson';
+import { RewritePromptParams, RewritePromptResult } from '@/types';
 import { getTextModel } from '../../../config';
 
 /**

@@ -8,9 +8,9 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Theme, ViewMode } from '../../types';
-import { THEMES } from '../../config/themes';
-import { loadGoogleFont } from '../../lib/fonts';
+import { Theme, ViewMode } from '@/types';
+import { THEMES } from '@/config/themes';
+import { loadGoogleFont } from '@/lib/fonts';
 
 /** Save status for UI feedback */
 export type SaveStatus = 'idle' | 'saving' | 'saved';

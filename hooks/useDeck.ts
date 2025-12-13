@@ -12,12 +12,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession } from '../types';
-import { generatePresentationPlan, ensureApiKeySelection } from '../services/geminiService';
-import { THEMES } from '../config/themes';
-import { IMAGE_STYLES } from '../config/imageStyles';
-import { WABI_SABI_LAYOUT_NAMES } from '../config/layoutConstants';
-import { loadThemeFonts } from '../lib/fonts';
+import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession } from '@/types';
+import { generatePresentationPlan, ensureApiKeySelection } from '@/services/geminiService';
+import { THEMES } from '@/config/themes';
+import { IMAGE_STYLES } from '@/config/imageStyles';
+import { WABI_SABI_LAYOUT_NAMES } from '@/config/layoutConstants';
+import { loadThemeFonts } from '@/lib/fonts';
 
 // Query and mutation hooks
 import { useSavedDecks, usePresentation, presentationKeys } from './queries/usePresentationQueries';
@@ -45,7 +45,7 @@ import {
 } from './presentation';
 
 // Agent activity context for agent logs
-import { useAgentActivitySafe } from '../contexts/AgentActivityContext';
+import { useAgentActivitySafe } from '@/contexts/AgentActivityContext';
 
 export const useDeck = () => {
   const queryClient = useQueryClient();

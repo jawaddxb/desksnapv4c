@@ -75,7 +75,7 @@ export interface ExtractKeywordsResult {
 
 // ============ Agent Log Types ============
 // Re-exported from types layer for backward compatibility
-export type { AgentLog, AgentAction } from '../../types/agents';
+export type { AgentLog, AgentAction } from '@/types/agents';
 
 // ============ Agent Result Types ============
 

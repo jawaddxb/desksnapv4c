@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { NoteCategory } from '../../types/ideation';
+import { NoteCategory } from '@/types/ideation';
 import { Check, Filter, ArrowRight, Sparkles } from 'lucide-react';
 
 interface TopicPillsPanelProps {

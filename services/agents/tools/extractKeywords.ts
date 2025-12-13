@@ -5,9 +5,9 @@
  * These keywords help validate and guide prompt generation.
  */
 
-import { getAIClient } from '../../aiClient';
-import { parseAIJsonResponse } from '../../ai/parseJson';
-import { ExtractKeywordsParams, ExtractKeywordsResult } from '../types';
+import { getAIClient } from '@/services/aiClient';
+import { parseAIJsonResponse } from '@/services/ai/parseJson';
+import { ExtractKeywordsParams, ExtractKeywordsResult } from '@/types';
 import { getTextModel } from '../../../config';
 
 /**

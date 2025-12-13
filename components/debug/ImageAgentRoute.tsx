@@ -16,8 +16,8 @@ import {
   RefreshCw,
   Trash2,
 } from 'lucide-react';
-import { useDebugUI } from '../../contexts/DebugUIContext';
-import { useAgentActivity } from '../../contexts/AgentActivityContext';
+import { useDebugUI } from '@/contexts/DebugUIContext';
+import { useAgentActivity } from '@/contexts/AgentActivityContext';
 import { ImageAgentDebugPanel } from './ImageAgentDebugPanel';
 
 export function ImageAgentRoute() {

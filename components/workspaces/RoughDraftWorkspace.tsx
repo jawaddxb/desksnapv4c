@@ -9,8 +9,8 @@
 
 import React, { useCallback, useEffect } from 'react';
 import { RoughDraftCanvas } from '../rough-draft';
-import { useWorkspaceMode, RoughDraftSource, SourcesPreset, SourcesRecipe } from '../../contexts/WorkspaceModeContext';
-import { RoughDraftInput, RoughDraftResult } from '../../services/agents';
+import { useWorkspaceMode, RoughDraftSource, SourcesPreset, SourcesRecipe } from '@/contexts/WorkspaceModeContext';
+import { RoughDraftInput, RoughDraftResult } from '@/services/agents';
 
 export interface RoughDraftWorkspaceProps {
   /** Source of the draft */

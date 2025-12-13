@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check, ChevronRight, Minus } from 'lucide-react';
-import type { Theme, ContentType, BulletStyle, ThemeContentStyle } from '../../types';
-import { DEFAULT_CONTENT_STYLE } from '../../config/contentStyles';
+import type { Theme, ContentType, BulletStyle, ThemeContentStyle } from '@/types';
+import { DEFAULT_CONTENT_STYLE } from '@/config/contentStyles';
 
 interface BulletRendererProps {
   theme: Theme;

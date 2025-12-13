@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Slide, Theme, ContentType } from '../types';
+import { Slide, Theme, ContentType } from '@/types';
 import { SmartText } from './SmartText';
-import { LayoutLayer } from '../config/zIndex';
-import { PRNG } from '../lib/utils';
-import { TextRole, getTextConfigWithOverrides } from '../lib/wabiSabiText';
-import { applyFontScale } from '../lib/textPresets';
-import { useTextSelection } from '../contexts/TextSelectionContext';
+import { LayoutLayer } from '@/config/zIndex';
+import { PRNG } from '@/lib/utils';
+import { TextRole, getTextConfigWithOverrides } from '@/lib/wabiSabiText';
+import { applyFontScale } from '@/lib/textPresets';
+import { useTextSelection } from '@/contexts/TextSelectionContext';
 import { BulletRenderer } from './content';
 
 export interface ArchetypeProps {

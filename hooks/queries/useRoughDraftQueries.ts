@@ -16,8 +16,8 @@ import {
   addSlide,
   updateSlide,
   deleteSlide,
-} from '../../services/api/roughDraftService';
-import { RoughDraft, RoughDraftSlide, RoughDraftStatus } from '../../types/roughDraft';
+} from '@/services/api/roughDraftService';
+import { RoughDraft, RoughDraftSlide, RoughDraftStatus } from '@/types/roughDraft';
 
 // Query keys for cache management
 export const roughDraftKeys = {

@@ -5,8 +5,8 @@
  */
 
 import { FunctionDeclaration } from '@google/genai';
-import { ResearchPreferences, ProgressUpdate } from '../../types';
-import { IdeationSession } from '../../types/ideation';
+import { ResearchPreferences, ProgressUpdate } from '@/types';
+import { IdeationSession } from '@/types/ideation';
 
 /**
  * Response from the agent loop

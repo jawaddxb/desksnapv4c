@@ -9,9 +9,9 @@
 
 import React, { useCallback } from 'react';
 import { IdeationCopilot } from '../ideation/IdeationCopilot';
-import { useWorkspaceMode } from '../../contexts/WorkspaceModeContext';
-import { PresentationPlanResponse } from '../../types';
-import { RoughDraftInput } from '../../services/agents';
+import { useWorkspaceMode } from '@/contexts/WorkspaceModeContext';
+import { PresentationPlanResponse } from '@/types';
+import { RoughDraftInput } from '@/services/agents';
 
 export interface IdeationWorkspaceProps {
   /** Session ID to load (optional, for resuming) */

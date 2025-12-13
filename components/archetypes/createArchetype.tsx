@@ -11,9 +11,9 @@
  */
 
 import React from 'react';
-import { Slide, Theme } from '../../types';
-import { PRNG } from '../../lib/utils';
-import { LayoutLayer } from '../../config';
+import { Slide, Theme } from '@/types';
+import { PRNG } from '@/lib/utils';
+import { LayoutLayer } from '@/config';
 import { EditableTitle, EditableContent } from '../WabiSabiComponents';
 import { ImageContainer } from '../StandardLayouts';
 

@@ -10,7 +10,7 @@
  */
 
 import PptxGenJS from 'pptxgenjs';
-import type { Presentation, Theme, Slide, ExportMode, ContentType } from '../types';
+import type { Presentation, Theme, Slide, ExportMode, ContentType } from '@/types';
 import type { ExportProgress, PPTStrategyOptions } from '../types/export';
 import { getThemeCompatibility, getFontMapping, extractFontName } from '../lib/fontCompatibility';
 import { downloadBlob } from '../lib/fileUtils';

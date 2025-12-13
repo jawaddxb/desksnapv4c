@@ -13,14 +13,14 @@
  */
 
 import { getAIClient } from '../aiClient';
-import { Slide, PresentationPlanResponse, LayoutType, Alignment } from '../../types';
-import { IdeaNote, JournalEntry, JournalStage, COLUMNS } from '../../types/ideation';
-import { THEMES } from '../../config/themes';
+import { Slide, PresentationPlanResponse, LayoutType, Alignment } from '@/types';
+import { IdeaNote, JournalEntry, JournalStage, COLUMNS } from '@/types/ideation';
+import { THEMES } from '@/config/themes';
 import { runImagePromptAgent } from './imagePromptAgent';
 import { AgentLog, AgentContext } from './types';
 import { generateSlideImage } from '../geminiService';
-import { getTextModel } from '../../config';
-import { safeJsonParse } from '../../lib/jsonUtils';
+import { getTextModel } from '@/config';
+import { safeJsonParse } from '@/lib/jsonUtils';
 import { createJournalEntry } from '../copilot/journalHelpers';
 
 // ============ Types ============

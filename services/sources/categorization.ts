@@ -5,8 +5,8 @@
  */
 
 import { getAIClient } from '../aiClient';
-import { getTextModel } from '../../config';
-import { DeckRecipe, NoteCategory, getRecipeColumns } from '../../types/ideation';
+import { getTextModel } from '@/config';
+import { DeckRecipe, NoteCategory, getRecipeColumns } from '@/types/ideation';
 import { ComprehensiveContent } from '../firecrawlService';
 import { CategorizedNote } from './types';
 

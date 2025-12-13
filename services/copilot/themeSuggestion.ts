@@ -6,9 +6,9 @@
  */
 
 import { getAIClient } from '../aiClient';
-import { IdeationSession, ThemeSuggestion, COLUMNS, JournalEntry } from '../../types/ideation';
-import { THEMES, THEME_CATEGORIES } from '../../config/themes';
-import { getTextModel } from '../../config';
+import { IdeationSession, ThemeSuggestion, COLUMNS, JournalEntry } from '@/types/ideation';
+import { THEMES, THEME_CATEGORIES } from '@/config/themes';
+import { getTextModel } from '@/config';
 import { createJournalEntry } from './journalHelpers';
 
 /**

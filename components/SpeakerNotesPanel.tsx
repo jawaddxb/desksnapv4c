@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Slide } from '../types';
+import { Slide } from '@/types';
 import { X, GripHorizontal, FileText } from 'lucide-react';
 
 interface SpeakerNotesPanelProps {

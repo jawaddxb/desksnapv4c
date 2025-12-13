@@ -4,7 +4,7 @@
  * Helper functions for the sources agent.
  */
 
-import { DeckRecipe, getRecipeColumns } from '../../types/ideation';
+import { DeckRecipe, getRecipeColumns } from '@/types/ideation';
 
 /**
  * Extract video ID from YouTube URL

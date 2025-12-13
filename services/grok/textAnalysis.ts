@@ -5,7 +5,7 @@
  * source reliability estimation, and URL parsing.
  */
 
-import type { Finding, FindingType } from '../../types';
+import type { Finding, FindingType } from '@/types';
 
 /**
  * Extract source name from URL

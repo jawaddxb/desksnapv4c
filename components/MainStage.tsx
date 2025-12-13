@@ -1,60 +1,29 @@
 
 
 import React, { useState, useCallback } from 'react';
-import { Slide, Theme, Presentation, ImageStylePreset } from '../types';
-import { IdeationSession } from '../types/ideation';
-import { RoughDraft } from '../types/roughDraft';
 import { RotateCw, Wand2, Layers } from 'lucide-react';
 import { WabiSabiStage } from './WabiSabiStage';
-import { getLayout } from '../lib/layoutRegistry';
+import { getLayout } from '@/lib/layoutRegistry';
 import { SlideContentEditor } from './SlideContentEditor';
 import { LayoutToolbar } from './LayoutToolbar';
 import { Dashboard } from './Dashboard';
 import { SpeakerNotesPanel } from './SpeakerNotesPanel';
-import { generateHolisticImageSuggestions } from '../services/geminiService';
+import { generateHolisticImageSuggestions } from '@/services/geminiService';
+import type { MainStageProps } from '@/types/mainStage';
 
-interface MainStageProps {
-  slide: Slide | null;
-  theme: Theme;
-  activeWabiSabiLayout?: string;
-  onRegenerateSlide?: (mode: 'same' | 'varied') => void;
-  onRegenerateAll?: (mode: 'same' | 'varied') => void;
-  onUpdateSlide?: (updates: Partial<Slide>) => void;
-  printMode?: boolean;
-  viewMode?: 'standard' | 'wabi-sabi';
-  // AI Refinement Props
-  onRefineContent?: (type: 'tone' | 'content', subType: string) => Promise<void>;
-  onEnhanceImage?: (preset: ImageStylePreset) => Promise<void>;
-  isRefining?: boolean;
-  // Dashboard Props
-  savedDecks?: Presentation[];
-  onLoadDeck?: (id: string) => void;
-  onDeleteDeck?: (id: string) => void;
-  onCloneDeck?: (id: string) => void;
-  onCreateDeck?: () => void;
-  onImport?: (file: File) => void;
-  onIdeate?: () => void;
-  // Ideation Props
-  savedIdeations?: IdeationSession[];
-  isLoadingIdeations?: boolean;
-  onLoadIdeation?: (id: string) => void;
-  onDeleteIdeation?: (id: string) => void;
-  onGenerateDeckFromIdeation?: (id: string) => void;
-  onViewJournal?: (id: string) => void;
-  // Rough Draft Props
-  savedRoughDrafts?: RoughDraft[];
-  isLoadingRoughDrafts?: boolean;
-  onLoadRoughDraft?: (id: string) => void;
-  onDeleteRoughDraft?: (id: string) => void;
-  onApproveRoughDraft?: (id: string) => void;
-  // Sources Mode Props (VideoDeck / Research & Present)
-  onOpenSources?: (preset: 'video' | 'web' | 'mixed') => void;
-  // Beautify Mode Props
-  onBeautify?: () => void;
-  // Presentation context for image prompt toolbar
-  presentation?: Presentation | null;
-  activeSlideIndex?: number;
-}
+// Re-export domain interfaces for consumers that need specific subsets
+export type {
+  SlideDisplayProps,
+  SlideEditingProps,
+  AIRefinementProps,
+  PresentationContextProps,
+  DeckOperationsProps,
+  IdeationOperationsProps,
+  RoughDraftOperationsProps,
+  WorkspaceModeProps,
+  DashboardProps,
+  MainStageProps,
+} from '@/types/mainStage';
 
 export const MainStage: React.FC<MainStageProps> = ({
     slide,

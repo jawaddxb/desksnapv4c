@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check, Plus, Lightbulb, Palette, Download, X, ArrowRight } from 'lucide-react';
-import { OnboardingStep } from '../../hooks/useOnboarding';
+import { OnboardingStep } from '@/hooks/useOnboarding';
 
 interface GettingStartedProps {
   completedSteps: OnboardingStep[];

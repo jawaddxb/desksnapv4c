@@ -5,8 +5,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Presentation } from '../../types';
-import { generateHolisticImageSuggestions } from '../../services/geminiService';
+import { Presentation } from '@/types';
+import { generateHolisticImageSuggestions } from '@/services/geminiService';
 
 export interface UseImagePromptSuggestionsOptions {
   /** Full presentation for context */

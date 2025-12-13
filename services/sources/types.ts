@@ -4,7 +4,7 @@
  * Local types for the sources agent service.
  */
 
-import { NoteCategory } from '../../types/ideation';
+import { NoteCategory } from '@/types/ideation';
 
 /**
  * Categorized note from AI analysis

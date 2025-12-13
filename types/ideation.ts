@@ -5,7 +5,7 @@
  * Notes connect via parentId references, positioned in swimlane columns.
  */
 
-import { Message } from '../types';
+import { Message } from '@/types';
 
 // Swimlane column names (presentation narrative flow) - default for pitch/persuasion
 export const COLUMNS = ['Hook', 'Problem', 'Solution', 'Proof', 'CTA'] as const;

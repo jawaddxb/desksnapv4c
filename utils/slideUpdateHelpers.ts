@@ -8,7 +8,7 @@
  * DRY: Extracted from 5+ repeated patterns across hooks.
  */
 
-import type { Presentation, Slide } from '../types';
+import type { Presentation, Slide } from '@/types';
 
 /**
  * Update a single slide at a specific index.

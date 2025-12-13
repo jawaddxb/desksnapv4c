@@ -6,13 +6,13 @@
  */
 
 import { useCallback, useRef, useEffect } from 'react';
-import { Presentation, Slide } from '../../types';
+import { Presentation, Slide } from '@/types';
 import {
   generateAllImagesAsync,
   regenerateSlideImageAsync,
   pollImageGeneration,
   BatchStatusResponse,
-} from '../../services/api/imageService';
+} from '@/services/api/imageService';
 
 export interface UseAsyncImageGenerationOptions {
   /** Current presentation */

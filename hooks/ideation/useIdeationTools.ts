@@ -8,14 +8,14 @@
  */
 
 import { useCallback } from 'react';
-import { Message, MessageRole, MessageRoleType } from '../../types';
+import { Message, MessageRole, MessageRoleType } from '@/types';
 import {
   IdeationSession,
   IdeationStage,
   JournalEntry,
   NoteColor,
   COLUMNS,
-} from '../../types/ideation';
+} from '@/types/ideation';
 import { AddNoteOptions } from './useIdeationNotes';
 
 export interface UseIdeationToolsOptions {

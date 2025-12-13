@@ -8,14 +8,14 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Message, MessageRole, MessageRoleType } from '../types';
+import { Message, MessageRole, MessageRoleType } from '@/types';
 import {
   IdeationSession,
   IdeaNote,
   IdeationStage,
   JournalEntry,
   createSession,
-} from '../types/ideation';
+} from '@/types/ideation';
 import { useSavedIdeations, useIdeationSession } from './queries/useIdeationQueries';
 import {
   useCreateIdeation,
@@ -24,7 +24,7 @@ import {
   useLinkIdeationToDeck,
 } from './mutations/useIdeationMutations';
 import { useAutoSave } from './useAutoSave';
-import { updateIdeationSession } from '../services/api/ideationService';
+import { updateIdeationSession } from '@/services/api/ideationService';
 
 // Composed hooks
 import {

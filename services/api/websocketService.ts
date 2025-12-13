@@ -7,8 +7,8 @@
 
 import { QueryClient } from '@tanstack/react-query';
 import { getAccessToken } from './tokenManager';
-import { Presentation, Slide } from '../../types';
-import { WS_BASE_URL } from '../../config';
+import { Presentation, Slide } from '@/types';
+import { WS_BASE_URL } from '@/config';
 
 // WebSocket message types (must match backend)
 export type MessageType =

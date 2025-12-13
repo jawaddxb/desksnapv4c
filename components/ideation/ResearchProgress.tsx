@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import type { ProgressState, Finding } from '../../types';
+import type { ProgressState, Finding } from '@/types';
 
 interface ResearchProgressProps {
   progress: ProgressState | null;

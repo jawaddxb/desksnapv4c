@@ -1,6 +1,6 @@
 import React from 'react';
-import { LayoutLayer } from '../../../config/zIndex';
-import { Slide, Theme } from '../../../types';
+import { LayoutLayer } from '@/config/zIndex';
+import { Slide, Theme } from '@/types';
 import { ImageContainer } from '../../StandardLayouts';
 
 /**

@@ -5,7 +5,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Message, MessageRole } from '../types';
+import { Message, MessageRole } from '@/types';
 
 const INITIAL_MESSAGE: Message = {
   id: 'init',

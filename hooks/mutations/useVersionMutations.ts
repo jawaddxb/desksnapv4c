@@ -9,7 +9,7 @@ import {
   createVersion,
   restoreVersion,
   deleteVersion,
-} from '../../services/api/versionService';
+} from '@/services/api/versionService';
 import { versionKeys } from '../queries/useVersionQueries';
 import { presentationKeys } from '../queries/usePresentationQueries';
 

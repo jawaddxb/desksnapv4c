@@ -6,7 +6,7 @@
  */
 
 import { api } from './apiClient';
-import { Message } from '../../types';
+import { Message } from '@/types';
 import {
   IdeationSession,
   IdeaNote,
@@ -24,7 +24,7 @@ import {
   UpdateIdeationRequest,
   CreateNoteRequest,
   UpdateNoteRequest,
-} from '../../types/ideation';
+} from '@/types/ideation';
 
 // ============ Conversion Helpers ============
 

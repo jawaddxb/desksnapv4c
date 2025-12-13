@@ -8,7 +8,7 @@
 import React from 'react';
 import { MoveUpRight, VenetianMask, Ruler } from 'lucide-react';
 import { ArchetypeConfig } from '../createArchetype';
-import { LayoutLayer } from '../../../config';
+import { LayoutLayer } from '@/config';
 import { EditableTitle, EditableContent } from '../../WabiSabiComponents';
 import { ImageContainer } from '../../StandardLayouts';
 

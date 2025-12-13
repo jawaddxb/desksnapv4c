@@ -14,9 +14,9 @@ import {
   updateSlide,
   addSlide,
   deleteSlide,
-} from '../../services/api/presentationService';
+} from '@/services/api/presentationService';
 import { presentationKeys } from '../queries/usePresentationQueries';
-import { Presentation, Slide } from '../../types';
+import { Presentation, Slide } from '@/types';
 
 /**
  * Hook to create a new presentation

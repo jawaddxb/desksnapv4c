@@ -8,7 +8,7 @@
 import React from 'react';
 import { Triangle, Barcode, Grid } from 'lucide-react';
 import { ArchetypeConfig, ArchetypeContext } from '../createArchetype';
-import { LayoutLayer } from '../../../config';
+import { LayoutLayer } from '@/config';
 import { EditableTitle, EditableContent, DecorativeLabel } from '../../WabiSabiComponents';
 import { ImageContainer } from '../../StandardLayouts';
 

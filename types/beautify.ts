@@ -5,7 +5,7 @@
  * DRY: Reuses LayoutType, Alignment from ../types
  */
 
-import type { LayoutType, Alignment, Slide } from '../types';
+import type { LayoutType, Alignment, Slide } from '@/types';
 
 // =============================================================================
 // SLIDE CLASSIFICATION

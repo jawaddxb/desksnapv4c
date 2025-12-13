@@ -16,9 +16,9 @@ import {
   Sparkles,
   Clock,
 } from 'lucide-react';
-import { useAgentActivitySafe, SlideInfo } from '../contexts/AgentActivityContext';
-import { AgentLog } from '../types/agents';
-import { PromptValidationResult } from '../services/agents/types';
+import { useAgentActivitySafe, SlideInfo } from '@/contexts/AgentActivityContext';
+import { AgentLog } from '@/types/agents';
+import { PromptValidationResult } from '@/services/agents/types';
 
 export interface AgentActivityPanelProps {
   className?: string;

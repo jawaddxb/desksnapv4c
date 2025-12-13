@@ -9,10 +9,10 @@
 
 import React from 'react';
 import { Check, FileSpreadsheet } from 'lucide-react';
-import { Theme } from '../../types';
-import { THEMES } from '../../config/themes';
-import { isPptxSafe } from '../../lib/fontCompatibility';
-import { getThemeThumbnailPath } from '../../services/thumbnailService';
+import { Theme } from '@/types';
+import { THEMES } from '@/config/themes';
+import { isPptxSafe } from '@/lib/fontCompatibility';
+import { getThemeThumbnailPath } from '@/services/thumbnailService';
 
 export interface ThemePickerProps {
   /** Currently selected theme ID */

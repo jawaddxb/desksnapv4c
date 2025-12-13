@@ -17,7 +17,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import { Slide, Presentation } from '../../types';
+import { Slide, Presentation } from '@/types';
 import { IconButton } from '../ui/IconButton';
 
 export interface ImagePromptMenuProps {

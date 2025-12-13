@@ -5,10 +5,10 @@
  * Single responsibility: Transform and optimize image prompts for generation.
  */
 
-import { ImageStylePreset } from '../types';
+import { ImageStylePreset } from '@/types';
 import { getAIClient } from './aiClient';
 import { REFINEMENT_INSTRUCTIONS } from '../lib/prompts';
-import { getTextModel } from '../config';
+import { getTextModel } from '@/config';
 
 export type RefinementFocus = keyof typeof REFINEMENT_INSTRUCTIONS;
 

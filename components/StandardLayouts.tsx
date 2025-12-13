@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Slide, Theme, ImageStyleOverride } from '../types';
+import { Slide, Theme, ImageStyleOverride } from '@/types';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
 
 // ============ Types ============

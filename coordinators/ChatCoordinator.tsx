@@ -6,10 +6,10 @@
  */
 
 import React from 'react';
-import { ChatInterface } from '../components/ChatInterface';
-import { useChatUI } from '../contexts/ChatUIContext';
-import { Presentation } from '../types';
-import { Message } from '../hooks/useChat';
+import { ChatInterface } from '@/components/ChatInterface';
+import { useChatUI } from '@/contexts/ChatUIContext';
+import { Presentation } from '@/types';
+import { Message } from '@/hooks/useChat';
 
 interface ChatCoordinatorProps {
   currentPresentation: Presentation | null;

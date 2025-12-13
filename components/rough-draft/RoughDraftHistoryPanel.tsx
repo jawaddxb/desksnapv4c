@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { RoughDraft, RoughDraftStatus } from '../../types/roughDraft';
+import { RoughDraft, RoughDraftStatus } from '@/types/roughDraft';
 import { FileEdit, Trash2, Clock, Layers, ArrowRight, CheckCircle } from 'lucide-react';
 
 interface RoughDraftHistoryPanelProps {

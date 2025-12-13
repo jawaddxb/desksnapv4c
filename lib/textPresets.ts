@@ -4,7 +4,7 @@
  * Can be overridden per-archetype for artistic intent
  */
 
-import { FontScale } from '../types';
+import { FontScale } from '@/types';
 
 export const TEXT_PRESETS = {
     // Standard layouts (SlideContentEditor)

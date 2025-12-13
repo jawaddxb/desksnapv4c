@@ -8,9 +8,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Presentation, ViewMode } from '../../types';
-import { THEMES } from '../../config/themes';
-import { Theme } from '../../types';
+import { Presentation, ViewMode } from '@/types';
+import { THEMES } from '@/config/themes';
+import { Theme } from '@/types';
 
 export interface UseDeckSyncStateOptions {
   /** Presentation fetched from server */

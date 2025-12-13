@@ -6,7 +6,7 @@
  */
 
 import { useCallback } from 'react';
-import { deleteIdeationSession } from '../../services/api/ideationService';
+import { deleteIdeationSession } from '@/services/api/ideationService';
 
 export interface UseWorkspaceHandlersOptions {
   // Ideation state

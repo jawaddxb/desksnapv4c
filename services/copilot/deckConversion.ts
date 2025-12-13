@@ -8,10 +8,10 @@
 import { Type } from '@google/genai';
 import { getAIClient } from '../aiClient';
 import { parseAIJsonResponse } from '../ai/parseJson';
-import { PresentationPlanResponse } from '../../types';
-import { IdeationSession, COLUMNS, JournalEntry } from '../../types/ideation';
-import { THEMES } from '../../config/themes';
-import { getTextModel } from '../../config';
+import { PresentationPlanResponse } from '@/types';
+import { IdeationSession, COLUMNS, JournalEntry } from '@/types/ideation';
+import { THEMES } from '@/config/themes';
+import { getTextModel } from '@/config';
 import { createJournalEntry } from './journalHelpers';
 
 // Schema for deck plan conversion - ensures proper JSON escaping

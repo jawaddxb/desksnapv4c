@@ -17,7 +17,7 @@ import {
   X,
   Loader2,
 } from 'lucide-react';
-import { Version } from '../services/api/versionService';
+import { Version } from '@/services/api/versionService';
 
 interface VersionHistoryPanelProps {
   versions: Version[];

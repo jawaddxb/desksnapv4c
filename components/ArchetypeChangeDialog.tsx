@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { Image, RefreshCw, ArrowRight } from 'lucide-react';
-import { getArchetypeVisualStyle } from '../lib/archetypeVisualStyles';
-import { findArchetype } from '../lib/archetypeCategories';
+import { getArchetypeVisualStyle } from '@/lib/archetypeVisualStyles';
+import { findArchetype } from '@/lib/archetypeCategories';
 import { Dialog, DialogButton } from './shared/Dialog';
 
 export interface ArchetypeChangeDialogProps {

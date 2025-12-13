@@ -5,7 +5,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { listVersions, Version } from '../../services/api/versionService';
+import { listVersions, Version } from '@/services/api/versionService';
 
 // Query keys factory
 export const versionKeys = {

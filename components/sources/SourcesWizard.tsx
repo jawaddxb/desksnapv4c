@@ -8,7 +8,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { MessageRole } from '../../types';
+import { MessageRole } from '@/types';
 import {
   IdeationSession,
   IdeaNote,
@@ -17,12 +17,12 @@ import {
   NoteCategory,
   RECIPE_COLUMNS,
   createSourcesSession,
-} from '../../types/ideation';
-import { runSourcesAgentLoop } from '../../services/sourcesAgent';
-import { AgentResponse } from '../../services/copilotAgent';
-import { createIdeationSession, updateIdeationSession } from '../../services/api/ideationService';
-import { ideationKeys } from '../../hooks/queries/useIdeationQueries';
-import { useAutoSave } from '../../hooks/useAutoSave';
+} from '@/types/ideation';
+import { runSourcesAgentLoop } from '@/services/sourcesAgent';
+import { AgentResponse } from '@/services/copilotAgent';
+import { createIdeationSession, updateIdeationSession } from '@/services/api/ideationService';
+import { ideationKeys } from '@/hooks/queries/useIdeationQueries';
+import { useAutoSave } from '@/hooks/useAutoSave';
 import { FlowCanvas } from '../ideation/FlowCanvas';
 import { CollapsibleSourcesList } from './CollapsibleSourcesList';
 import { ProofSidebar } from './ProofSidebar';

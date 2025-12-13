@@ -7,10 +7,10 @@
 
 import React from 'react';
 import { FileText, Download, Presentation, Loader2, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
-import type { ExportProgress, ExportType } from '../../types/export';
+import type { ExportProgress, ExportType } from '@/types/export';
 
 // Re-export for backwards compatibility
-export type { ExportProgress, ExportType } from '../../types/export';
+export type { ExportProgress, ExportType } from '@/types/export';
 
 interface ExportProgressModalProps {
   isOpen: boolean;

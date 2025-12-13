@@ -6,7 +6,7 @@
  */
 
 import { getRefreshToken, setTokens, clearTokens } from './tokenManager';
-import { API_BASE_URL } from '../../config';
+import { API_BASE_URL } from '@/config';
 
 // ============ Error Types ============
 

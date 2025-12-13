@@ -5,9 +5,9 @@
  * Scores the prompt 0-100 based on relevance, specificity, and safety.
  */
 
-import { getAIClient } from '../../aiClient';
-import { parseAIJsonResponse } from '../../ai/parseJson';
-import { PromptValidationResult, ValidatePromptParams } from '../types';
+import { getAIClient } from '@/services/aiClient';
+import { parseAIJsonResponse } from '@/services/ai/parseJson';
+import { PromptValidationResult, ValidatePromptParams } from '@/types';
 import { getTextModel } from '../../../config';
 
 /**

@@ -5,7 +5,7 @@
  * Handles slide creation, layout mapping, image upload, and speaker notes.
  */
 
-import type { Presentation, Theme, Slide, LayoutType } from '../types';
+import type { Presentation, Theme, Slide, LayoutType } from '@/types';
 import { ensureAuthenticated, isGoogleAuthenticated as checkAuth, getAccessToken, isGoogleConfigured } from './googleAuthService';
 
 // Re-export auth checks for ExportMenu

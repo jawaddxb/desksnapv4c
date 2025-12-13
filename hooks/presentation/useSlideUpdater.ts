@@ -6,13 +6,13 @@
  */
 
 import { useCallback } from 'react';
-import { Presentation, Slide } from '../../types';
+import { Presentation, Slide } from '@/types';
 import {
   updateSlideAtIndex as updateSlideAtIndexUtil,
   updateAllSlides as updateAllSlidesUtil,
   swapSlides,
   shuffleLayoutVariants as shuffleLayoutVariantsUtil,
-} from '../../utils/slideUpdateHelpers';
+} from '@/utils/slideUpdateHelpers';
 
 export interface UseSlideUpdaterOptions {
   /** Current presentation state */

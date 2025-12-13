@@ -5,7 +5,7 @@
  * Reduces boilerplate and ensures consistency.
  */
 
-import { Theme } from '../../types';
+import { Theme } from '@/types';
 
 /**
  * Theme configuration with optional fields that have defaults.

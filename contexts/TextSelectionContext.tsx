@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { TextSelection } from '../types';
+import { TextSelection } from '@/types';
 
 interface TextSelectionContextValue {
   selection: TextSelection;

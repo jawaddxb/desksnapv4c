@@ -15,7 +15,7 @@ import {
   NoteType,
   createNote,
   getColumnIndex,
-} from '../../types/ideation';
+} from '@/types/ideation';
 
 export interface AddNoteOptions {
   type?: NoteType;

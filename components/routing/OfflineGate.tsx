@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { useNetwork } from '../../contexts/NetworkContext';
+import { useNetwork } from '@/contexts/NetworkContext';
 
 interface OfflineGateProps {
   children: React.ReactNode;

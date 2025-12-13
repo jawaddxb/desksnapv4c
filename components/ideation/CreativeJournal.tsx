@@ -11,7 +11,7 @@
  */
 
 import React, { useState } from 'react';
-import { CreativeJournal as CreativeJournalType, JournalEntry, JournalStage } from '../../types/ideation';
+import { CreativeJournal as CreativeJournalType, JournalEntry, JournalStage } from '@/types/ideation';
 import {
   BookOpen,
   Lightbulb,

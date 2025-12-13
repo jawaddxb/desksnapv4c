@@ -5,7 +5,7 @@
  * Combines theme categories into a single THEMES object.
  */
 
-import { Theme } from '../../types';
+import { Theme } from '@/types';
 import {
   SYSTEM_THEME,
   coreThemes,

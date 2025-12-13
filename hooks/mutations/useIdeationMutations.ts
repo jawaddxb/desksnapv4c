@@ -17,9 +17,9 @@ import {
   removeConnection,
   linkToPresentation,
   addJournalEntry,
-} from '../../services/api/ideationService';
+} from '@/services/api/ideationService';
 import { ideationKeys } from '../queries/useIdeationQueries';
-import { IdeationSession, IdeaNote, JournalEntry, createNote } from '../../types/ideation';
+import { IdeationSession, IdeaNote, JournalEntry, createNote } from '@/types/ideation';
 
 /**
  * Hook to create a new ideation session

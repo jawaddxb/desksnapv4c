@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from 'react';
-import { Source } from '../../types/ideation';
+import { Source } from '@/types/ideation';
 import { ChevronDown, ChevronUp, Video, Globe, FileText, X, Loader2 } from 'lucide-react';
 
 interface CollapsibleSourcesListProps {

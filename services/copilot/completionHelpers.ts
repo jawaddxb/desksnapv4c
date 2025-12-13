@@ -4,7 +4,7 @@
  * Functions for detecting completion and generating summaries.
  */
 
-import { IdeationSession, getColumnFillStatus } from '../../types/ideation';
+import { IdeationSession, getColumnFillStatus } from '@/types/ideation';
 import { ProcessedToolCall, CompletionQuestion } from './types';
 
 /**

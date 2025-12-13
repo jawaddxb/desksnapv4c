@@ -8,10 +8,10 @@
  */
 
 import React from 'react';
-import { PresentationModeOverlay } from '../components/PresentationModeOverlay';
-import { MainStage } from '../components/MainStage';
-import { PrintView } from '../components/PrintView';
-import { Presentation, Theme, ViewMode } from '../types';
+import { PresentationModeOverlay } from '@/components/PresentationModeOverlay';
+import { MainStage } from '@/components/MainStage';
+import { PrintView } from '@/components/PrintView';
+import { Presentation, Theme, ViewMode } from '@/types';
 
 interface PresentationModeCoordinatorProps {
   presentation: Presentation;

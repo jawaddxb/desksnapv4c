@@ -14,16 +14,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Slide, Theme } from '../../types';
+import { Slide, Theme } from '@/types';
 import { MainStage } from '../MainStage';
 import { WabiSabiStage } from '../WabiSabiStage';
-import { THEMES } from '../../config/themes';
+import { THEMES } from '@/config/themes';
 import {
   SLIDE_DIMENSIONS,
   EXPORT_EVENTS,
   EXPORT_ELEMENT_IDS,
-} from '../../config/exportConstants';
-import type { RenderSlideEventDetail, ExportViewMode } from '../../types/export';
+} from '@/config/exportConstants';
+import type { RenderSlideEventDetail, ExportViewMode } from '@/types/export';
 
 // =============================================================================
 // TYPES

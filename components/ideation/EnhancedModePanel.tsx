@@ -15,7 +15,7 @@ import type {
   ProgressState,
   Finding,
   EnhancedModeStep,
-} from '../../types';
+} from '@/types';
 import { ResearchProgress } from './ResearchProgress';
 import { ResearchMindMap } from './ResearchMindMap';
 

@@ -8,7 +8,7 @@
  */
 
 import { useCallback } from 'react';
-import { IdeationSession, NoteConnection } from '../../types/ideation';
+import { IdeationSession, NoteConnection } from '@/types/ideation';
 
 export interface UseIdeationConnectionsOptions {
   /** Setter for local session state */

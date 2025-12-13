@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Source } from '../../types/ideation';
+import { Source } from '@/types/ideation';
 
 interface SourcesPanelProps {
   sources: Source[];

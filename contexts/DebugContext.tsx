@@ -13,7 +13,7 @@
  */
 
 import React, { createContext, useContext, useMemo, ReactNode } from 'react';
-import { AgentLog } from '../types/agents';
+import { AgentLog } from '@/types/agents';
 import {
   DebugUIProvider,
   useDebugUISafe,

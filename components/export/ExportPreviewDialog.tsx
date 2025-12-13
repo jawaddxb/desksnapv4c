@@ -10,20 +10,20 @@
 
 import React, { useState, useMemo } from 'react';
 import { X, FileSpreadsheet, Image, Type, Check, AlertTriangle, Info } from 'lucide-react';
-import type { Presentation, Theme, ExportMode } from '../../types';
+import type { Presentation, Theme, ExportMode } from '@/types';
 import {
   getThemeCompatibility,
   getRecommendedExportMode,
   getExportModeReason,
   extractFontName,
   type PptxCompatibility,
-} from '../../lib/fontCompatibility';
+} from '@/lib/fontCompatibility';
 import {
   exportPresentation,
   downloadBlob,
   type ExportProgress,
-} from '../../services/pptExportStrategies';
-import { generatePPT } from '../../services/pptService';
+} from '@/services/pptExportStrategies';
+import { generatePPT } from '@/services/pptService';
 
 interface ExportPreviewDialogProps {
   isOpen: boolean;

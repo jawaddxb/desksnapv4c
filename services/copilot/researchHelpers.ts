@@ -6,8 +6,8 @@
  */
 
 import { getAIClient } from '../aiClient';
-import { WebSearchResult } from '../../types/ideation';
-import { getTextModel } from '../../config';
+import { WebSearchResult } from '@/types/ideation';
+import { getTextModel } from '@/config';
 
 /**
  * Perform web research using Gemini's grounding

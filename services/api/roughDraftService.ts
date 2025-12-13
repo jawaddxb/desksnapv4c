@@ -6,7 +6,7 @@
  */
 
 import { api } from './apiClient';
-import { LayoutType, Alignment, Presentation } from '../../types';
+import { LayoutType, Alignment, Presentation } from '@/types';
 import {
   RoughDraft,
   RoughDraftSlide,
@@ -20,7 +20,7 @@ import {
   ApproveRoughDraftRequest,
   RoughDraftStatus,
   ApprovalState,
-} from '../../types/roughDraft';
+} from '@/types/roughDraft';
 
 // ============ Conversion Helpers ============
 

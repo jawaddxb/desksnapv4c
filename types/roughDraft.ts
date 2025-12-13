@@ -5,7 +5,7 @@
  * Matches the backend API schema.
  */
 
-import { LayoutType, Alignment, SlideApprovalState } from '../types';
+import { LayoutType, Alignment, SlideApprovalState } from '@/types';
 
 // ============ Frontend Types ============
 

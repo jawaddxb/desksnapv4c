@@ -9,14 +9,14 @@
 
 import React, { useState } from 'react';
 import { ChevronDown, FileText, Download, Presentation, Share2, FileSpreadsheet } from 'lucide-react';
-import { Presentation as PresentationType, Theme } from '../../types';
-import { generatePDF, PDFExportProgress } from '../../services/pdfService';
-import { generatePPT, PPTExportProgress } from '../../services/pptService';
-import { exportToGoogleSlides, isGoogleAuthenticated, isGoogleConfigured } from '../../services/googleSlidesService';
+import { Presentation as PresentationType, Theme } from '@/types';
+import { generatePDF, PDFExportProgress } from '@/services/pdfService';
+import { generatePPT, PPTExportProgress } from '@/services/pptService';
+import { exportToGoogleSlides, isGoogleAuthenticated, isGoogleConfigured } from '@/services/googleSlidesService';
 import { ExportProgressModal, ExportType, ExportProgress } from './ExportProgressModal';
 import { ExportRenderer } from './ExportRenderer';
 import { ExportPreviewDialog } from './ExportPreviewDialog';
-import { isPptxSafe } from '../../lib/fontCompatibility';
+import { isPptxSafe } from '@/lib/fontCompatibility';
 
 interface ExportMenuProps {
   presentation: PresentationType | null;

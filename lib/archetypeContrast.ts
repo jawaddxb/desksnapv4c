@@ -5,7 +5,7 @@
  * This file handles special cases like conditional contrasts that depend on theme.
  */
 
-import { Theme } from '../types';
+import { Theme } from '@/types';
 import { ContrastConfig } from './contrast';
 import { getArchetypeCustomContrast } from '../config/archetypeRegistry';
 

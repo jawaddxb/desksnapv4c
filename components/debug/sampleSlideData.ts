@@ -5,7 +5,7 @@
  * Uses neutral content that works across all visual styles.
  */
 
-import { Slide } from '../../types';
+import { Slide } from '@/types';
 
 /**
  * Sample slide for thumbnail generation.

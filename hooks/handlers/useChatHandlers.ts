@@ -6,8 +6,8 @@
  */
 
 import { useCallback } from 'react';
-import { Slide, GenerationMode } from '../../types';
-import { IMAGE_STYLES } from '../../config/imageStyles';
+import { Slide, GenerationMode } from '@/types';
+import { IMAGE_STYLES } from '@/config/imageStyles';
 
 export interface UseChatHandlersOptions {
   // Chat UI state

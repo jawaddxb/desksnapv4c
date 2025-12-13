@@ -5,12 +5,12 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Presentation, Slide, ToneType, ContentRefinementType, ImageStylePreset } from '../../types';
+import { Presentation, Slide, ToneType, ContentRefinementType, ImageStylePreset } from '@/types';
 import {
   refineSlideContent as refineSlideContentApi,
   refineSlideContentByType,
   enhanceImagePrompt,
-} from '../../services/geminiService';
+} from '@/services/geminiService';
 
 export interface UseContentRefinementOptions {
   /** Current presentation */

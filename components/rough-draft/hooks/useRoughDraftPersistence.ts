@@ -8,13 +8,13 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { RoughDraftSlide } from '../../../services/agents/roughDraftAgent';
-import { RoughDraft } from '../../../types/roughDraft';
+import { RoughDraftSlide } from '@/services/agents/roughDraftAgent';
+import { RoughDraft } from '@/types/roughDraft';
 import {
   createRoughDraft,
   updateSlide as apiUpdateSlide,
   approveRoughDraft,
-} from '../../../services/api/roughDraftService';
+} from '@/services/api/roughDraftService';
 
 /**
  * Check if a string is a valid UUID (v4 format)

@@ -13,7 +13,7 @@ import {
   createSource,
   createKnowledgeNote,
   getRecipeColumns,
-} from '../../types/ideation';
+} from '@/types/ideation';
 import { extractComprehensiveContent } from '../firecrawlService';
 import { extractYouTubeTranscript } from './extraction';
 import { categorizeContentWithAI, extractUniqueThemes, extractUniqueTypes } from './categorization';

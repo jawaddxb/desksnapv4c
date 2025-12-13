@@ -7,8 +7,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { RoughDraftSlide } from '../../services/agents/roughDraftAgent';
-import { Theme } from '../../types';
+import { RoughDraftSlide } from '@/services/agents/roughDraftAgent';
+import { Theme } from '@/types';
 import { RefreshCw, Check, ChevronUp, Plus, Trash2, Sparkles, Search, Wand2 } from 'lucide-react';
 
 interface RoughDraftSlideCardProps {

@@ -5,10 +5,10 @@
  * Single responsibility: Transform slide text based on tone and content goals.
  */
 
-import { ToneType, ContentRefinementType } from '../types';
+import { ToneType, ContentRefinementType } from '@/types';
 import { getAIClient } from './aiClient';
 import { parseAIJsonResponse } from './ai/parseJson';
-import { getTextModel } from '../config';
+import { getTextModel } from '@/config';
 
 /**
  * Tone instructions for content refinement.

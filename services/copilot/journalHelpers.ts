@@ -5,7 +5,7 @@
  * Extracted from copilotAgent.ts for better SRP.
  */
 
-import { JournalEntry, JournalStage } from '../../types/ideation';
+import { JournalEntry, JournalStage } from '@/types/ideation';
 
 export interface JournalEntryOptions {
   decision?: string;

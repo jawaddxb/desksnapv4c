@@ -11,7 +11,7 @@ import {
   AgentImageGenerationOptions,
   AgentImageGenerationResult,
 } from './agents';
-import { getImageModelFallbacks } from '../config';
+import { getImageModelFallbacks } from '@/config';
 
 /**
  * Options for slide image generation.

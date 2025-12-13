@@ -9,8 +9,8 @@
 
 import React, { useCallback } from 'react';
 import { SourcesWizard } from '../sources';
-import { useWorkspaceMode, SourcesPreset, SourcesRecipe } from '../../contexts/WorkspaceModeContext';
-import { IdeationSession } from '../../types/ideation';
+import { useWorkspaceMode, SourcesPreset, SourcesRecipe } from '@/contexts/WorkspaceModeContext';
+import { IdeationSession } from '@/types/ideation';
 
 export interface SourcesWorkspaceProps {
   /** Preset mode: 'video' for VideoDeck, 'web' for Research & Present */

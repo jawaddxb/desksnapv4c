@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Presentation } from '../types';
+import { Presentation } from '@/types';
 
 interface PresentationModeOverlayProps {
   /** Current presentation */

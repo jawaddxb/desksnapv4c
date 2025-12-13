@@ -11,12 +11,12 @@
 
 import { Content, Part, FunctionCall, FunctionCallingConfigMode } from '@google/genai';
 import { getAIClient } from '../aiClient';
-import { MessageRole } from '../../types';
-import { IdeationSession } from '../../types/ideation';
-import { COPILOT_TOOLS } from '../../lib/copilotTools';
-import { buildFullPrompt } from '../../lib/copilotPrompts';
+import { MessageRole } from '@/types';
+import { IdeationSession } from '@/types/ideation';
+import { COPILOT_TOOLS } from '@/lib/copilotTools';
+import { buildFullPrompt } from '@/lib/copilotPrompts';
 import { performGrokResearch, hasGrokApiKey } from '../grokService';
-import { getTextModel } from '../../config';
+import { getTextModel } from '@/config';
 import { performResearch } from './researchHelpers';
 import {
   AgentResponse,

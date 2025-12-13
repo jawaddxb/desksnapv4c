@@ -7,7 +7,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { SmartText } from '../SmartText';
-import { IdeaNote, NOTE_COLORS, NoteColor } from '../../types/ideation';
+import { IdeaNote, NOTE_COLORS, NoteColor } from '@/types/ideation';
 
 interface StickyNoteProps {
   note: IdeaNote;

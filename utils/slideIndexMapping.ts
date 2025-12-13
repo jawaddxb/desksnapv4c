@@ -5,7 +5,7 @@
  * Single responsibility: Map between filtered and original slide indices.
  */
 
-import { Slide } from '../types';
+import { Slide } from '@/types';
 
 /**
  * Create a mapping from filtered indices to original indices.

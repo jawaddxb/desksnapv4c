@@ -6,8 +6,8 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import { Slide, TextStyleOverride } from '../../types';
-import { useTextSelection } from '../../contexts/TextSelectionContext';
+import { Slide, TextStyleOverride } from '@/types';
+import { useTextSelection } from '@/contexts/TextSelectionContext';
 
 export interface UseSlideStylesOptions {
   /** Current slide */

@@ -8,7 +8,7 @@
 import React from 'react';
 import { Globe, Sparkles } from 'lucide-react';
 import { ArchetypeConfig, ArchetypeContext } from '../createArchetype';
-import { LayoutLayer } from '../../../config';
+import { LayoutLayer } from '@/config';
 import { EditableTitle, EditableContent } from '../../WabiSabiComponents';
 import { ImageContainer } from '../../StandardLayouts';
 import { SmartText } from '../../SmartText';

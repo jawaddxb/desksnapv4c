@@ -6,9 +6,9 @@
  */
 
 import React from 'react';
-import { Presentation } from '../../types';
-import { IdeationSession, COLUMNS, JournalEntry } from '../../types/ideation';
-import { THEMES } from '../../config/themes';
+import { Presentation } from '@/types';
+import { IdeationSession, COLUMNS, JournalEntry } from '@/types/ideation';
+import { THEMES } from '@/config/themes';
 import { CreativeJournal } from '../ideation/CreativeJournal';
 import {
   X,

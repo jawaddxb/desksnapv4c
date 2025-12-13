@@ -6,8 +6,8 @@
 
 import { getAIClient } from '../aiClient';
 import { scrapeUrl, parseMarkdownToSections, isFirecrawlAvailable } from '../firecrawlService';
-import { getTextModel } from '../../config';
-import { TranscriptSegment } from '../../types/ideation';
+import { getTextModel } from '@/config';
+import { TranscriptSegment } from '@/types/ideation';
 
 /**
  * Extract transcript from YouTube video using Gemini's native video understanding.

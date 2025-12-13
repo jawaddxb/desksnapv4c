@@ -9,87 +9,34 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MainStage } from '../components/MainStage';
-import { AppHeader } from '../components/AppHeader';
-import { AppSidebar } from '../components/AppSidebar';
-import { AgentActivityPanel } from '../components/AgentActivityPanel';
-import { ArchetypeChangeDialog } from '../components/ArchetypeChangeDialog';
-import { getArchetypeVisualStyle } from '../lib/archetypeVisualStyles';
-import { useChatUI } from '../contexts/ChatUIContext';
-import { Presentation, Theme, ViewMode } from '../types';
-import { Message } from '../hooks/useChat';
-import { ImageStyle } from '../config/imageStyles';
-import { IdeationSession } from '../services/api/ideationService';
-import { RoughDraftSession } from '../services/api/roughDraftService';
+import { MainStage } from '@/components/MainStage';
+import { AppHeader } from '@/components/AppHeader';
+import { AppSidebar } from '@/components/AppSidebar';
+import { AgentActivityPanel } from '@/components/AgentActivityPanel';
+import { ArchetypeChangeDialog } from '@/components/ArchetypeChangeDialog';
+import { getArchetypeVisualStyle } from '@/lib/archetypeVisualStyles';
+import { useChatUI } from '@/contexts/ChatUIContext';
+import type { DeckViewCoordinatorProps } from '@/types/deckViewCoordinator';
 
-interface DeckViewCoordinatorProps {
-  // Presentation state
-  currentPresentation: Presentation | null;
-  savedDecks: Presentation[];
-  activeSlideIndex: number;
-  setActiveSlideIndex: (index: number) => void;
-  isGenerating: boolean;
-  isRefining: boolean;
-  activeTheme: Theme;
-  activeWabiSabiLayout: string;
-  viewMode: ViewMode;
-  setViewMode: (mode: ViewMode) => void;
-  saveStatus: 'idle' | 'saving' | 'saved' | 'error';
-
-  // Deck actions
-  actions: {
-    applyTheme: (themeId: string) => void;
-    applyTypography: (fontFamily: string) => void;
-    setWabiSabiLayout: (layoutName: string) => void;
-    cycleWabiSabiLayout: () => void;
-    regenerateAllImages: () => void;
-    regenerateSlideImage: (slideIndex: number) => void;
-    remixDeck: () => void;
-    saveDeck: () => void;
-    closeDeck: () => void;
-    loadDeck: (id: string) => void;
-    deleteDeck: (id: string) => void;
-    importDeck: (file: File) => void;
-    exportDeck: () => void;
-    shuffleLayoutVariants: () => void;
-    updateSlide: (slideIndex: number, updates: Partial<any>) => void;
-    refineSlideContent: (slideIndex: number, refinementType: string) => void;
-    enhanceSlideImage: (slideIndex: number) => void;
-    moveSlide: (from: number, to: number) => void;
-    updateVisualStyleAndRegenerateImages: (visualStyle: string, regenerate?: boolean) => void;
-  };
-
-  // Chat state
-  messages: Message[];
-  sidebarScrollRef: React.RefObject<HTMLDivElement>;
-
-  // Ideation/Rough draft data
-  savedIdeations: IdeationSession[];
-  isLoadingIdeations: boolean;
-  savedRoughDrafts: RoughDraftSession[];
-  isLoadingRoughDrafts: boolean;
-
-  // Source content
-  sourceIdeation: IdeationSession | null | undefined;
-  sourceRoughDraft: RoughDraftSession | null | undefined;
-
-  // Handlers
-  onSendMessage: () => void;
-  onCreateDeck: () => void;
-  onIdeate: () => void;
-  onLoadIdeation: (id: string) => void;
-  onDeleteIdeation: (id: string) => void;
-  onLoadRoughDraft: (id: string) => void;
-  onDeleteRoughDraft: (id: string) => void;
-  onApproveRoughDraft: (id: string) => void;
-  onCloneDeck: (id: string) => void;
-  onCloneCurrentDeck: () => void;
-  onOpenSources: (preset: 'video' | 'web' | 'mixed', recipe?: 'training' | 'explainer' | 'brief' | 'pitch') => void;
-  onOpenBeautify: () => void;
-  onViewSourceIdeation: (id: string) => void;
-  onViewSourceRoughDraft: (id: string) => void;
-  onStartPresenting: () => void;
-}
+// Re-export domain interfaces for consumers that need specific subsets
+export type {
+  PresentationState,
+  ThemeLayoutState,
+  ThemeActions,
+  SlideActions,
+  ImageActions,
+  DeckLifecycleActions,
+  DeckActions,
+  ChatState,
+  IdeationData,
+  RoughDraftData,
+  SourceContentData,
+  DeckHandlers,
+  IdeationHandlers,
+  RoughDraftHandlers,
+  ModeNavigationHandlers,
+  DeckViewCoordinatorProps,
+} from '@/types/deckViewCoordinator';
 
 export function DeckViewCoordinator({
   currentPresentation,

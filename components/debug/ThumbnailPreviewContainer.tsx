@@ -6,7 +6,7 @@
  */
 
 import React, { forwardRef } from 'react';
-import { Slide, Theme } from '../../types';
+import { Slide, Theme } from '@/types';
 import { WabiSabiStage } from '../WabiSabiStage';
 import { SplitLayout } from '../StandardLayouts';
 

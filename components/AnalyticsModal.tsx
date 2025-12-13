@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Presentation, AnalyticsSession } from '../types';
+import { Presentation, AnalyticsSession } from '@/types';
 import { X, Clock, Activity, BarChart3, TrendingUp, Eye, Share2 } from 'lucide-react';
 import { StatCard } from './shared/StatCard';
 

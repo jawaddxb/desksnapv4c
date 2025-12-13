@@ -18,7 +18,7 @@ import {
   CONTENT_DECONSTRUCTION_PROMPT,
   CONTENT_DECONSTRUCTION_SCHEMA,
 } from '../lib/prompts';
-import { getTextModel } from '../config';
+import { getTextModel } from '@/config';
 
 /**
  * Result from content deconstruction.

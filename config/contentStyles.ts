@@ -1,4 +1,4 @@
-import type { ThemeContentStyle } from '../types';
+import type { ThemeContentStyle } from '@/types';
 
 /**
  * Content style presets for theme-driven bullet variety.

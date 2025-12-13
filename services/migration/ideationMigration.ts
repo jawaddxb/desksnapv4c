@@ -15,7 +15,7 @@
 
 import { getIdeationSessions as getLocalIdeations } from '../storageService';
 import { createIdeationSession } from '../api/ideationService';
-import { IdeationSession } from '../../types/ideation';
+import { IdeationSession } from '@/types/ideation';
 
 // Migration version key - increment if migration logic changes
 const MIGRATION_KEY = 'ideation_migrated_v1';

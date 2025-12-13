@@ -6,10 +6,10 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Theme, ViewMode, Presentation } from '../../types';
-import { THEMES } from '../../config/themes';
-import { loadThemeFonts } from '../../lib/fonts';
-import { WABI_SABI_LAYOUT_NAMES } from '../../config/layoutConstants';
+import { Theme, ViewMode, Presentation } from '@/types';
+import { THEMES } from '@/config/themes';
+import { loadThemeFonts } from '@/lib/fonts';
+import { WABI_SABI_LAYOUT_NAMES } from '@/config/layoutConstants';
 
 export interface UseThemeManagerOptions {
   /** Current presentation */

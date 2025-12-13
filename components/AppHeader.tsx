@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Presentation, Theme } from '../types';
-import { THEMES } from '../config/themes';
-import { CURATED_FONT_PAIRINGS } from '../lib/fonts';
-import { isPptxSafe, getThemeCompatibility } from '../lib/fontCompatibility';
+import { Presentation, Theme } from '@/types';
+import { THEMES } from '@/config/themes';
+import { CURATED_FONT_PAIRINGS } from '@/lib/fonts';
+import { isPptxSafe, getThemeCompatibility } from '@/lib/fontCompatibility';
 import { Sparkles, Palette, ChevronDown, Check, Play, Shuffle, LayoutTemplate, Type, Search, Home, Loader2, Cloud, FileSpreadsheet, Copy } from 'lucide-react';
 import { ExportMenu } from './export';
 import { ModeSwitcher } from './ModeSwitcher';

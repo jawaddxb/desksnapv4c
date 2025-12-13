@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Slide, ImageStylePreset, Presentation } from '../types';
+import { Slide, ImageStylePreset, Presentation } from '@/types';
 import {
   Columns, Maximize2, Type, LayoutTemplate,
   AlignLeft, AlignCenter, AlignRight,

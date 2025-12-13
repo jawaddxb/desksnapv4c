@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Message, Presentation, MessageRole, GenerationMode } from '../types';
+import { Message, Presentation, MessageRole, GenerationMode } from '@/types';
 import { Bot, Minus, RefreshCw, ImageIcon, ArrowRight, StopCircle, AlignLeft, Layers, FileText, Quote, Eye } from 'lucide-react';
-import { IMAGE_STYLES } from '../config/imageStyles';
+import { IMAGE_STYLES } from '@/config/imageStyles';
 
 interface ChatInterfaceProps {
   mode: 'sidebar' | 'modal';

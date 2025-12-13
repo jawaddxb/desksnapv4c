@@ -14,7 +14,7 @@
 
 import React, { createContext, useContext, useMemo, ReactNode } from 'react';
 import { GoogleGenAI } from '@google/genai';
-import { getAIClient, hasApiKey } from '../services/aiClient';
+import { getAIClient, hasApiKey } from '@/services/aiClient';
 
 /**
  * Service interface definitions.

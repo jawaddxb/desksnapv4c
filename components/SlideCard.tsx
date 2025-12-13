@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Slide, Theme } from '../types';
+import { Slide, Theme } from '@/types';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { 
     RenderMiniFullBleed, RenderMiniGallery, RenderMiniSplit, RenderMiniStatement,

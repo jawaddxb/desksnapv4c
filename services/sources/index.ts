@@ -12,8 +12,8 @@
  * - Pedagogy elements (learning objectives, exercises, quizzes)
  */
 
-import { IdeationSession, IdeaNote } from '../../types/ideation';
-import { SOURCES_TOOLS } from '../../lib/sourcesTools';
+import { IdeationSession, IdeaNote } from '@/types/ideation';
+import { SOURCES_TOOLS } from '@/lib/sourcesTools';
 import { runAgentLoop, AgentResponse } from '../copilotAgent';
 import { buildSourcesPrompt } from './prompts';
 import { createSourcesToolExecutor } from './toolExecutor';

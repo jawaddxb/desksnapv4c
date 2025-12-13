@@ -8,7 +8,7 @@
  */
 
 import { useRef, useEffect, useCallback } from 'react';
-import { Presentation, AnalyticsSession } from '../types';
+import { Presentation, AnalyticsSession } from '@/types';
 
 export interface UseAnalyticsOptions {
   /** Whether presentation mode is active */

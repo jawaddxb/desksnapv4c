@@ -17,7 +17,7 @@ import ReactFlow, {
   MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import type { Finding, MindMapNode as MindMapNodeType } from '../../types';
+import type { Finding, MindMapNode as MindMapNodeType } from '@/types';
 
 interface ResearchMindMapProps {
   findings: Finding[];

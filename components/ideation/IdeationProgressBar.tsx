@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { IdeaNote, COLUMNS, getColumnFillStatus, isIdeationComplete } from '../../types/ideation';
+import { IdeaNote, COLUMNS, getColumnFillStatus, isIdeationComplete } from '@/types/ideation';
 
 interface Props {
   notes: IdeaNote[];

@@ -5,7 +5,7 @@
  * Renders actual slide components and converts them to PPTX.
  */
 
-import type { Presentation, Theme } from '../types';
+import type { Presentation, Theme } from '@/types';
 import type { ExportProgress, PPTExportOptions as BasePPTExportOptions } from '../types/export';
 import { waitForImages, waitForFonts } from '../utils/exportHelpers';
 import { sanitizeFilename } from '../lib/fileUtils';

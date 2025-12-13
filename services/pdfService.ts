@@ -5,7 +5,7 @@
  * Captures each slide at 1920x1080 resolution for pixel-perfect quality.
  */
 
-import type { Presentation, Theme } from '../types';
+import type { Presentation, Theme } from '@/types';
 import type { ExportProgress, PDFExportOptions } from '../types/export';
 import { waitForImages, waitForFonts } from '../utils/exportHelpers';
 import {

@@ -6,8 +6,8 @@
  */
 
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { listPresentations, getPresentation } from '../../services/api/presentationService';
-import { Presentation } from '../../types';
+import { listPresentations, getPresentation } from '@/services/api/presentationService';
+import { Presentation } from '@/types';
 
 // Query keys for cache management
 export const presentationKeys = {

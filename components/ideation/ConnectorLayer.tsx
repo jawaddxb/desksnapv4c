@@ -6,7 +6,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { IdeaNote, NoteConnection } from '../../types/ideation';
+import { IdeaNote, NoteConnection } from '@/types/ideation';
 
 interface ConnectorLayerProps {
   notes: IdeaNote[];

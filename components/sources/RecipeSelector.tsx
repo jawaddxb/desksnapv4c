@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { DeckRecipe } from '../../types/ideation';
+import { DeckRecipe } from '@/types/ideation';
 import { X, Target, MessageCircle, FileText, Presentation } from 'lucide-react';
 
 interface RecipeSelectorProps {

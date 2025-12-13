@@ -1,9 +1,9 @@
 
 import React, { useRef, useState } from 'react';
-import { Presentation } from '../types';
-import { IdeationSession, DeckRecipe } from '../types/ideation';
-import { RoughDraft } from '../types/roughDraft';
-import { THEMES } from '../config/themes';
+import { Presentation } from '@/types';
+import { IdeationSession, DeckRecipe } from '@/types/ideation';
+import { RoughDraft } from '@/types/roughDraft';
+import { THEMES } from '@/config/themes';
 import { WabiSabiStage } from './WabiSabiStage';
 import { Trash2, Clock, Play, BarChart2, FileText, Sparkles, Copy, FileEdit, Layers } from 'lucide-react';
 import { AnalyticsModal } from './AnalyticsModal';
@@ -13,7 +13,7 @@ import { RecipeSelector } from './sources/RecipeSelector';
 import { FeatureCards } from './dashboard/FeatureCards';
 import { GettingStarted } from './onboarding/GettingStarted';
 import { TabTip } from './onboarding/FeatureTooltip';
-import { useOnboarding, OnboardingStep } from '../hooks/useOnboarding';
+import { useOnboarding, OnboardingStep } from '@/hooks/useOnboarding';
 
 type DashboardTab = 'decks' | 'rough-drafts' | 'ideations';
 

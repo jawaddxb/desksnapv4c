@@ -7,8 +7,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { wsService, ConnectionStatus } from '../services/api/websocketService';
-import { useAuth } from '../contexts/AuthContext';
+import { wsService, ConnectionStatus } from '@/services/api/websocketService';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function useRealtimeSync() {
   const queryClient = useQueryClient();

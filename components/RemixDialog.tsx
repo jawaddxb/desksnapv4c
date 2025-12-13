@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import { Shuffle } from 'lucide-react';
-import { THEMES } from '../config/themes';
+import { THEMES } from '@/config/themes';
 import { ThemePicker } from './shared/ThemePicker';
 import { Dialog, DialogButton } from './shared/Dialog';
 

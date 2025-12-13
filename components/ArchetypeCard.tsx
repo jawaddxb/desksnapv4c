@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
-import { ArchetypeInfo } from '../lib/archetypeCategories';
-import { getArchetypeThumbnailPath } from '../services/thumbnailService';
-import { getDecorationConfig } from '../config/archetypeDecorations';
+import { ArchetypeInfo } from '@/lib/archetypeCategories';
+import { getArchetypeThumbnailPath } from '@/services/thumbnailService';
+import { getDecorationConfig } from '@/config/archetypeDecorations';
 
 interface ArchetypeCardProps {
   archetype: ArchetypeInfo;

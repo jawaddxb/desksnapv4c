@@ -5,7 +5,7 @@
  * Extracted to reduce duplication between createDeck and createDeckFromPlan.
  */
 
-import { Slide, Presentation } from '../../types';
+import { Slide, Presentation } from '@/types';
 
 export interface SlidePlan {
   title: string;

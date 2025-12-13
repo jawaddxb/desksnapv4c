@@ -6,8 +6,8 @@
  */
 
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { listIdeationSessions, getIdeationSession } from '../../services/api/ideationService';
-import { IdeationSession } from '../../types/ideation';
+import { listIdeationSessions, getIdeationSession } from '@/services/api/ideationService';
+import { IdeationSession } from '@/types/ideation';
 
 // Query keys for cache management
 export const ideationKeys = {

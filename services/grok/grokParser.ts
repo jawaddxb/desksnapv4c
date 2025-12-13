@@ -11,7 +11,7 @@ import type {
   Citation,
   MindMapNode,
   FindingType,
-} from '../../types';
+} from '@/types';
 import {
   extractSourceFromUrl,
   extractTitleFromUrl,

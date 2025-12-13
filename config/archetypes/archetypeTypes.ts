@@ -4,7 +4,7 @@
  * Type definitions for the archetype system.
  */
 
-import type { ContrastConfig } from '../../lib/contrast';
+import type { ContrastConfig } from '@/lib/contrast';
 
 /**
  * Definition of a single archetype with its visual properties

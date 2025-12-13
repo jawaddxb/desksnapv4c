@@ -6,7 +6,7 @@
  */
 
 import { useEffect } from 'react';
-import { Presentation } from '../types';
+import { Presentation } from '@/types';
 
 export interface UseKeyboardNavigationOptions {
   /** Whether presentation mode is active */

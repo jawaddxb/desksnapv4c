@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
-import type { Finding, Citation } from '../../types';
+import type { Finding, Citation } from '@/types';
 import { ResearchMindMap } from './ResearchMindMap';
 
 // Tab types

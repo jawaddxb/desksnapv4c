@@ -27,11 +27,11 @@ import {
   Wand2,
   RefreshCw,
 } from 'lucide-react';
-import type { Slide } from '../../types';
-import type { BeautifySession, TransformIntensity, SlideIR, StylePack } from '../../types/beautify';
-import { beautifyService } from '../../services/api/beautifyService';
-import { STYLE_PACKS, getDefaultStylePack } from '../../lib/stylePacks';
-import { THEMES } from '../../config/themes';
+import type { Slide } from '@/types';
+import type { BeautifySession, TransformIntensity, SlideIR, StylePack } from '@/types/beautify';
+import { beautifyService } from '@/services/api/beautifyService';
+import { STYLE_PACKS, getDefaultStylePack } from '@/lib/stylePacks';
+import { THEMES } from '@/config/themes';
 import { BeforeAfterSlider } from './BeforeAfterSlider';
 
 // =============================================================================

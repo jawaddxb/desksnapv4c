@@ -6,8 +6,8 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { wsService, ConnectionStatus, WebSocketMessage, UserInfo } from '../services/api/websocketService';
-import { useAuth } from '../contexts/AuthContext';
+import { wsService, ConnectionStatus, WebSocketMessage, UserInfo } from '@/services/api/websocketService';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PresentationSubscriptionState {
   isConnected: boolean;

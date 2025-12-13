@@ -7,7 +7,7 @@
 
 import React, { Component, ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Message, MessageRole } from '../../types';
+import { Message, MessageRole } from '@/types';
 import { Bot, User } from 'lucide-react';
 
 // Error boundary to catch ReactMarkdown crashes

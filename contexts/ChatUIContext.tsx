@@ -8,8 +8,8 @@
  */
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { GenerationMode } from '../types';
-import { IMAGE_STYLES } from '../config/imageStyles';
+import { GenerationMode } from '@/types';
+import { IMAGE_STYLES } from '@/config/imageStyles';
 
 interface ChatUIState {
   // Chat input

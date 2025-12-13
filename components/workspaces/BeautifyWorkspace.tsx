@@ -9,8 +9,8 @@
 
 import React, { useCallback } from 'react';
 import { BeautifyWizard } from '../beautify/BeautifyWizard';
-import { useWorkspaceMode } from '../../contexts/WorkspaceModeContext';
-import { Slide } from '../../types';
+import { useWorkspaceMode } from '@/contexts/WorkspaceModeContext';
+import { Slide } from '@/types';
 
 export interface BeautifyWorkspaceProps {
   /** Callback when beautification is complete */
