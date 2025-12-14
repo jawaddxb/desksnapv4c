@@ -8,6 +8,7 @@ import { TextRole, getTextConfigWithOverrides } from '@/lib/wabiSabiText';
 import { applyFontScale } from '@/lib/textPresets';
 import { useTextSelection } from '@/contexts/TextSelectionContext';
 import { BulletRenderer } from './content';
+import { ContentBlockRenderer, hasContentBlocks } from '@/components/content-blocks';
 
 export interface ArchetypeProps {
     slide: Slide;
@@ -78,6 +79,7 @@ export const EditableTitle = ({
  *
  * Renders content items at preferred font size. Container expands to fit.
  * Supports style overrides from slide.textStyles.content and per-item styles
+ * NEW: Also supports contentBlocks for rich content rendering
  */
 export const EditableContent = ({
     slide, theme, contrast, onUpdateSlide,
@@ -100,6 +102,35 @@ export const EditableContent = ({
             fontStyle: itemStyle?.fontStyle ?? contentStyle?.fontStyle,
         };
     };
+
+    // Handle contentBlocks update
+    const handleUpdateBlock = (index: number, updates: any) => {
+        if (!onUpdateSlide || !slide.contentBlocks) return;
+        const newBlocks = [...slide.contentBlocks];
+        newBlocks[index] = { ...newBlocks[index], ...updates };
+        onUpdateSlide({ contentBlocks: newBlocks });
+    };
+
+    // NEW: Use ContentBlockRenderer if contentBlocks exist
+    if (hasContentBlocks(slide)) {
+        return (
+            <div
+                className={`relative flex flex-col ${className}`}
+                style={{
+                    zIndex: style.zIndex || LayoutLayer.CONTENT_BASE,
+                    ...style
+                }}
+            >
+                <ContentBlockRenderer
+                    blocks={slide.contentBlocks!}
+                    theme={theme}
+                    readOnly={readOnly}
+                    onUpdateBlock={!readOnly ? handleUpdateBlock : undefined}
+                    gap="md"
+                />
+            </div>
+        );
+    }
 
     return (
         <div

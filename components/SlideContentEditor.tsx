@@ -5,6 +5,7 @@ import { SmartText } from './SmartText';
 import { applyFontScale } from '@/lib/textPresets';
 import { ContentItem } from './content';
 import { DEFAULT_CONTENT_STYLE } from '@/config/contentStyles';
+import { ContentBlockRenderer, hasContentBlocks } from '@/components/content-blocks';
 
 interface SlideContentEditorProps {
     slide: Slide;
@@ -36,6 +37,63 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
         newContent[index] = newText;
         onUpdateSlide({ content: newContent });
     };
+
+    // Handle contentBlocks update
+    const updateContentBlock = (index: number, updates: any) => {
+        if (!onUpdateSlide || !slide.contentBlocks) return;
+        const newBlocks = [...slide.contentBlocks];
+        newBlocks[index] = { ...newBlocks[index], ...updates };
+        onUpdateSlide({ contentBlocks: newBlocks });
+    };
+
+    // Render title component (reusable)
+    const renderTitle = (defaultSize: number, extraClassName = '') => (
+        <SmartText
+            value={slide.title}
+            onChange={updateTitle}
+            readOnly={printMode}
+            fontSize={applyFontScale(slide.titleFontSize ?? defaultSize, slide.fontScale)}
+            lineHeight={0.9}
+            fontWeight={titleStyle?.fontWeight ?? (parseInt(theme.layout.headingWeight) || undefined)}
+            fontStyle={titleStyle?.fontStyle}
+            textAlign={titleStyle?.textAlign}
+            className={`p-0 ${extraClassName}`}
+            style={{
+                fontFamily: theme.fonts.heading,
+                color: theme.colors.text,
+                textTransform: theme.layout.headingTransform as any,
+            }}
+        />
+    );
+
+    // NEW: Use ContentBlockRenderer if contentBlocks exist
+    if (hasContentBlocks(slide)) {
+        const defaultTitleSize = isStatement ? 80 : 64;
+
+        return (
+            <div className={`w-full h-full flex flex-col ${isStatement || (isFullBleed && isCenter) ? 'items-center' : ''}`}>
+                {/* Title Region */}
+                <div className={`w-full shrink-0 mb-4 ${isStatement ? 'text-center' : ''}`}>
+                    {renderTitle(defaultTitleSize, isStatement ? 'text-center' : '')}
+                </div>
+
+                {!isStatement && (
+                    <div className="w-24 h-3 rounded-full mb-8 shrink-0" style={{ backgroundColor: theme.colors.accent }} />
+                )}
+
+                {/* Content Blocks */}
+                <div className={`w-full flex flex-col ${isStatement ? 'items-center justify-center' : ''}`}>
+                    <ContentBlockRenderer
+                        blocks={slide.contentBlocks!}
+                        theme={theme}
+                        readOnly={printMode}
+                        onUpdateBlock={!printMode ? updateContentBlock : undefined}
+                        gap="md"
+                    />
+                </div>
+            </div>
+        );
+    }
 
     // Gallery Render
     if (isGallery) {

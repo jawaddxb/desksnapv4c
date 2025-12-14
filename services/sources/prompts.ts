@@ -105,7 +105,7 @@ ${columnList}
     : '\n\nNo sources added yet. Ask the user for YouTube URLs or web page links.';
 
   const notesContext = session.notes.length
-    ? `\n\nExtracted notes:\n${session.notes.map(n => `- [${columns[n.column] || 'Unknown'}] ${n.content.slice(0, 100)}${n.content.length > 100 ? '...' : ''}`).join('\n')}`
+    ? `\n\nExtracted notes:\n${session.notes.map(n => `- [${columns[n.column] || 'Unknown'}] ${n.content}`).join('\n')}`
     : '';
 
   return `${recipePrompts[recipe]}

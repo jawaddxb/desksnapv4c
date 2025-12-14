@@ -12,6 +12,7 @@ import { IdeationCopilot } from '../ideation/IdeationCopilot';
 import { useWorkspaceMode } from '@/contexts/WorkspaceModeContext';
 import { PresentationPlanResponse } from '@/types';
 import { RoughDraftInput } from '@/services/agents';
+import { ContentDensity } from '@/lib/contentBlockPrompts';
 
 export interface IdeationWorkspaceProps {
   /** Session ID to load (optional, for resuming) */
@@ -75,7 +76,8 @@ export const IdeationWorkspace: React.FC<IdeationWorkspaceProps> = ({
   const handleRoughDraft = useCallback((
     deckPlan: PresentationPlanResponse,
     ideationSessionId: string,
-    notes?: Array<{ content: string; column: number }>
+    notes?: Array<{ content: string; column: number }>,
+    contentDensity?: ContentDensity
   ) => {
     // Transform notes to RoughDraftInput format
     const input: RoughDraftInput = {
@@ -92,6 +94,7 @@ export const IdeationWorkspace: React.FC<IdeationWorkspaceProps> = ({
       topic: deckPlan.topic,
       themeId: deckPlan.themeId,
       visualStyle: deckPlan.visualStyle,
+      contentDensity: contentDensity || 'detailed',
     };
 
     goToRoughDraft('ideation', {

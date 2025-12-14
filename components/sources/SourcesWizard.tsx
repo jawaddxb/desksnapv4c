@@ -29,6 +29,9 @@ import { CollapsibleSourcesList } from './CollapsibleSourcesList';
 import { ProofSidebar } from './ProofSidebar';
 import { ChatMessage } from './ChatMessage';
 import { TopicPillsPanel } from './TopicPillsPanel';
+import { DraftSetupOverlay } from '@/components/shared/DraftSetupOverlay';
+import { useDraftSetup } from '@/hooks/useDraftSetup';
+import { ContentDensity } from '@/lib/contentBlockPrompts';
 import { Plus, ArrowLeft, Video, Globe, Link, Bot } from 'lucide-react';
 
 interface SourcesWizardProps {
@@ -40,8 +43,8 @@ interface SourcesWizardProps {
   recipe: DeckRecipe;
   /** Called when wizard is closed */
   onClose?: () => void;
-  /** Called when ready to build deck */
-  onBuildDeck?: (session: IdeationSession) => void;
+  /** Called when ready to build deck (with density and theme from DraftSetupPanel) */
+  onBuildDeck?: (session: IdeationSession, contentDensity?: ContentDensity, themeId?: string) => void;
 }
 
 export const SourcesWizard: React.FC<SourcesWizardProps> = ({
@@ -73,6 +76,9 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
   // URL input state
   const [urlInput, setUrlInput] = useState('');
   const [dragOver, setDragOver] = useState(false);
+
+  // Draft setup state (DRY: replaces 3 useState calls with reusable hook)
+  const draftSetup = useDraftSetup();
 
   // Topic pills state - shown after comprehensive extraction
   const [showPillsForSource, setShowPillsForSource] = useState<string | null>(null);
@@ -287,15 +293,25 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
     handleSendMessage(option);
   }, [handleSendMessage]);
 
-  // Handle build deck
+  // Handle build deck - shows DraftSetupPanel for density/theme selection
   const handleBuildDeck = useCallback(() => {
-    if (session.stage === 'ready' && onBuildDeck) {
-      onBuildDeck(session);
+    if (session.stage === 'ready') {
+      // Show DraftSetupOverlay (uses hook state)
+      draftSetup.open();
     } else {
       // Ask agent to mark ready
       handleSendMessage("I'm ready to build the deck. Please summarize what we have.");
     }
-  }, [session, onBuildDeck, handleSendMessage]);
+  }, [session.stage, draftSetup, handleSendMessage]);
+
+  // Handle confirming build after density/theme selection
+  const handleConfirmBuild = useCallback(() => {
+    if (onBuildDeck) {
+      // Pass density and theme from hook to parent
+      onBuildDeck(session, draftSetup.contentDensity, draftSetup.themeId);
+    }
+    draftSetup.close();
+  }, [session, draftSetup, onBuildDeck]);
 
   // Get selected note for proof sidebar
   const selectedNote = selectedNoteId
@@ -627,6 +643,19 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
           </div>
         )}
       </div>
+
+      {/* DraftSetupOverlay - uses useDraftSetup hook for state (DRY) */}
+      <DraftSetupOverlay
+        isOpen={draftSetup.isOpen}
+        onClose={draftSetup.close}
+        selectedThemeId={draftSetup.themeId}
+        onSelectTheme={draftSetup.setTheme}
+        contentDensity={draftSetup.contentDensity}
+        onSelectDensity={draftSetup.setDensity}
+        onConfirm={handleConfirmBuild}
+        isLoading={false}
+        draftOnly={true}
+      />
     </div>
   );
 };

@@ -6,6 +6,8 @@
  */
 
 import { LayoutType, Alignment, SlideApprovalState } from '@/types';
+import { ContentBlock } from '@/types/contentBlocks';
+import { ContentDensity } from '@/lib/contentBlockPrompts';
 
 // ============ Frontend Types ============
 
@@ -21,6 +23,7 @@ export interface RoughDraftSlide {
   position: number;
   title: string | null;
   content: string[] | null;
+  contentBlocks?: ContentBlock[] | null;  // Rich content blocks (takes precedence over content)
   speakerNotes: string | null;
   imagePrompt: string | null;
   imageUrl: string | null;
@@ -39,6 +42,7 @@ export interface RoughDraft {
   topic: string;
   themeId: string;
   visualStyle: string | null;
+  contentDensity?: ContentDensity;  // User-selected content density
   status: RoughDraftStatus;
   slides: RoughDraftSlide[];
   createdAt: number;
@@ -53,6 +57,7 @@ export interface BackendRoughDraftSlide {
   position: number;
   title: string | null;
   content: string[] | null;
+  content_blocks?: ContentBlock[] | null;  // Rich content blocks
   speaker_notes: string | null;
   image_prompt: string | null;
   image_url: string | null;
@@ -71,6 +76,7 @@ export interface BackendRoughDraft {
   topic: string;
   theme_id: string;
   visual_style: string | null;
+  content_density?: string;  // User-selected content density
   status: string;
   slides?: BackendRoughDraftSlide[];
   created_at: string;
@@ -90,6 +96,7 @@ export interface CreateRoughDraftSlideRequest {
   position: number;
   title: string | null;
   content: string[] | null;
+  content_blocks?: ContentBlock[] | null;
   speaker_notes: string | null;
   image_prompt: string | null;
   image_url: string | null;
@@ -102,6 +109,7 @@ export interface CreateRoughDraftRequest {
   topic: string;
   theme_id: string;
   visual_style: string | null;
+  content_density?: string;
   status: string;
   ideation_session_id: string | null;
   slides: CreateRoughDraftSlideRequest[];
@@ -111,6 +119,7 @@ export interface UpdateRoughDraftRequest {
   topic?: string;
   theme_id?: string;
   visual_style?: string;
+  content_density?: string;
   status?: string;
 }
 
@@ -118,6 +127,7 @@ export interface UpdateRoughDraftSlideRequest {
   position?: number;
   title?: string;
   content?: string[];
+  content_blocks?: ContentBlock[];
   speaker_notes?: string;
   image_prompt?: string;
   image_url?: string;

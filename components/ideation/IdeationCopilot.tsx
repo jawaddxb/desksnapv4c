@@ -14,6 +14,7 @@ import { performGrokResearch, hasGrokApiKey } from '@/services/grokService';
 import { FlowCanvas } from './FlowCanvas';
 import { CopilotPanel } from './CopilotPanel';
 import { ResearchModal } from './ResearchModal';
+import { ContentDensity } from '@/lib/contentBlockPrompts';
 
 interface IdeationCopilotProps {
   initialTopic?: string;
@@ -25,7 +26,8 @@ interface IdeationCopilotProps {
   onRoughDraft?: (
     deckPlan: any,
     sessionId: string,
-    notes?: Array<{ content: string; column: number }>
+    notes?: Array<{ content: string; column: number }>,
+    contentDensity?: ContentDensity
   ) => void;
 }
 
@@ -41,9 +43,10 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   const [isThinking, setIsThinking] = useState(false);
   const [askUserQuestion, setAskUserQuestion] = useState<AgentResponse['askUserQuestion'] | null>(null);
   const [completionQuestion, setCompletionQuestion] = useState<CompletionQuestion | null>(null);
-  // Theme selection state for style-preview stage
+  // Theme and density selection state for style-preview stage
   const [themeSuggestion, setThemeSuggestion] = useState<ThemeSuggestion | null>(null);
   const [selectedThemeId, setSelectedThemeId] = useState<string>('executive');
+  const [contentDensity, setContentDensity] = useState<ContentDensity>('detailed');
   // Enhanced Mode (Research Co-Pilot) state
   const [researchProgress, setResearchProgress] = useState<ProgressState | null>(null);
   const [researchFindings, setResearchFindings] = useState<Finding[]>([]);
@@ -216,12 +219,12 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
       if (mode === 'direct') {
         onBuildDeck?.(deckPlan);
       } else {
-        // Go to rough draft with notes for reference
+        // Go to rough draft with notes for reference and selected content density
         const notes = ideation.session.notes.map(n => ({
           content: n.content,
           column: n.column,
         }));
-        onRoughDraft?.(deckPlan, ideation.session.id, notes);
+        onRoughDraft?.(deckPlan, ideation.session.id, notes, contentDensity);
       }
     } catch (error) {
       console.error('Deck conversion error:', error);
@@ -257,6 +260,11 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   // Handle theme selection change
   const handleSelectTheme = useCallback((themeId: string) => {
     setSelectedThemeId(themeId);
+  }, []);
+
+  // Handle content density selection change
+  const handleSelectDensity = useCallback((density: ContentDensity) => {
+    setContentDensity(density);
   }, []);
 
   // Handle note operations
@@ -451,10 +459,12 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             completionQuestion={completionQuestion}
             onDirectBuild={handleDirectBuild}
             onGoToRoughDraft={handleGoToRoughDraft}
-            // Theme selection props
+            // Theme and density selection props
             themeSuggestion={themeSuggestion}
             selectedThemeId={selectedThemeId}
             onSelectTheme={handleSelectTheme}
+            contentDensity={contentDensity}
+            onSelectDensity={handleSelectDensity}
             onSendMessage={handleSendMessage}
             onBuildDeck={handleBuildDeck}
             onConfirmBuild={handleConfirmBuild}

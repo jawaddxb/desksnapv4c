@@ -14,6 +14,7 @@
 
 import { getAIClient } from '../aiClient';
 import { Slide, PresentationPlanResponse, LayoutType, Alignment } from '@/types';
+import { ContentBlock } from '@/types/contentBlocks';
 import { IdeaNote, JournalEntry, JournalStage, COLUMNS } from '@/types/ideation';
 import { THEMES } from '@/config/themes';
 import { runImagePromptAgent } from './imagePromptAgent';
@@ -23,6 +24,12 @@ import { getTextModel } from '@/config';
 import { safeJsonParse } from '@/lib/jsonUtils';
 import { createJournalEntry } from '../copilot/journalHelpers';
 import { generateId } from '@/utils/idGenerator';
+import {
+  ContentDensity,
+  DENSITY_CONFIGS,
+  getContentBlockPrompt,
+  getLegacyContentPrompt,
+} from '@/lib/contentBlockPrompts';
 
 // ============ Types ============
 
@@ -37,11 +44,15 @@ export interface RoughDraftInput {
   visualStyle: string;
   /** Source of the draft request - affects how content is processed */
   source?: 'ideation' | 'sources' | 'copilot';
+  /** Content density mode (default: 'detailed') */
+  contentDensity?: ContentDensity;
 }
 
 export interface SlideContent {
   title: string;
   content: string[];
+  /** Rich content blocks (takes precedence over content) */
+  contentBlocks?: ContentBlock[];
   speakerNotes: string;
   imagePrompt: string;
   layoutType: LayoutType;
@@ -51,6 +62,7 @@ export interface SlideContent {
 /**
  * Working slide type during rough draft generation.
  * Different from RoughDraftSlide in types/roughDraft.ts which is the persistence type.
+ * Now includes contentBlocks for rich content rendering.
  */
 export interface RoughDraftWorkingSlide extends SlideContent {
   id: string;
@@ -58,6 +70,7 @@ export interface RoughDraftWorkingSlide extends SlideContent {
   imageError?: string;
   isImageLoading: boolean;
   approvalState: 'pending' | 'approved' | 'modified';
+  // contentBlocks inherited from SlideContent
 }
 
 /** @deprecated Use RoughDraftWorkingSlide instead */
@@ -115,6 +128,7 @@ function generateSlideId(): string {
 
 /**
  * Generate slide content from ideation notes or topic using AI
+ * Now supports contentBlocks for rich content rendering
  */
 async function generateSlideContent(
   input: RoughDraftInput,
@@ -123,6 +137,8 @@ async function generateSlideContent(
   const ai = getAIClient();
   const theme = THEMES[input.themeId] || THEMES.executive;
   const journalEntries: JournalEntry[] = [];
+  const density = input.contentDensity || 'detailed';
+  const config = DENSITY_CONFIGS[density];
 
   // Emit analyzing narrative
   const analyzingEntry = createJournalEntry(
@@ -138,7 +154,7 @@ async function generateSlideContent(
   journalEntries.push(analyzingEntry);
   callbacks?.onNarrativeEntry?.(analyzingEntry);
 
-  // Build context from notes or topic
+  // Build context from notes - NO TRUNCATION to preserve full content
   const notesContext = input.ideationNotes
     ? input.ideationNotes
         .map(n => `[${COLUMNS[n.column]}] ${n.content}`)
@@ -147,101 +163,60 @@ async function generateSlideContent(
 
   // Use more conservative approach for source-based decks (video/web extraction)
   const isFromSources = input.source === 'sources';
-  const openingInstruction = isFromSources
-    ? 'Organize these extracted notes into a presentation, preserving the original wording and key concepts as closely as possible.'
-    : 'Convert these ideation notes into a presentation plan.';
 
-  const prompt = input.ideationNotes
-    ? `${openingInstruction}
-
-Topic: ${input.topic}
-Selected Theme: ${input.themeId} - ${theme.name}
-Theme Description: ${theme.description}
-Visual Style: ${input.visualStyle}
-
-Notes:
-${notesContext}
-
-Create a structured presentation with 6-12 slides. For each slide provide:
-- title: Compelling slide title
-- bulletPoints: 2-4 key points (array of strings)${isFromSources ? ' - USE THE ORIGINAL NOTE CONTENT DIRECTLY where possible' : ''}
-- speakerNotes: What to say (2-3 sentences)
-- imageVisualDescription: Visual description that matches the "${theme.name}" theme style: ${input.visualStyle}
-- layoutType: One of: split, full-bleed, statement, gallery, card, horizontal, magazine
-- alignment: left, right, or center
-${isFromSources ? `
-IMPORTANT: This content was extracted from a source (video/article). PRESERVE the original phrasing, examples, and key concepts. Do NOT fundamentally rewrite or change the narrative. Stay faithful to the source material.
-` : ''}
-IMPORTANT: The imageVisualDescription should match the theme's visual style: ${input.visualStyle}
-
-Return as JSON with structure:
-{
-  "topic": "...",
-  "slides": [...]
-}`
-    : `Create a presentation plan for the following topic.
-
-Topic: ${input.topic}
-Selected Theme: ${input.themeId} - ${theme.name}
-Theme Description: ${theme.description}
-Visual Style: ${input.visualStyle}
-
-Create a structured presentation with 6-10 slides. For each slide provide:
-- title: Compelling slide title
-- bulletPoints: 2-4 key points (array of strings)
-- speakerNotes: What to say (2-3 sentences)
-- imageVisualDescription: Visual description that matches the "${theme.name}" theme style: ${input.visualStyle}
-- layoutType: One of: split, full-bleed, statement, gallery, card, horizontal, magazine
-- alignment: left, right, or center
-
-IMPORTANT: The imageVisualDescription should match the theme's visual style: ${input.visualStyle}
-
-Return as JSON with structure:
-{
-  "topic": "...",
-  "slides": [...]
-}`;
+  // Use the unified content block prompt
+  const prompt = getContentBlockPrompt(config, {
+    topic: input.topic,
+    context: notesContext || undefined,
+    themeName: theme.name,
+    visualStyle: input.visualStyle,
+    isFromSources,
+  });
 
   const response = await ai.models.generateContent({
     model: getTextModel(),
     contents: prompt,
     config: {
       responseMimeType: 'application/json',
-      maxOutputTokens: 16384, // Increased from 8192 to prevent truncation on larger decks
+      maxOutputTokens: 32768, // Increased for larger content block outputs
     },
   });
 
   const text = response.text;
   if (!text) throw new Error('Failed to generate slide content - empty response');
 
-  // Debug: log response length and finish reason
-  console.log(`[generateSlideContent] Response length: ${text.length} chars`);
+  // Debug: log response length
+  console.log(`[generateSlideContent] Response length: ${text.length} chars, density: ${density}`);
 
-  const result = safeJsonParse(text) as { topic?: string; slides: Array<{
+  const result = safeJsonParse(text) as { slides: Array<{
     title: string;
-    bulletPoints: string[];
+    contentBlocks?: ContentBlock[];
+    bulletPoints?: string[]; // Fallback for legacy responses
     speakerNotes: string;
-    imageVisualDescription: string;
+    imagePrompt: string;
     layoutType?: LayoutType;
     alignment?: Alignment;
   }> };
 
-  // Convert to SlideContent array
-  const slides: SlideContent[] = result.slides.map((slide: {
-    title: string;
-    bulletPoints: string[];
-    speakerNotes: string;
-    imageVisualDescription: string;
-    layoutType: LayoutType;
-    alignment: Alignment;
-  }) => ({
-    title: slide.title,
-    content: slide.bulletPoints,
-    speakerNotes: slide.speakerNotes,
-    imagePrompt: slide.imageVisualDescription,
-    layoutType: slide.layoutType || 'split',
-    alignment: slide.alignment || 'left',
-  }));
+  // Convert to SlideContent array with contentBlocks support
+  const slides: SlideContent[] = result.slides.map((slide) => {
+    // Prefer contentBlocks, fall back to bulletPoints for legacy/compatibility
+    const contentBlocks = slide.contentBlocks || undefined;
+    const content = slide.bulletPoints ||
+      (contentBlocks
+        ? contentBlocks.filter(b => b.type === 'bullets').flatMap((b: any) => b.items || [])
+        : []);
+
+    return {
+      title: slide.title,
+      content,
+      contentBlocks,
+      speakerNotes: slide.speakerNotes,
+      imagePrompt: slide.imagePrompt,
+      layoutType: slide.layoutType || 'split',
+      alignment: slide.alignment || 'left',
+    };
+  });
 
   // Emit creating narrative
   const layoutCounts: Record<string, number> = {};
@@ -252,10 +227,21 @@ Return as JSON with structure:
     .map(([layout, count]) => `${count} ${layout}`)
     .join(', ');
 
+  // Count block types used
+  const blockTypeCounts: Record<string, number> = {};
+  slides.forEach(slide => {
+    slide.contentBlocks?.forEach(block => {
+      blockTypeCounts[block.type] = (blockTypeCounts[block.type] || 0) + 1;
+    });
+  });
+  const blockSummary = Object.keys(blockTypeCounts).length > 0
+    ? ` Using ${Object.entries(blockTypeCounts).map(([type, count]) => `${count} ${type}`).join(', ')} blocks.`
+    : '';
+
   const creatingEntry = createJournalEntry(
     'creating',
     'Structuring Your Presentation',
-    `I've designed a ${slides.length}-slide presentation with ${layoutSummary} layouts. Opening with "${slides[0]?.title}" and concluding with "${slides[slides.length - 1]?.title}" to create a compelling narrative arc.`,
+    `I've designed a ${slides.length}-slide presentation with ${layoutSummary} layouts.${blockSummary} Opening with "${slides[0]?.title}" and concluding with "${slides[slides.length - 1]?.title}" to create a compelling narrative arc.`,
     {
       decision: `${slides.length} slides with ${Object.keys(layoutCounts).length} layout types`,
       confidence: 85,

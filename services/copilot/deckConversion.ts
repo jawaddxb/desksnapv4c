@@ -13,6 +13,8 @@ import { IdeationSession, COLUMNS, JournalEntry } from '@/types/ideation';
 import { THEMES } from '@/config/themes';
 import { getTextModel } from '@/config';
 import { createJournalEntry } from './journalHelpers';
+import { ContentBlock } from '@/types/contentBlocks';
+import { ContentDensity, DENSITY_CONFIGS, getContentBlockPrompt } from '@/lib/contentBlockPrompts';
 
 // Schema for deck plan conversion - ensures proper JSON escaping
 const DECK_PLAN_SCHEMA = {
@@ -53,7 +55,8 @@ const DECK_PLAN_SCHEMA = {
  */
 export interface SlideData {
   title: string;
-  bulletPoints: string[];
+  bulletPoints: string[];  // Legacy format for backward compatibility
+  contentBlocks?: ContentBlock[];  // Rich content blocks (takes precedence)
   speakerNotes: string;
   imageVisualDescription: string;
   layoutType: string;
@@ -127,10 +130,14 @@ Return as JSON.`,
  * Convert session to deck plan WITH a pre-selected theme.
  * SECOND STEP of the split conversion flow - uses the user's confirmed theme choice.
  * Includes Creative Director's Journal entries for layout and content decisions.
+ *
+ * NOTE: This function still uses bulletPoints format for direct builds.
+ * For rich content blocks, use the roughDraftAgent flow which uses contentBlocks.
  */
 export async function convertSessionToDeckPlanWithTheme(
   session: IdeationSession,
-  themeId: string
+  themeId: string,
+  contentDensity: ContentDensity = 'detailed'
 ): Promise<DeckPlanWithJournal> {
   const ai = getAIClient();
 
@@ -143,6 +150,11 @@ export async function convertSessionToDeckPlanWithTheme(
     .map(n => `[${COLUMNS[n.column]}] ${n.content}`)
     .join('\n');
 
+  // Get slide count range from density config
+  const densityConfig = DENSITY_CONFIGS[contentDensity];
+  const [minSlides, maxSlides] = densityConfig.slideRange;
+  const [minBullets, maxBullets] = densityConfig.blocksPerSlide;
+
   const response = await ai.models.generateContent({
     model: getTextModel(),
     contents: `Convert these ideation notes into a presentation plan.
@@ -151,14 +163,15 @@ Topic: ${session.topic}
 Selected Theme: ${themeId} - ${theme.name}
 Theme Description: ${theme.description}
 Visual Style: ${visualStyle}
+Content Density: ${contentDensity}
 
 Notes:
 ${notesContext}
 
-Create a structured presentation with 6-12 slides. For each slide provide:
+Create a structured presentation with ${minSlides}-${maxSlides} slides. For each slide provide:
 - title: Compelling slide title
-- bulletPoints: 2-4 key points (array of strings)
-- speakerNotes: What to say (2-3 sentences)
+- bulletPoints: ${minBullets}-${maxBullets} key points (array of strings)
+- speakerNotes: ${densityConfig.speakerNotesLength === 'brief' ? '1-2 sentences' : densityConfig.speakerNotesLength === 'moderate' ? '2-3 sentences' : '3-5 sentences'}
 - imageVisualDescription: Visual description that matches the "${theme.name}" theme style: ${visualStyle}
 - layoutType: One of: split, full-bleed, statement, gallery, card
 - alignment: left, right, or center

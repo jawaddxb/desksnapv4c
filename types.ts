@@ -1,3 +1,4 @@
+import { ContentBlock } from './types/contentBlocks';
 
 // Layout type constants (single source of truth)
 export const LAYOUT_TYPES = ['split', 'full-bleed', 'statement', 'gallery', 'card', 'horizontal', 'magazine'] as const;
@@ -90,7 +91,10 @@ export type ImageStylePreset = 'vivid' | 'muted' | 'high-contrast' | 'soft';
 export interface SlideCore {
   id: string;
   title: string;
+  /** Legacy bullet-point content (for backward compatibility) */
   content: string[];
+  /** Rich content blocks (takes precedence over content if present) */
+  contentBlocks?: ContentBlock[];
   speakerNotes: string;
   imagePrompt: string;
 }

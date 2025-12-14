@@ -6,10 +6,13 @@
  * When selected, expands to show full editing capabilities.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Suspense } from 'react';
 import { RoughDraftSlide } from '@/services/agents/roughDraftAgent';
 import { Theme } from '@/types';
+import { ContentBlock } from '@/types/contentBlocks';
 import { RefreshCw, Check, ChevronUp, Plus, Trash2, Sparkles, Search, Wand2 } from 'lucide-react';
+import { ImagePlaceholder } from './ImagePlaceholder';
+import { ContentBlockRenderer } from '@/components/content-blocks';
 
 interface RoughDraftSlideCardProps {
   slide: RoughDraftSlide;
@@ -44,17 +47,22 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
   const [editTitle, setEditTitle] = useState(slide.title);
   const [editImagePrompt, setEditImagePrompt] = useState(slide.imagePrompt);
   const [editBullets, setEditBullets] = useState(slide.content);
+  const [editContentBlocks, setEditContentBlocks] = useState<ContentBlock[]>(slide.contentBlocks || []);
   const [editSpeakerNotes, setEditSpeakerNotes] = useState(slide.speakerNotes);
   const [showCustomPrompt, setShowCustomPrompt] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+
+  // Determine if we're using contentBlocks or legacy content
+  const hasContentBlocks = slide.contentBlocks && slide.contentBlocks.length > 0;
 
   // Sync state when slide changes
   React.useEffect(() => {
     setEditTitle(slide.title);
     setEditImagePrompt(slide.imagePrompt);
     setEditBullets(slide.content);
+    setEditContentBlocks(slide.contentBlocks || []);
     setEditSpeakerNotes(slide.speakerNotes);
-  }, [slide.title, slide.imagePrompt, slide.content, slide.speakerNotes]);
+  }, [slide.title, slide.imagePrompt, slide.content, slide.contentBlocks, slide.speakerNotes]);
 
   // Save handlers
   const handleSaveTitle = useCallback(() => {
@@ -95,6 +103,32 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
       onUpdate({ speakerNotes: editSpeakerNotes, approvalState: 'modified' });
     }
   }, [editSpeakerNotes, slide.speakerNotes, onUpdate]);
+
+  // Handler for updating a content block
+  const handleUpdateBlock = useCallback((index: number, block: ContentBlock) => {
+    const newBlocks = [...editContentBlocks];
+    newBlocks[index] = block;
+    setEditContentBlocks(newBlocks);
+    onUpdate({ contentBlocks: newBlocks, approvalState: 'modified' });
+  }, [editContentBlocks, onUpdate]);
+
+  // Helper to extract text preview from contentBlocks
+  const getContentPreview = (): string[] => {
+    if (!hasContentBlocks) return slide.content || [];
+    return editContentBlocks.slice(0, 3).map(block => {
+      switch (block.type) {
+        case 'paragraph': return block.text.slice(0, 60) + (block.text.length > 60 ? '...' : '');
+        case 'bullets': return block.items[0] || '';
+        case 'numbered': return block.items[0] || '';
+        case 'quote': return `"${block.text.slice(0, 40)}..."`;
+        case 'statistic': return `${block.value} - ${block.label}`;
+        case 'callout': return block.text.slice(0, 50);
+        case 'chart': return `[Chart: ${block.title || block.chartType}]`;
+        case 'diagram': return `[Diagram]`;
+        default: return '';
+      }
+    });
+  };
 
   const handleCustomPromptSubmit = useCallback(() => {
     if (customPrompt.trim() && onAIEnhance) {
@@ -160,11 +194,12 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
           ) : slide.imageUrl ? (
             <img src={slide.imageUrl} alt={slide.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: theme.colors.surface }}>
-              <svg className="w-8 h-8 text-white/20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-              </svg>
-            </div>
+            <ImagePlaceholder
+              theme={theme}
+              onGenerate={onRegenerateImage}
+              isGenerating={false}
+              size="compact"
+            />
           )}
         </div>
 
@@ -172,17 +207,25 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
         <div className="p-3">
           <h3 className="text-sm font-bold text-white line-clamp-1">{slide.title}</h3>
           <div className="mt-1.5 space-y-0.5">
-            {slide.content.slice(0, 2).map((bullet, i) => (
-              <p key={i} className="text-[10px] text-white/50 line-clamp-1">{bullet}</p>
+            {getContentPreview().slice(0, 2).map((text, i) => (
+              <p key={i} className="text-[10px] text-white/50 line-clamp-1">{text}</p>
             ))}
-            {slide.content.length > 2 && (
-              <p className="text-[10px] text-white/30">+{slide.content.length - 2} more...</p>
+            {(hasContentBlocks ? editContentBlocks.length : (slide.content?.length || 0)) > 2 && (
+              <p className="text-[10px] text-white/30">
+                +{(hasContentBlocks ? editContentBlocks.length : (slide.content?.length || 0)) - 2} more...
+              </p>
             )}
           </div>
           <div className="mt-2 flex items-center gap-1">
             <span className="text-[8px] text-white/30 uppercase tracking-wider">{slide.layoutType}</span>
             <span className="text-[8px] text-white/20">|</span>
             <span className="text-[8px] text-white/30 uppercase tracking-wider">{slide.alignment}</span>
+            {hasContentBlocks && (
+              <>
+                <span className="text-[8px] text-white/20">|</span>
+                <span className="text-[8px] text-[#c5a47e] uppercase tracking-wider">Rich</span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -225,23 +268,24 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
                 <span className="text-xs text-white/40">{isRegenerating ? 'Regenerating...' : 'Generating...'}</span>
               </div>
             ) : slide.imageUrl ? (
-              <img src={slide.imageUrl} alt={slide.title} className="w-full h-full object-cover" />
+              <>
+                <img src={slide.imageUrl} alt={slide.title} className="w-full h-full object-cover" />
+                {/* Regenerate button for existing images */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); onRegenerateImage(); }}
+                  className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 hover:bg-black text-white text-xs flex items-center gap-1 transition-colors"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  Regenerate
+                </button>
+              </>
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <svg className="w-12 h-12 text-white/20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-                </svg>
-              </div>
-            )}
-            {/* Regenerate overlay */}
-            {!slide.isImageLoading && !isRegenerating && (
-              <button
-                onClick={(e) => { e.stopPropagation(); onRegenerateImage(); }}
-                className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 hover:bg-black text-white text-xs flex items-center gap-1 transition-colors"
-              >
-                <RefreshCw className="w-3 h-3" />
-                Regenerate
-              </button>
+              <ImagePlaceholder
+                theme={theme}
+                onGenerate={onRegenerateImage}
+                isGenerating={false}
+                size="default"
+              />
             )}
           </div>
 
@@ -287,40 +331,58 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
             />
           </div>
 
-          {/* Bullets */}
+          {/* Content - Rich blocks or legacy bullets */}
           <div>
-            <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1">Content</label>
-            <div className="space-y-2">
-              {editBullets.map((bullet, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="text-white/30 text-xs mt-2">•</span>
-                  <input
-                    type="text"
-                    value={bullet}
-                    onChange={(e) => {
-                      const newBullets = [...editBullets];
-                      newBullets[i] = e.target.value;
-                      setEditBullets(newBullets);
-                    }}
-                    onBlur={() => handleSaveBullet(i, editBullets[i])}
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex-1 bg-black/30 border border-white/10 text-xs text-white p-1.5 focus:outline-none focus:border-[#c5a47e]/50"
+            <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1">
+              Content {hasContentBlocks && <span className="text-[#c5a47e]">(Rich Blocks)</span>}
+            </label>
+            {hasContentBlocks ? (
+              // Render content blocks with editing support
+              <div className="bg-black/20 border border-white/10 p-3 max-h-[200px] overflow-y-auto">
+                <Suspense fallback={<div className="text-xs text-white/40">Loading content...</div>}>
+                  <ContentBlockRenderer
+                    blocks={editContentBlocks}
+                    theme={theme}
+                    readOnly={false}
+                    onUpdateBlock={handleUpdateBlock}
+                    compact
                   />
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleRemoveBullet(i); }}
-                    className="p-1 text-white/30 hover:text-red-400 transition-colors"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-              <button
-                onClick={(e) => { e.stopPropagation(); handleAddBullet(); }}
-                className="flex items-center gap-1 text-[10px] text-[#c5a47e] hover:text-white transition-colors"
-              >
-                <Plus className="w-3 h-3" /> Add bullet
-              </button>
-            </div>
+                </Suspense>
+              </div>
+            ) : (
+              // Legacy bullet editing
+              <div className="space-y-2">
+                {editBullets.map((bullet, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="text-white/30 text-xs mt-2">•</span>
+                    <input
+                      type="text"
+                      value={bullet}
+                      onChange={(e) => {
+                        const newBullets = [...editBullets];
+                        newBullets[i] = e.target.value;
+                        setEditBullets(newBullets);
+                      }}
+                      onBlur={() => handleSaveBullet(i, editBullets[i])}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-1 bg-black/30 border border-white/10 text-xs text-white p-1.5 focus:outline-none focus:border-[#c5a47e]/50"
+                    />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleRemoveBullet(i); }}
+                      className="p-1 text-white/30 hover:text-red-400 transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleAddBullet(); }}
+                  className="flex items-center gap-1 text-[10px] text-[#c5a47e] hover:text-white transition-colors"
+                >
+                  <Plus className="w-3 h-3" /> Add bullet
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Speaker Notes */}

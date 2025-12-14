@@ -11,6 +11,7 @@
 
 import PptxGenJS from 'pptxgenjs';
 import type { Presentation, Theme, Slide, ExportMode, ContentType } from '@/types';
+import type { ContentBlock } from '@/types/contentBlocks';
 import type { ExportProgress, PPTStrategyOptions } from '../types/export';
 import { getThemeCompatibility, getFontMapping, extractFontName } from '../lib/fontCompatibility';
 import { downloadBlob } from '../lib/fileUtils';
@@ -99,6 +100,92 @@ const WABI_SABI_LAYOUT: LayoutConfig = {
  */
 function hexToColor(hex: string): string {
   return hex.replace('#', '');
+}
+
+/**
+ * Convert contentBlocks to exportable text items.
+ * For PPTX, we flatten rich content blocks to text with appropriate formatting hints.
+ *
+ * @param contentBlocks - Array of typed content blocks
+ * @returns Array of text strings for export
+ */
+function contentBlocksToText(contentBlocks: ContentBlock[]): string[] {
+  const result: string[] = [];
+
+  for (const block of contentBlocks) {
+    switch (block.type) {
+      case 'paragraph':
+        result.push(block.text);
+        break;
+
+      case 'bullets':
+      case 'numbered':
+        result.push(...block.items);
+        break;
+
+      case 'quote':
+        const attribution = block.attribution ? ` — ${block.attribution}` : '';
+        result.push(`"${block.text}"${attribution}`);
+        break;
+
+      case 'statistic':
+        const trend = block.trend === 'up' ? ' ↑' : block.trend === 'down' ? ' ↓' : '';
+        result.push(`${block.value}${trend} ${block.label}`);
+        break;
+
+      case 'callout':
+        const prefix = block.variant.toUpperCase();
+        result.push(`[${prefix}] ${block.text}`);
+        break;
+
+      case 'chart':
+        // Charts become descriptive text in PPTX export
+        const chartDesc = block.title || 'Chart';
+        const dataDesc = block.data.labels.map((label, i) =>
+          `${label}: ${block.data.values[i]}`
+        ).join(', ');
+        result.push(`${chartDesc}: ${dataDesc}`);
+        break;
+
+      case 'diagram':
+        // Diagrams become caption text in PPTX export
+        result.push(block.caption || 'Diagram');
+        break;
+
+      default:
+        // Future block types - ignore gracefully
+        break;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Get content items from a slide, preferring contentBlocks if available.
+ * Provides backward compatibility with legacy content: string[] format.
+ */
+function getSlideContentItems(slide: Slide): string[] {
+  if (slide.contentBlocks && slide.contentBlocks.length > 0) {
+    return contentBlocksToText(slide.contentBlocks);
+  }
+  return slide.content || [];
+}
+
+/**
+ * Determine content type based on slide data.
+ * For contentBlocks, infer the dominant type.
+ */
+function getSlideContentType(slide: Slide): ContentType {
+  if (slide.contentBlocks && slide.contentBlocks.length > 0) {
+    // Check if there's a dominant type
+    const hasNumbered = slide.contentBlocks.some(b => b.type === 'numbered');
+    const hasQuote = slide.contentBlocks.some(b => b.type === 'quote');
+    if (hasNumbered) return 'numbered';
+    if (hasQuote) return 'quotes';
+    return 'bullets';
+  }
+  return slide.contentType || 'bullets';
 }
 
 /**
@@ -209,9 +296,11 @@ export async function exportEditable(
     });
 
     // Add content as bullet list with content type support
-    if (slide.content.length > 0) {
-      const contentType: ContentType = slide.contentType || 'bullets';
-      const contentItems = slide.content.map((text, index) => {
+    // Uses contentBlocks if available, falls back to legacy content array
+    const slideContent = getSlideContentItems(slide);
+    if (slideContent.length > 0) {
+      const contentType = getSlideContentType(slide);
+      const contentItems = slideContent.map((text, index) => {
         const bulletOpts = getBulletOptions(contentType, index);
         return {
           text,
@@ -333,9 +422,11 @@ export async function exportHybrid(
     });
 
     // Body as editable text with content type support
-    if (slide.content.length > 0) {
-      const contentType: ContentType = slide.contentType || 'bullets';
-      const contentItems = slide.content.map((text, index) => {
+    // Uses contentBlocks if available, falls back to legacy content array
+    const slideContent = getSlideContentItems(slide);
+    if (slideContent.length > 0) {
+      const contentType = getSlideContentType(slide);
+      const contentItems = slideContent.map((text, index) => {
         const bulletOpts = getBulletOptions(contentType, index);
         return {
           text,

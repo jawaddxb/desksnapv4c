@@ -9,10 +9,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Message, MessageRole, ResearchPreferences, ProgressState, Finding } from '@/types';
 import { IdeationStage, ThemeSuggestion, IdeaNote } from '@/types/ideation';
-import { ThemePreviewPanel } from './ThemePreviewPanel';
+import { DraftSetupPanel } from '@/components/shared/DraftSetupPanel';
 import { EnhancedModePanel } from './EnhancedModePanel';
 import { IdeationProgressBar } from './IdeationProgressBar';
 import { CompletionQuestion } from '@/services/copilot';
+import { ContentDensity } from '@/lib/contentBlockPrompts';
 
 interface CopilotPanelProps {
   messages: Message[];
@@ -31,11 +32,14 @@ interface CopilotPanelProps {
   themeSuggestion?: ThemeSuggestion | null;
   selectedThemeId?: string;
   onSelectTheme?: (themeId: string) => void;
+  // Content density props for draft setup
+  contentDensity?: ContentDensity;
+  onSelectDensity?: (density: ContentDensity) => void;
   // Message and action handlers
   onSendMessage: (message: string) => void;
   onBuildDeck?: () => void;
   onConfirmBuild?: () => void;
-  /** Called when user confirms theme. mode: 'direct' builds immediately, 'draft' goes to rough draft */
+  /** Called when user confirms theme and density. mode: 'direct' builds immediately, 'draft' goes to rough draft */
   onConfirmThemeAndBuild?: (mode: 'direct' | 'draft') => void;
   onBackFromStylePreview?: () => void;
   // Enhanced mode (Research Co-Pilot) props
@@ -116,6 +120,9 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   themeSuggestion,
   selectedThemeId,
   onSelectTheme,
+  // Content density props
+  contentDensity = 'detailed',
+  onSelectDensity,
   onSendMessage,
   onBuildDeck,
   onConfirmBuild,
@@ -303,13 +310,15 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
 
   const stageInfo = STAGE_INFO[stage];
 
-  // Render theme preview panel in style-preview stage
-  if (stage === 'style-preview' && themeSuggestion && selectedThemeId && onSelectTheme) {
+  // Render draft setup panel in style-preview stage (includes density + theme selection)
+  if (stage === 'style-preview' && selectedThemeId && onSelectTheme && onSelectDensity) {
     return (
-      <ThemePreviewPanel
-        suggestion={themeSuggestion}
+      <DraftSetupPanel
+        suggestion={themeSuggestion || undefined}
         selectedThemeId={selectedThemeId}
         onSelectTheme={onSelectTheme}
+        contentDensity={contentDensity}
+        onSelectDensity={onSelectDensity}
         onConfirm={onConfirmThemeAndBuild || (() => {})}
         onBack={onBackFromStylePreview || (() => {})}
         isLoading={isThinking}
