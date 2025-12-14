@@ -9,12 +9,13 @@ import React, { useState, useCallback } from 'react';
 import { MessageRole, ResearchPreferences, ProgressState, Finding, ProgressUpdate, Citation } from '@/types';
 import { COLUMNS, ThemeSuggestion } from '@/types/ideation';
 import { useIdeation } from '@/hooks/useIdeation';
+import { useDraftSetup } from '@/hooks/useDraftSetup';
 import { runAgentLoop, convertSessionToDeckPlan, suggestThemeForSession, convertSessionToDeckPlanWithTheme, AgentResponse, CompletionQuestion } from '@/services/copilot';
 import { performGrokResearch, hasGrokApiKey } from '@/services/grokService';
 import { FlowCanvas } from './FlowCanvas';
 import { CopilotPanel } from './CopilotPanel';
 import { ResearchModal } from './ResearchModal';
-import { ContentDensity } from '@/lib/contentBlockPrompts';
+import { DEFAULT_THEME_ID } from '@/config/defaults';
 
 interface IdeationCopilotProps {
   initialTopic?: string;
@@ -39,14 +40,14 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   onRoughDraft,
 }) => {
   const ideation = useIdeation();
+  // DRY: Use shared hook for theme/density state (replaces 2 useState calls)
+  const draftSetup = useDraftSetup();
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [askUserQuestion, setAskUserQuestion] = useState<AgentResponse['askUserQuestion'] | null>(null);
   const [completionQuestion, setCompletionQuestion] = useState<CompletionQuestion | null>(null);
-  // Theme and density selection state for style-preview stage
+  // Theme suggestion from AI (ideation-specific, not in shared hook)
   const [themeSuggestion, setThemeSuggestion] = useState<ThemeSuggestion | null>(null);
-  const [selectedThemeId, setSelectedThemeId] = useState<string>('executive');
-  const [contentDensity, setContentDensity] = useState<ContentDensity>('detailed');
   // Enhanced Mode (Research Co-Pilot) state
   const [researchProgress, setResearchProgress] = useState<ProgressState | null>(null);
   const [researchFindings, setResearchFindings] = useState<Finding[]>([]);
@@ -172,7 +173,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
       // STEP 1: Get AI theme suggestion
       const suggestion = await suggestThemeForSession(ideation.session);
       setThemeSuggestion(suggestion);
-      setSelectedThemeId(suggestion.themeId);
+      draftSetup.setTheme(suggestion.themeId);
 
       // Move to style-preview stage
       ideation.setStage('style-preview');
@@ -187,24 +188,24 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
         MessageRole.MODEL,
         "I couldn't analyze the best theme. Please select one manually."
       );
-      // Fallback: still go to style-preview with default
+      // Fallback: still go to style-preview with default (DRY: uses centralized default)
       setThemeSuggestion({
-        themeId: 'executive',
+        themeId: DEFAULT_THEME_ID,
         reasoning: 'A professional, versatile theme.',
         visualStyleHint: 'Clean corporate photography',
         alternativeIds: ['startup', 'minimalist'],
       });
-      setSelectedThemeId('executive');
+      draftSetup.setTheme(DEFAULT_THEME_ID);
       ideation.setStage('style-preview');
     } finally {
       setIsThinking(false);
     }
-  }, [ideation]);
+  }, [ideation, draftSetup]);
 
   // Handle final build after theme confirmation
   // mode: 'direct' builds deck immediately, 'draft' goes to rough draft view
   const handleConfirmThemeAndBuild = useCallback(async (mode: 'direct' | 'draft' = 'direct') => {
-    if (!ideation.session || !selectedThemeId) return;
+    if (!ideation.session || !draftSetup.themeId) return;
     if (mode === 'direct' && !onBuildDeck) return;
     if (mode === 'draft' && !onRoughDraft) return;
 
@@ -213,7 +214,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
       // STEP 2: Convert to deck plan with confirmed theme
       const deckPlan = await convertSessionToDeckPlanWithTheme(
         ideation.session,
-        selectedThemeId
+        draftSetup.themeId
       );
 
       if (mode === 'direct') {
@@ -224,7 +225,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
           content: n.content,
           column: n.column,
         }));
-        onRoughDraft?.(deckPlan, ideation.session.id, notes, contentDensity);
+        onRoughDraft?.(deckPlan, ideation.session.id, notes, draftSetup.contentDensity);
       }
     } catch (error) {
       console.error('Deck conversion error:', error);
@@ -235,7 +236,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     } finally {
       setIsThinking(false);
     }
-  }, [ideation, onBuildDeck, onRoughDraft, selectedThemeId]);
+  }, [ideation, onBuildDeck, onRoughDraft, draftSetup]);
 
   // Handle going back from style-preview to review
   const handleBackFromStylePreview = useCallback(() => {
@@ -256,16 +257,6 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     // Go to theme selection - user will pick "Continue to Draft" there
     handleConfirmBuild();
   }, [handleConfirmBuild]);
-
-  // Handle theme selection change
-  const handleSelectTheme = useCallback((themeId: string) => {
-    setSelectedThemeId(themeId);
-  }, []);
-
-  // Handle content density selection change
-  const handleSelectDensity = useCallback((density: ContentDensity) => {
-    setContentDensity(density);
-  }, []);
 
   // Handle note operations
   const handleAddNote = useCallback((column: number) => {
@@ -459,12 +450,12 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
             completionQuestion={completionQuestion}
             onDirectBuild={handleDirectBuild}
             onGoToRoughDraft={handleGoToRoughDraft}
-            // Theme and density selection props
+            // Theme and density selection props (DRY: uses shared hook methods)
             themeSuggestion={themeSuggestion}
-            selectedThemeId={selectedThemeId}
-            onSelectTheme={handleSelectTheme}
-            contentDensity={contentDensity}
-            onSelectDensity={handleSelectDensity}
+            selectedThemeId={draftSetup.themeId}
+            onSelectTheme={draftSetup.setTheme}
+            contentDensity={draftSetup.contentDensity}
+            onSelectDensity={draftSetup.setDensity}
             onSendMessage={handleSendMessage}
             onBuildDeck={handleBuildDeck}
             onConfirmBuild={handleConfirmBuild}

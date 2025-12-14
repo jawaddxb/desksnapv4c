@@ -15,6 +15,7 @@ import { DebugProvider } from './contexts/DebugContext';
 import { WorkspaceModeProvider } from './contexts/WorkspaceModeContext';
 import { ChatUIProvider } from './contexts/ChatUIContext';
 import { DebugRoute, ThumbnailGenerator, ComponentShowcase, ImageAgentRoute } from './components/debug';
+import { DesignShowcase } from './design-showcase/DesignShowcase';
 import { AuthModal } from './components/auth';
 import { ProtectedRoute, OfflineGate } from './components/routing';
 import { LandingPage } from './components/landing';
@@ -73,6 +74,7 @@ function AppRoutes() {
         <Route path="/debug/thumbnails" element={<ThumbnailGenerator />} />
         <Route path="/debug/components" element={<ComponentShowcase />} />
         <Route path="/debug/image-agent" element={<ImageAgentRoute />} />
+        <Route path="/design-showcase" element={<DesignShowcase />} />
 
         {/* Auth Routes */}
         <Route

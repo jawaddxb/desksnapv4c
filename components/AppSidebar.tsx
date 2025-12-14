@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Presentation, Message, GenerationMode } from '@/types';
 import { IdeationSession } from '@/types/ideation';
 import { RoughDraft } from '@/types/roughDraft';
-import { Zap, MessageSquare, Sparkles, Clock, ArrowRight, FileText, Lightbulb, FileEdit, LayoutDashboard } from 'lucide-react';
+import { Sparkles, Clock, ArrowRight, FileText, Lightbulb } from 'lucide-react';
 import { ChatInterface } from './ChatInterface';
 import { SlideList } from './SlideList';
 import { VersionHistoryPanel } from './VersionHistoryPanel';
@@ -104,163 +104,179 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     };
 
     return (
-        <div className="w-[360px] md:w-[400px] flex flex-col border-r border-white/10 bg-black relative z-20 h-full flex-shrink-0">
-            <div className="h-20 flex-none px-6 border-b border-white/10 flex items-center justify-between bg-black z-30">
+        <div className="w-[320px] md:w-[360px] flex flex-col border-r border-white/8 bg-[#0d0d0d] relative z-20 h-full flex-shrink-0">
+            {/* Header - Clean and minimal */}
+            <div className="h-16 flex-none px-5 border-b border-white/8 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white text-black flex items-center justify-center"><Zap className="w-6 h-6" strokeWidth={2.5} /></div>
-                    <div><h1 className="font-bold text-2xl tracking-tight text-white leading-none">DeckSnap</h1><span className="text-[10px] font-bold uppercase tracking-widest text-[#c5a47e]">GenAI Studio</span></div>
+                    <div className="w-9 h-9 bg-[#c5a47e] text-black flex items-center justify-center rounded">
+                        <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <h1 className="font-semibold text-lg text-white leading-none">DeckSnap</h1>
+                        <span className="text-[10px] text-white/40">AI Presentation Studio</span>
+                    </div>
                 </div>
-                {currentPresentation && (
-                    <button onClick={() => setIsChatOpen(!isChatOpen)} className={`p-2 transition-all duration-150 ${isChatOpen ? 'bg-[#c5a47e] text-black' : 'bg-black text-white/60 border border-white/20 hover:border-[#c5a47e] hover:text-[#c5a47e]'}`}><MessageSquare className="w-5 h-5" strokeWidth={2.5} /></button>
-                )}
             </div>
+
+            {/* Content based on state */}
             {!currentPresentation ? (
+                /* No presentation - Show chat and recent work */
                 <div className="flex flex-col grow h-full overflow-hidden">
+                    {/* Chat Interface */}
                     <ChatInterface
-                        mode="sidebar" messages={messages} isGenerating={isGenerating} currentPresentation={currentPresentation}
-                        isChatOpen={isChatOpen} setIsChatOpen={setIsChatOpen} inputValue={inputValue} setInputValue={setInputValue}
-                        handleSendMessage={handleSendMessage} selectedImageStyle={selectedImageStyle} setSelectedImageStyle={setSelectedImageStyle}
-                        generationMode={generationMode} setGenerationMode={setGenerationMode}
+                        mode="sidebar"
+                        messages={messages}
+                        isGenerating={isGenerating}
+                        currentPresentation={currentPresentation}
+                        isChatOpen={isChatOpen}
+                        setIsChatOpen={setIsChatOpen}
+                        inputValue={inputValue}
+                        setInputValue={setInputValue}
+                        handleSendMessage={handleSendMessage}
+                        selectedImageStyle={selectedImageStyle}
+                        setSelectedImageStyle={setSelectedImageStyle}
+                        generationMode={generationMode}
+                        setGenerationMode={setGenerationMode}
                         scrollRef={scrollRef}
                     />
 
-                    {/* Recent Ideations Section */}
+                    {/* Recent Ideations - Compact list */}
                     {recentIdeations.length > 0 && onLoadIdeation && (
-                        <ExpandableSection title="Recent Ideations" icon={Sparkles}>
-                            {recentIdeations.slice(0, 5).map((ideation) => (
-                                <button
-                                    key={ideation.id}
-                                    onClick={() => onLoadIdeation(ideation.id)}
-                                    className="w-full p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 text-left group"
-                                >
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-white font-medium line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-150">
-                                                {ideation.topic || 'Untitled Ideation'}
-                                            </p>
-                                            <div className="flex items-center gap-2 mt-1 text-[10px] text-white/40">
-                                                <span className="flex items-center gap-1">
+                        <div className="border-t border-white/8 p-4">
+                            <h3 className="text-xs font-medium text-white/40 mb-3">
+                                Continue working
+                            </h3>
+                            <div className="space-y-2">
+                                {recentIdeations.slice(0, 3).map((ideation) => (
+                                    <button
+                                        key={ideation.id}
+                                        onClick={() => onLoadIdeation(ideation.id)}
+                                        className="w-full p-3 bg-[#171717] border border-white/5 rounded-lg hover:border-[#c5a47e]/30 transition-all duration-200 text-left group"
+                                    >
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm text-white font-medium truncate group-hover:text-[#c5a47e] transition-colors">
+                                                    {ideation.topic || 'Untitled'}
+                                                </p>
+                                                <div className="flex items-center gap-2 mt-1 text-[10px] text-white/40">
                                                     <Clock className="w-3 h-3" />
-                                                    {new Date(ideation.lastModified).toLocaleDateString()}
-                                                </span>
-                                                <span className="px-1.5 py-0.5 bg-white/5 rounded-sm">
-                                                    {ideation.notes.length} notes
-                                                </span>
-                                                {ideation.generatedPresentationIds && ideation.generatedPresentationIds.length > 0 && (
-                                                    <span className="flex items-center gap-1 text-[#c5a47e]">
-                                                        <FileText className="w-3 h-3" />
-                                                        {ideation.generatedPresentationIds.length}
+                                                    <span>{formatTimeAgo(ideation.lastModified)}</span>
+                                                    <span className="px-1.5 py-0.5 bg-white/5 rounded">
+                                                        {ideation.notes.length} notes
                                                     </span>
-                                                )}
+                                                </div>
                                             </div>
+                                            <Lightbulb className="w-4 h-4 text-[#c5a47e]/50 flex-shrink-0" />
                                         </div>
-                                        <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-[#c5a47e] transition-colors duration-150 flex-shrink-0" />
-                                    </div>
-                                </button>
-                            ))}
+                                    </button>
+                                ))}
+                            </div>
 
-                            {onViewAllIdeations && (
+                            {onViewAllIdeations && recentIdeations.length > 3 && (
                                 <button
                                     onClick={onViewAllIdeations}
-                                    className="w-full py-2 text-[10px] font-bold uppercase tracking-widest text-[#c5a47e] hover:text-white transition-colors duration-150"
+                                    className="w-full mt-2 py-2 text-xs text-white/40 hover:text-[#c5a47e] transition-colors"
                                 >
-                                    View All Ideations &rarr;
+                                    View all ideations
                                 </button>
                             )}
-                        </ExpandableSection>
+                        </div>
                     )}
                 </div>
             ) : (
+                /* Presentation loaded - Show slides and tools */
                 <div className="flex flex-col flex-1 overflow-hidden">
-                    <SlideList
-                        presentation={currentPresentation}
-                        activeSlideIndex={activeSlideIndex}
-                        setActiveSlideIndex={setActiveSlideIndex}
-                        onMoveSlide={onMoveSlide}
-                        viewMode={viewMode}
-                        activeWabiSabiLayout={activeWabiSabiLayout}
-                    />
-                    {/* Related Content Panel - shows source ideation/rough draft */}
-                    <RelatedContentPanel
-                        ideation={sourceIdeation ? {
-                            id: sourceIdeation.id,
-                            topic: sourceIdeation.topic,
-                            lastModified: sourceIdeation.lastModified,
-                            notesCount: sourceIdeation.notes.length,
-                        } : null}
-                        roughDraft={sourceRoughDraft ? {
-                            id: sourceRoughDraft.id,
-                            topic: sourceRoughDraft.topic,
-                            lastModified: sourceRoughDraft.updatedAt,
-                            slidesCount: sourceRoughDraft.slides.length,
-                            status: sourceRoughDraft.status,
-                        } : null}
-                        onViewIdeation={onViewSourceIdeation}
-                        onViewRoughDraft={onViewSourceRoughDraft}
-                    />
-                    <VersionHistoryPanel
-                        versions={versions}
-                        isLoading={isLoadingVersions}
-                        onCreateVersion={handleCreateVersion}
-                        onRestoreVersion={handleRestoreVersion}
-                        onDeleteVersion={handleDeleteVersion}
-                        isCreating={createVersionMutation.isPending}
-                        isRestoring={restoreVersionMutation.isPending}
-                    />
+                    {/* Slide List - Primary content */}
+                    <div className="flex-1 overflow-hidden">
+                        <SlideList
+                            presentation={currentPresentation}
+                            activeSlideIndex={activeSlideIndex}
+                            setActiveSlideIndex={setActiveSlideIndex}
+                            onMoveSlide={onMoveSlide}
+                            viewMode={viewMode}
+                            activeWabiSabiLayout={activeWabiSabiLayout}
+                        />
+                    </div>
 
-                    {/* Workspace Navigation Panel */}
-                    <ExpandableSection title="Workspace" icon={Sparkles}>
-                        {/* New Ideation Button */}
-                        {onIdeate && (
-                            <button
-                                onClick={onIdeate}
-                                className="w-full p-3 bg-[#c5a47e]/10 hover:bg-[#c5a47e]/20 border border-[#c5a47e]/30 hover:border-[#c5a47e]/50 transition-all duration-150 text-left group flex items-center gap-3"
-                            >
-                                <div className="w-8 h-8 bg-[#c5a47e]/20 flex items-center justify-center flex-shrink-0">
-                                    <Lightbulb className="w-4 h-4 text-[#c5a47e]" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm text-[#c5a47e] font-medium">New Ideation</p>
-                                    <p className="text-[10px] text-white/40">Brainstorm your next deck</p>
-                                </div>
-                            </button>
-                        )}
+                    {/* Related Content - Only if there's source content */}
+                    {(sourceIdeation || sourceRoughDraft) && (
+                        <RelatedContentPanel
+                            ideation={sourceIdeation ? {
+                                id: sourceIdeation.id,
+                                topic: sourceIdeation.topic,
+                                lastModified: sourceIdeation.lastModified,
+                                notesCount: sourceIdeation.notes.length,
+                            } : null}
+                            roughDraft={sourceRoughDraft ? {
+                                id: sourceRoughDraft.id,
+                                topic: sourceRoughDraft.topic,
+                                lastModified: sourceRoughDraft.updatedAt,
+                                slidesCount: sourceRoughDraft.slides.length,
+                                status: sourceRoughDraft.status,
+                            } : null}
+                            onViewIdeation={onViewSourceIdeation}
+                            onViewRoughDraft={onViewSourceRoughDraft}
+                        />
+                    )}
 
-                        {/* Go to Dashboard Button */}
-                        {onGoToDashboard && (
-                            <button
-                                onClick={onGoToDashboard}
-                                className="w-full p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-150 text-left group flex items-center gap-3"
-                            >
-                                <div className="w-8 h-8 bg-white/10 flex items-center justify-center flex-shrink-0">
-                                    <LayoutDashboard className="w-4 h-4 text-white/60" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm text-white font-medium group-hover:text-[#c5a47e] transition-colors duration-150">Dashboard</p>
-                                    <div className="flex items-center gap-2 text-[10px] text-white/40">
-                                        {ideationsCount > 0 && (
-                                            <span className="flex items-center gap-1">
-                                                <Lightbulb className="w-3 h-3" />
-                                                {ideationsCount} ideations
-                                            </span>
-                                        )}
-                                        {roughDraftsCount > 0 && (
-                                            <span className="flex items-center gap-1">
-                                                <FileEdit className="w-3 h-3" />
-                                                {roughDraftsCount} drafts
-                                            </span>
-                                        )}
-                                        {ideationsCount === 0 && roughDraftsCount === 0 && (
-                                            <span>View all your work</span>
-                                        )}
-                                    </div>
-                                </div>
-                                <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-[#c5a47e] transition-colors duration-150 flex-shrink-0" />
-                            </button>
-                        )}
+                    {/* Version History - Collapsible */}
+                    <ExpandableSection
+                        title="History"
+                        icon={Clock}
+                        defaultExpanded={false}
+                    >
+                        <VersionHistoryPanel
+                            versions={versions}
+                            isLoading={isLoadingVersions}
+                            onCreateVersion={handleCreateVersion}
+                            onRestoreVersion={handleRestoreVersion}
+                            onDeleteVersion={handleDeleteVersion}
+                            isCreating={createVersionMutation.isPending}
+                            isRestoring={restoreVersionMutation.isPending}
+                            compact
+                        />
                     </ExpandableSection>
+
+                    {/* Quick Actions - Bottom of sidebar */}
+                    <div className="border-t border-white/8 p-3">
+                        <div className="flex gap-2">
+                            {onIdeate && (
+                                <button
+                                    onClick={onIdeate}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#c5a47e]/10 border border-[#c5a47e]/20 rounded text-xs text-[#c5a47e] hover:bg-[#c5a47e]/20 transition-colors"
+                                >
+                                    <Lightbulb className="w-4 h-4" />
+                                    New Idea
+                                </button>
+                            )}
+                            {onGoToDashboard && (
+                                <button
+                                    onClick={onGoToDashboard}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-white/5 border border-white/8 rounded text-xs text-white/60 hover:text-white hover:border-white/20 transition-colors"
+                                >
+                                    <FileText className="w-4 h-4" />
+                                    Dashboard
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
     );
 };
+
+/** Format time ago helper */
+function formatTimeAgo(timestamp: number): string {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(timestamp).toLocaleDateString();
+}
