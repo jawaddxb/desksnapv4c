@@ -44,29 +44,29 @@ export const Dialog: React.FC<DialogProps> = ({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000]"
+        className="fixed inset-0 bg-[#1E2E1E]/40 backdrop-blur-sm z-[1000]"
         onClick={onClose}
       />
 
       {/* Dialog */}
       <div
-        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] ${MAX_WIDTH_CLASSES[maxWidth]} bg-[#111111] border border-white/20 shadow-2xl z-[1001] overflow-hidden animate-in fade-in zoom-in-95 duration-200`}
+        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] ${MAX_WIDTH_CLASSES[maxWidth]} bg-white border border-[#D4E5D4] shadow-[0_12px_48px_rgba(107,142,107,0.12)] rounded-lg z-[1001] overflow-hidden animate-in fade-in zoom-in-95 duration-200`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#D4E5D4]">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#c5a47e]/20 rounded">
-              <Icon className="w-5 h-5 text-[#c5a47e]" />
+            <div className="p-2 bg-[#6B8E6B]/10 rounded-md">
+              <Icon className="w-5 h-5 text-[#6B8E6B]" />
             </div>
-            <h2 className="text-sm font-bold uppercase tracking-widest text-white">
+            <h2 className="text-sm font-medium tracking-wide text-[#1E2E1E]">
               {title}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/10 transition-colors"
+            className="p-2 hover:bg-[#EDF5F0] transition-colors rounded-md"
           >
-            <X className="w-4 h-4 text-white/60" />
+            <X className="w-4 h-4 text-[#4A5D4A]" />
           </button>
         </div>
 
@@ -88,9 +88,9 @@ export const Dialog: React.FC<DialogProps> = ({
 
 // Common button styles for dialog actions
 export const DialogButton = {
-  secondary: 'flex-1 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white/70 bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-center gap-2',
-  primary: 'flex-1 px-4 py-3 text-xs font-bold uppercase tracking-widest text-black bg-[#c5a47e] hover:bg-[#b8956f] transition-all flex items-center justify-center gap-2',
-  primaryDisabled: 'flex-1 px-4 py-3 text-xs font-bold uppercase tracking-widest text-black bg-[#c5a47e] hover:bg-[#b8956f] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2',
+  secondary: 'flex-1 px-4 py-3 text-xs font-medium tracking-wide text-[#4A5D4A] bg-[#EDF5F0] hover:bg-[#D4E5D4] border border-[#D4E5D4] rounded-md transition-all flex items-center justify-center gap-2',
+  primary: 'flex-1 px-4 py-3 text-xs font-medium tracking-wide text-white bg-[#6B8E6B] hover:bg-[#5A7A5A] rounded-md transition-all flex items-center justify-center gap-2',
+  primaryDisabled: 'flex-1 px-4 py-3 text-xs font-medium tracking-wide text-white bg-[#6B8E6B] hover:bg-[#5A7A5A] disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all flex items-center justify-center gap-2',
 };
 
 export default Dialog;

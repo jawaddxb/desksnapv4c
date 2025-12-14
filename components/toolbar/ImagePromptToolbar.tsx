@@ -118,11 +118,11 @@ export const ImagePromptToolbar: React.FC<ImagePromptToolbarProps> = ({
       {!isExpanded && (
         <button
           onClick={() => setIsExpanded(true)}
-          className="p-2.5 bg-black/80 backdrop-blur-md hover:bg-[#c5a47e] border border-white/20 text-white hover:text-black transition-all duration-150 opacity-60 hover:opacity-100 group/btn relative"
+          className="p-2.5 bg-white/80 backdrop-blur-md hover:bg-[#6B8E6B] border border-[#D4E5D4] text-[#1E2E1E] hover:text-white transition-all duration-150 opacity-60 hover:opacity-100 group/btn relative"
           title="Edit Image Prompt"
         >
           <ImageIcon className="w-4 h-4" />
-          <span className="absolute right-full mr-2 top-1.5 px-2 py-1 bg-black text-white text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">
+          <span className="absolute right-full mr-2 top-1.5 px-2 py-1 bg-white text-[#1E2E1E] text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-[#D4E5D4]">
             Prompt
           </span>
         </button>
@@ -194,7 +194,7 @@ export const ImagePromptToolbar: React.FC<ImagePromptToolbarProps> = ({
             <textarea
               value={editedPrompt}
               onChange={(e) => setEditedPrompt(e.target.value)}
-              className="w-full h-20 text-xs text-zinc-700 bg-zinc-50 border border-zinc-200 rounded-lg p-2 resize-none focus:outline-none focus:ring-2 focus:ring-[#c5a47e] focus:border-transparent transition-all"
+              className="w-full h-20 text-xs text-zinc-700 bg-zinc-50 border border-zinc-200 rounded-lg p-2 resize-none focus:outline-none focus:ring-2 focus:ring-[#6B8E6B] focus:border-transparent transition-all"
               placeholder="Describe the image subject..."
             />
             <div className="flex items-center justify-between mt-2">
@@ -217,7 +217,7 @@ export const ImagePromptToolbar: React.FC<ImagePromptToolbarProps> = ({
                 <button
                   onClick={handleApplyAndRegenerate}
                   disabled={isRegenerating}
-                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-[#c5a47e] text-black hover:bg-[#b8956f] transition-all flex items-center gap-1"
+                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-[#6B8E6B] text-white hover:bg-[#5A7A5A] transition-all flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
                   Regenerate

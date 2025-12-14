@@ -64,10 +64,10 @@ export const ThemePicker: React.FC<ThemePickerProps> = ({
         <button
           key={theme.id}
           onClick={() => onSelect(theme.id)}
-          className={`group relative flex flex-col items-start text-left transition-all duration-150 p-1 ${
+          className={`group relative flex flex-col items-start text-left transition-all duration-150 p-1 rounded-lg ${
             selectedThemeId === theme.id
-              ? 'bg-white/10 ring-1 ring-[#c5a47e]'
-              : 'hover:bg-white/5'
+              ? 'bg-[#6B8E6B]/10 ring-1 ring-[#6B8E6B]'
+              : 'hover:bg-[#EDF5F0]'
           }`}
         >
           <div
@@ -111,7 +111,7 @@ export const ThemePicker: React.FC<ThemePickerProps> = ({
             {/* Selected indicator */}
             {selectedThemeId === theme.id && (
               <div
-                className={`absolute ${checkPosition} ${checkSize} bg-[#c5a47e] text-black flex items-center justify-center shadow-md z-20`}
+                className={`absolute ${checkPosition} ${checkSize} bg-[#6B8E6B] text-white rounded-md flex items-center justify-center shadow-md z-20`}
               >
                 <Check className={checkIconSize} strokeWidth={3} />
               </div>
@@ -119,7 +119,7 @@ export const ThemePicker: React.FC<ThemePickerProps> = ({
 
             {/* Current theme badge (for comparison UIs like RemixDialog) */}
             {currentThemeId && currentThemeId === theme.id && selectedThemeId !== theme.id && (
-              <div className={`absolute ${checkPosition} px-1.5 py-0.5 bg-white/20 text-white text-[8px] font-bold uppercase tracking-wider z-20`}>
+              <div className={`absolute ${checkPosition} px-1.5 py-0.5 bg-[#8FA58F] text-white rounded text-[8px] font-bold uppercase tracking-wider z-20`}>
                 Current
               </div>
             )}
@@ -136,7 +136,7 @@ export const ThemePicker: React.FC<ThemePickerProps> = ({
           </div>
 
           <div className="px-2 pb-2 w-full">
-            <span className={`${textSize} font-bold text-white`}>{theme.name}</span>
+            <span className={`${textSize} font-bold text-[#1E2E1E]`}>{theme.name}</span>
           </div>
         </button>
       ))}

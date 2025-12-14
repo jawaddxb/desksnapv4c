@@ -79,7 +79,7 @@ export const Menu: React.FC<MenuProps> = ({
         ref={menuRef}
         className={`
           absolute z-50 mt-2 min-w-[160px]
-          bg-white border border-zinc-200 rounded-xl shadow-lg
+          bg-white border border-[#D4E5D4] rounded-lg shadow-[0_8px_32px_rgba(107,142,107,0.1)]
           py-1 animate-in fade-in-0 zoom-in-95 duration-200
           ${alignmentClass}
           ${className}
@@ -132,8 +132,8 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         flex items-center gap-2
         transition-colors duration-150
         ${selected
-          ? 'bg-zinc-100 text-zinc-900'
-          : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+          ? 'bg-[#EDF5F0] text-[#1E2E1E]'
+          : 'text-[#4A5D4A] hover:bg-[#EDF5F0] hover:text-[#1E2E1E]'
         }
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         ${className}
@@ -141,7 +141,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
     >
       {icon && <span className="w-4 h-4 flex-shrink-0">{icon}</span>}
       <span className="flex-1">{children}</span>
-      {hasSubmenu && <ChevronRight className="w-3 h-3 text-zinc-400" />}
+      {hasSubmenu && <ChevronRight className="w-3 h-3 text-[#8FA58F]" />}
     </button>
   );
 };
@@ -149,7 +149,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
 // ============ Menu Separator ============
 
 export const MenuSeparator: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <div className={`h-px bg-zinc-200 my-1 ${className}`} />
+  <div className={`h-px bg-[#D4E5D4] my-1 ${className}`} />
 );
 
 // ============ Menu Header ============
@@ -160,7 +160,7 @@ export interface MenuHeaderProps {
 }
 
 export const MenuHeader: React.FC<MenuHeaderProps> = ({ children, className = '' }) => (
-  <div className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-400 ${className}`}>
+  <div className={`px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider text-[#8FA58F] ${className}`}>
     {children}
   </div>
 );
@@ -204,7 +204,7 @@ export const Submenu: React.FC<SubmenuProps> = ({
         <div
           className={`
             absolute left-full top-0 ml-1 min-w-[160px]
-            bg-white border border-zinc-200 rounded-xl shadow-lg
+            bg-white border border-[#D4E5D4] rounded-lg shadow-[0_8px_32px_rgba(107,142,107,0.1)]
             py-1 animate-in fade-in-0 slide-in-from-left-2 duration-200
             ${className}
           `}

@@ -146,6 +146,7 @@ export interface DeckHandlers {
   onCloneDeck: (id: string) => void;
   onCloneCurrentDeck: () => void;
   onStartPresenting: () => void;
+  onStartMobilePresenting: () => void;
 }
 
 /**

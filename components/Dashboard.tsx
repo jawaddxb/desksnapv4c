@@ -56,9 +56,9 @@ interface DashboardProps {
 /** Type badge component */
 const TypeBadge: React.FC<{ type: WorkItemType }> = ({ type }) => {
   const config = {
-    deck: { label: 'Deck', icon: FileText, color: 'bg-white/10 text-white/70' },
-    draft: { label: 'Draft', icon: FileEdit, color: 'bg-[#c5a47e]/20 text-[#c5a47e]' },
-    ideation: { label: 'Idea', icon: Sparkles, color: 'bg-purple-500/20 text-purple-400' },
+    deck: { label: 'Deck', icon: FileText, color: 'bg-[#EDF5F0] text-[#4A5D4A]' },
+    draft: { label: 'Draft', icon: FileEdit, color: 'bg-[#6B8E6B]/20 text-[#6B8E6B]' },
+    ideation: { label: 'Idea', icon: Sparkles, color: 'bg-purple-100 text-purple-600' },
   };
   const { label, icon: Icon, color } = config[type];
 
@@ -88,10 +88,10 @@ const WorkItemCard: React.FC<{
     : null;
 
   return (
-    <div className="group bg-[#171717] border border-white/5 hover:border-[#c5a47e]/30 rounded-lg transition-all duration-300 flex flex-col overflow-hidden relative hover:-translate-y-0.5 hover:shadow-lg">
+    <div className="group bg-white border border-[#D4E5D4] hover:border-[#6B8E6B]/50 rounded-lg transition-all duration-300 flex flex-col overflow-hidden relative hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(107,142,107,0.1)]">
       {/* Thumbnail */}
       <div
-        className="aspect-video w-full bg-[#0d0d0d] relative overflow-hidden cursor-pointer"
+        className="aspect-video w-full bg-[#F5FAF7] relative overflow-hidden cursor-pointer"
         onClick={onOpen}
       >
         {coverSlide ? (
@@ -104,14 +104,14 @@ const WorkItemCard: React.FC<{
             />
           </div>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500/10 to-[#c5a47e]/10">
-            <Sparkles className="w-8 h-8 text-white/20" />
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-100/50 to-[#6B8E6B]/10">
+            <Sparkles className="w-8 h-8 text-[#8FA58F]" />
           </div>
         )}
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-          <div className="bg-[#c5a47e] text-black px-4 py-2 rounded font-medium text-xs flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+        <div className="absolute inset-0 bg-[#1E2E1E]/0 group-hover:bg-[#1E2E1E]/50 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <div className="bg-[#6B8E6B] text-white px-4 py-2 rounded-md font-medium text-xs flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
             <Play className="w-3 h-3" fill="currentColor" />
             {item.type === 'ideation' ? 'Continue' : 'Open'}
           </div>
@@ -126,25 +126,25 @@ const WorkItemCard: React.FC<{
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
         <h3
-          className="font-semibold text-sm text-white line-clamp-1 group-hover:text-[#c5a47e] transition-colors duration-200 cursor-pointer mb-2"
+          className="font-medium text-sm text-[#1E2E1E] line-clamp-1 group-hover:text-[#6B8E6B] transition-colors duration-200 cursor-pointer mb-2"
           onClick={onOpen}
         >
           {item.title}
         </h3>
 
         <div className="flex items-center justify-between mt-auto">
-          <div className="flex items-center gap-3 text-xs text-white/40">
+          <div className="flex items-center gap-3 text-xs text-[#8FA58F]">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {formatTimeAgo(item.lastModified)}
             </span>
             {item.slideCount !== undefined && (
-              <span className="px-1.5 py-0.5 bg-white/5 rounded text-white/50">
+              <span className="px-1.5 py-0.5 bg-[#EDF5F0] rounded text-[#4A5D4A]">
                 {item.slideCount} slides
               </span>
             )}
             {item.noteCount !== undefined && (
-              <span className="px-1.5 py-0.5 bg-white/5 rounded text-white/50">
+              <span className="px-1.5 py-0.5 bg-[#EDF5F0] rounded text-[#4A5D4A]">
                 {item.noteCount} notes
               </span>
             )}
@@ -157,7 +157,7 @@ const WorkItemCard: React.FC<{
         {onAction && actionLabel && (
           <button
             onClick={(e) => { e.stopPropagation(); onAction(); }}
-            className="p-1.5 bg-[#c5a47e] text-black rounded hover:bg-[#d4b68e] transition-colors duration-150"
+            className="p-1.5 bg-[#6B8E6B] text-white rounded-md hover:bg-[#5A7A5A] transition-colors duration-150"
             title={actionLabel}
           >
             <ChevronRight className="w-3.5 h-3.5" />
@@ -166,7 +166,7 @@ const WorkItemCard: React.FC<{
         {onClone && (
           <button
             onClick={(e) => { e.stopPropagation(); onClone(); }}
-            className="p-1.5 bg-black/80 text-white/70 rounded hover:bg-black hover:text-[#c5a47e] transition-colors duration-150"
+            className="p-1.5 bg-white/90 text-[#4A5D4A] rounded-md hover:bg-white hover:text-[#6B8E6B] transition-colors duration-150 shadow-sm"
             title="Clone"
           >
             <Copy className="w-3.5 h-3.5" />
@@ -174,7 +174,7 @@ const WorkItemCard: React.FC<{
         )}
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="p-1.5 bg-black/80 text-white/70 rounded hover:bg-red-500/20 hover:text-red-400 transition-colors duration-150"
+          className="p-1.5 bg-white/90 text-[#4A5D4A] rounded-md hover:bg-red-50 hover:text-red-500 transition-colors duration-150 shadow-sm"
           title="Delete"
         >
           <Trash2 className="w-3.5 h-3.5" />
@@ -373,7 +373,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const isLoading = isLoadingIdeations || isLoadingRoughDrafts;
 
   return (
-    <div className="flex-1 h-full overflow-y-auto bg-[#0d0d0d] p-8 md:p-12">
+    <div className="flex-1 h-full overflow-y-auto bg-[#F5FAF7] p-8 md:p-12">
       {analyticsDeck && (
         <AnalyticsModal presentation={analyticsDeck} onClose={() => setAnalyticsDeck(null)} />
       )}
@@ -411,22 +411,22 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="mt-8">
           {/* Header with filter */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-sm font-medium text-white/40">
+            <h2 className="text-sm font-medium text-[#8FA58F]">
               Your recent work
             </h2>
 
             {/* Filter dropdown */}
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-white/30" />
+              <Filter className="w-4 h-4 text-[#8FA58F]" />
               <select
                 value={activeFilter}
                 onChange={(e) => setActiveFilter(e.target.value as FilterType)}
-                className="bg-transparent border border-white/10 rounded px-3 py-1.5 text-sm text-white/70 focus:border-[#c5a47e]/50 focus:outline-none cursor-pointer"
+                className="bg-white border border-[#D4E5D4] rounded-md px-3 py-1.5 text-sm text-[#4A5D4A] focus:border-[#6B8E6B]/50 focus:outline-none cursor-pointer"
               >
-                <option value="all" className="bg-[#171717]">All ({counts.all})</option>
-                <option value="deck" className="bg-[#171717]">Decks ({counts.deck})</option>
-                <option value="draft" className="bg-[#171717]">Drafts ({counts.draft})</option>
-                <option value="ideation" className="bg-[#171717]">Ideas ({counts.ideation})</option>
+                <option value="all">All ({counts.all})</option>
+                <option value="deck">Decks ({counts.deck})</option>
+                <option value="draft">Drafts ({counts.draft})</option>
+                <option value="ideation">Ideas ({counts.ideation})</option>
               </select>
             </div>
           </div>
@@ -434,27 +434,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* Loading state */}
           {isLoading && (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 text-[#c5a47e] animate-spin" />
+              <Loader2 className="w-6 h-6 text-[#6B8E6B] animate-spin" />
             </div>
           )}
 
           {/* Empty state */}
           {!isLoading && filteredItems.length === 0 && (
-            <div className="border border-dashed border-white/10 rounded-lg p-16 text-center">
-              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FileText className="w-8 h-8 text-white/20" />
+            <div className="border border-dashed border-[#D4E5D4] rounded-lg p-16 text-center bg-white">
+              <div className="w-16 h-16 bg-[#EDF5F0] rounded-full flex items-center justify-center mx-auto mb-6">
+                <FileText className="w-8 h-8 text-[#8FA58F]" />
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">
+              <h3 className="text-lg font-medium text-[#1E2E1E] mb-2">
                 {activeFilter === 'all' ? 'Ready to create?' : `No ${activeFilter}s yet`}
               </h3>
-              <p className="text-white/50 mb-6 max-w-md mx-auto text-sm">
+              <p className="text-[#4A5D4A] mb-6 max-w-md mx-auto text-sm">
                 {activeFilter === 'all'
                   ? 'Start by creating a new presentation or exploring your ideas with ideation.'
                   : `Create your first ${activeFilter} to see it here.`}
               </p>
               <button
                 onClick={handleCreateNew}
-                className="bg-[#c5a47e] hover:bg-[#d4b68e] text-black px-6 py-2.5 rounded font-medium text-sm transition-colors duration-200"
+                className="bg-[#6B8E6B] hover:bg-[#5A7A5A] text-white px-6 py-2.5 rounded-md font-medium text-sm transition-colors duration-200"
               >
                 Create Your First Deck
               </button>

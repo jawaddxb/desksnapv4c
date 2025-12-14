@@ -82,32 +82,32 @@ export const ContentDensitySelector: React.FC<ContentDensitySelectorProps> = ({
               onClick={() => onChange(option.id)}
               className={`relative p-4 text-left transition-all duration-150 ${
                 isSelected
-                  ? 'bg-[#c5a47e]/10 ring-2 ring-[#c5a47e] border-transparent'
-                  : 'bg-white/5 border border-white/10 hover:border-white/30 hover:bg-white/10'
+                  ? 'bg-[#6B8E6B]/10 ring-2 ring-[#6B8E6B] border-transparent'
+                  : 'bg-[#F5FAF7] border border-[#D4E5D4] hover:border-[#6B8E6B] hover:bg-[#EDF5F0]'
               }`}
             >
               {/* Icon */}
               <div
                 className={`w-10 h-10 flex items-center justify-center mb-3 ${
-                  isSelected ? 'bg-[#c5a47e] text-black' : 'bg-white/10 text-white/70'
+                  isSelected ? 'bg-[#6B8E6B] text-white' : 'bg-[#EDF5F0] text-[#8FA58F]'
                 }`}
               >
                 <Icon className="w-5 h-5" />
               </div>
 
               {/* Label */}
-              <h4 className={`font-bold text-sm mb-1 ${isSelected ? 'text-[#c5a47e]' : 'text-white'}`}>
+              <h4 className={`font-bold text-sm mb-1 ${isSelected ? 'text-[#6B8E6B]' : 'text-[#1E2E1E]'}`}>
                 {option.label}
               </h4>
 
               {/* Description */}
-              <p className="text-xs text-white/60 mb-3">{option.description}</p>
+              <p className="text-xs text-[#8FA58F] mb-3">{option.description}</p>
 
               {/* Details */}
               <ul className="space-y-1">
                 {option.details.map((detail, i) => (
-                  <li key={i} className="text-[10px] text-white/40 flex items-center gap-1.5">
-                    <span className={`w-1 h-1 rounded-full ${isSelected ? 'bg-[#c5a47e]' : 'bg-white/30'}`} />
+                  <li key={i} className="text-[10px] text-[#8FA58F] flex items-center gap-1.5">
+                    <span className={`w-1 h-1 rounded-full ${isSelected ? 'bg-[#6B8E6B]' : 'bg-[#D4E5D4]'}`} />
                     {detail}
                   </li>
                 ))}
@@ -115,7 +115,7 @@ export const ContentDensitySelector: React.FC<ContentDensitySelectorProps> = ({
 
               {/* Selected indicator */}
               {isSelected && (
-                <div className="absolute top-2 right-2 w-5 h-5 bg-[#c5a47e] text-black flex items-center justify-center">
+                <div className="absolute top-2 right-2 w-5 h-5 bg-[#6B8E6B] text-white flex items-center justify-center">
                   <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
@@ -127,7 +127,7 @@ export const ContentDensitySelector: React.FC<ContentDensitySelectorProps> = ({
       </div>
 
       {/* Hint text */}
-      <p className="text-[10px] text-white/40 text-center">
+      <p className="text-[10px] text-[#8FA58F] text-center">
         {value === 'concise' && 'Best for quick pitches and executive summaries'}
         {value === 'detailed' && 'Recommended for most presentations'}
         {value === 'very-detailed' && 'Best for workshops, training, and documentation'}

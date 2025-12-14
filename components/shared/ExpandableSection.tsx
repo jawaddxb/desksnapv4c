@@ -26,13 +26,13 @@ export const ExpandableSection: React.FC<ExpandableSectionProps> = ({
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   return (
-    <div className={`border-t border-white/10 bg-black/50 ${className}`}>
+    <div className={`border-t border-[#D4E5D4] bg-[#F5FAF7] ${className}`}>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center justify-between text-white/60 hover:text-white transition-colors duration-150"
+        className="w-full px-4 py-3 flex items-center justify-between text-[#8FA58F] hover:text-[#1E2E1E] transition-colors duration-150"
       >
         <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-          <Icon className="w-4 h-4 text-[#c5a47e]" />
+          <Icon className="w-4 h-4 text-[#6B8E6B]" />
           {title}
         </span>
         {expanded ? (

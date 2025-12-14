@@ -77,21 +77,21 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#111111] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 bg-white overflow-hidden flex flex-col">
       {/* Header */}
-      <header className="flex-shrink-0 h-16 border-b border-white/10 flex items-center justify-between px-6 bg-black">
+      <header className="flex-shrink-0 h-16 border-b border-[#D4E5D4] flex items-center justify-between px-6 bg-white">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-[#c5a47e]/20 rounded-lg flex items-center justify-center">
-            <Lightbulb className="w-5 h-5 text-[#c5a47e]" />
+          <div className="w-10 h-10 bg-[#6B8E6B]/20 rounded-lg flex items-center justify-center">
+            <Lightbulb className="w-5 h-5 text-[#6B8E6B]" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white">Behind the Scenes</h1>
-            <p className="text-xs text-white/50">{presentation.topic}</p>
+            <h1 className="text-lg font-bold text-[#1E2E1E]">Behind the Scenes</h1>
+            <p className="text-xs text-[#8FA58F]">{presentation.topic}</p>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="p-2 text-white/40 hover:text-white hover:bg-white/5 rounded transition-colors"
+          className="p-2 text-[#8FA58F] hover:text-[#1E2E1E] hover:bg-[#EDF5F0] rounded-lg transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -102,33 +102,33 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
         <div className="max-w-5xl mx-auto py-8 px-6">
           {/* Journey overview */}
           <section className="mb-12">
-            <h2 className="text-2xl font-light text-white mb-6">Creative Journey</h2>
+            <h2 className="text-2xl font-light text-[#1E2E1E] mb-6">Creative Journey</h2>
 
             {/* Timeline */}
             <div className="relative">
               {/* Connection line */}
-              <div className="absolute left-6 top-6 bottom-6 w-[2px] bg-white/10" />
+              <div className="absolute left-6 top-6 bottom-6 w-[2px] bg-[#D4E5D4]" />
 
               {journeySteps.map((step, idx) => (
                 <div key={idx} className="relative flex gap-4 mb-6 last:mb-0">
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 z-10 ${
                       step.completed
-                        ? 'bg-[#c5a47e]/20 text-[#c5a47e]'
-                        : 'bg-white/5 text-white/30'
+                        ? 'bg-[#6B8E6B]/20 text-[#6B8E6B]'
+                        : 'bg-[#EDF5F0] text-[#8FA58F]'
                     }`}
                   >
                     {step.completed ? step.icon : <Clock className="w-5 h-5" />}
                   </div>
                   <div className="flex-1 py-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-white">{step.title}</h3>
+                      <h3 className="font-medium text-[#1E2E1E]">{step.title}</h3>
                       {step.completed && (
                         <CheckCircle2 className="w-4 h-4 text-green-400" />
                       )}
                     </div>
-                    <p className="text-sm text-white/50">{step.subtitle}</p>
-                    <span className="text-[10px] text-white/30 mt-1 block">
+                    <p className="text-sm text-[#8FA58F]">{step.subtitle}</p>
+                    <span className="text-[10px] text-[#8FA58F] mt-1 block">
                       {new Date(step.timestamp).toLocaleString()}
                     </span>
                   </div>
@@ -142,16 +142,16 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
             {/* Left: Ideation summary */}
             <section>
               <div className="flex items-center gap-2 mb-4">
-                <Lightbulb className="w-5 h-5 text-[#c5a47e]" />
-                <h2 className="text-lg font-bold text-white">Source Ideas</h2>
+                <Lightbulb className="w-5 h-5 text-[#6B8E6B]" />
+                <h2 className="text-lg font-bold text-[#1E2E1E]">Source Ideas</h2>
               </div>
 
               {ideation ? (
-                <div className="bg-black/30 border border-white/10 rounded-lg overflow-hidden">
+                <div className="bg-white border border-[#D4E5D4] rounded-lg overflow-hidden">
                   {/* Ideation topic */}
-                  <div className="p-4 border-b border-white/10">
-                    <h3 className="font-medium text-white mb-2">{ideation.topic}</h3>
-                    <div className="flex items-center gap-3 text-xs text-white/40">
+                  <div className="p-4 border-b border-[#D4E5D4]">
+                    <h3 className="font-medium text-[#1E2E1E] mb-2">{ideation.topic}</h3>
+                    <div className="flex items-center gap-3 text-xs text-[#8FA58F]">
                       <span>{ideation.notes.length} notes</span>
                       <span>{ideation.connections.length} connections</span>
                     </div>
@@ -166,10 +166,10 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
                       return (
                         <div key={col}>
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#8FA58F]">
                               {col}
                             </span>
-                            <span className="text-[10px] text-white/30">
+                            <span className="text-[10px] text-[#8FA58F]">
                               ({colNotes.length})
                             </span>
                           </div>
@@ -177,13 +177,13 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
                             {colNotes.slice(0, 3).map((note) => (
                               <div
                                 key={note.id}
-                                className="p-2 bg-white/5 rounded text-xs text-white/70 line-clamp-2"
+                                className="p-2 bg-[#EDF5F0] rounded-lg text-xs text-[#1E2E1E] line-clamp-2"
                               >
                                 {note.content}
                               </div>
                             ))}
                             {colNotes.length > 3 && (
-                              <p className="text-[10px] text-white/30">
+                              <p className="text-[10px] text-[#8FA58F]">
                                 +{colNotes.length - 3} more
                               </p>
                             )}
@@ -195,8 +195,8 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
 
                   {/* Link to ideation */}
                   {ideation.generatedPresentationIds && ideation.generatedPresentationIds.length > 1 && (
-                    <div className="p-4 border-t border-white/10 bg-black/30">
-                      <p className="text-xs text-white/40 flex items-center gap-2">
+                    <div className="p-4 border-t border-[#D4E5D4] bg-[#EDF5F0]">
+                      <p className="text-xs text-[#8FA58F] flex items-center gap-2">
                         <FileText className="w-3 h-3" />
                         {ideation.generatedPresentationIds.length} decks generated from this ideation
                       </p>
@@ -204,12 +204,12 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
                   )}
                 </div>
               ) : (
-                <div className="bg-black/30 border border-white/10 rounded-lg p-8 text-center">
-                  <FileText className="w-10 h-10 text-white/20 mx-auto mb-3" />
-                  <p className="text-white/50 text-sm">
+                <div className="bg-white border border-[#D4E5D4] rounded-lg p-8 text-center">
+                  <FileText className="w-10 h-10 text-[#8FA58F] mx-auto mb-3" />
+                  <p className="text-[#8FA58F] text-sm">
                     This deck was created directly without an ideation session.
                   </p>
-                  <p className="text-white/30 text-xs mt-2">
+                  <p className="text-[#8FA58F] text-xs mt-2">
                     Use the Ideate mode to brainstorm and structure ideas before creating a deck.
                   </p>
                 </div>
@@ -219,21 +219,21 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
             {/* Right: Theme & Style decisions */}
             <section>
               <div className="flex items-center gap-2 mb-4">
-                <Palette className="w-5 h-5 text-[#c5a47e]" />
-                <h2 className="text-lg font-bold text-white">Design Choices</h2>
+                <Palette className="w-5 h-5 text-[#6B8E6B]" />
+                <h2 className="text-lg font-bold text-[#1E2E1E]">Design Choices</h2>
               </div>
 
               <div className="space-y-4">
                 {/* Theme card */}
-                <div className="bg-black/30 border border-white/10 rounded-lg p-4">
+                <div className="bg-white border border-[#D4E5D4] rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div
-                      className="w-12 h-12 rounded"
+                      className="w-12 h-12 rounded-lg"
                       style={{ backgroundColor: theme.colors.primary }}
                     />
                     <div>
-                      <h3 className="font-medium text-white">{theme.name}</h3>
-                      <p className="text-xs text-white/50">{theme.description}</p>
+                      <h3 className="font-medium text-[#1E2E1E]">{theme.name}</h3>
+                      <p className="text-xs text-[#8FA58F]">{theme.description}</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -241,7 +241,7 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
                       (color, i) => (
                         <div
                           key={i}
-                          className="w-8 h-8 rounded border border-white/20"
+                          className="w-8 h-8 rounded-lg border border-[#D4E5D4]"
                           style={{ backgroundColor: color }}
                           title={color}
                         />
@@ -251,18 +251,18 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
                 </div>
 
                 {/* Visual style */}
-                <div className="bg-black/30 border border-white/10 rounded-lg p-4">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-2">
+                <div className="bg-white border border-[#D4E5D4] rounded-lg p-4">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#8FA58F] mb-2">
                     Visual Style
                   </h4>
-                  <p className="text-sm text-white/70">
+                  <p className="text-sm text-[#1E2E1E]">
                     {presentation.visualStyle || theme.imageStyle || 'Default theme style'}
                   </p>
                 </div>
 
                 {/* Layout distribution */}
-                <div className="bg-black/30 border border-white/10 rounded-lg p-4">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">
+                <div className="bg-white border border-[#D4E5D4] rounded-lg p-4">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#8FA58F] mb-3">
                     Layout Distribution
                   </h4>
                   <div className="space-y-2">
@@ -274,16 +274,16 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
                       }, {})
                     ).map(([layout, count]) => (
                       <div key={layout} className="flex items-center gap-3">
-                        <span className="text-xs text-white/50 w-24 capitalize">{layout}</span>
-                        <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                        <span className="text-xs text-[#8FA58F] w-24 capitalize">{layout}</span>
+                        <div className="flex-1 h-2 bg-[#EDF5F0] rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-[#c5a47e] rounded-full"
+                            className="h-full bg-[#6B8E6B] rounded-full"
                             style={{
                               width: `${(count / presentation.slides.length) * 100}%`,
                             }}
                           />
                         </div>
-                        <span className="text-xs text-white/40 w-8">{count}</span>
+                        <span className="text-xs text-[#8FA58F] w-8">{count}</span>
                       </div>
                     ))}
                   </div>
@@ -295,7 +295,7 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
           {/* Creative Journal (full width) */}
           {ideation?.creativeJournal && ideation.creativeJournal.entries.length > 0 && (
             <section className="mt-12">
-              <div className="bg-black/30 border border-white/10 rounded-lg overflow-hidden">
+              <div className="bg-white border border-[#D4E5D4] rounded-lg overflow-hidden">
                 <CreativeJournal
                   journal={ideation.creativeJournal}
                   variant="full"
@@ -308,33 +308,33 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
           {/* Slide breakdown */}
           <section className="mt-12">
             <div className="flex items-center gap-2 mb-6">
-              <Layout className="w-5 h-5 text-[#c5a47e]" />
-              <h2 className="text-lg font-bold text-white">Slide Breakdown</h2>
+              <Layout className="w-5 h-5 text-[#6B8E6B]" />
+              <h2 className="text-lg font-bold text-[#1E2E1E]">Slide Breakdown</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {presentation.slides.map((slide, idx) => (
                 <div
                   key={slide.id}
-                  className="bg-black/30 border border-white/10 rounded-lg p-4 hover:border-[#c5a47e]/50 transition-colors"
+                  className="bg-white border border-[#D4E5D4] rounded-lg p-4 hover:border-[#6B8E6B] transition-colors"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#8FA58F]">
                       Slide {idx + 1}
                     </span>
-                    <span className="text-[10px] text-white/30 capitalize px-2 py-0.5 bg-white/5 rounded">
+                    <span className="text-[10px] text-[#8FA58F] capitalize px-2 py-0.5 bg-[#EDF5F0] rounded-lg">
                       {slide.layoutType || 'split'}
                     </span>
                   </div>
-                  <h4 className="text-sm font-medium text-white line-clamp-1 mb-1">
+                  <h4 className="text-sm font-medium text-[#1E2E1E] line-clamp-1 mb-1">
                     {slide.title}
                   </h4>
-                  <p className="text-xs text-white/50 line-clamp-2">
+                  <p className="text-xs text-[#8FA58F] line-clamp-2">
                     {slide.content?.[0] || slide.speakerNotes || 'No content'}
                   </p>
                   {slide.imagePrompt && (
-                    <div className="mt-2 pt-2 border-t border-white/10">
-                      <p className="text-[10px] text-white/30 line-clamp-1 flex items-center gap-1">
+                    <div className="mt-2 pt-2 border-t border-[#D4E5D4]">
+                      <p className="text-[10px] text-[#8FA58F] line-clamp-1 flex items-center gap-1">
                         <Image className="w-3 h-3" />
                         {slide.imagePrompt}
                       </p>
@@ -346,8 +346,8 @@ export const BehindTheScenes: React.FC<BehindTheScenesProps> = ({
           </section>
 
           {/* Footer */}
-          <footer className="mt-12 pt-8 border-t border-white/10 text-center">
-            <p className="text-xs text-white/30">
+          <footer className="mt-12 pt-8 border-t border-[#D4E5D4] text-center">
+            <p className="text-xs text-[#8FA58F]">
               Created with DeckSnap AI &middot; {new Date(presentation.createdAt).toLocaleDateString()}
             </p>
           </footer>

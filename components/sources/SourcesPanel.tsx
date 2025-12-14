@@ -101,13 +101,13 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
   };
 
   return (
-    <div className="h-[60%] flex flex-col">
+    <div className="h-[60%] flex flex-col bg-white">
       {/* Header */}
-      <div className="p-4 border-b border-white/10">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-1">
+      <div className="p-4 border-b border-[#D4E5D4]">
+        <h2 className="text-sm font-bold text-[#1E2E1E] uppercase tracking-wider mb-1">
           Sources
         </h2>
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-[#8FA58F]">
           {preset === 'video'
             ? 'Add YouTube videos to extract knowledge from'
             : preset === 'web'
@@ -117,9 +117,9 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
       </div>
 
       {/* URL Input */}
-      <form onSubmit={handleSubmit} className="p-3 border-b border-white/10">
+      <form onSubmit={handleSubmit} className="p-3 border-b border-[#D4E5D4]">
         <div
-          className={`relative ${dragOver ? 'ring-2 ring-[#c5a47e]' : ''}`}
+          className={`relative ${dragOver ? 'ring-2 ring-[#6B8E6B]' : ''}`}
           onDragOver={(e) => {
             e.preventDefault();
             setDragOver(true);
@@ -138,12 +138,12 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
             onChange={(e) => setUrl(e.target.value)}
             onPaste={handlePaste}
             placeholder={getPlaceholder()}
-            className="w-full px-3 py-2 pr-10 bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:border-[#c5a47e] focus:outline-none"
+            className="w-full px-3 py-2 pr-10 bg-[#F5FAF7] border border-[#D4E5D4] rounded-md text-[#1E2E1E] text-sm placeholder:text-[#8FA58F] focus:border-[#6B8E6B] focus:outline-none focus:ring-2 focus:ring-[#6B8E6B]/20"
           />
           <button
             type="submit"
             disabled={!url.trim()}
-            className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-white/40 hover:text-[#c5a47e] disabled:opacity-30 disabled:hover:text-white/40"
+            className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-[#8FA58F] hover:text-[#6B8E6B] disabled:opacity-30 disabled:hover:text-[#8FA58F]"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -156,58 +156,58 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
       <div className="flex-1 overflow-y-auto">
         {sources.length === 0 ? (
           <div className="p-6 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 bg-white/5 flex items-center justify-center">
+            <div className="w-12 h-12 mx-auto mb-3 bg-[#EDF5F0] rounded-lg flex items-center justify-center">
               {preset === 'video' ? (
-                <svg className="w-6 h-6 text-white/20" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-6 h-6 text-[#8FA58F]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
                 </svg>
               ) : (
-                <svg className="w-6 h-6 text-white/20" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-6 h-6 text-[#8FA58F]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93z"/>
                 </svg>
               )}
             </div>
-            <p className="text-white/40 text-sm">
+            <p className="text-[#8FA58F] text-sm">
               {preset === 'video'
                 ? 'Paste a YouTube URL to get started'
                 : 'Paste a URL to analyze'}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-[#EDF5F0]">
             {sources.map((source) => (
               <div
                 key={source.id}
-                className="p-3 hover:bg-white/5 group"
+                className="p-3 hover:bg-[#F5FAF7] group"
               >
                 <div className="flex items-start gap-3">
-                  <div className="text-white/40 mt-0.5">
+                  <div className="text-[#8FA58F] mt-0.5">
                     <SourceIcon type={source.type} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm text-white truncate">
+                      <span className="text-sm text-[#1E2E1E] truncate">
                         {source.title || extractDomain(source.url)}
                       </span>
                       <StatusBadge status={source.status} />
                     </div>
-                    <p className="text-xs text-white/40 truncate">
+                    <p className="text-xs text-[#8FA58F] truncate">
                       {source.url}
                     </p>
                     {source.metadata?.duration && (
-                      <p className="text-xs text-white/30 mt-1">
+                      <p className="text-xs text-[#8FA58F] mt-1">
                         {formatDuration(source.metadata.duration)}
                       </p>
                     )}
                     {source.errorMessage && (
-                      <p className="text-xs text-red-400 mt-1">
+                      <p className="text-xs text-red-500 mt-1">
                         {source.errorMessage}
                       </p>
                     )}
                   </div>
                   <button
                     onClick={() => onRemoveSource(source.id)}
-                    className="p-1 text-white/20 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="p-1 text-[#D4E5D4] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -217,8 +217,8 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
 
                 {/* Progress bar for ingesting */}
                 {source.status === 'ingesting' && (
-                  <div className="mt-2 h-1 bg-white/10 overflow-hidden">
-                    <div className="h-full bg-[#c5a47e] w-1/3 animate-pulse" />
+                  <div className="mt-2 h-1 bg-[#EDF5F0] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#6B8E6B] w-1/3 animate-pulse rounded-full" />
                   </div>
                 )}
               </div>
@@ -229,8 +229,8 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
 
       {/* Summary footer */}
       {sources.length > 0 && (
-        <div className="p-3 border-t border-white/10 bg-white/5">
-          <div className="flex justify-between text-xs text-white/40">
+        <div className="p-3 border-t border-[#D4E5D4] bg-[#F5FAF7]">
+          <div className="flex justify-between text-xs text-[#8FA58F]">
             <span>
               {sources.filter(s => s.status === 'ingested').length} of {sources.length} processed
             </span>

@@ -44,9 +44,9 @@ const SlidePreview: React.FC<SlidePreviewProps> = ({
   label,
   isOriginal = false,
 }) => {
-  const bgColor = isOriginal ? '#1a1a1a' : (theme?.colors.background || '#ffffff');
-  const textColor = isOriginal ? '#ffffff' : (theme?.colors.text || '#000000');
-  const accentColor = isOriginal ? '#666666' : (theme?.colors.accent || '#c5a47e');
+  const bgColor = isOriginal ? '#EDF5F0' : (theme?.colors.background || '#ffffff');
+  const textColor = isOriginal ? '#1E2E1E' : (theme?.colors.text || '#000000');
+  const accentColor = isOriginal ? '#8FA58F' : (theme?.colors.accent || '#6B8E6B');
 
   return (
     <div
@@ -57,8 +57,8 @@ const SlidePreview: React.FC<SlidePreviewProps> = ({
       <div
         className="absolute top-4 left-4 px-3 py-1 text-xs font-bold uppercase tracking-wide rounded"
         style={{
-          backgroundColor: isOriginal ? '#333' : accentColor,
-          color: isOriginal ? '#fff' : '#000',
+          backgroundColor: isOriginal ? '#D4E5D4' : accentColor,
+          color: isOriginal ? '#1E2E1E' : '#000',
         }}
       >
         {label}
@@ -84,7 +84,7 @@ const SlidePreview: React.FC<SlidePreviewProps> = ({
                 key={i}
                 className="flex items-start gap-2 text-sm"
                 style={{
-                  color: isOriginal ? '#aaa' : textColor,
+                  color: isOriginal ? '#8FA58F' : textColor,
                   fontFamily: isOriginal ? 'Arial, sans-serif' : theme?.fonts.body,
                 }}
               >
@@ -171,7 +171,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full select-none cursor-ew-resize overflow-hidden rounded-lg border border-white/10"
+      className="relative w-full h-full select-none cursor-ew-resize overflow-hidden rounded-lg border border-[#D4E5D4]"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
@@ -206,22 +206,22 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
 
       {/* Slider handle */}
       <div
-        className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize z-10"
+        className="absolute top-0 bottom-0 w-1 bg-[#6B8E6B] cursor-ew-resize z-10"
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
         onMouseDown={handleMouseDown}
         onTouchStart={handleMouseDown}
       >
         {/* Handle knob */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center border border-[#D4E5D4]">
           <div className="flex gap-0.5">
-            <div className="w-0.5 h-4 bg-gray-400 rounded-full" />
-            <div className="w-0.5 h-4 bg-gray-400 rounded-full" />
+            <div className="w-0.5 h-4 bg-[#8FA58F] rounded-full" />
+            <div className="w-0.5 h-4 bg-[#8FA58F] rounded-full" />
           </div>
         </div>
       </div>
 
       {/* Instructions */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/60 rounded-full text-white/60 text-xs">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#1E2E1E]/60 rounded-full text-[#F5FAF7] text-xs">
         Drag to compare
       </div>
     </div>

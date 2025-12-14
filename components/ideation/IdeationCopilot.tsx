@@ -385,37 +385,37 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
   // If no session, show loading or start screen
   if (!ideation.session) {
     return (
-      <div className="flex items-center justify-center h-full bg-black">
+      <div className="flex items-center justify-center h-full bg-[#F5FAF7]">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 border border-[#c5a47e] flex items-center justify-center animate-pulse">
-            <svg className="w-8 h-8 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
+          <div className="w-16 h-16 mx-auto mb-4 border border-[#6B8E6B] rounded-lg flex items-center justify-center animate-pulse">
+            <svg className="w-8 h-8 text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
             </svg>
           </div>
-          <p className="text-white/60 uppercase tracking-widest text-sm">Loading session...</p>
+          <p className="text-[#8FA58F] uppercase tracking-widest text-sm">Loading session...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen w-full bg-black relative">
+    <div className="flex h-screen w-full bg-[#F5FAF7] relative">
       {/* Header bar */}
-      <div className="absolute top-0 left-0 right-0 h-14 bg-black border-b border-white/10 flex items-center justify-between px-4 z-20">
+      <div className="absolute top-0 left-0 right-0 h-14 bg-white border-b border-[#D4E5D4] flex items-center justify-between px-4 z-20">
         <div className="flex items-center gap-3">
           {onClose && (
             <button
               onClick={() => onClose(ideation.session?.id)}
-              className="p-2 hover:bg-white/5 transition-colors"
+              className="p-2 hover:bg-[#EDF5F0] rounded-md transition-colors"
             >
-              <svg className="w-5 h-5 text-white/60 hover:text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="w-5 h-5 text-[#8FA58F] hover:text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
               </svg>
             </button>
           )}
           <div>
-            <h1 className="font-bold text-white uppercase tracking-wide">{ideation.session.topic}</h1>
-            <p className="text-xs text-white/40 uppercase tracking-widest">
+            <h1 className="font-bold text-[#1E2E1E] uppercase tracking-wide">{ideation.session.topic}</h1>
+            <p className="text-xs text-[#8FA58F] uppercase tracking-widest">
               {ideation.notes.length} notes • {ideation.saveStatus === 'saving' ? 'Saving...' : ideation.saveStatus === 'saved' ? 'Saved' : 'Draft'}
             </p>
           </div>

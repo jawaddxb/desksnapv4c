@@ -180,18 +180,18 @@ export const MainStage: React.FC<MainStageProps> = ({
         {!printMode && onRegenerateSlide && (
             // Z-Index boosted to 200 to ensure visibility over Wabi-Sabi layers (which go up to 100)
             <div className="absolute top-6 right-6 flex flex-col gap-2 opacity-0 group-hover/stage:opacity-100 transition-all duration-150 translate-x-4 group-hover/stage:translate-x-0 z-[200]">
-                <button onClick={() => onRegenerateSlide('same')} className="p-2.5 bg-black/80 backdrop-blur-md hover:bg-[#c5a47e] border border-white/20 text-white hover:text-black transition-all duration-150 group/btn relative" title="Regenerate Image">
+                <button onClick={() => onRegenerateSlide('same')} className="p-2.5 bg-white/80 backdrop-blur-md hover:bg-[#6B8E6B] border border-[#D4E5D4] text-[#1E2E1E] hover:text-white transition-all duration-150 group/btn relative" title="Regenerate Image">
                     <RotateCw className="w-4 h-4" />
-                    <span className="absolute right-full mr-2 top-1.5 px-2 py-1 bg-black text-white text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">Redraw</span>
+                    <span className="absolute right-full mr-2 top-1.5 px-2 py-1 bg-white text-[#1E2E1E] text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-[#D4E5D4]">Redraw</span>
                 </button>
-                <button onClick={() => onRegenerateSlide('varied')} className="p-2.5 bg-black/80 backdrop-blur-md hover:bg-[#c5a47e] border border-white/20 text-white hover:text-black transition-all duration-150 group/btn relative" title="Remix Image">
+                <button onClick={() => onRegenerateSlide('varied')} className="p-2.5 bg-white/80 backdrop-blur-md hover:bg-[#6B8E6B] border border-[#D4E5D4] text-[#1E2E1E] hover:text-white transition-all duration-150 group/btn relative" title="Remix Image">
                     <Wand2 className="w-4 h-4" />
-                    <span className="absolute right-full mr-2 top-1.5 px-2 py-1 bg-black text-white text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">Remix</span>
+                    <span className="absolute right-full mr-2 top-1.5 px-2 py-1 bg-white text-[#1E2E1E] text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-[#D4E5D4]">Remix</span>
                 </button>
                 {onRegenerateAll && (
-                     <button onClick={() => onRegenerateAll('same')} className="p-2.5 bg-black/80 backdrop-blur-md hover:bg-[#c5a47e] border border-white/20 text-white hover:text-black transition-all duration-150 group/btn relative mt-2" title="Regenerate All Images">
+                     <button onClick={() => onRegenerateAll('same')} className="p-2.5 bg-white/80 backdrop-blur-md hover:bg-[#6B8E6B] border border-[#D4E5D4] text-[#1E2E1E] hover:text-white transition-all duration-150 group/btn relative mt-2" title="Regenerate All Images">
                         <Layers className="w-4 h-4" />
-                        <span className="absolute right-full mr-2 top-1.5 px-2 py-1 bg-black text-white text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">Regen All</span>
+                        <span className="absolute right-full mr-2 top-1.5 px-2 py-1 bg-white text-[#1E2E1E] text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-[#D4E5D4]">Regen All</span>
                     </button>
                 )}
             </div>

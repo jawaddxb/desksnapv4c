@@ -62,8 +62,8 @@ export const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
       onChange,
       size = 'md',
       disabled = false,
-      activeColor = 'bg-[#c5a47e]',
-      inactiveColor = 'bg-white/20',
+      activeColor = 'bg-[#6B8E6B]',
+      inactiveColor = 'bg-[#D4E5D4]',
       label,
       labelPosition = 'left',
       className = '',
@@ -100,7 +100,7 @@ export const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
           relative ${config.track} rounded-full transition-colors duration-200
           ${checked ? activeColor : inactiveColor}
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-          focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a47e] focus-visible:ring-offset-2 focus-visible:ring-offset-black
+          focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6B8E6B] focus-visible:ring-offset-2 focus-visible:ring-offset-white
         `}
       >
         <span
@@ -121,11 +121,11 @@ export const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
     return (
       <label className={`flex items-center gap-2 cursor-pointer ${disabled ? 'cursor-not-allowed' : ''} ${className}`}>
         {labelPosition === 'left' && (
-          <span className={`text-sm text-white/50 ${disabled ? 'opacity-50' : ''}`}>{label}</span>
+          <span className={`text-sm text-[#8FA58F] ${disabled ? 'opacity-50' : ''}`}>{label}</span>
         )}
         {toggle}
         {labelPosition === 'right' && (
-          <span className={`text-sm text-white/50 ${disabled ? 'opacity-50' : ''}`}>{label}</span>
+          <span className={`text-sm text-[#8FA58F] ${disabled ? 'opacity-50' : ''}`}>{label}</span>
         )}
       </label>
     );
@@ -152,11 +152,11 @@ export const ToggleGroup = forwardRef<HTMLButtonElement, ToggleGroupProps>(
     return (
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {icon && <span className="text-white/40">{icon}</span>}
+          {icon && <span className="text-[#8FA58F]">{icon}</span>}
           <div>
-            <div className="text-sm font-medium text-white">{title}</div>
+            <div className="text-sm font-medium text-[#1E2E1E]">{title}</div>
             {description && (
-              <div className="text-xs text-white/50">{description}</div>
+              <div className="text-xs text-[#8FA58F]">{description}</div>
             )}
           </div>
         </div>

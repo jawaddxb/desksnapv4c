@@ -59,16 +59,16 @@ export const noirConfig: ArchetypeConfig = {
   id: 'noir',
   name: 'Noir',
   category: 'cinematic',
-  container: { background: '#0a0a0a' },
-  title: { contrast: { text: '#fff' } },
-  content: { contrast: { text: '#ccc' } },
+  container: { background: '#F5FAF7' },
+  title: { contrast: { text: '#1E2E1E' } },
+  content: { contrast: { text: '#8FA58F' } },
   customRender: ({ slide, theme, rng, onUpdateSlide, readOnly }) => {
     return (
-      <div className="w-full h-full bg-[#0a0a0a] relative overflow-hidden flex items-center justify-center">
+      <div className="w-full h-full bg-[#F5FAF7] relative overflow-hidden flex items-center justify-center">
         {/* Venetian Blind Shadow Effect */}
         <div className="absolute inset-0 pointer-events-none" style={{
           zIndex: LayoutLayer.OVERLAY,
-          background: `linear-gradient(transparent 50%, rgba(0,0,0,0.8) 50%)`,
+          background: `linear-gradient(transparent 50%, rgba(30,46,30,0.15) 50%)`,
           backgroundSize: '100% 40px'
         }} />
 
@@ -76,11 +76,11 @@ export const noirConfig: ArchetypeConfig = {
           <ImageContainer slide={slide} theme={theme} />
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" style={{ zIndex: LayoutLayer.BACKGROUND }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent" style={{ zIndex: LayoutLayer.BACKGROUND }} />
 
         <div className="relative z-20 w-full max-w-6xl px-12 grid grid-cols-2">
-          <div className="col-span-1 pr-12 border-r border-white/20">
-            <div className="flex items-center gap-3 mb-8 text-white/40">
+          <div className="col-span-1 pr-12 border-r border-[#D4E5D4]">
+            <div className="flex items-center gap-3 mb-8 text-[#8FA58F]">
               <VenetianMask className="w-6 h-6" />
               <span className="text-xs font-bold uppercase tracking-[0.3em]">Shadow Play</span>
             </div>
@@ -88,12 +88,12 @@ export const noirConfig: ArchetypeConfig = {
             {/* Text boosted to CONTENT_TOP (60) to float ABOVE the blinds overlay (50) */}
             <div style={{ position: 'relative', zIndex: LayoutLayer.CONTENT_TOP }}>
               <EditableTitle
-                slide={slide} theme={theme} contrast={{ text: '#fff' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
-                className="text-5xl md:text-7xl font-serif font-bold text-white mb-8 drop-shadow-2xl"
+                slide={slide} theme={theme} contrast={{ text: '#1E2E1E' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly}
+                className="text-5xl md:text-7xl font-serif font-bold text-[#1E2E1E] mb-8 drop-shadow-2xl"
                 style={{ lineHeight: '1.1' }}
               />
-              <div className="w-24 h-1 bg-white mb-8 shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
-              <EditableContent slide={slide} theme={theme} contrast={{ text: '#ccc' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="font-serif text-xl italic opacity-80" />
+              <div className="w-24 h-1 bg-[#6B8E6B] mb-8 shadow-[0_0_10px_rgba(107,142,107,0.5)]" />
+              <EditableContent slide={slide} theme={theme} contrast={{ text: '#8FA58F' }} onUpdateSlide={onUpdateSlide} readOnly={readOnly} className="font-serif text-xl italic opacity-80" />
             </div>
           </div>
         </div>

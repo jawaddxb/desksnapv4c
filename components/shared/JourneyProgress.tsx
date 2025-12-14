@@ -52,10 +52,10 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
                 className={`
                   flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-200
                   ${isCurrent
-                    ? 'bg-[#c5a47e]/20 text-[#c5a47e]'
+                    ? 'bg-[#6B8E6B]/20 text-[#6B8E6B]'
                     : isCompleted
-                      ? 'text-[#c5a47e]/60 hover:text-[#c5a47e] cursor-pointer'
-                      : 'text-white/30'
+                      ? 'text-[#6B8E6B]/60 hover:text-[#6B8E6B] cursor-pointer'
+                      : 'text-[#8FA58F]'
                   }
                   ${!onNavigateToStage ? 'cursor-default' : ''}
                 `}
@@ -69,7 +69,7 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
               </button>
 
               {index < stages.length - 1 && (
-                <ChevronRight className="w-3 h-3 text-white/20" />
+                <ChevronRight className="w-3 h-3 text-[#8FA58F]" />
               )}
             </React.Fragment>
           );
@@ -79,7 +79,7 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
   }
 
   return (
-    <div className="bg-[#171717] border border-white/8 rounded-lg p-4">
+    <div className="bg-white border border-[#D4E5D4] rounded-lg p-4">
       {/* Progress steps */}
       <div className="flex items-center justify-between mb-4">
         {stages.map((stage, index) => {
@@ -104,10 +104,10 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
                   className={`
                     w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
                     ${isCurrent
-                      ? 'bg-[#c5a47e] text-black'
+                      ? 'bg-[#6B8E6B] text-white'
                       : isCompleted
-                        ? 'bg-[#c5a47e]/20 text-[#c5a47e]'
-                        : 'bg-white/5 text-white/30'
+                        ? 'bg-[#6B8E6B]/20 text-[#6B8E6B]'
+                        : 'bg-[#EDF5F0] text-[#8FA58F]'
                     }
                   `}
                 >
@@ -123,10 +123,10 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
                   className={`
                     text-xs font-medium transition-colors duration-200
                     ${isCurrent
-                      ? 'text-[#c5a47e]'
+                      ? 'text-[#6B8E6B]'
                       : isCompleted
-                        ? 'text-white/60'
-                        : 'text-white/30'
+                        ? 'text-[#8FA58F]'
+                        : 'text-[#8FA58F]'
                     }
                   `}
                 >
@@ -137,9 +137,9 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
               {/* Connector line */}
               {index < stages.length - 1 && (
                 <div className="flex-1 mx-4 relative">
-                  <div className="h-0.5 bg-white/10 rounded" />
+                  <div className="h-0.5 bg-[#EDF5F0] rounded" />
                   <div
-                    className="absolute top-0 left-0 h-0.5 bg-[#c5a47e] rounded transition-all duration-500"
+                    className="absolute top-0 left-0 h-0.5 bg-[#6B8E6B] rounded transition-all duration-500"
                     style={{
                       width: isCompleted ? '100%' : isCurrent ? '50%' : '0%',
                     }}
@@ -155,22 +155,22 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
       {showNextAction && onNextAction && nextActionLabel && currentIndex < stages.length - 1 && (
         <button
           onClick={onNextAction}
-          className="w-full flex items-center justify-between p-3 bg-[#c5a47e]/10 border border-[#c5a47e]/20 rounded-lg hover:bg-[#c5a47e]/15 transition-colors duration-200 group"
+          className="w-full flex items-center justify-between p-3 bg-[#6B8E6B]/10 border border-[#6B8E6B]/20 rounded-lg hover:bg-[#6B8E6B]/15 transition-colors duration-200 group"
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#c5a47e]/20 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#6B8E6B]/20 rounded-full flex items-center justify-center">
               {React.createElement(stages[currentIndex + 1].icon, {
-                className: 'w-4 h-4 text-[#c5a47e]',
+                className: 'w-4 h-4 text-[#6B8E6B]',
               })}
             </div>
             <div className="text-left">
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-medium text-[#1E2E1E]">
                 Next: {stages[currentIndex + 1].label}
               </p>
-              <p className="text-xs text-white/50">{nextActionLabel}</p>
+              <p className="text-xs text-[#8FA58F]">{nextActionLabel}</p>
             </div>
           </div>
-          <ArrowRight className="w-5 h-5 text-[#c5a47e] transform group-hover:translate-x-1 transition-transform duration-200" />
+          <ArrowRight className="w-5 h-5 text-[#6B8E6B] transform group-hover:translate-x-1 transition-transform duration-200" />
         </button>
       )}
     </div>
@@ -201,31 +201,31 @@ export const JourneyCompletionCard: React.FC<JourneyCompletionCardProps> = ({
   if (!nextStage) return null;
 
   return (
-    <div className="bg-gradient-to-br from-[#c5a47e]/10 to-transparent border border-[#c5a47e]/20 rounded-lg p-6">
+    <div className="bg-gradient-to-br from-[#6B8E6B]/10 to-transparent border border-[#6B8E6B]/20 rounded-lg p-6">
       {/* Completion badge */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 bg-[#c5a47e] rounded-full flex items-center justify-center">
-          <Check className="w-5 h-5 text-black" />
+        <div className="w-10 h-10 bg-[#6B8E6B] rounded-full flex items-center justify-center">
+          <Check className="w-5 h-5 text-white" />
         </div>
         <div>
-          <p className="text-sm font-medium text-[#c5a47e]">
+          <p className="text-sm font-medium text-[#6B8E6B]">
             {completedStageInfo.label} Complete
           </p>
           {summary && (
-            <p className="text-xs text-white/50">{summary}</p>
+            <p className="text-xs text-[#8FA58F]">{summary}</p>
           )}
         </div>
       </div>
 
       {/* Next step card */}
-      <div className="bg-[#141414] border border-white/5 rounded-lg p-4 mb-4">
+      <div className="bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg p-4 mb-4">
         <div className="flex items-center gap-3 mb-2">
-          <nextStage.icon className="w-5 h-5 text-white/50" />
-          <p className="text-sm font-medium text-white">
+          <nextStage.icon className="w-5 h-5 text-[#8FA58F]" />
+          <p className="text-sm font-medium text-[#1E2E1E]">
             Next: {nextStage.label}
           </p>
         </div>
-        <p className="text-xs text-white/50 leading-relaxed">
+        <p className="text-xs text-[#8FA58F] leading-relaxed">
           {nextStage.id === 'rough-draft'
             ? 'AI will generate slides based on your ideas. You can review and refine them before finalizing.'
             : 'Polish your presentation with the final theme, typography, and layout settings.'
@@ -238,14 +238,14 @@ export const JourneyCompletionCard: React.FC<JourneyCompletionCardProps> = ({
         {onGoBack && (
           <button
             onClick={onGoBack}
-            className="flex-1 py-2.5 text-sm text-white/50 hover:text-white border border-white/10 rounded transition-colors"
+            className="flex-1 py-2.5 text-sm text-[#8FA58F] hover:text-[#1E2E1E] border border-[#D4E5D4] rounded transition-colors"
           >
             Back to {completedStageInfo.label}
           </button>
         )}
         <button
           onClick={onContinue}
-          className="flex-1 py-2.5 text-sm bg-[#c5a47e] text-black font-medium rounded hover:bg-[#d4b68e] transition-colors flex items-center justify-center gap-2"
+          className="flex-1 py-2.5 text-sm bg-[#6B8E6B] text-white font-medium rounded hover:bg-[#5A7A5A] transition-colors flex items-center justify-center gap-2"
         >
           Continue
           <ArrowRight className="w-4 h-4" />

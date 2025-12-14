@@ -183,7 +183,7 @@ export const ImagePromptMenu: React.FC<ImagePromptMenuProps> = ({
               <textarea
                 value={editedPrompt}
                 onChange={(e) => setEditedPrompt(e.target.value)}
-                className="w-full h-20 text-xs text-zinc-700 bg-zinc-50 border border-zinc-200 rounded-lg p-2 resize-none focus:outline-none focus:ring-2 focus:ring-[#c5a47e] focus:border-transparent transition-all"
+                className="w-full h-20 text-xs text-zinc-700 bg-zinc-50 border border-zinc-200 rounded-lg p-2 resize-none focus:outline-none focus:ring-2 focus:ring-[#6B8E6B] focus:border-transparent transition-all"
                 placeholder="Describe the image subject..."
               />
               <div className="flex items-center justify-between mt-2">
@@ -206,7 +206,7 @@ export const ImagePromptMenu: React.FC<ImagePromptMenuProps> = ({
                   <button
                     onClick={handleApplyAndRegenerate}
                     disabled={isRegenerating}
-                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-[#c5a47e] text-black hover:bg-[#b8956f] transition-all flex items-center gap-1"
+                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-[#6B8E6B] text-white hover:bg-[#5A7A5A] transition-all flex items-center gap-1"
                   >
                     <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
                     Regenerate

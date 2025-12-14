@@ -133,16 +133,16 @@ export const ConnectorLayer: React.FC<ConnectorLayerProps> = ({
         >
           <path
             d="M0 0 L8 3 L0 6 L2 3 Z"
-            fill="#c5a47e"
+            fill="#6B8E6B"
             opacity="0.8"
           />
         </marker>
 
         {/* Refined gradient for connector lines */}
         <linearGradient id="connectorGradientRefined" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="rgba(255, 255, 255, 0.25)" />
-          <stop offset="50%" stopColor="rgba(197, 164, 126, 0.6)" />
-          <stop offset="100%" stopColor="rgba(197, 164, 126, 0.4)" />
+          <stop offset="0%" stopColor="rgba(212, 229, 212, 0.8)" />
+          <stop offset="50%" stopColor="rgba(107, 142, 107, 0.6)" />
+          <stop offset="100%" stopColor="rgba(107, 142, 107, 0.4)" />
         </linearGradient>
       </defs>
 
@@ -153,7 +153,7 @@ export const ConnectorLayer: React.FC<ConnectorLayerProps> = ({
           <path
             d={path.d}
             fill="none"
-            stroke="rgba(197, 164, 126, 0.06)"
+            stroke="rgba(107, 142, 107, 0.06)"
             strokeWidth="8"
             strokeLinecap="round"
           />
@@ -161,7 +161,7 @@ export const ConnectorLayer: React.FC<ConnectorLayerProps> = ({
           <path
             d={path.d}
             fill="none"
-            stroke="rgba(197, 164, 126, 0.1)"
+            stroke="rgba(107, 142, 107, 0.1)"
             strokeWidth="3"
             strokeLinecap="round"
           />

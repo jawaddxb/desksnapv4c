@@ -85,9 +85,9 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#0d0d0d] border-t border-white/8">
+    <div className="flex flex-col h-full bg-white border-t border-[#D4E5D4]">
       {/* Tabs */}
-      <div className="flex border-b border-white/8 px-2">
+      <div className="flex border-b border-[#D4E5D4] px-2">
         {tabs.map(tab => {
           const Icon = tab.icon;
           return (
@@ -98,8 +98,8 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
                 flex items-center gap-2 px-4 py-3 text-xs font-medium
                 transition-all duration-150
                 ${activeTab === tab.id
-                  ? 'text-[#c5a47e] border-b-2 border-[#c5a47e]'
-                  : 'text-white/40 hover:text-white/60'
+                  ? 'text-[#6B8E6B] border-b-2 border-[#6B8E6B]'
+                  : 'text-[#8FA58F] hover:text-[#4A5D4A]'
                 }
               `}
             >
@@ -122,8 +122,8 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             >
               {messages.length === 0 ? (
                 <div className="text-center py-8">
-                  <MessageSquare className="w-8 h-8 text-white/20 mx-auto mb-3" />
-                  <p className="text-sm text-white/40">
+                  <MessageSquare className="w-8 h-8 text-[#8FA58F] mx-auto mb-3" />
+                  <p className="text-sm text-[#8FA58F]">
                     Ask about this slide or request changes
                   </p>
                 </div>
@@ -134,8 +134,8 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
                     className={`
                       p-3 rounded-lg text-sm
                       ${msg.role === 'user'
-                        ? 'bg-[#c5a47e]/20 text-white ml-8'
-                        : 'bg-white/5 text-white/80 mr-8'
+                        ? 'bg-[#6B8E6B]/15 text-[#1E2E1E] ml-8'
+                        : 'bg-[#F5FAF7] text-[#4A5D4A] mr-8'
                       }
                     `}
                   >
@@ -145,15 +145,15 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
               )}
 
               {isGenerating && (
-                <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg mr-8">
-                  <Loader2 className="w-4 h-4 animate-spin text-[#c5a47e]" />
-                  <span className="text-sm text-white/60">Thinking...</span>
+                <div className="flex items-center gap-2 p-3 bg-[#F5FAF7] rounded-lg mr-8">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#6B8E6B]" />
+                  <span className="text-sm text-[#8FA58F]">Thinking...</span>
                 </div>
               )}
             </div>
 
             {/* Input */}
-            <div className="p-3 border-t border-white/8">
+            <div className="p-3 border-t border-[#D4E5D4]">
               <div className="relative">
                 <textarea
                   ref={inputRef}
@@ -163,12 +163,12 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
                   placeholder={currentSlide ? `Ask about "${currentSlide.title}"...` : 'Enter a topic to create a deck...'}
                   rows={2}
                   disabled={isGenerating}
-                  className="w-full p-3 pr-12 bg-[#171717] border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:border-[#c5a47e]/50 focus:outline-none resize-none disabled:opacity-50"
+                  className="w-full p-3 pr-12 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg text-sm text-[#1E2E1E] placeholder:text-[#8FA58F] focus:border-[#6B8E6B] focus:outline-none resize-none disabled:opacity-50"
                 />
                 <button
                   onClick={onSendMessage}
                   disabled={!inputValue.trim() || isGenerating}
-                  className="absolute right-2 bottom-2 p-2 bg-[#c5a47e] text-black rounded disabled:opacity-30 hover:bg-[#d4b68e] transition-colors"
+                  className="absolute right-2 bottom-2 p-2 bg-[#6B8E6B] text-white rounded disabled:opacity-30 hover:bg-[#5A7A5A] transition-colors"
                 >
                   {isGenerating ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -183,7 +183,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
                 <select
                   value={generationMode}
                   onChange={(e) => setGenerationMode(e.target.value as GenerationMode)}
-                  className="text-[10px] bg-transparent border border-white/10 rounded px-2 py-1 text-white/50 focus:outline-none"
+                  className="text-[10px] bg-[#F5FAF7] border border-[#D4E5D4] rounded px-2 py-1 text-[#8FA58F] focus:outline-none"
                 >
                   <option value="concise">Concise</option>
                   <option value="balanced">Balanced</option>
@@ -198,16 +198,16 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
         {/* Notes Tab */}
         {activeTab === 'notes' && (
           <div className="flex-1 p-4 flex flex-col">
-            <p className="text-xs text-white/40 mb-3">
+            <p className="text-xs text-[#8FA58F] mb-3">
               Speaker notes for this slide
             </p>
             <textarea
               value={notesValue}
               onChange={(e) => handleNotesChange(e.target.value)}
               placeholder="Add speaker notes..."
-              className="flex-1 w-full p-3 bg-[#171717] border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:border-[#c5a47e]/50 focus:outline-none resize-none"
+              className="flex-1 w-full p-3 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg text-sm text-[#1E2E1E] placeholder:text-[#8FA58F] focus:border-[#6B8E6B] focus:outline-none resize-none"
             />
-            <p className="text-[10px] text-white/30 mt-2">
+            <p className="text-[10px] text-[#8FA58F] mt-2">
               Notes are auto-saved and visible in presenter view
             </p>
           </div>
@@ -216,7 +216,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
         {/* AI Enhance Tab */}
         {activeTab === 'ai' && (
           <div className="flex-1 p-4 overflow-y-auto">
-            <p className="text-xs text-white/40 mb-4">
+            <p className="text-xs text-[#8FA58F] mb-4">
               Quick enhancements for this slide
             </p>
 
@@ -233,13 +233,13 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
                   key={i}
                   onClick={() => onApplySuggestion?.(option.action)}
                   disabled={isGenerating}
-                  className="w-full p-3 bg-[#171717] border border-white/8 rounded-lg text-left hover:bg-[#1f1f1f] hover:border-[#c5a47e]/20 transition-all duration-150 group disabled:opacity-50"
+                  className="w-full p-3 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg text-left hover:bg-[#EDF5F0] hover:border-[#6B8E6B]/30 transition-all duration-150 group disabled:opacity-50"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-white/5 rounded flex items-center justify-center group-hover:bg-[#c5a47e]/10 transition-colors">
-                      <Wand2 className="w-4 h-4 text-white/40 group-hover:text-[#c5a47e] transition-colors" />
+                    <div className="w-8 h-8 bg-[#6B8E6B]/10 rounded flex items-center justify-center group-hover:bg-[#6B8E6B]/20 transition-colors">
+                      <Wand2 className="w-4 h-4 text-[#8FA58F] group-hover:text-[#6B8E6B] transition-colors" />
                     </div>
-                    <span className="text-sm text-white/70 group-hover:text-white transition-colors">
+                    <span className="text-sm text-[#4A5D4A] group-hover:text-[#1E2E1E] transition-colors">
                       {option.label}
                     </span>
                   </div>
@@ -250,7 +250,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
             {/* Custom suggestions from AI */}
             {suggestions.length > 0 && (
               <div className="mt-6">
-                <p className="text-xs text-white/40 mb-3">
+                <p className="text-xs text-[#8FA58F] mb-3">
                   AI Suggestions
                 </p>
                 <div className="space-y-2">
@@ -258,7 +258,7 @@ export const ContextPanel: React.FC<ContextPanelProps> = ({
                     <button
                       key={i}
                       onClick={() => onApplySuggestion?.(suggestion)}
-                      className="w-full p-3 bg-[#c5a47e]/5 border border-[#c5a47e]/20 rounded-lg text-left hover:bg-[#c5a47e]/10 transition-colors text-sm text-white/70"
+                      className="w-full p-3 bg-[#6B8E6B]/10 border border-[#6B8E6B]/20 rounded-lg text-left hover:bg-[#6B8E6B]/15 transition-colors text-sm text-[#4A5D4A]"
                     >
                       {suggestion}
                     </button>

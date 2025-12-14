@@ -39,20 +39,20 @@ export const RoughDraftControls: React.FC<RoughDraftControlsProps> = ({
     : 'Drafts';
 
   return (
-    <div className="h-16 bg-black border-t border-white/10 flex items-center justify-between px-4">
+    <div className="h-16 bg-white border-t border-[#D4E5D4] flex items-center justify-between px-4">
       {/* Left actions */}
       <div className="flex items-center gap-3">
         <button
           onClick={onDiscard}
-          className="px-4 py-2.5 border border-white/20 text-white/60 text-xs font-bold uppercase tracking-wider
-                     hover:border-[#c5a47e]/50 hover:text-white transition-all duration-200"
+          className="px-4 py-2.5 border border-[#D4E5D4] text-[#8FA58F] text-xs font-bold uppercase tracking-wider rounded-md
+                     hover:border-[#6B8E6B]/50 hover:text-[#4A5D4A] transition-all duration-200"
         >
           Discard
         </button>
         <button
           onClick={onBack}
-          className="px-4 py-2.5 border border-white/20 text-white/60 text-xs font-bold uppercase tracking-wider
-                     hover:border-[#c5a47e]/50 hover:text-white transition-all duration-200"
+          className="px-4 py-2.5 border border-[#D4E5D4] text-[#8FA58F] text-xs font-bold uppercase tracking-wider rounded-md
+                     hover:border-[#6B8E6B]/50 hover:text-[#4A5D4A] transition-all duration-200"
         >
           Back to {sourceLabel}
         </button>
@@ -64,8 +64,8 @@ export const RoughDraftControls: React.FC<RoughDraftControlsProps> = ({
           <button
             onClick={onApproveAll}
             disabled={slideCount === 0}
-            className="px-6 py-2 bg-[#c5a47e] text-black font-bold text-xs uppercase tracking-wider
-                       hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+            className="px-6 py-2 bg-[#6B8E6B] text-white font-bold text-xs uppercase tracking-wider rounded-md
+                       hover:bg-[#5A7A5A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                        flex items-center gap-2"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">

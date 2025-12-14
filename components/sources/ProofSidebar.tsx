@@ -61,10 +61,10 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
   const ConfidenceBadge = ({ confidence }: { confidence: number }) => {
     const percent = Math.round(confidence * 100);
     const color = confidence >= 0.8
-      ? 'text-green-400'
+      ? 'text-[#6B8E6B]'
       : confidence >= 0.6
-      ? 'text-yellow-400'
-      : 'text-red-400';
+      ? 'text-[#A89050]'
+      : 'text-[#C47070]';
 
     return (
       <span className={`text-[10px] ${color}`}>
@@ -74,20 +74,20 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-black">
+    <div className="h-full flex flex-col bg-white">
       {/* Header */}
-      <div className="p-4 border-b border-white/10 flex items-center justify-between">
+      <div className="p-4 border-b border-[#D4E5D4] flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-[#1E2E1E] uppercase tracking-wider">
             Sources
           </h2>
-          <p className="text-xs text-white/40 mt-0.5">
+          <p className="text-xs text-[#8FA58F] mt-0.5">
             {proofLinks.length} citation{proofLinks.length !== 1 ? 's' : ''}
           </p>
         </div>
         <button
           onClick={onClose}
-          className="p-1.5 text-white/40 hover:text-white transition-colors"
+          className="p-1.5 text-[#8FA58F] hover:text-[#4A5D4A] transition-colors"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -96,12 +96,12 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
       </div>
 
       {/* Note preview */}
-      <div className="p-3 border-b border-white/10 bg-white/5">
-        <p className="text-sm text-white/80 line-clamp-3">
+      <div className="p-3 border-b border-[#D4E5D4] bg-[#F5FAF7]">
+        <p className="text-sm text-[#4A5D4A] line-clamp-3">
           {note.content}
         </p>
         {note.knowledgeType && (
-          <span className="mt-2 inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider bg-[#c5a47e]/20 text-[#c5a47e]">
+          <span className="mt-2 inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider bg-[#6B8E6B]/15 text-[#6B8E6B] rounded">
             {note.knowledgeType}
           </span>
         )}
@@ -111,17 +111,17 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
       <div className="flex-1 overflow-y-auto">
         {proofLinks.length === 0 ? (
           <div className="p-6 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 bg-white/5 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white/20" viewBox="0 0 24 24" fill="currentColor">
+            <div className="w-12 h-12 mx-auto mb-3 bg-[#EDF5F0] flex items-center justify-center rounded-lg">
+              <svg className="w-6 h-6 text-[#8FA58F]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
               </svg>
             </div>
-            <p className="text-white/40 text-sm">
+            <p className="text-[#8FA58F] text-sm">
               No sources linked to this note
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-[#D4E5D4]">
             {proofLinks.map((link, index) => {
               const source = getSource(link.sourceId);
 
@@ -129,7 +129,7 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
                 <div key={index} className="p-4">
                   {/* Source info */}
                   <div className="flex items-start gap-3 mb-3">
-                    <div className="text-white/40 mt-0.5">
+                    <div className="text-[#8FA58F] mt-0.5">
                       {source?.type === 'video' ? (
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
@@ -141,7 +141,7 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white font-medium truncate">
+                      <p className="text-sm text-[#1E2E1E] font-medium truncate">
                         {source?.title || source?.metadata?.author || 'Unknown source'}
                       </p>
                       <ConfidenceBadge confidence={link.confidence} />
@@ -183,7 +183,7 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
 
                   {/* Excerpt quote */}
                   {link.excerpt && (
-                    <blockquote className="pl-3 border-l-2 border-[#c5a47e]/50 text-sm text-white/60 italic">
+                    <blockquote className="pl-3 border-l-2 border-[#6B8E6B]/50 text-sm text-[#4A5D4A] italic">
                       "{link.excerpt}"
                     </blockquote>
                   )}
@@ -194,7 +194,7 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 flex items-center gap-1 text-xs text-white/30 hover:text-white/50 transition-colors"
+                      className="mt-3 flex items-center gap-1 text-xs text-[#8FA58F] hover:text-[#6B8E6B] transition-colors"
                     >
                       <span className="truncate">{extractDomain(source.url)}</span>
                       <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
@@ -211,8 +211,8 @@ export const ProofSidebar: React.FC<ProofSidebarProps> = ({
 
       {/* Footer summary */}
       {proofLinks.length > 0 && (
-        <div className="p-3 border-t border-white/10 bg-white/5">
-          <div className="flex justify-between text-xs text-white/40">
+        <div className="p-3 border-t border-[#D4E5D4] bg-[#F5FAF7]">
+          <div className="flex justify-between text-xs text-[#8FA58F]">
             <span>
               {proofLinks.filter(l => l.startTime !== undefined).length} video clips
             </span>

@@ -136,41 +136,41 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={onClose} />
+      <div className="fixed inset-0 bg-[#1E2E1E]/40 backdrop-blur-sm z-50" onClick={onClose} />
 
       {/* Dialog */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-        <div className="w-full max-w-lg bg-[#111111] border border-white/20 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+        <div className="w-full max-w-lg bg-white border border-[#D4E5D4] shadow-[0_8px_32px_rgba(107,142,107,0.15)] rounded-lg animate-in fade-in zoom-in-95 duration-150">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
+          <div className="flex items-center justify-between p-4 border-b border-[#D4E5D4]">
             <div className="flex items-center gap-3">
-              <FileSpreadsheet className="w-5 h-5 text-[#c5a47e]" />
-              <h2 className="text-lg font-bold text-white">Export to PowerPoint</h2>
+              <FileSpreadsheet className="w-5 h-5 text-[#6B8E6B]" />
+              <h2 className="text-lg font-bold text-[#1E2E1E]">Export to PowerPoint</h2>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 transition-colors"
+              className="p-2 hover:bg-[#EDF5F0] transition-colors rounded"
               disabled={isExporting}
             >
-              <X className="w-5 h-5 text-white/60" />
+              <X className="w-5 h-5 text-[#8FA58F]" />
             </button>
           </div>
 
           {/* Content */}
           <div className="p-4 space-y-6">
             {/* Theme Info */}
-            <div className="p-4 bg-black/50 border border-white/10">
+            <div className="p-4 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-white">{theme.name}</span>
+                  <span className="text-sm font-bold text-[#1E2E1E]">{theme.name}</span>
                   {viewMode === 'wabi-sabi' && (
-                    <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-wider border border-purple-500/30">
+                    <span className="px-2 py-0.5 bg-[#6B8E6B]/15 text-[#6B8E6B] text-[10px] font-bold uppercase tracking-wider border border-[#6B8E6B]/30 rounded">
                       {wabiSabiLayout || 'Organic'}
                     </span>
                   )}
                 </div>
                 {compatibility.safe && viewMode === 'standard' && (
-                  <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-500/30">
+                  <span className="px-2 py-0.5 bg-[#6B8E6B]/15 text-[#6B8E6B] text-[10px] font-bold uppercase tracking-wider border border-[#6B8E6B]/30 rounded">
                     PowerPoint Safe
                   </span>
                 )}
@@ -179,20 +179,20 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
               {/* Font Preview */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-white/60">Heading:</span>
+                  <span className="text-[#8FA58F]">Heading:</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">{headingFont}</span>
-                    <span className="text-white/40">→</span>
-                    <span className="text-white/80">{compatibility.pptxHeadingFont}</span>
+                    <span className="text-[#1E2E1E] font-medium">{headingFont}</span>
+                    <span className="text-[#8FA58F]">→</span>
+                    <span className="text-[#4A5D4A]">{compatibility.pptxHeadingFont}</span>
                     <MatchBadge match={compatibility.headingMatch} />
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-white/60">Body:</span>
+                  <span className="text-[#8FA58F]">Body:</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">{bodyFont}</span>
-                    <span className="text-white/40">→</span>
-                    <span className="text-white/80">{compatibility.pptxBodyFont}</span>
+                    <span className="text-[#1E2E1E] font-medium">{bodyFont}</span>
+                    <span className="text-[#8FA58F]">→</span>
+                    <span className="text-[#4A5D4A]">{compatibility.pptxBodyFont}</span>
                     <MatchBadge match={compatibility.bodyMatch} />
                   </div>
                 </div>
@@ -201,7 +201,7 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
 
             {/* Export Mode Selection */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-white/60">
+              <div className="flex items-center gap-2 text-sm text-[#8FA58F]">
                 <Info className="w-4 h-4" />
                 <span>{modeReason}</span>
               </div>
@@ -210,29 +210,29 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
                 {/* Editable Mode */}
                 <button
                   onClick={() => setSelectedMode('editable')}
-                  className={`w-full p-3 text-left border transition-all ${
+                  className={`w-full p-3 text-left border transition-all rounded-lg ${
                     activeMode === 'editable'
-                      ? 'border-[#c5a47e] bg-[#c5a47e]/10'
-                      : 'border-white/10 hover:border-white/20'
+                      ? 'border-[#6B8E6B] bg-[#6B8E6B]/10'
+                      : 'border-[#D4E5D4] hover:border-[#C0D6C0]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Type className="w-5 h-5 text-white/60" />
+                    <Type className="w-5 h-5 text-[#8FA58F]" />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-white">Editable</span>
+                        <span className="text-sm font-bold text-[#1E2E1E]">Editable</span>
                         {recommendedMode === 'editable' && (
-                          <span className="px-1.5 py-0.5 bg-[#c5a47e]/20 text-[#c5a47e] text-[8px] font-bold uppercase">
+                          <span className="px-1.5 py-0.5 bg-[#6B8E6B]/15 text-[#6B8E6B] text-[8px] font-bold uppercase rounded">
                             Recommended
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-white/50">
+                      <span className="text-xs text-[#8FA58F]">
                         All text editable in PowerPoint. Fonts substituted.
                       </span>
                     </div>
                     {activeMode === 'editable' && (
-                      <Check className="w-5 h-5 text-[#c5a47e]" />
+                      <Check className="w-5 h-5 text-[#6B8E6B]" />
                     )}
                   </div>
                 </button>
@@ -240,32 +240,32 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
                 {/* Hybrid Mode */}
                 <button
                   onClick={() => setSelectedMode('hybrid')}
-                  className={`w-full p-3 text-left border transition-all ${
+                  className={`w-full p-3 text-left border transition-all rounded-lg ${
                     activeMode === 'hybrid'
-                      ? 'border-[#c5a47e] bg-[#c5a47e]/10'
-                      : 'border-white/10 hover:border-white/20'
+                      ? 'border-[#6B8E6B] bg-[#6B8E6B]/10'
+                      : 'border-[#D4E5D4] hover:border-[#C0D6C0]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex items-center">
-                      <Image className="w-4 h-4 text-white/60" />
-                      <Type className="w-4 h-4 text-white/60 -ml-1" />
+                      <Image className="w-4 h-4 text-[#8FA58F]" />
+                      <Type className="w-4 h-4 text-[#8FA58F] -ml-1" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-white">Hybrid</span>
+                        <span className="text-sm font-bold text-[#1E2E1E]">Hybrid</span>
                         {recommendedMode === 'hybrid' && (
-                          <span className="px-1.5 py-0.5 bg-[#c5a47e]/20 text-[#c5a47e] text-[8px] font-bold uppercase">
+                          <span className="px-1.5 py-0.5 bg-[#6B8E6B]/15 text-[#6B8E6B] text-[8px] font-bold uppercase rounded">
                             Recommended
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-white/50">
+                      <span className="text-xs text-[#8FA58F]">
                         Headers as images, body text editable.
                       </span>
                     </div>
                     {activeMode === 'hybrid' && (
-                      <Check className="w-5 h-5 text-[#c5a47e]" />
+                      <Check className="w-5 h-5 text-[#6B8E6B]" />
                     )}
                   </div>
                 </button>
@@ -273,29 +273,29 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
                 {/* Visual Match Mode */}
                 <button
                   onClick={() => setSelectedMode('visual-match')}
-                  className={`w-full p-3 text-left border transition-all ${
+                  className={`w-full p-3 text-left border transition-all rounded-lg ${
                     activeMode === 'visual-match'
-                      ? 'border-[#c5a47e] bg-[#c5a47e]/10'
-                      : 'border-white/10 hover:border-white/20'
+                      ? 'border-[#6B8E6B] bg-[#6B8E6B]/10'
+                      : 'border-[#D4E5D4] hover:border-[#C0D6C0]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Image className="w-5 h-5 text-white/60" />
+                    <Image className="w-5 h-5 text-[#8FA58F]" />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-white">Visual Match</span>
+                        <span className="text-sm font-bold text-[#1E2E1E]">Visual Match</span>
                         {recommendedMode === 'visual-match' && (
-                          <span className="px-1.5 py-0.5 bg-[#c5a47e]/20 text-[#c5a47e] text-[8px] font-bold uppercase">
+                          <span className="px-1.5 py-0.5 bg-[#6B8E6B]/15 text-[#6B8E6B] text-[8px] font-bold uppercase rounded">
                             Recommended
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-white/50">
+                      <span className="text-xs text-[#8FA58F]">
                         Pixel-accurate rendering. Limited editability.
                       </span>
                     </div>
                     {activeMode === 'visual-match' && (
-                      <Check className="w-5 h-5 text-[#c5a47e]" />
+                      <Check className="w-5 h-5 text-[#6B8E6B]" />
                     )}
                   </div>
                 </button>
@@ -303,11 +303,11 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
             </div>
 
             {/* Speaker Notes Toggle */}
-            <div className="flex items-center justify-between p-3 bg-black/50 border border-white/10">
+            <div className="flex items-center justify-between p-3 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-white">Include speaker notes</span>
+                <span className="text-sm text-[#1E2E1E]">Include speaker notes</span>
                 {activeMode === 'visual-match' && (
-                  <span className="text-[10px] text-amber-400">(not supported)</span>
+                  <span className="text-[10px] text-[#A89050]">(not supported)</span>
                 )}
               </div>
               <button
@@ -315,8 +315,8 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
                 disabled={activeMode === 'visual-match'}
                 className={`w-10 h-5 rounded-full transition-colors ${
                   includeNotes && activeMode !== 'visual-match'
-                    ? 'bg-[#c5a47e]'
-                    : 'bg-white/20'
+                    ? 'bg-[#6B8E6B]'
+                    : 'bg-[#D4E5D4]'
                 } ${activeMode === 'visual-match' ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <div
@@ -329,16 +329,16 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
 
             {/* Progress */}
             {isExporting && progress && (
-              <div className="p-3 bg-black/50 border border-white/10">
+              <div className="p-3 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-white">{progress.message}</span>
-                  <span className="text-xs text-white/60">
+                  <span className="text-sm text-[#1E2E1E]">{progress.message}</span>
+                  <span className="text-xs text-[#8FA58F]">
                     {progress.currentSlide}/{progress.totalSlides}
                   </span>
                 </div>
-                <div className="h-1 bg-white/10 overflow-hidden">
+                <div className="h-1 bg-[#D4E5D4] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#c5a47e] transition-all duration-300"
+                    className="h-full bg-[#6B8E6B] transition-all duration-300 rounded-full"
                     style={{
                       width: `${(progress.currentSlide / progress.totalSlides) * 100}%`,
                     }}
@@ -349,18 +349,18 @@ export const ExportPreviewDialog: React.FC<ExportPreviewDialogProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-white/10 flex justify-end gap-3">
+          <div className="p-4 border-t border-[#D4E5D4] flex justify-end gap-3">
             <button
               onClick={onClose}
               disabled={isExporting}
-              className="px-4 py-2 text-sm font-bold uppercase tracking-wider text-white/60 hover:text-white transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-bold uppercase tracking-wider text-[#8FA58F] hover:text-[#4A5D4A] transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="px-6 py-2 bg-[#c5a47e] text-black text-sm font-bold uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50"
+              className="px-6 py-2 bg-[#6B8E6B] text-white text-sm font-bold uppercase tracking-wider rounded-md hover:bg-[#5A7A5A] transition-colors disabled:opacity-50"
             >
               {isExporting ? 'Exporting...' : 'Export PowerPoint'}
             </button>

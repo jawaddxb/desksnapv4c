@@ -101,16 +101,16 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
   };
 
   return (
-    <div className="p-4 border-t border-white/10 bg-gradient-to-b from-white/5 to-transparent">
+    <div className="p-4 border-t border-[#D4E5D4] bg-gradient-to-b from-[#EDF5F0] to-transparent">
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
-        <Sparkles className="w-4 h-4 text-[#c5a47e]" />
-        <p className="text-sm font-medium text-white">
+        <Sparkles className="w-4 h-4 text-[#6B8E6B]" />
+        <p className="text-sm font-medium text-[#1E2E1E]">
           Extracted {noteCount} items from "{title}"
         </p>
       </div>
 
-      <p className="text-xs text-white/60 mb-4">
+      <p className="text-xs text-[#8FA58F] mb-4">
         All content has been categorized. Choose how to proceed:
       </p>
 
@@ -118,7 +118,7 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
       <div className="flex gap-2 mb-4">
         <button
           onClick={onAcceptAll}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#c5a47e] hover:bg-[#d4b38f] text-black font-medium text-sm rounded-lg transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#6B8E6B] hover:bg-[#5A7A5A] text-white font-medium text-sm rounded-lg transition-colors"
         >
           <Check className="w-4 h-4" />
           Use All ({noteCount})
@@ -127,8 +127,8 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
           onClick={() => setShowFilters(!showFilters)}
           className={`flex items-center justify-center gap-2 px-4 py-2.5 border text-sm rounded-lg transition-colors ${
             showFilters || hasActiveFilters
-              ? 'bg-white/10 border-white/30 text-white'
-              : 'bg-transparent border-white/20 text-white/70 hover:bg-white/5'
+              ? 'bg-[#EDF5F0] border-[#6B8E6B] text-[#1E2E1E]'
+              : 'bg-transparent border-[#D4E5D4] text-[#8FA58F] hover:bg-[#EDF5F0]'
           }`}
         >
           <Filter className="w-4 h-4" />
@@ -138,16 +138,16 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
 
       {/* Filter Panel (expandable) */}
       {showFilters && (
-        <div className="space-y-4 pt-4 border-t border-white/10">
+        <div className="space-y-4 pt-4 border-t border-[#D4E5D4]">
           {/* Themes */}
           {themes.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-white/50 uppercase tracking-wider">Themes</span>
+                <span className="text-xs text-[#8FA58F] uppercase tracking-wider">Themes</span>
                 {selectedThemes.size > 0 && (
                   <button
                     onClick={() => setSelectedThemes(new Set())}
-                    className="text-xs text-white/40 hover:text-white/60"
+                    className="text-xs text-[#8FA58F] hover:text-[#6B8E6B]"
                   >
                     Clear
                   </button>
@@ -160,8 +160,8 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
                     onClick={() => toggleTheme(theme)}
                     className={`px-3 py-1.5 text-xs rounded-full border transition-all ${
                       selectedThemes.has(theme)
-                        ? 'bg-[#c5a47e]/20 border-[#c5a47e]/50 text-[#c5a47e]'
-                        : 'bg-white/5 border-white/20 text-white/70 hover:bg-white/10'
+                        ? 'bg-[#6B8E6B]/20 border-[#6B8E6B]/50 text-[#6B8E6B]'
+                        : 'bg-white border-[#D4E5D4] text-[#8FA58F] hover:bg-[#EDF5F0]'
                     }`}
                   >
                     {selectedThemes.has(theme) && <Check className="w-3 h-3 inline mr-1" />}
@@ -176,11 +176,11 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
           {types.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-white/50 uppercase tracking-wider">Content Types</span>
+                <span className="text-xs text-[#8FA58F] uppercase tracking-wider">Content Types</span>
                 {selectedTypes.size > 0 && (
                   <button
                     onClick={() => setSelectedTypes(new Set())}
-                    className="text-xs text-white/40 hover:text-white/60"
+                    className="text-xs text-[#8FA58F] hover:text-[#6B8E6B]"
                   >
                     Clear
                   </button>
@@ -194,7 +194,7 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
                     className={`px-3 py-1.5 text-xs rounded-full border transition-all ${
                       selectedTypes.has(type)
                         ? TYPE_COLORS[type]
-                        : 'bg-white/5 border-white/20 text-white/70 hover:bg-white/10'
+                        : 'bg-white border-[#D4E5D4] text-[#8FA58F] hover:bg-[#EDF5F0]'
                     }`}
                   >
                     {selectedTypes.has(type) && <Check className="w-3 h-3 inline mr-1" />}
@@ -210,14 +210,14 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
             <div className="flex gap-2 pt-2">
               <button
                 onClick={handleFilteredAccept}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 text-white text-sm rounded-lg transition-colors border border-white/20"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#EDF5F0] hover:bg-[#6B8E6B]/10 text-[#1E2E1E] text-sm rounded-lg transition-colors border border-[#D4E5D4]"
               >
                 <ArrowRight className="w-4 h-4" />
                 Use Selected Filters
               </button>
               <button
                 onClick={clearFilters}
-                className="px-4 py-2 text-white/50 hover:text-white/70 text-sm transition-colors"
+                className="px-4 py-2 text-[#8FA58F] hover:text-[#6B8E6B] text-sm transition-colors"
               >
                 Reset
               </button>
@@ -230,7 +230,7 @@ export const TopicPillsPanel: React.FC<TopicPillsPanelProps> = ({
       {onCancel && (
         <button
           onClick={onCancel}
-          className="w-full mt-3 py-2 text-xs text-white/40 hover:text-white/60 transition-colors"
+          className="w-full mt-3 py-2 text-xs text-[#8FA58F] hover:text-[#6B8E6B] transition-colors"
         >
           Cancel and remove source
         </button>

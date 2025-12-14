@@ -18,13 +18,13 @@ interface AgentNarrativePanelProps {
   onClose: () => void;
 }
 
-// Stage color mapping - Studio Noir palette (gold + white only)
+// Stage color mapping - Bento Matcha palette (green accent)
 const STAGE_COLORS: Record<JournalStage, { bg: string; text: string; icon: string }> = {
-  analyzing: { bg: 'bg-white/10', text: 'text-white/70', icon: 'search' },
-  exploring: { bg: 'bg-white/10', text: 'text-white/70', icon: 'explore' },
-  deciding: { bg: 'bg-[#c5a47e]/10', text: 'text-[#c5a47e]/80', icon: 'lightbulb' },
-  creating: { bg: 'bg-[#c5a47e]/20', text: 'text-[#c5a47e]', icon: 'create' },
-  refining: { bg: 'bg-[#c5a47e]/20', text: 'text-[#c5a47e]', icon: 'tune' },
+  analyzing: { bg: 'bg-[#EDF5F0]', text: 'text-[#4A5D4A]', icon: 'search' },
+  exploring: { bg: 'bg-[#EDF5F0]', text: 'text-[#4A5D4A]', icon: 'explore' },
+  deciding: { bg: 'bg-[#6B8E6B]/10', text: 'text-[#6B8E6B]', icon: 'lightbulb' },
+  creating: { bg: 'bg-[#6B8E6B]/20', text: 'text-[#6B8E6B]', icon: 'create' },
+  refining: { bg: 'bg-[#6B8E6B]/20', text: 'text-[#6B8E6B]', icon: 'tune' },
 };
 
 // Icons for different stages
@@ -87,18 +87,18 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
   };
 
   return (
-    <div className="w-80 flex-shrink-0 bg-[#111111] border-l border-white/10 flex flex-col h-full">
+    <div className="w-80 flex-shrink-0 bg-white border-l border-[#D4E5D4] flex flex-col h-full">
       {/* Header */}
-      <div className="h-14 px-4 border-b border-white/10 flex items-center justify-between bg-black">
+      <div className="h-14 px-4 border-b border-[#D4E5D4] flex items-center justify-between bg-white">
         <div className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
+          <svg className="w-5 h-5 text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">
             <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
           </svg>
-          <span className="font-bold text-white text-sm uppercase tracking-wide">Agent Activity</span>
+          <span className="font-bold text-[#1E2E1E] text-sm uppercase tracking-wide">Agent Activity</span>
         </div>
         <button
           onClick={onClose}
-          className="p-1.5 hover:bg-white/5 text-white/60 hover:text-white transition-colors"
+          className="p-1.5 hover:bg-[#EDF5F0] text-[#8FA58F] hover:text-[#4A5D4A] transition-colors rounded-md"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -108,21 +108,21 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
 
       {/* Progress indicator */}
       {currentPhase !== 'complete' && totalSlides > 0 && (
-        <div className="px-4 py-2 bg-[#c5a47e]/10 border-b border-[#c5a47e]/20">
+        <div className="px-4 py-2 bg-[#6B8E6B]/10 border-b border-[#6B8E6B]/20">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-[#c5a47e] uppercase tracking-wider font-bold">
+            <span className="text-[#6B8E6B] uppercase tracking-wider font-bold">
               {currentSlideIndex >= 0 ? `Slide ${currentSlideIndex + 1} of ${totalSlides}` : 'Processing...'}
             </span>
-            <span className="text-white/50">{currentPhase.replace(/-/g, ' ')}</span>
+            <span className="text-[#8FA58F]">{currentPhase.replace(/-/g, ' ')}</span>
           </div>
         </div>
       )}
 
       {/* Tab bar with animated indicator */}
-      <div className="flex border-b border-white/10 bg-black/50 relative">
+      <div className="flex border-b border-[#D4E5D4] bg-[#F5FAF7] relative">
         {/* Animated tab indicator */}
         <div
-          className="absolute bottom-0 h-0.5 bg-[#c5a47e] transition-all duration-200 ease-out"
+          className="absolute bottom-0 h-0.5 bg-[#6B8E6B] transition-all duration-200 ease-out"
           style={{
             left: activeTab === 'narrative' ? '0%' : '50%',
             width: '50%'
@@ -132,8 +132,8 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
           onClick={() => setActiveTab('narrative')}
           className={`flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors duration-200 ${
             activeTab === 'narrative'
-              ? 'text-[#c5a47e]'
-              : 'text-white/50 hover:text-white'
+              ? 'text-[#6B8E6B]'
+              : 'text-[#8FA58F] hover:text-[#4A5D4A]'
           }`}
         >
           Narrative
@@ -142,8 +142,8 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
           onClick={() => setActiveTab('logs')}
           className={`flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors duration-200 ${
             activeTab === 'logs'
-              ? 'text-[#c5a47e]'
-              : 'text-white/50 hover:text-white'
+              ? 'text-[#6B8E6B]'
+              : 'text-[#8FA58F] hover:text-[#4A5D4A]'
           }`}
         >
           Logs ({logs.length})
@@ -156,12 +156,12 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
           <div className="p-4 space-y-4">
             {entries.length === 0 ? (
               <div className="text-center py-8">
-                <div className="w-12 h-12 mx-auto mb-3 border border-white/10 flex items-center justify-center animate-pulse">
-                  <svg className="w-6 h-6 text-white/30" viewBox="0 0 24 24" fill="currentColor">
+                <div className="w-12 h-12 mx-auto mb-3 border border-[#D4E5D4] rounded-lg flex items-center justify-center animate-pulse">
+                  <svg className="w-6 h-6 text-[#8FA58F]" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
                   </svg>
                 </div>
-                <p className="text-xs text-white/40 uppercase tracking-wider">Waiting for agent...</p>
+                <p className="text-xs text-[#8FA58F] uppercase tracking-wider">Waiting for agent...</p>
               </div>
             ) : (
               entries.map((entry, index) => {
@@ -177,7 +177,7 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
                     }}
                   >
                     {/* Stage badge */}
-                    <div className={`inline-flex items-center gap-1.5 px-2 py-1 ${stageStyle.bg} mb-2`}>
+                    <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded ${stageStyle.bg} mb-2`}>
                       <StageIcon stage={entry.stage} className={`w-3 h-3 ${stageStyle.text}`} />
                       <span className={`text-[10px] uppercase tracking-wider font-bold ${stageStyle.text}`}>
                         {entry.stage}
@@ -185,34 +185,34 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
                     </div>
 
                     {/* Title */}
-                    <h4 className="font-bold text-white text-sm mb-1">{entry.title}</h4>
+                    <h4 className="font-bold text-[#1E2E1E] text-sm mb-1">{entry.title}</h4>
 
                     {/* Narrative */}
-                    <p className="text-xs text-white/70 leading-relaxed mb-2">{entry.narrative}</p>
+                    <p className="text-xs text-[#4A5D4A] leading-relaxed mb-2">{entry.narrative}</p>
 
                     {/* Decision */}
                     {entry.decision && (
                       <div className="flex items-start gap-2 text-xs">
-                        <span className="text-[#c5a47e] font-bold uppercase tracking-wider">Decision:</span>
-                        <span className="text-white/60">{entry.decision}</span>
+                        <span className="text-[#6B8E6B] font-bold uppercase tracking-wider">Decision:</span>
+                        <span className="text-[#8FA58F]">{entry.decision}</span>
                       </div>
                     )}
 
                     {/* Confidence - enhanced with gradient */}
                     {entry.confidence !== undefined && (
                       <div className="mt-2 flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className="flex-1 h-1.5 bg-[#EDF5F0] rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-[#c5a47e]/70 to-[#c5a47e] rounded-full transition-all duration-500 ease-out"
+                            className="h-full bg-gradient-to-r from-[#6B8E6B]/70 to-[#6B8E6B] rounded-full transition-all duration-500 ease-out"
                             style={{ width: `${entry.confidence}%` }}
                           />
                         </div>
-                        <span className="text-[10px] text-white/40 font-bold">{entry.confidence}%</span>
+                        <span className="text-[10px] text-[#8FA58F] font-bold">{entry.confidence}%</span>
                       </div>
                     )}
 
                     {/* Timestamp */}
-                    <p className="text-[10px] text-white/30 mt-2">{formatTime(entry.timestamp)}</p>
+                    <p className="text-[10px] text-[#8FA58F] mt-2">{formatTime(entry.timestamp)}</p>
                   </div>
                 );
               })
@@ -223,13 +223,13 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
           <div className="p-4 space-y-2 font-mono text-xs">
             {logs.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-white/40">No logs yet...</p>
+                <p className="text-[#8FA58F]">No logs yet...</p>
               </div>
             ) : (
               logs.map((log, index) => (
                 <div
                   key={index}
-                  className="p-2.5 bg-white/5 border border-white/10 hover:border-white/20 transition-colors duration-200"
+                  className="p-2.5 bg-[#F5FAF7] border border-[#D4E5D4] rounded-md hover:border-[#6B8E6B]/30 transition-colors duration-200"
                   style={{
                     animation: 'fadeInUp 0.2s ease-out forwards',
                     animationDelay: `${index * 30}ms`,
@@ -238,22 +238,22 @@ export const AgentNarrativePanel: React.FC<AgentNarrativePanelProps> = ({
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className={`text-[10px] uppercase tracking-wider font-bold ${
-                      log.action === 'validate' ? 'text-white/60' :
-                      log.action === 'rewrite' ? 'text-[#c5a47e]/80' :
-                      log.action === 'finalize' ? 'text-[#c5a47e]' :
-                      'text-white/50'
+                      log.action === 'validate' ? 'text-[#4A5D4A]' :
+                      log.action === 'rewrite' ? 'text-[#6B8E6B]/80' :
+                      log.action === 'finalize' ? 'text-[#6B8E6B]' :
+                      'text-[#8FA58F]'
                     }`}>
                       {log.action}
                     </span>
-                    <span className="text-[10px] text-white/30">
+                    <span className="text-[10px] text-[#8FA58F]">
                       Slide {log.slideIndex + 1}
                     </span>
                   </div>
                   {log.reasoning && (
-                    <p className="text-white/60 line-clamp-2">{log.reasoning}</p>
+                    <p className="text-[#4A5D4A] line-clamp-2">{log.reasoning}</p>
                   )}
                   {log.durationMs && (
-                    <p className="text-white/30 mt-1">{log.durationMs}ms</p>
+                    <p className="text-[#8FA58F] mt-1">{log.durationMs}ms</p>
                   )}
                 </div>
               ))

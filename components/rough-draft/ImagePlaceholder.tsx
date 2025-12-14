@@ -78,7 +78,7 @@ export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
       </div>
 
       {/* Generate button - visible on hover or always on mobile */}
-      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors">
+      <div className="absolute inset-0 flex items-center justify-center bg-[#1E2E1E]/0 group-hover:bg-[#1E2E1E]/20 transition-colors rounded-lg">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -86,16 +86,16 @@ export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
           }}
           disabled={isGenerating}
           className={`
-            ${buttonPadding} flex items-center gap-2
-            bg-[#c5a47e] text-black text-xs font-bold uppercase tracking-wider
+            ${buttonPadding} flex items-center gap-2 rounded-md
+            bg-[#6B8E6B] text-white text-xs font-bold uppercase tracking-wider
             opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0
             transition-all duration-200 disabled:opacity-50
-            hover:bg-white
+            hover:bg-[#5A7A5A]
           `}
         >
           {isGenerating ? (
             <>
-              <div className="w-3 h-3 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               Generating...
             </>
           ) : (

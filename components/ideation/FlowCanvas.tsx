@@ -141,25 +141,25 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
       style={{
         minHeight: canvasHeight,
         background: `
-          radial-gradient(ellipse 80% 50% at 50% 0%, rgba(197, 164, 126, 0.03) 0%, transparent 50%),
-          linear-gradient(180deg, #0a0a0a 0%, #080808 100%)
+          radial-gradient(ellipse 80% 50% at 50% 0%, rgba(107, 142, 107, 0.05) 0%, transparent 50%),
+          linear-gradient(180deg, #F5FAF7 0%, #EDF5F0 100%)
         `
       }}
       onClick={handleCanvasClick}
     >
       {/* Subtle grid pattern for spatial orientation */}
       <div
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            linear-gradient(rgba(107,142,107,0.2) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(107,142,107,0.2) 1px, transparent 1px)
           `,
           backgroundSize: '44px 44px'
         }}
       />
       {/* Column headers and swimlanes */}
-      <div className="flex gap-4 px-4 pt-3 sticky top-0 bg-[#0a0a0a] z-10">
+      <div className="flex gap-4 px-4 pt-3 sticky top-0 bg-[#F5FAF7] z-10">
         {columns.map((colName, colIndex) => (
           <div
             key={colName}
@@ -190,9 +190,9 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
               key={colName}
               className={`
                 flex-1 min-w-[160px] max-w-[280px] min-h-full
-                transition-all duration-200 ease-out
+                transition-all duration-200 ease-out rounded-lg
                 ${dragOverColumn === colIndex
-                  ? 'bg-[#c5a47e]/[0.08] ring-1 ring-inset ring-[#c5a47e]/20'
+                  ? 'bg-[#6B8E6B]/[0.08] ring-1 ring-inset ring-[#6B8E6B]/20'
                   : ''}
               `}
               onDragOver={handleDragOver(colIndex)}
@@ -217,8 +217,8 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 {/* Add note button */}
                 <button
                   onClick={handleAddNote(colIndex)}
-                  className="w-full h-12 border border-dashed border-white/20
-                             text-white/40 hover:border-[#c5a47e] hover:text-[#c5a47e]
+                  className="w-full h-12 border border-dashed border-[#D4E5D4] rounded-md
+                             text-[#8FA58F] hover:border-[#6B8E6B] hover:text-[#6B8E6B]
                              transition-colors flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -238,12 +238,12 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
           className="fixed inset-0 flex items-center justify-center pointer-events-none"
           style={{ right: '480px' }}
         >
-          <div className="text-center text-white/40">
-            <svg className="w-16 h-16 mx-auto mb-4 opacity-50 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
+          <div className="text-center text-[#8FA58F]">
+            <svg className="w-16 h-16 mx-auto mb-4 opacity-50 text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
             </svg>
-            <p className="text-lg font-bold text-white uppercase tracking-wide">Start brainstorming</p>
-            <p className="text-sm text-white/50">Chat with the copilot or click "Add note" to begin</p>
+            <p className="text-lg font-bold text-[#1E2E1E] uppercase tracking-wide">Start brainstorming</p>
+            <p className="text-sm text-[#8FA58F]">Chat with the copilot or click "Add note" to begin</p>
           </div>
         </div>
       )}

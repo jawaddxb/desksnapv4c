@@ -24,12 +24,12 @@ export const ResearchProgress: React.FC<ResearchProgressProps> = ({
       {/* Progress bar */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-white/70">{progress.status}</span>
-          <span className="text-[#c5a47e]">{progress.percent}%</span>
+          <span className="text-[#1E2E1E] opacity-70">{progress.status}</span>
+          <span className="text-[#6B8E6B]">{progress.percent}%</span>
         </div>
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-2 bg-[#D4E5D4] rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-[#c5a47e] to-[#d4b38d] transition-all duration-500 ease-out"
+            className="h-full bg-gradient-to-r from-[#6B8E6B] to-[#5A7A5A] transition-all duration-500 ease-out"
             style={{ width: `${progress.percent}%` }}
           />
         </div>
@@ -42,10 +42,10 @@ export const ResearchProgress: React.FC<ResearchProgressProps> = ({
             <span
               className={
                 step.done
-                  ? 'text-green-400'
+                  ? 'text-green-600'
                   : step.active
-                  ? 'text-[#c5a47e]'
-                  : 'text-white/40'
+                  ? 'text-[#6B8E6B]'
+                  : 'text-[#8FA58F]'
               }
             >
               {step.done ? (
@@ -66,10 +66,10 @@ export const ResearchProgress: React.FC<ResearchProgressProps> = ({
             <span
               className={
                 step.done
-                  ? 'text-white/70'
+                  ? 'text-[#1E2E1E] opacity-70'
                   : step.active
-                  ? 'text-white'
-                  : 'text-white/40'
+                  ? 'text-[#1E2E1E]'
+                  : 'text-[#8FA58F]'
               }
             >
               {step.label}
@@ -81,43 +81,43 @@ export const ResearchProgress: React.FC<ResearchProgressProps> = ({
       {/* Live discoveries */}
       {findings.length > 0 && (
         <div className="space-y-2 mt-4">
-          <h4 className="text-xs uppercase tracking-wider text-white/50">Discoveries</h4>
+          <h4 className="text-xs uppercase tracking-wider text-[#8FA58F]">Discoveries</h4>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {findings.map((finding, index) => (
               <div
                 key={finding.id}
-                className="p-3 bg-white/5 rounded-lg animate-fadeIn"
+                className="p-3 bg-[#F5FAF7] rounded-lg animate-fadeIn border border-[#D4E5D4]"
                 style={{
                   animationDelay: `${index * 100}ms`,
                 }}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">{finding.icon}</span>
-                  <span className="text-[#c5a47e] text-sm font-medium capitalize">
+                  <span className="text-[#6B8E6B] text-sm font-medium capitalize">
                     {finding.type}
                   </span>
                   {finding.citation.reliability && (
-                    <span className="ml-auto text-xs text-white/40">
+                    <span className="ml-auto text-xs text-[#8FA58F]">
                       {'★'.repeat(finding.citation.reliability)}
                       {'☆'.repeat(5 - finding.citation.reliability)}
                     </span>
                   )}
                 </div>
-                <p className="text-white/80 text-sm line-clamp-2">{finding.summary}</p>
+                <p className="text-[#1E2E1E] opacity-80 text-sm line-clamp-2">{finding.summary}</p>
                 {finding.metrics && (
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="text-lg font-bold text-[#c5a47e]">
+                    <span className="text-lg font-bold text-[#6B8E6B]">
                       {finding.metrics.value}
                     </span>
-                    <span className="text-xs text-white/50">{finding.metrics.label}</span>
+                    <span className="text-xs text-[#8FA58F]">{finding.metrics.label}</span>
                     {finding.metrics.change && (
                       <span
                         className={`text-xs ${
                           finding.metrics.change.startsWith('+')
-                            ? 'text-green-400'
+                            ? 'text-green-600'
                             : finding.metrics.change.startsWith('-')
-                            ? 'text-red-400'
-                            : 'text-white/50'
+                            ? 'text-red-600'
+                            : 'text-[#8FA58F]'
                         }`}
                       >
                         {finding.metrics.change}
@@ -130,7 +130,7 @@ export const ResearchProgress: React.FC<ResearchProgressProps> = ({
                     href={finding.citation.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-400 hover:underline mt-1 inline-block"
+                    className="text-xs text-blue-600 hover:underline mt-1 inline-block"
                   >
                     {finding.citation.source} - {finding.citation.title.slice(0, 40)}
                     {finding.citation.title.length > 40 ? '...' : ''}
@@ -145,7 +145,7 @@ export const ResearchProgress: React.FC<ResearchProgressProps> = ({
       {/* Empty state while searching */}
       {findings.length === 0 && progress.percent > 0 && progress.percent < 100 && (
         <div className="text-center py-4">
-          <div className="inline-flex items-center gap-2 text-white/50 text-sm">
+          <div className="inline-flex items-center gap-2 text-[#8FA58F] text-sm">
             <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
               <path d="M12 2a10 10 0 0 1 10 10" />

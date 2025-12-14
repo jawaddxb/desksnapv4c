@@ -69,14 +69,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     <>
       {/* Modal header */}
       {mode === 'modal' && (
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/8 bg-[#0d0d0d] cursor-move">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#D4E5D4] bg-white cursor-move">
           <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5 text-[#c5a47e]" />
-            <span className="text-xs font-medium text-white/60">Design Assistant</span>
+            <Bot className="w-5 h-5 text-[#6B8E6B]" />
+            <span className="text-xs font-medium text-[#4A5D4A]">Design Assistant</span>
           </div>
           <button
             onClick={() => setIsChatOpen(false)}
-            className="p-1 hover:bg-white/5 rounded transition-colors text-white/40 hover:text-white"
+            className="p-1 hover:bg-[#EDF5F0] rounded transition-colors text-[#8FA58F] hover:text-[#1E2E1E]"
           >
             <Minus className="w-5 h-5" />
           </button>
@@ -85,19 +85,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
       {/* Messages area */}
       <div
-        className={`overflow-y-auto p-5 space-y-4 scroll-smooth ${mode === 'modal' ? 'bg-[#171717] grow' : 'bg-[#0d0d0d] flex-1'
+        className={`overflow-y-auto p-5 space-y-4 scroll-smooth ${mode === 'modal' ? 'bg-[#F5FAF7] grow' : 'bg-white flex-1'
           }`}
         ref={scrollRef}
       >
         {messages.length === 0 && !currentPresentation && (
           <div className="text-center py-8">
-            <div className="w-12 h-12 bg-[#c5a47e]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-6 h-6 text-[#c5a47e]" />
+            <div className="w-12 h-12 bg-[#6B8E6B]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-6 h-6 text-[#6B8E6B]" />
             </div>
-            <h3 className="text-sm font-medium text-white mb-2">
+            <h3 className="text-sm font-medium text-[#1E2E1E] mb-2">
               What will you create today?
             </h3>
-            <p className="text-xs text-white/40 max-w-[250px] mx-auto">
+            <p className="text-xs text-[#8FA58F] max-w-[250px] mx-auto">
               Describe your presentation topic and AI will handle the rest with smart defaults.
             </p>
           </div>
@@ -110,10 +110,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           >
             <div
               className={`max-w-[85%] p-4 text-sm leading-relaxed rounded-lg ${msg.role === MessageRole.USER
-                  ? 'bg-[#c5a47e]/20 text-white'
+                  ? 'bg-[#6B8E6B]/20 text-[#1E2E1E]'
                   : msg.role === MessageRole.SYSTEM
-                    ? 'bg-transparent text-white/40 text-xs text-center w-full'
-                    : 'bg-white/5 text-white/80 border border-white/5'
+                    ? 'bg-transparent text-[#8FA58F] text-xs text-center w-full'
+                    : 'bg-white text-[#1E2E1E] border border-[#D4E5D4]'
                 }`}
             >
               {msg.text}
@@ -123,29 +123,29 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         {isGenerating && (
           <div className="flex justify-start">
-            <div className="bg-[#171717] border border-white/10 rounded-lg px-4 py-3 flex items-center gap-3">
-              <RefreshCw className="w-4 h-4 text-[#c5a47e] animate-spin" />
-              <span className="text-xs text-white/60">Creating your presentation...</span>
+            <div className="bg-white border border-[#D4E5D4] rounded-lg px-4 py-3 flex items-center gap-3">
+              <RefreshCw className="w-4 h-4 text-[#6B8E6B] animate-spin" />
+              <span className="text-xs text-[#4A5D4A]">Creating your presentation...</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Input area */}
-      <div className="flex-none p-4 border-t border-white/8 bg-[#0d0d0d]">
+      <div className="flex-none p-4 border-t border-[#D4E5D4] bg-white">
         {/* Smart defaults indicator - only show when we have defaults */}
         {!currentPresentation && !isGenerating && smartDefaults && smartDefaults.confidence > 0.3 && (
-          <div className="mb-3 p-3 bg-[#c5a47e]/5 border border-[#c5a47e]/20 rounded-lg">
+          <div className="mb-3 p-3 bg-[#6B8E6B]/5 border border-[#6B8E6B]/20 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#c5a47e]" />
-                <span className="text-xs text-white/70">
+                <Sparkles className="w-4 h-4 text-[#6B8E6B]" />
+                <span className="text-xs text-[#4A5D4A]">
                   AI suggests: {getThemeDisplayName(smartDefaults.themeId)} theme, {smartDefaults.density} content
                 </span>
               </div>
               <button
                 onClick={() => setShowCustomize(!showCustomize)}
-                className="text-[10px] text-[#c5a47e] hover:text-[#d4b68e] transition-colors"
+                className="text-[10px] text-[#6B8E6B] hover:text-[#5A7A5A] transition-colors"
               >
                 {showCustomize ? 'Hide' : 'Customize'}
               </button>
@@ -155,21 +155,21 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         {/* Customization panel - hidden by default */}
         {!currentPresentation && !isGenerating && showCustomize && (
-          <div className="mb-4 space-y-4 p-4 bg-[#141414] border border-white/5 rounded-lg">
+          <div className="mb-4 space-y-4 p-4 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg">
             {/* Content Density */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Layers className="w-3 h-3 text-white/40" />
-                <span className="text-[10px] font-medium text-white/40">Content Density</span>
+                <Layers className="w-3 h-3 text-[#8FA58F]" />
+                <span className="text-[10px] font-medium text-[#8FA58F]">Content Density</span>
               </div>
               <div className="grid grid-cols-4 gap-2">
                 {MODE_OPTIONS.map(opt => (
                   <button
                     key={opt.id}
                     onClick={() => setGenerationMode(opt.id)}
-                    className={`flex flex-col items-center justify-center py-2 px-1 rounded border transition-all duration-200 ${generationMode === opt.id
-                        ? 'bg-[#c5a47e] text-black border-[#c5a47e]'
-                        : 'bg-transparent text-white/60 border-white/10 hover:border-[#c5a47e]/30 hover:text-white'
+                    className={`flex flex-col items-center justify-center py-2 px-1 rounded-md border transition-all duration-200 ${generationMode === opt.id
+                        ? 'bg-[#6B8E6B] text-white border-[#6B8E6B]'
+                        : 'bg-white text-[#4A5D4A] border-[#D4E5D4] hover:border-[#6B8E6B]/30 hover:text-[#1E2E1E]'
                       }`}
                   >
                     <opt.icon className="w-4 h-4 mb-1" />
@@ -182,17 +182,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {/* Visual Style */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <ImageIcon className="w-3 h-3 text-white/40" />
-                <span className="text-[10px] font-medium text-white/40">Visual Aesthetic</span>
+                <ImageIcon className="w-3 h-3 text-[#8FA58F]" />
+                <span className="text-[10px] font-medium text-[#8FA58F]">Visual Aesthetic</span>
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                 {IMAGE_STYLES.map(style => (
                   <button
                     key={style.id}
                     onClick={() => setSelectedImageStyle(style)}
-                    className={`flex-none px-3 py-1.5 text-[11px] font-medium rounded border transition-all duration-200 whitespace-nowrap ${selectedImageStyle.id === style.id
-                        ? 'bg-[#c5a47e] text-black border-[#c5a47e]'
-                        : 'bg-transparent text-white/60 border-white/10 hover:border-[#c5a47e]/30 hover:text-white'
+                    className={`flex-none px-3 py-1.5 text-[11px] font-medium rounded-md border transition-all duration-200 whitespace-nowrap ${selectedImageStyle.id === style.id
+                        ? 'bg-[#6B8E6B] text-white border-[#6B8E6B]'
+                        : 'bg-white text-[#4A5D4A] border-[#D4E5D4] hover:border-[#6B8E6B]/30 hover:text-[#1E2E1E]'
                       }`}
                   >
                     {style.label}
@@ -203,14 +203,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             {/* Draft Preview Toggle */}
             {setEnableDraftPreview && (
-              <div className="flex items-center justify-between py-2 px-3 bg-white/5 rounded">
+              <div className="flex items-center justify-between py-2 px-3 bg-white border border-[#D4E5D4] rounded-md">
                 <div className="flex items-center gap-2">
-                  <Eye className="w-3.5 h-3.5 text-white/40" />
-                  <span className="text-[11px] text-white/60">Preview slides before building</span>
+                  <Eye className="w-3.5 h-3.5 text-[#8FA58F]" />
+                  <span className="text-[11px] text-[#4A5D4A]">Preview slides before building</span>
                 </div>
                 <button
                   onClick={() => setEnableDraftPreview(!enableDraftPreview)}
-                  className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${enableDraftPreview ? 'bg-[#c5a47e]' : 'bg-white/20'
+                  className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${enableDraftPreview ? 'bg-[#6B8E6B]' : 'bg-[#D4E5D4]'
                     }`}
                 >
                   <span
@@ -227,7 +227,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         {!currentPresentation && !isGenerating && !smartDefaults && (
           <button
             onClick={() => setShowCustomize(!showCustomize)}
-            className="flex items-center gap-2 mb-3 text-xs text-white/40 hover:text-white/60 transition-colors"
+            className="flex items-center gap-2 mb-3 text-xs text-[#8FA58F] hover:text-[#4A5D4A] transition-colors"
           >
             <Settings2 className="w-3.5 h-3.5" />
             <span>Customize options</span>
@@ -244,25 +244,25 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
             placeholder={currentPresentation ? "Ask for changes..." : "What's your presentation about?"}
             disabled={isGenerating}
-            className="w-full bg-[#171717] border border-white/10 rounded-lg py-3.5 pl-4 pr-12 text-sm focus:outline-none focus:border-[#c5a47e]/50 transition-all duration-200 placeholder-white/30 text-white"
+            className="w-full bg-white border border-[#D4E5D4] rounded-lg py-3.5 pl-4 pr-12 text-sm focus:outline-none focus:border-[#6B8E6B] focus:ring-2 focus:ring-[#6B8E6B]/20 transition-all duration-200 placeholder-[#8FA58F] text-[#1E2E1E]"
             autoFocus={mode === 'modal' && isChatOpen}
           />
           <button
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || isGenerating}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#c5a47e] rounded hover:bg-[#d4b68e] disabled:opacity-30 disabled:bg-white/10 transition-all duration-200"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#6B8E6B] rounded-md hover:bg-[#5A7A5A] disabled:opacity-30 disabled:bg-[#D4E5D4] transition-all duration-200"
           >
             {isGenerating ? (
-              <StopCircle className="w-4 h-4 text-black" />
+              <StopCircle className="w-4 h-4 text-white" />
             ) : (
-              <ArrowRight className="w-4 h-4 text-black" />
+              <ArrowRight className="w-4 h-4 text-white" />
             )}
           </button>
         </div>
 
         {/* Helper text */}
         {!currentPresentation && !isGenerating && (
-          <p className="mt-2 text-[10px] text-white/30 text-center">
+          <p className="mt-2 text-[10px] text-[#8FA58F] text-center">
             Press Enter to generate. AI will select the best theme and layout automatically.
           </p>
         )}

@@ -19,11 +19,11 @@ export const StatCard: React.FC<StatCardProps> = ({
   label,
   value,
 }) => (
-  <div className="bg-zinc-50 p-6 rounded-xl border border-zinc-100">
-    <div className="flex items-center gap-2 mb-2 text-zinc-400 text-xs font-bold uppercase tracking-widest">
+  <div className="bg-[#F5FAF7] p-6 rounded-lg border border-[#D4E5D4]">
+    <div className="flex items-center gap-2 mb-2 text-[#8FA58F] text-xs font-bold uppercase tracking-widest">
       <Icon className="w-4 h-4" /> {label}
     </div>
-    <div className="text-4xl font-black text-zinc-900">{value}</div>
+    <div className="text-4xl font-black text-[#1E2E1E]">{value}</div>
   </div>
 );
 

@@ -59,16 +59,16 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
   };
 
   return (
-    <div className="border-t border-white/10 bg-black/50">
+    <div className="border-t border-[#D4E5D4] bg-[#F5FAF7]">
       {/* Header Toggle */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between text-white/60 hover:text-white transition-colors duration-150"
+        className="w-full px-4 py-3 flex items-center justify-between text-[#8FA58F] hover:text-[#1E2E1E] transition-colors duration-150"
       >
         <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-          <History className="w-4 h-4 text-[#c5a47e]" />
+          <History className="w-4 h-4 text-[#6B8E6B]" />
           Version History
-          <span className="px-1.5 py-0.5 bg-white/10 text-[10px]">
+          <span className="px-1.5 py-0.5 bg-[#EDF5F0] text-[10px]">
             {versions.length}
           </span>
         </span>
@@ -86,7 +86,7 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
             <button
               onClick={() => setShowLabelInput(true)}
               disabled={isCreating}
-              className="w-full py-2 flex items-center justify-center gap-2 bg-[#c5a47e] text-black font-bold text-xs uppercase tracking-widest hover:bg-white transition-colors duration-150 disabled:opacity-50"
+              className="w-full py-2 flex items-center justify-center gap-2 bg-[#6B8E6B] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#5A7A5A] transition-colors duration-150 disabled:opacity-50"
             >
               {isCreating ? (
                 <>
@@ -107,7 +107,7 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="Version label (optional)"
-                className="w-full px-3 py-2 bg-black border border-white/20 text-white text-sm focus:border-[#c5a47e] outline-none"
+                className="w-full px-3 py-2 bg-white border border-[#D4E5D4] text-[#1E2E1E] text-sm focus:border-[#6B8E6B] outline-none"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleCreate();
@@ -121,7 +121,7 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                 <button
                   onClick={handleCreate}
                   disabled={isCreating}
-                  className="flex-1 py-2 bg-[#c5a47e] text-black font-bold text-xs uppercase tracking-widest hover:bg-white disabled:opacity-50"
+                  className="flex-1 py-2 bg-[#6B8E6B] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#5A7A5A] disabled:opacity-50"
                 >
                   {isCreating ? 'Saving...' : 'Save'}
                 </button>
@@ -130,7 +130,7 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                     setShowLabelInput(false);
                     setLabel('');
                   }}
-                  className="px-3 py-2 bg-white/10 text-white/60 hover:text-white"
+                  className="px-3 py-2 bg-[#EDF5F0] text-[#8FA58F] hover:text-[#1E2E1E]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -140,12 +140,12 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
 
           {/* Version List */}
           {isLoading ? (
-            <div className="text-center py-4 text-white/40 text-sm flex items-center justify-center gap-2">
+            <div className="text-center py-4 text-[#8FA58F] text-sm flex items-center justify-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin" />
               Loading...
             </div>
           ) : versions.length === 0 ? (
-            <div className="text-center py-4 text-white/40 text-sm">
+            <div className="text-center py-4 text-[#8FA58F] text-sm">
               No versions saved yet
             </div>
           ) : (
@@ -153,21 +153,21 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
               {versions.map((version) => (
                 <div
                   key={version.id}
-                  className="p-3 bg-white/5 border border-white/10 hover:border-white/20 transition-colors duration-150"
+                  className="p-3 bg-white border border-[#D4E5D4] hover:border-[#6B8E6B] transition-colors duration-150"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-[#c5a47e] font-bold text-sm">
+                        <span className="text-[#6B8E6B] font-bold text-sm">
                           v{version.versionNumber}
                         </span>
                         {version.label && (
-                          <span className="text-white text-sm truncate">
+                          <span className="text-[#1E2E1E] text-sm truncate">
                             {version.label}
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 mt-1 text-[10px] text-white/40">
+                      <div className="flex items-center gap-1 mt-1 text-[10px] text-[#8FA58F]">
                         <Clock className="w-3 h-3" />
                         {formatDate(version.createdAt)}
                       </div>
@@ -181,13 +181,13 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                               setConfirmRestore(null);
                             }}
                             disabled={isRestoring}
-                            className="px-2 py-1 bg-[#c5a47e] text-black text-[10px] font-bold uppercase disabled:opacity-50"
+                            className="px-2 py-1 bg-[#6B8E6B] text-white text-[10px] font-bold uppercase disabled:opacity-50"
                           >
                             {isRestoring ? '...' : 'Confirm'}
                           </button>
                           <button
                             onClick={() => setConfirmRestore(null)}
-                            className="px-2 py-1 bg-white/10 text-white/60 text-[10px]"
+                            className="px-2 py-1 bg-[#EDF5F0] text-[#8FA58F] text-[10px]"
                           >
                             Cancel
                           </button>
@@ -196,14 +196,14 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                         <>
                           <button
                             onClick={() => setConfirmRestore(version.id)}
-                            className="p-1.5 text-white/40 hover:text-[#c5a47e] hover:bg-white/5 transition-colors duration-150"
+                            className="p-1.5 text-[#8FA58F] hover:text-[#6B8E6B] hover:bg-[#EDF5F0] transition-colors duration-150"
                             title="Restore this version"
                           >
                             <RotateCcw className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => onDeleteVersion(version.id)}
-                            className="p-1.5 text-white/40 hover:text-red-400 hover:bg-white/5 transition-colors duration-150"
+                            className="p-1.5 text-[#8FA58F] hover:text-red-400 hover:bg-[#EDF5F0] transition-colors duration-150"
                             title="Delete version"
                           >
                             <Trash2 className="w-4 h-4" />

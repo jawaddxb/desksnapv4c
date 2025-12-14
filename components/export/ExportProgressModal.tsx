@@ -51,14 +51,14 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
     <div className="fixed inset-0 z-[1000] flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#1E2E1E]/40 backdrop-blur-sm"
         onClick={isComplete || isError ? onClose : undefined}
       />
 
       {/* Modal */}
-      <div className="relative bg-[#111111] border border-white/20 w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white border border-[#D4E5D4] w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200 rounded-lg">
         {/* Header */}
-        <div className="p-6 border-b border-white/10">
+        <div className="p-6 border-b border-[#D4E5D4]">
           <div className="flex items-center gap-4">
             <div
               className="w-12 h-12 flex items-center justify-center"
@@ -73,10 +73,10 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
               )}
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-[#1E2E1E]">
                 {isComplete ? 'Export Complete' : isError ? 'Export Failed' : `Exporting to ${config.title}`}
               </h3>
-              <p className="text-sm text-white/60">
+              <p className="text-sm text-[#8FA58F]">
                 {progress.message || 'Processing your presentation...'}
               </p>
             </div>
@@ -86,7 +86,7 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
         {/* Progress Bar (only show when processing) */}
         {isProcessing && (
           <div className="px-6 py-4">
-            <div className="flex items-center justify-between text-sm text-white/60 mb-2">
+            <div className="flex items-center justify-between text-sm text-[#8FA58F] mb-2">
               <span>
                 {progress.phase === 'preparing' ? 'Preparing...' :
                  progress.phase === 'rendering' ? `Slide ${progress.currentSlide} of ${progress.totalSlides}` :
@@ -97,7 +97,7 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
               </span>
               <span>{percentage}%</span>
             </div>
-            <div className="h-2 bg-white/10 overflow-hidden">
+            <div className="h-2 bg-[#D4E5D4] overflow-hidden rounded-full">
               <div
                 className="h-full transition-all duration-300 ease-out"
                 style={{
@@ -112,7 +112,7 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
         {/* Spinner for preparing phase */}
         {progress.phase === 'preparing' && (
           <div className="flex justify-center py-4">
-            <Loader2 className="w-8 h-8 text-white/40 animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#8FA58F] animate-spin" />
           </div>
         )}
 
@@ -123,7 +123,7 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
               href={resultUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 bg-[#c5a47e] text-black font-bold uppercase tracking-widest text-xs hover:bg-white transition-colors"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-[#6B8E6B] text-white font-bold uppercase tracking-widest text-xs hover:bg-[#5A7A5A] transition-colors rounded"
             >
               <ExternalLink className="w-4 h-4" />
               Open in Google Slides
@@ -136,7 +136,7 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
           <div className="px-6 py-4">
             <button
               onClick={onRetry}
-              className="w-full py-3 bg-[#c5a47e] text-black font-bold uppercase tracking-widest text-xs hover:bg-white transition-colors"
+              className="w-full py-3 bg-[#6B8E6B] text-white font-bold uppercase tracking-widest text-xs hover:bg-[#5A7A5A] transition-colors rounded"
             >
               Try Again
             </button>
@@ -145,10 +145,10 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
 
         {/* Footer with close button */}
         {(isComplete || isError) && (
-          <div className="px-6 py-4 border-t border-white/10">
+          <div className="px-6 py-4 border-t border-[#D4E5D4]">
             <button
               onClick={onClose}
-              className="w-full py-3 bg-white/5 text-white/60 font-bold uppercase tracking-widest text-xs hover:bg-white/10 hover:text-white transition-colors"
+              className="w-full py-3 bg-[#EDF5F0] text-[#8FA58F] font-bold uppercase tracking-widest text-xs hover:bg-[#D4E5D4] hover:text-[#6B8E6B] transition-colors rounded"
             >
               Close
             </button>

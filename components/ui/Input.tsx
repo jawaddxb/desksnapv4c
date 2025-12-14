@@ -13,9 +13,9 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
 }
 
 const variantClasses: Record<InputVariant, string> = {
-  default: 'bg-black border border-white/20 focus:border-[#c5a47e]',
-  search: 'bg-white/5 border border-transparent focus:border-white/20',
-  minimal: 'bg-transparent border-b border-white/20 focus:border-[#c5a47e] rounded-none px-0',
+  default: 'bg-white border border-[#D4E5D4] focus:border-[#6B8E6B] focus:ring-2 focus:ring-[#6B8E6B]/20',
+  search: 'bg-[#EDF5F0] border border-transparent focus:border-[#D4E5D4] focus:bg-white',
+  minimal: 'bg-transparent border-b border-[#D4E5D4] focus:border-[#6B8E6B] rounded-none px-0',
 };
 
 const sizeClasses: Record<InputSize, string> = {
@@ -39,9 +39,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     ref
   ) => {
     const baseClasses =
-      'font-bold text-white outline-none transition-all duration-150 placeholder:text-white/40';
+      'font-medium text-[#1E2E1E] outline-none transition-all duration-150 placeholder:text-[#8FA58F] rounded-md';
 
-    const errorClasses = error ? 'border-red-500 focus:border-red-400' : '';
+    const errorClasses = error ? 'border-red-500 focus:border-red-400 focus:ring-red-500/20' : '';
 
     const combinedClasses = [
       baseClasses,
@@ -58,7 +58,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       return (
         <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
           {iconPosition === 'left' && (
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8FA58F]">
               {icon}
             </span>
           )}
@@ -68,7 +68,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {iconPosition === 'right' && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40">
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8FA58F]">
               {icon}
             </span>
           )}
@@ -101,9 +101,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref
   ) => {
     const baseClasses =
-      'p-3 text-sm font-bold text-white outline-none transition-all duration-150 placeholder:text-white/40 resize-none';
+      'p-3 text-sm font-medium text-[#1E2E1E] outline-none transition-all duration-150 placeholder:text-[#8FA58F] resize-none rounded-md';
 
-    const errorClasses = error ? 'border-red-500 focus:border-red-400' : '';
+    const errorClasses = error ? 'border-red-500 focus:border-red-400 focus:ring-red-500/20' : '';
 
     const combinedClasses = [
       baseClasses,

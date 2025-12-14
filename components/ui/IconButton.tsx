@@ -78,8 +78,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
         relative group flex items-center justify-center rounded-lg transition-all duration-200
         ${sizeClasses[size]}
         ${active
-          ? 'bg-zinc-900 text-white shadow-md scale-105'
-          : 'hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 hover:scale-105'
+          ? 'bg-[#6B8E6B] text-white shadow-md scale-105'
+          : 'hover:bg-[#EDF5F0] text-[#4A5D4A] hover:text-[#1E2E1E] hover:scale-105'
         }
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         ${className}
@@ -92,7 +92,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
         />
       )}
       {text && (
-        <span className={`text-[10px] font-bold ${active ? 'text-white' : 'text-current'}`}>
+        <span className={`text-[10px] font-medium ${active ? 'text-white' : 'text-current'}`}>
           {text}
         </span>
       )}
@@ -100,8 +100,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
       {/* Active Indicator Dot */}
       {showActiveDot && active && (
         <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500 border border-white" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5A7A5A] opacity-75" />
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#6B8E6B] border border-white" />
         </span>
       )}
     </button>

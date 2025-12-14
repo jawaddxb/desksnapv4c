@@ -42,12 +42,12 @@ export function ImageAgentRoute() {
 
   if (!isDebugModeAvailable) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#F5FAF7] text-[#1E2E1E] flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+          <AlertCircle className="w-12 h-12 text-amber-600 mx-auto mb-4" />
           <h1 className="text-xl font-bold mb-2">Debug Mode Not Available</h1>
-          <p className="text-white/50 mb-4">
-            Set <code className="bg-white/10 px-2 py-0.5 rounded">VITE_DEBUG_MODE=true</code> in your .env.local
+          <p className="text-[#8FA58F] mb-4">
+            Set <code className="bg-[#D4E5D4] px-2 py-0.5 rounded">VITE_DEBUG_MODE=true</code> in your .env.local
           </p>
           <Link
             to="/app"
@@ -62,23 +62,23 @@ export function ImageAgentRoute() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#F5FAF7] text-[#1E2E1E]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-white/10">
+      <header className="sticky top-0 z-50 bg-[#F5FAF7]/90 backdrop-blur-sm border-b border-[#D4E5D4]">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               to="/debug"
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 hover:bg-[#D4E5D4] rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
               <h1 className="text-lg font-bold flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-400" />
+                <Sparkles className="w-5 h-5 text-amber-600" />
                 Image Agent Inspector
               </h1>
-              <p className="text-xs text-white/50">View agent reasoning, validation scores, and prompt refinements</p>
+              <p className="text-xs text-[#8FA58F]">View agent reasoning, validation scores, and prompt refinements</p>
             </div>
           </div>
 
@@ -103,11 +103,11 @@ export function ImageAgentRoute() {
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Info Banner */}
-        <div className="mb-8 px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-3">
-          <Info className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+        <div className="mb-8 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+          <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm">
-            <strong className="text-amber-400">How This Works</strong>
-            <p className="text-white/70 mt-0.5">
+            <strong className="text-amber-700">How This Works</strong>
+            <p className="text-amber-600 mt-0.5">
               The Image Agent validates and refines prompts before image generation.
               Each slide goes through a validation loop (max 3 iterations) to ensure
               the prompt relates to the presentation topic. Prompts scoring below 70
@@ -119,15 +119,15 @@ export function ImageAgentRoute() {
         {/* No Logs State */}
         {presentationIds.length === 0 && (
           <div className="text-center py-16">
-            <Sparkles className="w-16 h-16 text-white/20 mx-auto mb-4" />
+            <Sparkles className="w-16 h-16 text-[#D4E5D4] mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">No Agent Logs Available</h2>
-            <p className="text-white/50 max-w-md mx-auto mb-6">
+            <p className="text-[#8FA58F] max-w-md mx-auto mb-6">
               Agent logs will appear here after you generate images for a presentation.
               The agent validates and refines image prompts to ensure they match your topic.
             </p>
             <Link
               to="/app"
-              className="px-4 py-2 bg-[#c5a47e] text-black rounded-lg font-medium inline-flex items-center gap-2"
+              className="px-4 py-2 bg-[#6B8E6B] text-white rounded-lg font-medium inline-flex items-center gap-2 hover:bg-[#5A7A5A] transition-colors"
             >
               Create a Presentation
             </Link>
@@ -137,7 +137,7 @@ export function ImageAgentRoute() {
         {/* Presentation Selector */}
         {presentationIds.length > 0 && (
           <div className="mb-6">
-            <label className="text-sm text-white/50 mb-2 block">Select Presentation</label>
+            <label className="text-sm text-[#8FA58F] mb-2 block">Select Presentation</label>
             <div className="flex gap-2 flex-wrap">
               {presentationIds.map((id) => {
                 const logs = agentLogs.get(id) || [];
@@ -149,8 +149,8 @@ export function ImageAgentRoute() {
                     onClick={() => setSelectedPresentationId(id)}
                     className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${
                       selectedPresentationId === id
-                        ? 'bg-[#c5a47e] text-black'
-                        : 'bg-white/10 hover:bg-white/20'
+                        ? 'bg-[#6B8E6B] text-white'
+                        : 'bg-white hover:bg-[#D4E5D4] border border-[#D4E5D4] text-[#1E2E1E]'
                     }`}
                   >
                     <FileText className="w-4 h-4" />
@@ -173,9 +173,9 @@ export function ImageAgentRoute() {
 
         {/* Empty State for Selected Presentation */}
         {selectedPresentationId && selectedLogs.length === 0 && (
-          <div className="text-center py-12 bg-white/5 rounded-xl">
-            <RefreshCw className="w-12 h-12 text-white/20 mx-auto mb-4" />
-            <p className="text-white/50">No logs found for this presentation</p>
+          <div className="text-center py-12 bg-white rounded-xl border border-[#D4E5D4]">
+            <RefreshCw className="w-12 h-12 text-[#D4E5D4] mx-auto mb-4" />
+            <p className="text-[#8FA58F]">No logs found for this presentation</p>
           </div>
         )}
       </main>

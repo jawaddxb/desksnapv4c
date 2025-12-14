@@ -72,24 +72,24 @@ function SystemInfo() {
   ];
 
   return (
-    <div className="bg-white/5 rounded-xl p-6">
-      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-        <Monitor className="w-5 h-5 text-[#c5a47e]" />
+    <div className="bg-white rounded-xl p-6 border border-[#D4E5D4]">
+      <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-[#1E2E1E]">
+        <Monitor className="w-5 h-5 text-[#6B8E6B]" />
         System Information
       </h2>
 
       <div className="space-y-3">
         {info.map(({ label, value }) => (
           <div key={label} className="flex justify-between text-sm">
-            <span className="text-white/50">{label}</span>
-            <span className="font-mono">{value}</span>
+            <span className="text-[#8FA58F]">{label}</span>
+            <span className="font-mono text-[#1E2E1E]">{value}</span>
           </div>
         ))}
 
         {/* API Status */}
         <div className="flex justify-between text-sm">
-          <span className="text-white/50">API Status</span>
-          <span className="flex items-center gap-1.5">
+          <span className="text-[#8FA58F]">API Status</span>
+          <span className="flex items-center gap-1.5 text-[#1E2E1E]">
             {apiStatus === 'checking' && (
               <>
                 <RefreshCw className="w-3 h-3 animate-spin" />
@@ -98,14 +98,14 @@ function SystemInfo() {
             )}
             {apiStatus === 'online' && (
               <>
-                <Wifi className="w-3 h-3 text-green-400" />
-                <span className="text-green-400">Online</span>
+                <Wifi className="w-3 h-3 text-green-600" />
+                <span className="text-green-600">Online</span>
               </>
             )}
             {apiStatus === 'offline' && (
               <>
-                <WifiOff className="w-3 h-3 text-red-400" />
-                <span className="text-red-400">Offline</span>
+                <WifiOff className="w-3 h-3 text-red-600" />
+                <span className="text-red-600">Offline</span>
               </>
             )}
           </span>
@@ -151,50 +151,50 @@ function QuickActions() {
   };
 
   return (
-    <div className="bg-white/5 rounded-xl p-6">
-      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-        <Settings className="w-5 h-5 text-[#c5a47e]" />
+    <div className="bg-white rounded-xl p-6 border border-[#D4E5D4]">
+      <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-[#1E2E1E]">
+        <Settings className="w-5 h-5 text-[#6B8E6B]" />
         Quick Actions
       </h2>
 
       <div className="space-y-3">
         <button
           onClick={clearCache}
-          className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-left flex items-center gap-3 transition-colors"
+          className="w-full px-4 py-2 bg-[#F5FAF7] hover:bg-[#D4E5D4] rounded-lg text-left flex items-center gap-3 transition-colors border border-[#D4E5D4]"
         >
-          <Trash2 className="w-4 h-4 text-amber-400" />
+          <Trash2 className="w-4 h-4 text-amber-600" />
           <div>
-            <div className="font-medium">Clear Cache</div>
-            <div className="text-xs text-white/50">Remove localStorage & sessionStorage</div>
+            <div className="font-medium text-[#1E2E1E]">Clear Cache</div>
+            <div className="text-xs text-[#8FA58F]">Remove localStorage & sessionStorage</div>
           </div>
         </button>
 
         <button
           onClick={clearIndexedDB}
-          className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-left flex items-center gap-3 transition-colors"
+          className="w-full px-4 py-2 bg-[#F5FAF7] hover:bg-[#D4E5D4] rounded-lg text-left flex items-center gap-3 transition-colors border border-[#D4E5D4]"
         >
-          <Database className="w-4 h-4 text-amber-400" />
+          <Database className="w-4 h-4 text-amber-600" />
           <div>
-            <div className="font-medium">Clear IndexedDB</div>
-            <div className="text-xs text-white/50">Remove all stored presentations</div>
+            <div className="font-medium text-[#1E2E1E]">Clear IndexedDB</div>
+            <div className="text-xs text-[#8FA58F]">Remove all stored presentations</div>
           </div>
         </button>
 
         <button
           onClick={reloadPage}
-          className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-left flex items-center gap-3 transition-colors"
+          className="w-full px-4 py-2 bg-[#F5FAF7] hover:bg-[#D4E5D4] rounded-lg text-left flex items-center gap-3 transition-colors border border-[#D4E5D4]"
         >
-          <RefreshCw className="w-4 h-4 text-blue-400" />
+          <RefreshCw className="w-4 h-4 text-blue-600" />
           <div>
-            <div className="font-medium">Reload Page</div>
-            <div className="text-xs text-white/50">Full page refresh</div>
+            <div className="font-medium text-[#1E2E1E]">Reload Page</div>
+            <div className="text-xs text-[#8FA58F]">Full page refresh</div>
           </div>
         </button>
       </div>
 
       {/* Status message */}
       {actionStatus && (
-        <div className="mt-4 px-3 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm flex items-center gap-2">
+        <div className="mt-4 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm flex items-center gap-2 border border-green-200">
           <CheckCircle className="w-4 h-4" />
           {actionStatus}
         </div>
@@ -279,12 +279,12 @@ function ServerDataInspector() {
 
   if (!isAuthenticated) {
     return (
-      <div className="bg-white/5 rounded-xl p-6">
-        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-          <Server className="w-5 h-5 text-[#c5a47e]" />
+      <div className="bg-white rounded-xl p-6 border border-[#D4E5D4]">
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-[#1E2E1E]">
+          <Server className="w-5 h-5 text-[#6B8E6B]" />
           Server Data Inspector
         </h2>
-        <div className="text-center py-8 text-white/50">
+        <div className="text-center py-8 text-[#8FA58F]">
           <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
           <p>Sign in to inspect server data</p>
         </div>
@@ -301,16 +301,16 @@ function ServerDataInspector() {
   ];
 
   return (
-    <div className="bg-white/5 rounded-xl p-6">
+    <div className="bg-white rounded-xl p-6 border border-[#D4E5D4]">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold flex items-center gap-2">
-          <Server className="w-5 h-5 text-[#c5a47e]" />
+        <h2 className="text-lg font-bold flex items-center gap-2 text-[#1E2E1E]">
+          <Server className="w-5 h-5 text-[#6B8E6B]" />
           Server Data Inspector
         </h2>
         <button
           onClick={() => fetchData(activeTab)}
           disabled={loading}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+          className="p-2 hover:bg-[#D4E5D4] rounded-lg transition-colors disabled:opacity-50 text-[#1E2E1E]"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -324,8 +324,8 @@ function ServerDataInspector() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 transition-colors ${
               activeTab === tab.id
-                ? 'bg-[#c5a47e] text-black'
-                : 'bg-white/10 hover:bg-white/20'
+                ? 'bg-[#6B8E6B] text-white'
+                : 'bg-[#F5FAF7] hover:bg-[#D4E5D4] border border-[#D4E5D4] text-[#1E2E1E]'
             }`}
           >
             <tab.icon className="w-3.5 h-3.5" />
@@ -336,7 +336,7 @@ function ServerDataInspector() {
 
       {/* Error */}
       {error && (
-        <div className="mb-4 px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm flex items-center gap-2">
+        <div className="mb-4 px-3 py-2 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2 border border-red-200">
           <AlertCircle className="w-4 h-4" />
           {error}
         </div>
@@ -345,7 +345,7 @@ function ServerDataInspector() {
       {/* Content */}
       <div className="max-h-96 overflow-y-auto">
         {loading && !error && (
-          <div className="text-center py-8 text-white/50">
+          <div className="text-center py-8 text-[#8FA58F]">
             <RefreshCw className="w-8 h-8 mx-auto mb-3 animate-spin" />
             <p>Loading...</p>
           </div>
@@ -354,49 +354,49 @@ function ServerDataInspector() {
         {/* My Data Tab */}
         {activeTab === 'me' && meData && !loading && (
           <div className="space-y-4">
-            <div className="bg-white/5 rounded-lg p-4">
-              <h3 className="font-semibold mb-2 text-[#c5a47e]">Current User</h3>
+            <div className="bg-[#F5FAF7] rounded-lg p-4 border border-[#D4E5D4]">
+              <h3 className="font-semibold mb-2 text-[#6B8E6B]">Current User</h3>
               <div className="space-y-1 text-sm font-mono">
                 <div className="flex justify-between">
-                  <span className="text-white/50">ID:</span>
-                  <span className="flex items-center gap-1">
+                  <span className="text-[#8FA58F]">ID:</span>
+                  <span className="flex items-center gap-1 text-[#1E2E1E]">
                     {meData.user.id.slice(0, 8)}...
-                    <button onClick={() => copyToClipboard(meData.user.id)} className="hover:text-[#c5a47e]">
+                    <button onClick={() => copyToClipboard(meData.user.id)} className="hover:text-[#6B8E6B]">
                       <Copy className="w-3 h-3" />
                     </button>
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/50">Email:</span>
-                  <span>{meData.user.email}</span>
+                  <span className="text-[#8FA58F]">Email:</span>
+                  <span className="text-[#1E2E1E]">{meData.user.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/50">Name:</span>
-                  <span>{meData.user.name || 'Not set'}</span>
+                  <span className="text-[#8FA58F]">Name:</span>
+                  <span className="text-[#1E2E1E]">{meData.user.name || 'Not set'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/50">Provider:</span>
-                  <span>{meData.user.auth_provider}</span>
+                  <span className="text-[#8FA58F]">Provider:</span>
+                  <span className="text-[#1E2E1E]">{meData.user.auth_provider}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/50">Created:</span>
-                  <span>{new Date(meData.user.created_at).toLocaleDateString()}</span>
+                  <span className="text-[#8FA58F]">Created:</span>
+                  <span className="text-[#1E2E1E]">{new Date(meData.user.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/5 rounded-lg p-4">
-              <h3 className="font-semibold mb-2 text-[#c5a47e]">
+            <div className="bg-[#F5FAF7] rounded-lg p-4 border border-[#D4E5D4]">
+              <h3 className="font-semibold mb-2 text-[#6B8E6B]">
                 My Presentations ({meData.presentations.count})
               </h3>
               {meData.presentations.items.length === 0 ? (
-                <p className="text-white/50 text-sm">No presentations found for this user</p>
+                <p className="text-[#8FA58F] text-sm">No presentations found for this user</p>
               ) : (
                 <div className="space-y-2">
                   {meData.presentations.items.map((p) => (
-                    <div key={p.id} className="text-sm bg-white/5 rounded p-2">
-                      <div className="font-medium">{p.topic}</div>
-                      <div className="text-white/50 text-xs">
+                    <div key={p.id} className="text-sm bg-white rounded p-2 border border-[#D4E5D4]">
+                      <div className="font-medium text-[#1E2E1E]">{p.topic}</div>
+                      <div className="text-[#8FA58F] text-xs">
                         {p.slide_count} slides | {new Date(p.created_at).toLocaleDateString()}
                       </div>
                     </div>
@@ -410,25 +410,25 @@ function ServerDataInspector() {
         {/* All Users Tab */}
         {activeTab === 'users' && usersData && !loading && (
           <div className="space-y-2">
-            <div className="text-sm text-white/50 mb-2">
+            <div className="text-sm text-[#8FA58F] mb-2">
               Total: {usersData.total} users | Your ID: {usersData.current_user_id.slice(0, 8)}...
             </div>
             {usersData.users.map((u) => (
               <div
                 key={u.id}
                 className={`text-sm rounded p-3 ${
-                  u.is_current_user ? 'bg-[#c5a47e]/20 border border-[#c5a47e]/50' : 'bg-white/5'
+                  u.is_current_user ? 'bg-[#6B8E6B]/20 border border-[#6B8E6B]' : 'bg-[#F5FAF7] border border-[#D4E5D4]'
                 }`}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-medium flex items-center gap-2">
+                    <div className="font-medium flex items-center gap-2 text-[#1E2E1E]">
                       {u.email}
                       {u.is_current_user && (
-                        <span className="text-xs bg-[#c5a47e] text-black px-1.5 py-0.5 rounded">YOU</span>
+                        <span className="text-xs bg-[#6B8E6B] text-white px-1.5 py-0.5 rounded">YOU</span>
                       )}
                     </div>
-                    <div className="text-white/50 text-xs">
+                    <div className="text-[#8FA58F] text-xs">
                       ID: {u.id.slice(0, 8)}... | {u.auth_provider} | {u.presentation_count} decks
                     </div>
                   </div>
@@ -441,24 +441,24 @@ function ServerDataInspector() {
         {/* All Presentations Tab */}
         {activeTab === 'presentations' && presentationsData && !loading && (
           <div className="space-y-2">
-            <div className="text-sm text-white/50 mb-2">
+            <div className="text-sm text-[#8FA58F] mb-2">
               Total: {presentationsData.total} presentations
             </div>
             {presentationsData.presentations.map((p) => (
               <div
                 key={p.id}
                 className={`text-sm rounded p-3 ${
-                  p.owner?.is_current_user ? 'bg-[#c5a47e]/20 border border-[#c5a47e]/50' : 'bg-white/5'
+                  p.owner?.is_current_user ? 'bg-[#6B8E6B]/20 border border-[#6B8E6B]' : 'bg-[#F5FAF7] border border-[#D4E5D4]'
                 }`}
               >
-                <div className="font-medium">{p.topic}</div>
-                <div className="text-white/50 text-xs mt-1">
+                <div className="font-medium text-[#1E2E1E]">{p.topic}</div>
+                <div className="text-[#8FA58F] text-xs mt-1">
                   {p.slide_count} slides | Theme: {p.theme_id || 'default'}
                 </div>
-                <div className="text-white/50 text-xs">
+                <div className="text-[#8FA58F] text-xs">
                   Owner: {p.owner?.email || 'Unknown'}
                   {p.owner?.is_current_user && (
-                    <span className="ml-1 text-[#c5a47e]">(you)</span>
+                    <span className="ml-1 text-[#6B8E6B]">(you)</span>
                   )}
                 </div>
               </div>
@@ -475,45 +475,45 @@ function ServerDataInspector() {
                 value={lookupEmail}
                 onChange={(e) => setLookupEmail(e.target.value)}
                 placeholder="Enter email address..."
-                className="flex-1 px-3 py-2 bg-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#c5a47e]"
+                className="flex-1 px-3 py-2 bg-white border border-[#D4E5D4] rounded-lg text-sm text-[#1E2E1E] placeholder:text-[#8FA58F] focus:outline-none focus:ring-2 focus:ring-[#6B8E6B]"
                 onKeyDown={(e) => e.key === 'Enter' && handleLookup()}
               />
               <button
                 onClick={handleLookup}
                 disabled={loading || !lookupEmail.trim()}
-                className="px-4 py-2 bg-[#c5a47e] text-black rounded-lg text-sm font-medium disabled:opacity-50"
+                className="px-4 py-2 bg-[#6B8E6B] text-white rounded-lg text-sm font-medium disabled:opacity-50 hover:bg-[#5A7A5A] transition-colors"
               >
                 Search
               </button>
             </div>
 
             {lookupData && (
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-[#F5FAF7] rounded-lg p-4 border border-[#D4E5D4]">
                 {!lookupData.found ? (
-                  <p className="text-amber-400 text-sm">{lookupData.message}</p>
+                  <p className="text-amber-600 text-sm">{lookupData.message}</p>
                 ) : (
                   <div className="space-y-3">
                     <div>
-                      <h4 className="font-semibold text-[#c5a47e]">User Found</h4>
-                      <div className="text-sm mt-1 space-y-1">
+                      <h4 className="font-semibold text-[#6B8E6B]">User Found</h4>
+                      <div className="text-sm mt-1 space-y-1 text-[#1E2E1E]">
                         <div>Email: {lookupData.user?.email}</div>
                         <div>ID: {lookupData.user?.id}</div>
                         <div>Provider: {lookupData.user?.auth_provider}</div>
                         {lookupData.is_current_user && (
-                          <div className="text-[#c5a47e]">This is your account</div>
+                          <div className="text-[#6B8E6B]">This is your account</div>
                         )}
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-[#c5a47e]">
+                      <h4 className="font-semibold text-[#6B8E6B]">
                         Presentations ({lookupData.presentations?.length || 0})
                       </h4>
                       {lookupData.presentations?.length === 0 ? (
-                        <p className="text-white/50 text-sm">No presentations</p>
+                        <p className="text-[#8FA58F] text-sm">No presentations</p>
                       ) : (
                         <div className="space-y-1 mt-1">
                           {lookupData.presentations?.map((p) => (
-                            <div key={p.id} className="text-sm bg-white/5 rounded p-2">
+                            <div key={p.id} className="text-sm bg-white rounded p-2 border border-[#D4E5D4] text-[#1E2E1E]">
                               {p.topic} ({p.slide_count} slides)
                             </div>
                           ))}
@@ -531,23 +531,23 @@ function ServerDataInspector() {
         {activeTab === 'stats' && statsData && !loading && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/5 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-[#c5a47e]">{statsData.totals.users}</div>
-                <div className="text-sm text-white/50">Total Users</div>
+              <div className="bg-[#F5FAF7] rounded-lg p-4 text-center border border-[#D4E5D4]">
+                <div className="text-2xl font-bold text-[#6B8E6B]">{statsData.totals.users}</div>
+                <div className="text-sm text-[#8FA58F]">Total Users</div>
               </div>
-              <div className="bg-white/5 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-[#c5a47e]">{statsData.totals.presentations}</div>
-                <div className="text-sm text-white/50">Total Presentations</div>
+              <div className="bg-[#F5FAF7] rounded-lg p-4 text-center border border-[#D4E5D4]">
+                <div className="text-2xl font-bold text-[#6B8E6B]">{statsData.totals.presentations}</div>
+                <div className="text-sm text-[#8FA58F]">Total Presentations</div>
               </div>
             </div>
 
-            <div className="bg-white/5 rounded-lg p-4">
-              <h4 className="font-semibold mb-2 text-[#c5a47e]">Top Users by Presentations</h4>
+            <div className="bg-[#F5FAF7] rounded-lg p-4 border border-[#D4E5D4]">
+              <h4 className="font-semibold mb-2 text-[#6B8E6B]">Top Users by Presentations</h4>
               <div className="space-y-2">
                 {statsData.top_users_by_presentations.map((u, i) => (
                   <div
                     key={u.id}
-                    className={`flex justify-between text-sm ${u.is_current_user ? 'text-[#c5a47e]' : ''}`}
+                    className={`flex justify-between text-sm ${u.is_current_user ? 'text-[#6B8E6B]' : 'text-[#1E2E1E]'}`}
                   >
                     <span>
                       {i + 1}. {u.email} {u.is_current_user && '(you)'}
@@ -593,8 +593,8 @@ function DebugTools() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold flex items-center gap-2">
-        <Bug className="w-5 h-5 text-[#c5a47e]" />
+      <h2 className="text-lg font-bold flex items-center gap-2 text-[#1E2E1E]">
+        <Bug className="w-5 h-5 text-[#6B8E6B]" />
         Debug Tools
       </h2>
 
@@ -603,17 +603,17 @@ function DebugTools() {
           <Link
             key={tool.to}
             to={tool.to}
-            className="group bg-white/5 hover:bg-white/10 rounded-xl p-6 transition-colors"
+            className="group bg-white hover:bg-[#F5FAF7] rounded-xl p-6 transition-colors border border-[#D4E5D4]"
           >
             <div className="flex items-start gap-4">
-              <div className={`p-3 rounded-lg bg-white/10 ${tool.color}`}>
+              <div className={`p-3 rounded-lg bg-[#F5FAF7] ${tool.color}`}>
                 <tool.icon className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold group-hover:text-[#c5a47e] transition-colors">
+                <h3 className="font-bold group-hover:text-[#6B8E6B] transition-colors text-[#1E2E1E]">
                   {tool.title}
                 </h3>
-                <p className="text-sm text-white/50 mt-1">{tool.description}</p>
+                <p className="text-sm text-[#8FA58F] mt-1">{tool.description}</p>
               </div>
             </div>
           </Link>
@@ -630,16 +630,16 @@ export function DebugRoute() {
 
   if (!isDebugModeAvailable) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#F5FAF7] text-[#1E2E1E] flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+          <AlertCircle className="w-12 h-12 text-amber-600 mx-auto mb-4" />
           <h1 className="text-xl font-bold mb-2">Debug Mode Not Available</h1>
-          <p className="text-white/50 mb-4">
-            Set <code className="bg-white/10 px-2 py-0.5 rounded">VITE_DEBUG_MODE=true</code> in your .env.local
+          <p className="text-[#8FA58F] mb-4">
+            Set <code className="bg-[#D4E5D4] px-2 py-0.5 rounded">VITE_DEBUG_MODE=true</code> in your .env.local
           </p>
           <Link
             to="/app"
-            className="px-4 py-2 bg-[#c5a47e] text-black rounded-lg font-medium inline-flex items-center gap-2"
+            className="px-4 py-2 bg-[#6B8E6B] text-white rounded-lg font-medium inline-flex items-center gap-2 hover:bg-[#5A7A5A] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to App
@@ -650,33 +650,33 @@ export function DebugRoute() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#F5FAF7] text-[#1E2E1E]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-white/10">
+      <header className="sticky top-0 z-50 bg-[#F5FAF7]/90 backdrop-blur-sm border-b border-[#D4E5D4]">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               to="/app"
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 hover:bg-[#D4E5D4] rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
               <h1 className="text-lg font-bold flex items-center gap-2">
-                <Bug className="w-5 h-5 text-[#c5a47e]" />
+                <Bug className="w-5 h-5 text-[#6B8E6B]" />
                 Debug Dashboard
               </h1>
-              <p className="text-xs text-white/50">Developer tools and diagnostics</p>
+              <p className="text-xs text-[#8FA58F]">Developer tools and diagnostics</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 cursor-pointer">
-              <span className="text-sm text-white/50">Debug UI</span>
+              <span className="text-sm text-[#8FA58F]">Debug UI</span>
               <button
                 onClick={actions.toggleDebugUI}
                 className={`relative w-10 h-5 rounded-full transition-colors ${
-                  isDebugUIEnabled ? 'bg-[#c5a47e]' : 'bg-white/20'
+                  isDebugUIEnabled ? 'bg-[#6B8E6B]' : 'bg-[#D4E5D4]'
                 }`}
               >
                 <span
@@ -693,11 +693,11 @@ export function DebugRoute() {
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Warning Banner */}
-        <div className="mb-8 px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-3">
-          <Info className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+        <div className="mb-8 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+          <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm">
-            <strong className="text-amber-400">Development Only</strong>
-            <p className="text-white/70 mt-0.5">
+            <strong className="text-amber-700">Development Only</strong>
+            <p className="text-amber-600 mt-0.5">
               These tools are only available when VITE_DEBUG_MODE is enabled.
               They will not appear in production builds.
             </p>

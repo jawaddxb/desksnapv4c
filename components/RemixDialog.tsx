@@ -65,21 +65,21 @@ export const RemixDialog: React.FC<RemixDialogProps> = ({
       }
     >
       {/* Description */}
-      <p className="text-sm text-white/70">
+      <p className="text-sm text-[#4A5D4A]">
         Remix applies creative variations (lighting, composition, mood) to all images.
         Optionally select a new theme to change the visual style.
       </p>
 
       {/* Current Theme Indicator */}
-      <div className="flex items-center gap-3 p-3 bg-black/50 border border-white/10">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+      <div className="flex items-center gap-3 p-3 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-[#8FA58F]">
           Current:
         </span>
-        <span className="text-sm font-bold text-white">{currentTheme?.name}</span>
+        <span className="text-sm font-bold text-[#1E2E1E]">{currentTheme?.name}</span>
         {hasThemeChanged && (
           <>
-            <span className="text-white/40">→</span>
-            <span className="text-sm font-bold text-[#c5a47e]">{selectedTheme?.name}</span>
+            <span className="text-[#8FA58F]">→</span>
+            <span className="text-sm font-bold text-[#6B8E6B]">{selectedTheme?.name}</span>
           </>
         )}
       </div>

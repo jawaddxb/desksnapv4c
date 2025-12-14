@@ -84,8 +84,8 @@ export const DiagramBlock: React.FC<BlockProps<DiagramBlockType>> = ({
           >
             <p className="font-medium mb-2">Unable to render diagram</p>
             <pre
-              className="text-xs bg-black/5 p-2 rounded overflow-auto max-w-full"
-              style={{ color: styles.text }}
+              className="text-xs p-2 rounded overflow-auto max-w-full"
+              style={{ color: styles.text, background: `${styles.accent}10` }}
             >
               {block.mermaid}
             </pre>

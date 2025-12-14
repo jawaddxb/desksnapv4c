@@ -93,29 +93,29 @@ export const DraftSetupPanel: React.FC<DraftSetupPanelProps> = ({
   const categoryList = suggestion ? CATEGORY_ORDER : CATEGORY_ORDER.filter(c => c !== 'recommended');
 
   return (
-    <div className="flex flex-col h-full bg-[#111111] border-l border-white/10">
+    <div className="flex flex-col h-full bg-white border-l border-[#D4E5D4]">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/10 bg-black">
+      <div className="px-4 py-3 border-b border-[#D4E5D4] bg-[#F5FAF7]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 border border-[#c5a47e] flex items-center justify-center">
-            <svg className="w-4 h-4 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
+          <div className="w-8 h-8 border border-[#6B8E6B] flex items-center justify-center">
+            <svg className="w-4 h-4 text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
             </svg>
           </div>
           <div>
-            <h3 className="font-bold text-white uppercase tracking-wide text-sm">Setup Your Draft</h3>
-            <p className="text-xs text-white/50">Choose content depth and visual style</p>
+            <h3 className="font-bold text-[#1E2E1E] uppercase tracking-wide text-sm">Setup Your Draft</h3>
+            <p className="text-xs text-[#8FA58F]">Choose content depth and visual style</p>
           </div>
         </div>
       </div>
 
       {/* Step 1: Content Density */}
-      <div className="px-4 py-4 border-b border-white/10">
+      <div className="px-4 py-4 border-b border-[#D4E5D4]">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-5 h-5 bg-[#c5a47e] text-black text-xs font-bold flex items-center justify-center">
+          <div className="w-5 h-5 bg-[#6B8E6B] text-white text-xs font-bold flex items-center justify-center">
             1
           </div>
-          <span className="text-xs text-white/60 uppercase tracking-wider font-bold">Content Depth</span>
+          <span className="text-xs text-[#8FA58F] uppercase tracking-wider font-bold">Content Depth</span>
         </div>
         <ContentDensitySelector
           value={contentDensity}
@@ -127,24 +127,24 @@ export const DraftSetupPanel: React.FC<DraftSetupPanelProps> = ({
       <div className="flex-1 flex flex-col min-h-0">
         <div className="px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[#c5a47e] text-black text-xs font-bold flex items-center justify-center">
+            <div className="w-5 h-5 bg-[#6B8E6B] text-white text-xs font-bold flex items-center justify-center">
               2
             </div>
-            <span className="text-xs text-white/60 uppercase tracking-wider font-bold">Visual Style</span>
+            <span className="text-xs text-[#8FA58F] uppercase tracking-wider font-bold">Visual Style</span>
           </div>
         </div>
 
         {/* AI Recommendation Banner (if available) */}
         {suggestion && (
           <div className="px-4 pb-3">
-            <div className="p-3 bg-[#c5a47e]/10 border border-[#c5a47e]/20">
+            <div className="p-3 bg-[#6B8E6B]/10 border border-[#6B8E6B]/20">
               <div className="flex items-start gap-2">
-                <svg className="w-4 h-4 text-[#c5a47e] mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-4 h-4 text-[#6B8E6B] mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
                 </svg>
                 <div>
-                  <p className="text-xs text-[#c5a47e] uppercase tracking-wider font-bold mb-0.5">AI Recommendation</p>
-                  <p className="text-xs text-white/70">{suggestion.reasoning}</p>
+                  <p className="text-xs text-[#6B8E6B] uppercase tracking-wider font-bold mb-0.5">AI Recommendation</p>
+                  <p className="text-xs text-[#8FA58F]">{suggestion.reasoning}</p>
                 </div>
               </div>
             </div>
@@ -152,15 +152,15 @@ export const DraftSetupPanel: React.FC<DraftSetupPanelProps> = ({
         )}
 
         {/* Category Tabs */}
-        <div className="flex overflow-x-auto border-b border-white/10 bg-black/50 scrollbar-hide">
+        <div className="flex overflow-x-auto border-b border-[#D4E5D4] bg-[#F5FAF7] scrollbar-hide">
           {categoryList.map(cat => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors flex-shrink-0 ${
                 activeCategory === cat
-                  ? 'text-[#c5a47e] border-b-2 border-[#c5a47e] bg-white/5'
-                  : 'text-white/50 hover:text-white hover:bg-white/5'
+                  ? 'text-[#6B8E6B] border-b-2 border-[#6B8E6B] bg-[#6B8E6B]/10'
+                  : 'text-[#8FA58F] hover:text-[#1E2E1E] hover:bg-[#EDF5F0]'
               }`}
             >
               {CATEGORY_LABELS[cat]}
@@ -185,11 +185,11 @@ export const DraftSetupPanel: React.FC<DraftSetupPanelProps> = ({
       </div>
 
       {/* Selected Theme Preview */}
-      <div className="px-4 py-3 border-t border-white/10 bg-black/50">
+      <div className="px-4 py-3 border-t border-[#D4E5D4] bg-[#F5FAF7]">
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-white/50 uppercase tracking-wider">Selected</p>
-            <p className="text-sm font-bold text-white truncate">{selectedTheme?.name}</p>
+            <p className="text-xs text-[#8FA58F] uppercase tracking-wider">Selected</p>
+            <p className="text-sm font-bold text-[#1E2E1E] truncate">{selectedTheme?.name}</p>
           </div>
           <div
             className="w-16 h-10 flex-shrink-0 ml-3 relative overflow-hidden"
@@ -219,14 +219,14 @@ export const DraftSetupPanel: React.FC<DraftSetupPanelProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="p-4 border-t border-white/10 bg-black">
+      <div className="p-4 border-t border-[#D4E5D4] bg-[#F5FAF7]">
         <div className="flex gap-2 mb-2">
           {!hideBack && (
             <button
               onClick={onBack}
               disabled={isLoading}
-              className="px-4 py-3 border border-white/20 text-white/60 text-xs font-bold uppercase tracking-wider
-                         hover:border-white/40 hover:text-white transition-colors disabled:opacity-50"
+              className="px-4 py-3 border border-[#D4E5D4] text-[#8FA58F] text-xs font-bold uppercase tracking-wider
+                         hover:border-[#6B8E6B]/30 hover:text-[#1E2E1E] transition-colors disabled:opacity-50"
             >
               Back
             </button>
@@ -236,14 +236,14 @@ export const DraftSetupPanel: React.FC<DraftSetupPanelProps> = ({
             disabled={isLoading}
             className={`flex-1 flex items-center justify-center gap-2 py-3
                        ${draftOnly
-                         ? 'bg-[#c5a47e] text-black hover:bg-white'
-                         : 'border border-[#c5a47e] text-[#c5a47e] hover:bg-[#c5a47e]/10'
+                         ? 'bg-[#6B8E6B] text-white hover:bg-[#5A7A5A]'
+                         : 'border border-[#6B8E6B] text-[#6B8E6B] hover:bg-[#6B8E6B]/10'
                        }
                        font-bold text-xs uppercase tracking-wider transition-colors disabled:opacity-50`}
           >
             {isLoading ? (
               <>
-                <div className={`w-4 h-4 border-2 ${draftOnly ? 'border-black/30 border-t-black' : 'border-[#c5a47e]/30 border-t-[#c5a47e]'} rounded-full animate-spin`} />
+                <div className={`w-4 h-4 border-2 ${draftOnly ? 'border-white/30 border-t-white' : 'border-[#6B8E6B]/30 border-t-[#6B8E6B]'} rounded-full animate-spin`} />
                 Preparing...
               </>
             ) : (
@@ -261,12 +261,12 @@ export const DraftSetupPanel: React.FC<DraftSetupPanelProps> = ({
             <button
               onClick={() => onConfirm('direct')}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-[#c5a47e] text-black
-                         font-bold text-xs uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-[#6B8E6B] text-white
+                         font-bold text-xs uppercase tracking-wider hover:bg-[#5A7A5A] transition-colors disabled:opacity-50"
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Building...
                 </>
               ) : (
@@ -278,7 +278,7 @@ export const DraftSetupPanel: React.FC<DraftSetupPanelProps> = ({
                 </>
               )}
             </button>
-            <p className="text-[10px] text-white/40 text-center mt-2">
+            <p className="text-[10px] text-[#8FA58F] text-center mt-2">
               Review Draft lets you preview and edit slides before finalizing
             </p>
           </>
@@ -299,8 +299,8 @@ const ThemeCard: React.FC<{
     onClick={onClick}
     className={`relative text-left p-2 transition-all duration-150 ${
       isSelected
-        ? 'ring-2 ring-[#c5a47e] bg-white/5'
-        : 'border border-white/10 hover:border-white/30 hover:bg-white/5'
+        ? 'ring-2 ring-[#6B8E6B] bg-[#6B8E6B]/10'
+        : 'border border-[#D4E5D4] hover:border-[#6B8E6B]/30 hover:bg-[#EDF5F0]'
     }`}
   >
     {/* Color Preview */}
@@ -332,12 +332,12 @@ const ThemeCard: React.FC<{
 
       {/* Badges */}
       {isRecommended && (
-        <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-[#c5a47e] text-black text-[8px] font-bold uppercase tracking-wider">
+        <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-[#6B8E6B] text-white text-[8px] font-bold uppercase tracking-wider">
           AI Pick
         </div>
       )}
       {isSelected && (
-        <div className="absolute top-1 right-1 w-4 h-4 bg-[#c5a47e] text-black flex items-center justify-center">
+        <div className="absolute top-1 right-1 w-4 h-4 bg-[#6B8E6B] text-white flex items-center justify-center">
           <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor" strokeWidth={3}>
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
           </svg>
@@ -346,8 +346,8 @@ const ThemeCard: React.FC<{
     </div>
 
     {/* Theme Info */}
-    <p className="text-xs font-bold text-white truncate">{theme.name}</p>
-    <p className="text-[10px] text-white/50 truncate">{theme.description}</p>
+    <p className="text-xs font-bold text-[#1E2E1E] truncate">{theme.name}</p>
+    <p className="text-[10px] text-[#8FA58F] truncate">{theme.description}</p>
   </button>
 );
 

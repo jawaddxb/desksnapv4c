@@ -421,24 +421,24 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
   const UrlIcon = preset === 'video' ? Video : preset === 'web' ? Globe : Link;
 
   return (
-    <div className="flex h-screen w-full bg-black relative">
+    <div className="flex h-screen w-full bg-[#F5FAF7] relative">
       {/* Header bar */}
-      <div className="absolute top-0 left-0 right-0 h-14 bg-black border-b border-white/10 flex items-center justify-between px-4 z-20">
+      <div className="absolute top-0 left-0 right-0 h-14 bg-white border-b border-[#D4E5D4] flex items-center justify-between px-4 z-20">
         <div className="flex items-center gap-3">
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/5 transition-colors"
+              className="p-2 hover:bg-[#EDF5F0] transition-colors rounded"
             >
-              <ArrowLeft className="w-5 h-5 text-white/60 hover:text-[#c5a47e]" />
+              <ArrowLeft className="w-5 h-5 text-[#8FA58F] hover:text-[#6B8E6B]" />
             </button>
           )}
           <div>
-            <h1 className="font-bold text-white uppercase tracking-wide">
+            <h1 className="font-bold text-[#1E2E1E] uppercase tracking-wide">
               {wizardTitle}
               {session.topic && `: ${session.topic}`}
             </h1>
-            <p className="text-xs text-white/40 uppercase tracking-widest">
+            <p className="text-xs text-[#8FA58F] uppercase tracking-widest">
               {session.sources?.length || 0} sources
               {' '}&bull;{' '}
               {session.notes.length} notes
@@ -460,7 +460,7 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
           {session.stage === 'ready' && (
             <button
               onClick={handleBuildDeck}
-              className="px-4 py-2 bg-[#c5a47e] text-black font-medium uppercase tracking-wider text-sm hover:bg-[#d4b58f] transition-colors"
+              className="px-4 py-2 bg-[#6B8E6B] text-white font-medium uppercase tracking-wider text-sm hover:bg-[#5A7A5A] transition-colors rounded"
             >
               Build Deck
             </button>
@@ -471,12 +471,12 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
       {/* Main content area */}
       <div className="flex w-full pt-14" style={{ height: 'calc(100vh - 0px)' }}>
         {/* AI-Centric Left Panel (400px) */}
-        <div className="w-[400px] flex-shrink-0 h-full border-r border-white/10 flex flex-col">
+        <div className="w-[400px] flex-shrink-0 h-full border-r border-[#D4E5D4] flex flex-col bg-white">
 
           {/* URL Input - Prominent at Top */}
-          <form onSubmit={handleUrlSubmit} className="p-4 border-b border-white/10">
+          <form onSubmit={handleUrlSubmit} className="p-4 border-b border-[#D4E5D4]">
             <div
-              className={`relative ${dragOver ? 'ring-2 ring-[#c5a47e]' : ''}`}
+              className={`relative ${dragOver ? 'ring-2 ring-[#6B8E6B]' : ''}`}
               onDragOver={(e) => {
                 e.preventDefault();
                 setDragOver(true);
@@ -489,26 +489,26 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
                 if (droppedUrl) handleAddSource(droppedUrl);
               }}
             >
-              <div className="flex items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 focus-within:border-[#c5a47e] transition-colors">
-                <UrlIcon className="w-4 h-4 text-white/30 flex-shrink-0" />
+              <div className="flex items-center gap-2 px-3 py-2.5 bg-[#EDF5F0] border border-[#D4E5D4] focus-within:border-[#6B8E6B] transition-colors rounded">
+                <UrlIcon className="w-4 h-4 text-[#8FA58F] flex-shrink-0" />
                 <input
                   type="url"
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   onPaste={handlePaste}
                   placeholder={urlPlaceholder}
-                  className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none"
+                  className="flex-1 bg-transparent text-[#1E2E1E] text-sm placeholder:text-[#8FA58F] focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={!urlInput.trim()}
-                  className="p-1 text-white/40 hover:text-[#c5a47e] disabled:opacity-30 disabled:hover:text-white/40 transition-colors"
+                  className="p-1 text-[#8FA58F] hover:text-[#6B8E6B] disabled:opacity-30 disabled:hover:text-[#8FA58F] transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
             </div>
-            <p className="mt-2 text-xs text-white/30">
+            <p className="mt-2 text-xs text-[#8FA58F]">
               {preset === 'video' ? 'Paste YouTube links to extract knowledge' : 'Add URLs to analyze and extract insights'}
             </p>
           </form>
@@ -544,13 +544,13 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {session.messages.length === 0 && (
                 <div className="text-center py-8">
-                  <div className="w-12 h-12 mx-auto mb-3 bg-[#c5a47e]/10 rounded-full flex items-center justify-center">
-                    <UrlIcon className="w-6 h-6 text-[#c5a47e]" />
+                  <div className="w-12 h-12 mx-auto mb-3 bg-[#6B8E6B]/10 rounded-full flex items-center justify-center">
+                    <UrlIcon className="w-6 h-6 text-[#6B8E6B]" />
                   </div>
-                  <p className="text-white/60 text-sm font-medium mb-1">
+                  <p className="text-[#1E2E1E] text-sm font-medium mb-1">
                     {preset === 'video' ? 'Add a YouTube video' : 'Add a source'}
                   </p>
-                  <p className="text-white/30 text-xs max-w-[250px] mx-auto">
+                  <p className="text-[#8FA58F] text-xs max-w-[250px] mx-auto">
                     {preset === 'video'
                       ? "I'll analyze the video and extract key insights for your deck"
                       : "I'll analyze the content and help organize it into a presentation"
@@ -564,18 +564,18 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
               {isThinking && (
                 <div className="flex gap-3">
                   {/* AI Avatar */}
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-[#c5a47e] to-[#a08060] flex items-center justify-center">
-                    <Bot className="w-3.5 h-3.5 text-black" />
+                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-[#6B8E6B] to-[#5A7A5A] flex items-center justify-center">
+                    <Bot className="w-3.5 h-3.5 text-white" />
                   </div>
                   {/* Thinking Indicator */}
                   <div className="flex-1 min-w-0">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-[#1a1816] border border-[#c5a47e]/20 rounded-xl">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-[#EDF5F0] border border-[#6B8E6B]/20 rounded-xl">
                       <div className="flex items-center gap-1">
-                        <div className="w-1.5 h-1.5 bg-[#c5a47e] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-1.5 h-1.5 bg-[#c5a47e] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-1.5 h-1.5 bg-[#c5a47e] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <div className="w-1.5 h-1.5 bg-[#6B8E6B] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-1.5 h-1.5 bg-[#6B8E6B] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-1.5 h-1.5 bg-[#6B8E6B] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
-                      <span className="text-white/50 text-sm">Processing...</span>
+                      <span className="text-[#8FA58F] text-sm">Processing...</span>
                     </div>
                   </div>
                 </div>
@@ -584,14 +584,14 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
 
             {/* Quick actions / ask_user options */}
             {askUserQuestion && (
-              <div className="p-3 border-t border-white/10 bg-white/5">
-                <p className="text-sm text-white/80 mb-2">{askUserQuestion.question}</p>
+              <div className="p-3 border-t border-[#D4E5D4] bg-[#EDF5F0]">
+                <p className="text-sm text-[#1E2E1E] mb-2">{askUserQuestion.question}</p>
                 <div className="flex flex-wrap gap-2">
                   {askUserQuestion.options?.map((option, i) => (
                     <button
                       key={i}
                       onClick={() => handleQuickAction(option)}
-                      className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-white/80 transition-colors"
+                      className="px-3 py-1.5 text-xs bg-white hover:bg-[#6B8E6B]/10 text-[#1E2E1E] transition-colors rounded border border-[#D4E5D4]"
                     >
                       {option}
                     </button>
@@ -601,11 +601,11 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
             )}
 
             {/* Chat Input - Fixed at Bottom */}
-            <div className="p-3 border-t border-white/10">
+            <div className="p-3 border-t border-[#D4E5D4]">
               <input
                 type="text"
                 placeholder="Ask about sources or give instructions..."
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:border-[#c5a47e] focus:outline-none"
+                className="w-full px-3 py-2.5 bg-[#EDF5F0] border border-[#D4E5D4] text-[#1E2E1E] text-sm placeholder:text-[#8FA58F] focus:border-[#6B8E6B] focus:outline-none rounded"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                     handleSendMessage(e.currentTarget.value);
@@ -634,7 +634,7 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
 
         {/* Proof Sidebar (right side - conditional) */}
         {showProofSidebar && selectedNote && (
-          <div className="w-[300px] flex-shrink-0 h-full border-l border-white/10">
+          <div className="w-[300px] flex-shrink-0 h-full border-l border-[#D4E5D4] bg-white">
             <ProofSidebar
               note={selectedNote}
               sources={session.sources || []}

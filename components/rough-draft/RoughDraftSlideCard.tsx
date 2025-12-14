@@ -138,15 +138,15 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
     }
   }, [customPrompt, onAIEnhance]);
 
-  // Approval badge color - Studio Noir palette
+  // Approval badge color - Bento Matcha palette
   const getApprovalBadge = () => {
     switch (slide.approvalState) {
       case 'approved':
-        return { bg: 'bg-[#c5a47e]/20', text: 'text-[#c5a47e]', label: 'Approved' };
+        return { bg: 'bg-[#6B8E6B]/20', text: 'text-[#6B8E6B]', label: 'Approved' };
       case 'modified':
-        return { bg: 'bg-white/10', text: 'text-white/70', label: 'Modified' };
+        return { bg: 'bg-[#EDF5F0]', text: 'text-[#4A5D4A]', label: 'Modified' };
       default:
-        return { bg: 'bg-white/5', text: 'text-white/40', label: 'Pending' };
+        return { bg: 'bg-[#F5FAF7]', text: 'text-[#8FA58F]', label: 'Pending' };
     }
   };
 
@@ -156,8 +156,8 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
   if (!isSelected) {
     return (
       <div
-        className="group relative bg-[#111111] border transition-all duration-200 cursor-pointer
-          hover:shadow-lg hover:shadow-black/50 hover:-translate-y-0.5 border-white/10 hover:border-[#c5a47e]/50"
+        className="group relative bg-white border rounded-lg transition-all duration-200 cursor-pointer
+          hover:shadow-lg hover:shadow-[#6B8E6B]/10 hover:-translate-y-0.5 border-[#D4E5D4] hover:border-[#6B8E6B]/50"
         onClick={onSelect}
         style={{
           animation: 'fadeInUp 0.3s ease-out forwards',
@@ -166,7 +166,7 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
         }}
       >
         {/* Slide number */}
-        <div className="absolute top-2 left-2 z-10 w-6 h-6 bg-black/80 text-white text-xs font-bold flex items-center justify-center">
+        <div className="absolute top-2 left-2 z-10 w-6 h-6 bg-[#6B8E6B] text-white text-xs font-bold flex items-center justify-center rounded">
           {index + 1}
         </div>
 
@@ -178,12 +178,12 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
         </div>
 
         {/* Image area (16:9 aspect) */}
-        <div className="relative aspect-video overflow-hidden">
+        <div className="relative aspect-video overflow-hidden rounded-t-lg">
           {slide.isImageLoading || isRegenerating ? (
             <div className="w-full h-full flex flex-col items-center justify-center relative" style={{ background: theme.colors.surface }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-[#c5a47e]/5 to-transparent animate-pulse" />
-              <div className="w-8 h-8 border-2 border-[#c5a47e]/30 border-t-[#c5a47e] rounded-full animate-spin mb-2 relative z-10" />
-              <span className="text-[10px] text-white/40 uppercase tracking-wider relative z-10">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#6B8E6B]/5 to-transparent animate-pulse" />
+              <div className="w-8 h-8 border-2 border-[#6B8E6B]/30 border-t-[#6B8E6B] rounded-full animate-spin mb-2 relative z-10" />
+              <span className="text-[10px] text-[#8FA58F] uppercase tracking-wider relative z-10">
                 {isRegenerating ? 'Regenerating...' : 'Generating...'}
               </span>
             </div>
@@ -205,25 +205,25 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
 
         {/* Content preview */}
         <div className="p-3">
-          <h3 className="text-sm font-bold text-white line-clamp-1">{slide.title}</h3>
+          <h3 className="text-sm font-bold text-[#1E2E1E] line-clamp-1">{slide.title}</h3>
           <div className="mt-1.5 space-y-0.5">
             {getContentPreview().slice(0, 2).map((text, i) => (
-              <p key={i} className="text-[10px] text-white/50 line-clamp-1">{text}</p>
+              <p key={i} className="text-[10px] text-[#8FA58F] line-clamp-1">{text}</p>
             ))}
             {(hasContentBlocks ? editContentBlocks.length : (slide.content?.length || 0)) > 2 && (
-              <p className="text-[10px] text-white/30">
+              <p className="text-[10px] text-[#8FA58F]/60">
                 +{(hasContentBlocks ? editContentBlocks.length : (slide.content?.length || 0)) - 2} more...
               </p>
             )}
           </div>
           <div className="mt-2 flex items-center gap-1">
-            <span className="text-[8px] text-white/30 uppercase tracking-wider">{slide.layoutType}</span>
-            <span className="text-[8px] text-white/20">|</span>
-            <span className="text-[8px] text-white/30 uppercase tracking-wider">{slide.alignment}</span>
+            <span className="text-[8px] text-[#8FA58F] uppercase tracking-wider">{slide.layoutType}</span>
+            <span className="text-[8px] text-[#D4E5D4]">|</span>
+            <span className="text-[8px] text-[#8FA58F] uppercase tracking-wider">{slide.alignment}</span>
             {hasContentBlocks && (
               <>
-                <span className="text-[8px] text-white/20">|</span>
-                <span className="text-[8px] text-[#c5a47e] uppercase tracking-wider">Rich</span>
+                <span className="text-[8px] text-[#D4E5D4]">|</span>
+                <span className="text-[8px] text-[#6B8E6B] uppercase tracking-wider">Rich</span>
               </>
             )}
           </div>
@@ -235,25 +235,25 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
   // Expanded card view (full editing)
   return (
     <div
-      className="col-span-full bg-[#111111] border border-[#c5a47e] ring-2 ring-[#c5a47e]/30"
+      className="col-span-full bg-white border border-[#6B8E6B] ring-2 ring-[#6B8E6B]/30 rounded-lg"
       style={{ animation: 'fadeIn 0.2s ease-out' }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-white/10">
+      <div className="flex items-center justify-between p-3 border-b border-[#D4E5D4]">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 bg-[#c5a47e] text-black text-xs font-bold flex items-center justify-center">
+          <div className="w-6 h-6 bg-[#6B8E6B] text-white text-xs font-bold flex items-center justify-center rounded">
             {index + 1}
           </div>
-          <span className={`px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold ${approval.bg} ${approval.text}`}>
+          <span className={`px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded ${approval.bg} ${approval.text}`}>
             {approval.label}
           </span>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onSelect(); }}
-          className="p-1.5 hover:bg-white/10 transition-colors"
+          className="p-1.5 hover:bg-[#EDF5F0] transition-colors rounded-md"
           title="Collapse"
         >
-          <ChevronUp className="w-4 h-4 text-white/60" />
+          <ChevronUp className="w-4 h-4 text-[#8FA58F]" />
         </button>
       </div>
 
@@ -261,11 +261,11 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
         {/* Left: Image */}
         <div className="space-y-3">
           {/* Image preview */}
-          <div className="relative aspect-video bg-black/50 overflow-hidden">
+          <div className="relative aspect-video bg-[#F5FAF7] overflow-hidden rounded-lg">
             {slide.isImageLoading || isRegenerating ? (
               <div className="w-full h-full flex flex-col items-center justify-center">
-                <div className="w-10 h-10 border-2 border-[#c5a47e]/30 border-t-[#c5a47e] rounded-full animate-spin mb-2" />
-                <span className="text-xs text-white/40">{isRegenerating ? 'Regenerating...' : 'Generating...'}</span>
+                <div className="w-10 h-10 border-2 border-[#6B8E6B]/30 border-t-[#6B8E6B] rounded-full animate-spin mb-2" />
+                <span className="text-xs text-[#8FA58F]">{isRegenerating ? 'Regenerating...' : 'Generating...'}</span>
               </div>
             ) : slide.imageUrl ? (
               <>
@@ -273,7 +273,7 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
                 {/* Regenerate button for existing images */}
                 <button
                   onClick={(e) => { e.stopPropagation(); onRegenerateImage(); }}
-                  className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 hover:bg-black text-white text-xs flex items-center gap-1 transition-colors"
+                  className="absolute bottom-2 right-2 px-2 py-1 bg-white/90 hover:bg-white text-[#1E2E1E] text-xs flex items-center gap-1 transition-colors rounded"
                 >
                   <RefreshCw className="w-3 h-3" />
                   Regenerate
@@ -291,7 +291,7 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
 
           {/* Image subject (editable) */}
           <div>
-            <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] text-[#8FA58F] uppercase tracking-wider mb-1">
               Image Subject (editable)
             </label>
             <textarea
@@ -300,17 +300,17 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
               onBlur={handleSaveImagePrompt}
               onClick={(e) => e.stopPropagation()}
               rows={2}
-              className="w-full bg-black/30 border border-white/10 text-sm text-white p-2 focus:outline-none focus:border-[#c5a47e]/50 resize-none"
+              className="w-full bg-[#F5FAF7] border border-[#D4E5D4] rounded-md text-sm text-[#1E2E1E] p-2 focus:outline-none focus:border-[#6B8E6B] resize-none"
               placeholder="Describe what the image should show..."
             />
           </div>
 
           {/* Visual style (locked) */}
           <div>
-            <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] text-[#8FA58F] uppercase tracking-wider mb-1">
               Visual Style (locked from theme)
             </label>
-            <div className="bg-black/20 border border-white/5 text-xs text-white/60 p-2 italic">
+            <div className="bg-[#F5FAF7] border border-[#EDF5F0] rounded-md text-xs text-[#8FA58F] p-2 italic">
               {visualStyle}
             </div>
           </div>
@@ -320,26 +320,26 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
         <div className="space-y-3">
           {/* Title */}
           <div>
-            <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1">Title</label>
+            <label className="block text-[10px] text-[#8FA58F] uppercase tracking-wider mb-1">Title</label>
             <input
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
               onBlur={handleSaveTitle}
               onClick={(e) => e.stopPropagation()}
-              className="w-full bg-black/30 border border-white/10 text-sm font-bold text-white p-2 focus:outline-none focus:border-[#c5a47e]/50"
+              className="w-full bg-[#F5FAF7] border border-[#D4E5D4] rounded-md text-sm font-bold text-[#1E2E1E] p-2 focus:outline-none focus:border-[#6B8E6B]"
             />
           </div>
 
           {/* Content - Rich blocks or legacy bullets */}
           <div>
-            <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1">
-              Content {hasContentBlocks && <span className="text-[#c5a47e]">(Rich Blocks)</span>}
+            <label className="block text-[10px] text-[#8FA58F] uppercase tracking-wider mb-1">
+              Content {hasContentBlocks && <span className="text-[#6B8E6B]">(Rich Blocks)</span>}
             </label>
             {hasContentBlocks ? (
               // Render content blocks with editing support
-              <div className="bg-black/20 border border-white/10 p-3 max-h-[200px] overflow-y-auto">
-                <Suspense fallback={<div className="text-xs text-white/40">Loading content...</div>}>
+              <div className="bg-[#F5FAF7] border border-[#D4E5D4] rounded-md p-3 max-h-[200px] overflow-y-auto">
+                <Suspense fallback={<div className="text-xs text-[#8FA58F]">Loading content...</div>}>
                   <ContentBlockRenderer
                     blocks={editContentBlocks}
                     theme={theme}
@@ -354,7 +354,7 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
               <div className="space-y-2">
                 {editBullets.map((bullet, i) => (
                   <div key={i} className="flex items-start gap-2">
-                    <span className="text-white/30 text-xs mt-2">•</span>
+                    <span className="text-[#8FA58F] text-xs mt-2">•</span>
                     <input
                       type="text"
                       value={bullet}
@@ -365,11 +365,11 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
                       }}
                       onBlur={() => handleSaveBullet(i, editBullets[i])}
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-1 bg-black/30 border border-white/10 text-xs text-white p-1.5 focus:outline-none focus:border-[#c5a47e]/50"
+                      className="flex-1 bg-[#F5FAF7] border border-[#D4E5D4] rounded text-xs text-[#1E2E1E] p-1.5 focus:outline-none focus:border-[#6B8E6B]"
                     />
                     <button
                       onClick={(e) => { e.stopPropagation(); handleRemoveBullet(i); }}
-                      className="p-1 text-white/30 hover:text-red-400 transition-colors"
+                      className="p-1 text-[#8FA58F] hover:text-red-500 transition-colors"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
@@ -377,7 +377,7 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
                 ))}
                 <button
                   onClick={(e) => { e.stopPropagation(); handleAddBullet(); }}
-                  className="flex items-center gap-1 text-[10px] text-[#c5a47e] hover:text-white transition-colors"
+                  className="flex items-center gap-1 text-[10px] text-[#6B8E6B] hover:text-[#5A7A5A] transition-colors"
                 >
                   <Plus className="w-3 h-3" /> Add bullet
                 </button>
@@ -387,14 +387,14 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
 
           {/* Speaker Notes */}
           <div>
-            <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1">Speaker Notes</label>
+            <label className="block text-[10px] text-[#8FA58F] uppercase tracking-wider mb-1">Speaker Notes</label>
             <textarea
               value={editSpeakerNotes}
               onChange={(e) => setEditSpeakerNotes(e.target.value)}
               onBlur={handleSaveSpeakerNotes}
               onClick={(e) => e.stopPropagation()}
               rows={2}
-              className="w-full bg-black/30 border border-white/10 text-xs text-white/70 p-2 focus:outline-none focus:border-[#c5a47e]/50 resize-none"
+              className="w-full bg-[#F5FAF7] border border-[#D4E5D4] rounded-md text-xs text-[#4A5D4A] p-2 focus:outline-none focus:border-[#6B8E6B] resize-none"
               placeholder="Notes for the presenter..."
             />
           </div>
@@ -402,12 +402,12 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
           {/* AI Enhance */}
           {onAIEnhance && (
             <div>
-              <label className="block text-[10px] text-white/40 uppercase tracking-wider mb-1">AI Enhance</label>
+              <label className="block text-[10px] text-[#8FA58F] uppercase tracking-wider mb-1">AI Enhance</label>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={(e) => { e.stopPropagation(); onAIEnhance('research'); }}
                   disabled={isEnhancing}
-                  className="flex items-center gap-1 px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-1 px-2 py-1 bg-[#EDF5F0] hover:bg-[#D4E5D4] border border-[#D4E5D4] rounded text-xs text-[#4A5D4A] disabled:opacity-50 transition-colors"
                 >
                   <Search className="w-3 h-3" />
                   Research
@@ -415,7 +415,7 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
                 <button
                   onClick={(e) => { e.stopPropagation(); onAIEnhance('rewrite'); }}
                   disabled={isEnhancing}
-                  className="flex items-center gap-1 px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-1 px-2 py-1 bg-[#EDF5F0] hover:bg-[#D4E5D4] border border-[#D4E5D4] rounded text-xs text-[#4A5D4A] disabled:opacity-50 transition-colors"
                 >
                   <Wand2 className="w-3 h-3" />
                   Rewrite
@@ -423,7 +423,7 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowCustomPrompt(!showCustomPrompt); }}
                   disabled={isEnhancing}
-                  className="flex items-center gap-1 px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-1 px-2 py-1 bg-[#EDF5F0] hover:bg-[#D4E5D4] border border-[#D4E5D4] rounded text-xs text-[#4A5D4A] disabled:opacity-50 transition-colors"
                 >
                   <Sparkles className="w-3 h-3" />
                   Custom...
@@ -438,20 +438,20 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.key === 'Enter' && handleCustomPromptSubmit()}
                     placeholder="Enter custom instruction..."
-                    className="flex-1 bg-black/30 border border-white/10 text-xs text-white p-1.5 focus:outline-none focus:border-[#c5a47e]/50"
+                    className="flex-1 bg-[#F5FAF7] border border-[#D4E5D4] rounded text-xs text-[#1E2E1E] p-1.5 focus:outline-none focus:border-[#6B8E6B]"
                   />
                   <button
                     onClick={(e) => { e.stopPropagation(); handleCustomPromptSubmit(); }}
                     disabled={!customPrompt.trim()}
-                    className="px-2 py-1 bg-[#c5a47e] text-black text-xs font-bold disabled:opacity-50"
+                    className="px-2 py-1 bg-[#6B8E6B] text-white rounded text-xs font-bold disabled:opacity-50"
                   >
                     Apply
                   </button>
                 </div>
               )}
               {isEnhancing && (
-                <div className="mt-2 flex items-center gap-2 text-xs text-[#c5a47e]">
-                  <div className="w-3 h-3 border border-[#c5a47e]/30 border-t-[#c5a47e] rounded-full animate-spin" />
+                <div className="mt-2 flex items-center gap-2 text-xs text-[#6B8E6B]">
+                  <div className="w-3 h-3 border border-[#6B8E6B]/30 border-t-[#6B8E6B] rounded-full animate-spin" />
                   Enhancing...
                 </div>
               )}
@@ -461,11 +461,11 @@ export const RoughDraftSlideCard: React.FC<RoughDraftSlideCardProps> = ({
       </div>
 
       {/* Footer actions */}
-      <div className="flex items-center justify-end gap-2 p-3 border-t border-white/10">
+      <div className="flex items-center justify-end gap-2 p-3 border-t border-[#D4E5D4]">
         {slide.approvalState !== 'approved' && (
           <button
             onClick={(e) => { e.stopPropagation(); onApprove(); }}
-            className="flex items-center gap-1 px-3 py-1.5 bg-[#c5a47e]/20 hover:bg-[#c5a47e]/40 text-[#c5a47e] text-xs font-bold uppercase tracking-wider transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 bg-[#6B8E6B]/20 hover:bg-[#6B8E6B]/40 text-[#6B8E6B] rounded text-xs font-bold uppercase tracking-wider transition-colors"
           >
             <Check className="w-3 h-3" />
             Approve Slide

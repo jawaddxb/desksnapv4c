@@ -104,16 +104,16 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     };
 
     return (
-        <div className="w-[320px] md:w-[360px] flex flex-col border-r border-white/8 bg-[#0d0d0d] relative z-20 h-full flex-shrink-0">
+        <div className="w-[320px] md:w-[360px] flex flex-col border-r border-[#D4E5D4] bg-[#F5FAF7] relative z-20 h-full flex-shrink-0">
             {/* Header - Clean and minimal */}
-            <div className="h-16 flex-none px-5 border-b border-white/8 flex items-center justify-between">
+            <div className="h-16 flex-none px-5 border-b border-[#D4E5D4] flex items-center justify-between bg-white">
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-[#c5a47e] text-black flex items-center justify-center rounded">
+                    <div className="w-9 h-9 bg-[#6B8E6B] text-white flex items-center justify-center rounded-md">
                         <Sparkles className="w-5 h-5" />
                     </div>
                     <div>
-                        <h1 className="font-semibold text-lg text-white leading-none">DeckSnap</h1>
-                        <span className="text-[10px] text-white/40">AI Presentation Studio</span>
+                        <h1 className="font-semibold text-lg text-[#1E2E1E] leading-none">DeckSnap</h1>
+                        <span className="text-[10px] text-[#8FA58F]">AI Presentation Studio</span>
                     </div>
                 </div>
             </div>
@@ -142,8 +142,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
                     {/* Recent Ideations - Compact list */}
                     {recentIdeations.length > 0 && onLoadIdeation && (
-                        <div className="border-t border-white/8 p-4">
-                            <h3 className="text-xs font-medium text-white/40 mb-3">
+                        <div className="border-t border-[#D4E5D4] p-4 bg-white">
+                            <h3 className="text-xs font-medium text-[#8FA58F] mb-3">
                                 Continue working
                             </h3>
                             <div className="space-y-2">
@@ -151,22 +151,22 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                                     <button
                                         key={ideation.id}
                                         onClick={() => onLoadIdeation(ideation.id)}
-                                        className="w-full p-3 bg-[#171717] border border-white/5 rounded-lg hover:border-[#c5a47e]/30 transition-all duration-200 text-left group"
+                                        className="w-full p-3 bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg hover:border-[#6B8E6B]/30 transition-all duration-200 text-left group"
                                     >
                                         <div className="flex items-center justify-between gap-2">
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm text-white font-medium truncate group-hover:text-[#c5a47e] transition-colors">
+                                                <p className="text-sm text-[#1E2E1E] font-medium truncate group-hover:text-[#6B8E6B] transition-colors">
                                                     {ideation.topic || 'Untitled'}
                                                 </p>
-                                                <div className="flex items-center gap-2 mt-1 text-[10px] text-white/40">
+                                                <div className="flex items-center gap-2 mt-1 text-[10px] text-[#8FA58F]">
                                                     <Clock className="w-3 h-3" />
                                                     <span>{formatTimeAgo(ideation.lastModified)}</span>
-                                                    <span className="px-1.5 py-0.5 bg-white/5 rounded">
+                                                    <span className="px-1.5 py-0.5 bg-[#EDF5F0] rounded">
                                                         {ideation.notes.length} notes
                                                     </span>
                                                 </div>
                                             </div>
-                                            <Lightbulb className="w-4 h-4 text-[#c5a47e]/50 flex-shrink-0" />
+                                            <Lightbulb className="w-4 h-4 text-[#6B8E6B]/50 flex-shrink-0" />
                                         </div>
                                     </button>
                                 ))}
@@ -175,7 +175,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                             {onViewAllIdeations && recentIdeations.length > 3 && (
                                 <button
                                     onClick={onViewAllIdeations}
-                                    className="w-full mt-2 py-2 text-xs text-white/40 hover:text-[#c5a47e] transition-colors"
+                                    className="w-full mt-2 py-2 text-xs text-[#8FA58F] hover:text-[#6B8E6B] transition-colors"
                                 >
                                     View all ideations
                                 </button>
@@ -238,12 +238,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     </ExpandableSection>
 
                     {/* Quick Actions - Bottom of sidebar */}
-                    <div className="border-t border-white/8 p-3">
+                    <div className="border-t border-[#D4E5D4] p-3 bg-white">
                         <div className="flex gap-2">
                             {onIdeate && (
                                 <button
                                     onClick={onIdeate}
-                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#c5a47e]/10 border border-[#c5a47e]/20 rounded text-xs text-[#c5a47e] hover:bg-[#c5a47e]/20 transition-colors"
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#6B8E6B]/10 border border-[#6B8E6B]/20 rounded-md text-xs text-[#6B8E6B] hover:bg-[#6B8E6B]/20 transition-colors"
                                 >
                                     <Lightbulb className="w-4 h-4" />
                                     New Idea
@@ -252,7 +252,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                             {onGoToDashboard && (
                                 <button
                                     onClick={onGoToDashboard}
-                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-white/5 border border-white/8 rounded text-xs text-white/60 hover:text-white hover:border-white/20 transition-colors"
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#EDF5F0] border border-[#D4E5D4] rounded-md text-xs text-[#4A5D4A] hover:text-[#1E2E1E] hover:border-[#C0D6C0] transition-colors"
                                 >
                                     <FileText className="w-4 h-4" />
                                     Dashboard

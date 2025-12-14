@@ -59,14 +59,14 @@ function buildGraph(
     data: { label: topic },
     position: { x: 250, y: 150 },
     style: {
-      background: '#c5a47e',
-      color: 'black',
+      background: '#6B8E6B',
+      color: 'white',
       padding: '12px 16px',
       borderRadius: '8px',
       fontWeight: 'bold',
       fontSize: '14px',
       border: 'none',
-      boxShadow: '0 4px 12px rgba(197, 164, 126, 0.3)',
+      boxShadow: '0 4px 12px rgba(107, 142, 107, 0.3)',
     },
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
@@ -97,12 +97,12 @@ function buildGraph(
       },
       position: { x, y },
       style: {
-        background: 'rgba(255, 255, 255, 0.1)',
-        color: 'white',
+        background: '#EDF5F0',
+        color: '#1E2E1E',
         padding: '8px 12px',
         borderRadius: '6px',
         fontSize: '12px',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
+        border: '1px solid #D4E5D4',
       },
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
@@ -113,11 +113,11 @@ function buildGraph(
       id: `edge-topic-${type}`,
       source: 'topic',
       target: categoryId,
-      style: { stroke: '#c5a47e', strokeWidth: 2 },
+      style: { stroke: '#6B8E6B', strokeWidth: 2 },
       animated: false,
       markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: '#c5a47e',
+        color: '#6B8E6B',
       },
     });
 
@@ -147,12 +147,12 @@ function buildGraph(
         },
         position: { x: leafX, y: leafY },
         style: {
-          background: 'rgba(255, 255, 255, 0.05)',
-          color: 'rgba(255, 255, 255, 0.8)',
+          background: '#F5FAF7',
+          color: '#1E2E1E',
           padding: '6px 10px',
           borderRadius: '4px',
           fontSize: '10px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid #D4E5D4',
           maxWidth: '150px',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -166,7 +166,7 @@ function buildGraph(
         id: `edge-${type}-${finding.id}`,
         source: categoryId,
         target: finding.id,
-        style: { stroke: 'rgba(255, 255, 255, 0.3)', strokeWidth: 1 },
+        style: { stroke: '#8FA58F', strokeWidth: 1 },
         animated: false,
       });
     });
@@ -199,8 +199,8 @@ export const ResearchMindMap: React.FC<ResearchMindMapProps> = ({
 
   if (findings.length === 0) {
     return (
-      <div className="h-64 bg-white/5 rounded-lg flex items-center justify-center">
-        <p className="text-white/40 text-sm">
+      <div className="h-64 bg-[#F5FAF7] rounded-lg flex items-center justify-center">
+        <p className="text-[#8FA58F] text-sm">
           Research findings will appear here as a mind map
         </p>
       </div>
@@ -208,7 +208,7 @@ export const ResearchMindMap: React.FC<ResearchMindMapProps> = ({
   }
 
   return (
-    <div className="h-64 bg-white/5 rounded-lg overflow-hidden">
+    <div className="h-64 bg-[#F5FAF7] rounded-lg overflow-hidden">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -226,11 +226,11 @@ export const ResearchMindMap: React.FC<ResearchMindMapProps> = ({
         maxZoom={1.5}
         defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
       >
-        <Background color="rgba(255, 255, 255, 0.05)" gap={20} />
+        <Background color="rgba(212, 229, 212, 0.4)" gap={20} />
         <Controls
           showInteractive={false}
           style={{
-            background: 'rgba(0, 0, 0, 0.5)',
+            background: '#EDF5F0',
             borderRadius: '4px',
           }}
         />

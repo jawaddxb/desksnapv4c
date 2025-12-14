@@ -18,6 +18,7 @@ import {
   DeckViewCoordinator,
   PresentationModeCoordinator,
 } from '@/coordinators';
+import { MobileViewCoordinator } from '@/components/mobile';
 import { useWorkspaceMode } from '@/contexts/WorkspaceModeContext';
 import { useChatUI } from '@/contexts/ChatUIContext';
 import { useDeck } from '@/hooks/useDeck';
@@ -38,6 +39,7 @@ export function AppContent() {
   // ============ Workspace Mode (from context) ============
   const {
     isPresenting,
+    isMobilePresenting,
     isIdeation,
     isRoughDraft,
     isBeautify,
@@ -48,6 +50,7 @@ export function AppContent() {
     goToBeautify,
     goToSources,
     startPresenting,
+    startMobilePresenting,
     stopPresenting,
     getRoughDraftState,
   } = useWorkspaceMode();
@@ -220,7 +223,7 @@ export function AppContent() {
     <>
       <div
         id="app-ui"
-        className="flex h-screen w-full bg-black overflow-hidden text-white font-sans selection:bg-white/20 relative"
+        className="flex h-screen w-full bg-[#F5FAF7] overflow-hidden text-[#1E2E1E] font-sans selection:bg-[#6B8E6B]/20 relative"
       >
         {/* FLOATING CHAT MODAL */}
         <ChatCoordinator
@@ -233,18 +236,31 @@ export function AppContent() {
 
         {/* PRESENTATION MODE */}
         {isPresenting && currentPresentation ? (
-          <ErrorBoundary name="PresentationMode" showRetry>
-            <PresentationModeCoordinator
-              presentation={currentPresentation}
-              activeSlideIndex={activeSlideIndex}
-              activeTheme={activeTheme}
-              activeWabiSabiLayout={activeWabiSabiLayout}
-              viewMode={viewMode}
-              onPreviousSlide={goToPreviousSlide}
-              onNextSlide={goToNextSlide}
-              onExit={stopPresenting}
-            />
-          </ErrorBoundary>
+          isMobilePresenting ? (
+            /* MOBILE PRESENTATION MODE */
+            <ErrorBoundary name="MobilePresentationMode" showRetry>
+              <MobileViewCoordinator
+                presentation={currentPresentation}
+                theme={activeTheme}
+                onExit={stopPresenting}
+                initialSlideIndex={activeSlideIndex}
+              />
+            </ErrorBoundary>
+          ) : (
+            /* DESKTOP PRESENTATION MODE */
+            <ErrorBoundary name="PresentationMode" showRetry>
+              <PresentationModeCoordinator
+                presentation={currentPresentation}
+                activeSlideIndex={activeSlideIndex}
+                activeTheme={activeTheme}
+                activeWabiSabiLayout={activeWabiSabiLayout}
+                viewMode={viewMode}
+                onPreviousSlide={goToPreviousSlide}
+                onNextSlide={goToNextSlide}
+                onExit={stopPresenting}
+              />
+            </ErrorBoundary>
+          )
         ) : (
           /* DECK VIEW MODE */
           <ErrorBoundary name="DeckView" showRetry>
@@ -284,6 +300,7 @@ export function AppContent() {
               onViewSourceIdeation={workspaceHandlers.handleViewSourceIdeation}
               onViewSourceRoughDraft={workspaceHandlers.handleViewSourceRoughDraft}
               onStartPresenting={startPresenting}
+              onStartMobilePresenting={startMobilePresenting}
             />
           </ErrorBoundary>
         )}

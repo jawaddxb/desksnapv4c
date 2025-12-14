@@ -30,7 +30,7 @@ class MarkdownErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
-      return <span className="text-white/60">{this.props.fallback}</span>;
+      return <span className="text-[#8FA58F]">{this.props.fallback}</span>;
     }
     return this.props.children;
   }
@@ -50,7 +50,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   // System messages (usually hidden or styled differently)
   if (isSystem) {
     return (
-      <div className="text-xs text-white/30 text-center py-1 italic">
+      <div className="text-xs text-[#8FA58F] text-center py-1 italic">
         {messageText}
       </div>
     );
@@ -69,14 +69,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       <div
         className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
           isUser
-            ? 'bg-white/10'
-            : 'bg-gradient-to-br from-[#c5a47e] to-[#a08060]'
+            ? 'bg-[#EDF5F0]'
+            : 'bg-gradient-to-br from-[#6B8E6B] to-[#4A5D4A]'
         }`}
       >
         {isUser ? (
-          <User className="w-3.5 h-3.5 text-white/60" />
+          <User className="w-3.5 h-3.5 text-[#8FA58F]" />
         ) : (
-          <Bot className="w-3.5 h-3.5 text-black" />
+          <Bot className="w-3.5 h-3.5 text-white" />
         )}
       </div>
 
@@ -87,8 +87,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         <div
           className={`inline-block text-left max-w-[95%] px-3.5 py-2.5 rounded-xl ${
             isUser
-              ? 'bg-white/10 text-white/90'
-              : 'bg-[#1a1816] border border-[#c5a47e]/20'
+              ? 'bg-[#EDF5F0] text-[#1E2E1E]'
+              : 'bg-white border border-[#D4E5D4]'
           }`}
         >
           <MarkdownErrorBoundary fallback={messageText}>
@@ -97,34 +97,34 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             components={{
               // Headings
               h1: ({ children }) => (
-                <h1 className="text-base font-bold text-white mb-2 mt-1 first:mt-0">
+                <h1 className="text-base font-bold text-[#1E2E1E] mb-2 mt-1 first:mt-0">
                   {children}
                 </h1>
               ),
               h2: ({ children }) => (
-                <h2 className="text-sm font-semibold text-white/95 mb-1.5 mt-2 first:mt-0">
+                <h2 className="text-sm font-semibold text-[#1E2E1E] mb-1.5 mt-2 first:mt-0">
                   {children}
                 </h2>
               ),
               h3: ({ children }) => (
-                <h3 className="text-sm font-medium text-[#c5a47e] mb-1 mt-2 first:mt-0">
+                <h3 className="text-sm font-medium text-[#6B8E6B] mb-1 mt-2 first:mt-0">
                   {children}
                 </h3>
               ),
 
               // Paragraphs
               p: ({ children }) => (
-                <p className="text-white/80 mb-2 last:mb-0">{children}</p>
+                <p className="text-[#4A5D4A] mb-2 last:mb-0">{children}</p>
               ),
 
               // Bold / Strong
               strong: ({ children }) => (
-                <strong className="font-semibold text-[#c5a47e]">{children}</strong>
+                <strong className="font-semibold text-[#6B8E6B]">{children}</strong>
               ),
 
               // Italic / Emphasis
               em: ({ children }) => (
-                <em className="italic text-white/70">{children}</em>
+                <em className="italic text-[#8FA58F]">{children}</em>
               ),
 
               // Unordered Lists
@@ -134,15 +134,15 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
               // Ordered Lists
               ol: ({ children }) => (
-                <ol className="my-2 space-y-1 pl-1 list-decimal list-inside marker:text-[#c5a47e]">
+                <ol className="my-2 space-y-1 pl-1 list-decimal list-inside marker:text-[#6B8E6B]">
                   {children}
                 </ol>
               ),
 
               // List Items
               li: ({ children }) => (
-                <li className="text-white/80 flex items-start gap-2">
-                  <span className="text-[#c5a47e] mt-1.5 w-1 h-1 rounded-full bg-[#c5a47e] flex-shrink-0" />
+                <li className="text-[#4A5D4A] flex items-start gap-2">
+                  <span className="text-[#6B8E6B] mt-1.5 w-1 h-1 rounded-full bg-[#6B8E6B] flex-shrink-0" />
                   <span className="flex-1">{children}</span>
                 </li>
               ),
@@ -153,11 +153,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                 const isBlock = className?.includes('language-');
                 if (isBlock) {
                   return (
-                    <code className="text-[#c5a47e] text-xs">{children}</code>
+                    <code className="text-[#6B8E6B] text-xs">{children}</code>
                   );
                 }
                 return (
-                  <code className="px-1.5 py-0.5 bg-black/40 rounded text-[#c5a47e] text-xs font-mono">
+                  <code className="px-1.5 py-0.5 bg-[#F5FAF7] rounded text-[#6B8E6B] text-xs font-mono">
                     {children}
                   </code>
                 );
@@ -165,20 +165,20 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
               // Code Blocks
               pre: ({ children }) => (
-                <pre className="my-2 p-3 bg-black/50 rounded-lg overflow-x-auto border border-white/5">
+                <pre className="my-2 p-3 bg-[#F5FAF7] rounded-lg overflow-x-auto border border-[#D4E5D4]">
                   {children}
                 </pre>
               ),
 
               // Blockquotes
               blockquote: ({ children }) => (
-                <blockquote className="my-2 pl-3 border-l-2 border-[#c5a47e]/50 text-white/60 italic">
+                <blockquote className="my-2 pl-3 border-l-2 border-[#6B8E6B]/50 text-[#8FA58F] italic">
                   {children}
                 </blockquote>
               ),
 
               // Horizontal Rule
-              hr: () => <hr className="my-3 border-white/10" />,
+              hr: () => <hr className="my-3 border-[#D4E5D4]" />,
 
               // Links
               a: ({ href, children }) => (
@@ -186,7 +186,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#c5a47e] hover:text-[#d4b58f] underline underline-offset-2"
+                  className="text-[#6B8E6B] hover:text-[#4A5D4A] underline underline-offset-2"
                 >
                   {children}
                 </a>
@@ -201,7 +201,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
         {/* Timestamp */}
         <div
-          className={`text-[10px] text-white/30 mt-1 opacity-0 group-hover:opacity-100 transition-opacity ${
+          className={`text-[10px] text-[#8FA58F] mt-1 opacity-0 group-hover:opacity-100 transition-opacity ${
             isUser ? 'pr-1' : 'pl-1'
           }`}
         >

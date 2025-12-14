@@ -26,6 +26,7 @@ import {
   ThemesGalleryPage,
   SolutionsPage,
 } from './components/pages';
+import { MobileViewRoute } from './components/mobile';
 import { PrototypeRouter } from './homepage-prototypes';
 import { useRealtimeSync } from './hooks/useRealtimeSync';
 
@@ -105,6 +106,9 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* Mobile Presentation View (Public - allows sharing) */}
+        <Route path="/mobile/:presentationId" element={<MobileViewRoute />} />
 
         {/* Fallback */}
         <Route path="*" element={<LandingPage onAuth={handleOpenAuth} />} />

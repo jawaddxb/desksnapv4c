@@ -65,8 +65,8 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-[#c5a47e] border-t-transparent rounded-full animate-spin" />
-          <p className="text-white/60 text-sm">Loading ideations...</p>
+          <div className="w-8 h-8 border-2 border-[#6B8E6B] border-t-transparent rounded-full animate-spin" />
+          <p className="text-[#8FA58F] text-sm">Loading ideations...</p>
         </div>
       </div>
     );
@@ -74,17 +74,17 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
 
   if (ideations.length === 0) {
     return (
-      <div className="border border-dashed border-white/20 p-16 text-center flex flex-col items-center justify-center bg-black/50">
-        <div className="w-16 h-16 bg-[#c5a47e]/10 flex items-center justify-center mb-6">
-          <Lightbulb className="w-8 h-8 text-[#c5a47e]/60" />
+      <div className="border border-dashed border-[#D4E5D4] p-16 text-center flex flex-col items-center justify-center bg-[#EDF5F0] rounded-lg">
+        <div className="w-16 h-16 bg-[#6B8E6B]/10 flex items-center justify-center mb-6">
+          <Lightbulb className="w-8 h-8 text-[#6B8E6B]/60" />
         </div>
-        <h3 className="text-xl font-light text-white mb-2">Start with a brainstorm</h3>
-        <p className="text-white/50 mb-6 max-w-md mx-auto">
+        <h3 className="text-xl font-light text-[#1E2E1E] mb-2">Start with a brainstorm</h3>
+        <p className="text-[#8FA58F] mb-6 max-w-md mx-auto">
           Ideations help you structure your thoughts before building slides.
           Use the AI copilot to explore ideas, organize content, and plan your presentation.
         </p>
         <div className="flex flex-col items-center gap-2 text-sm">
-          <div className="flex items-center gap-4 text-white/40">
+          <div className="flex items-center gap-4 text-[#8FA58F]">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-blue-400"></span>
               Discover
@@ -122,7 +122,7 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
         return (
           <div
             key={ideation.id}
-            className="group bg-[#1a1a1a] border border-white/10 hover:border-[#c5a47e]/50 transition-all duration-150 flex flex-col overflow-hidden relative"
+            className="group bg-white border border-[#D4E5D4] hover:border-[#6B8E6B] transition-all duration-150 flex flex-col overflow-hidden relative rounded-lg"
           >
             {/* Header */}
             <div
@@ -131,10 +131,10 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
             >
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-[#c5a47e]/10 flex items-center justify-center flex-shrink-0">
-                    <Lightbulb className="w-4 h-4 text-[#c5a47e]" />
+                  <div className="w-8 h-8 bg-[#6B8E6B]/10 flex items-center justify-center flex-shrink-0">
+                    <Lightbulb className="w-4 h-4 text-[#6B8E6B]" />
                   </div>
-                  <h3 className="font-bold text-white line-clamp-2 group-hover:text-[#c5a47e] transition-colors duration-150">
+                  <h3 className="font-bold text-[#1E2E1E] line-clamp-2 group-hover:text-[#6B8E6B] transition-colors duration-150">
                     {ideation.topic || 'Untitled Ideation'}
                   </h3>
                 </div>
@@ -147,15 +147,15 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
               <div className="flex gap-1 mb-4">
                 {COLUMNS.map((col, idx) => (
                   <div key={col} className="flex-1" title={`${col}: ${columnCounts[idx]} notes`}>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-1 bg-[#D4E5D4] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#c5a47e] transition-all duration-300"
+                        className="h-full bg-[#6B8E6B] transition-all duration-300"
                         style={{
                           width: `${Math.min(100, (columnCounts[idx] / Math.max(1, totalNotes)) * 100 * 2)}%`,
                         }}
                       />
                     </div>
-                    <span className="text-[8px] text-white/40 mt-1 block text-center">
+                    <span className="text-[8px] text-[#8FA58F] mt-1 block text-center">
                       {col.slice(0, 3)}
                     </span>
                   </div>
@@ -163,16 +163,16 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
               </div>
 
               {/* Stats row */}
-              <div className="flex items-center gap-4 text-[10px] text-white/40 font-bold uppercase tracking-widest">
+              <div className="flex items-center gap-4 text-[10px] text-[#8FA58F] font-bold uppercase tracking-widest">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {new Date(ideation.lastModified).toLocaleDateString()}
                 </span>
-                <span className="px-2 py-1 bg-white/5 text-white/60">
+                <span className="px-2 py-1 bg-[#EDF5F0] text-[#8FA58F]">
                   {totalNotes} Notes
                 </span>
                 {linkedDecks > 0 && (
-                  <span className="px-2 py-1 bg-[#c5a47e]/10 text-[#c5a47e]">
+                  <span className="px-2 py-1 bg-[#6B8E6B]/10 text-[#6B8E6B]">
                     {linkedDecks} Deck{linkedDecks > 1 ? 's' : ''}
                   </span>
                 )}
@@ -180,10 +180,10 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="border-t border-white/10 p-3 flex items-center gap-2 bg-black/30">
+            <div className="border-t border-[#D4E5D4] p-3 flex items-center gap-2 bg-[#EDF5F0]">
               <button
                 onClick={() => onGenerateDeck(ideation.id)}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#c5a47e] hover:bg-white text-black px-3 py-2 text-xs font-bold uppercase tracking-wide transition-all duration-150"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#6B8E6B] hover:bg-[#5A7A5A] text-white px-3 py-2 text-xs font-bold uppercase tracking-wide transition-all duration-150"
               >
                 <FileText className="w-3 h-3" />
                 Generate Deck
@@ -192,7 +192,7 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
               {hasJournal && onViewJournal && (
                 <button
                   onClick={() => onViewJournal(ideation.id)}
-                  className="p-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-[#c5a47e] transition-all duration-150"
+                  className="p-2 bg-white hover:bg-[#D4E5D4] text-[#8FA58F] hover:text-[#6B8E6B] transition-all duration-150"
                   title="View Creative Journal"
                 >
                   <BookOpen className="w-4 h-4" />
@@ -201,7 +201,7 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
 
               <button
                 onClick={() => onSelectIdeation(ideation.id)}
-                className="p-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all duration-150"
+                className="p-2 bg-white hover:bg-[#D4E5D4] text-[#8FA58F] hover:text-[#1E2E1E] transition-all duration-150"
                 title="Continue Editing"
               >
                 <ArrowRight className="w-4 h-4" />
@@ -214,7 +214,7 @@ export const IdeationHistoryPanel: React.FC<IdeationHistoryPanelProps> = ({
                 e.stopPropagation();
                 onDeleteIdeation(ideation.id);
               }}
-              className="absolute top-3 right-3 p-2 bg-black/80 text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 hover:text-red-400 transition-all duration-150 z-10"
+              className="absolute top-3 right-3 p-2 bg-white text-red-600 opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-700 transition-all duration-150 z-10 rounded"
               title="Delete Ideation"
             >
               <Trash2 className="w-4 h-4" />

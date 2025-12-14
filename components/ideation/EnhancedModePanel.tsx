@@ -41,17 +41,17 @@ const IntroStep: React.FC<{
     <div className="flex items-center gap-3 mb-4">
       <span className="text-2xl">🔬</span>
       <div>
-        <h3 className="text-white font-medium">Research Co-Pilot</h3>
-        <span className="text-xs text-[#c5a47e]">Enhanced Research Mode</span>
+        <h3 className="text-[#1E2E1E] font-medium">Research Co-Pilot</h3>
+        <span className="text-xs text-[#6B8E6B]">Enhanced Research Mode</span>
       </div>
     </div>
 
-    <p className="text-white/80">
+    <p className="text-[#4A5D4A]">
       I'd love to help you research{' '}
-      <span className="text-[#c5a47e] font-medium">"{topic}"</span>.
+      <span className="text-[#6B8E6B] font-medium">"{topic}"</span>.
     </p>
 
-    <p className="text-white/60 text-sm">
+    <p className="text-[#8FA58F] text-sm">
       I'll search the web and X/Twitter to find compelling evidence for your
       presentation. Let me ask a few questions to make sure I find exactly what
       you need.
@@ -60,8 +60,8 @@ const IntroStep: React.FC<{
     <div className="pt-4">
       <button
         onClick={onContinue}
-        className="w-full px-4 py-3 bg-[#c5a47e] text-black rounded-lg
-                   font-medium hover:bg-[#b8956e] transition-colors
+        className="w-full px-4 py-3 bg-[#6B8E6B] text-white rounded-lg
+                   font-medium hover:bg-[#5A7A5A] transition-colors
                    flex items-center justify-center gap-2"
       >
         Let's get started
@@ -71,7 +71,7 @@ const IntroStep: React.FC<{
       </button>
     </div>
 
-    <p className="text-xs text-white/30 text-center">
+    <p className="text-xs text-[#8FA58F] text-center">
       Powered by Grok AI with real-time web & X/Twitter search
     </p>
   </div>
@@ -126,7 +126,7 @@ const PreferencesStep: React.FC<{
     <div className="space-y-4 animate-fadeIn">
       <button
         onClick={onBack}
-        className="flex items-center gap-1 text-white/50 hover:text-white/80 text-sm"
+        className="flex items-center gap-1 text-[#8FA58F] hover:text-[#4A5D4A] text-sm"
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
@@ -134,7 +134,7 @@ const PreferencesStep: React.FC<{
         Back
       </button>
 
-      <p className="text-white/80">
+      <p className="text-[#4A5D4A]">
         What type of evidence would be most compelling for your audience?
       </p>
 
@@ -145,14 +145,14 @@ const PreferencesStep: React.FC<{
             onClick={() => handleToggle(opt.id)}
             className={`p-3 rounded-lg text-left transition-all ${
               selected.includes(opt.id)
-                ? 'bg-[#c5a47e] text-black'
-                : 'bg-white/5 text-white hover:bg-white/10'
+                ? 'bg-[#6B8E6B] text-white'
+                : 'bg-[#EDF5F0] text-[#1E2E1E] hover:bg-[#D4E5D4]'
             }`}
           >
             <div className="font-medium text-sm">{opt.label}</div>
             <div
               className={`text-xs ${
-                selected.includes(opt.id) ? 'text-black/70' : 'text-white/50'
+                selected.includes(opt.id) ? 'text-white/80' : 'text-[#8FA58F]'
               }`}
             >
               {opt.desc}
@@ -164,8 +164,8 @@ const PreferencesStep: React.FC<{
       <button
         onClick={handleSubmit}
         disabled={selected.length === 0}
-        className="w-full px-4 py-3 bg-[#c5a47e] text-black rounded-lg
-                   font-medium hover:bg-[#b8956e] transition-colors
+        className="w-full px-4 py-3 bg-[#6B8E6B] text-white rounded-lg
+                   font-medium hover:bg-[#5A7A5A] transition-colors
                    disabled:opacity-50 disabled:cursor-not-allowed
                    flex items-center justify-center gap-2"
       >
@@ -186,7 +186,7 @@ const ResearchingStep: React.FC<{
   <div className="space-y-4 animate-fadeIn">
     <div className="flex items-center gap-2 mb-2">
       <span className="text-lg">🔬</span>
-      <span className="text-white font-medium">Researching...</span>
+      <span className="text-[#1E2E1E] font-medium">Researching...</span>
     </div>
     <ResearchProgress progress={progress} findings={findings} />
   </div>
@@ -226,7 +226,7 @@ const ResultsStep: React.FC<{
     <div className="space-y-4 animate-fadeIn">
       {/* Research complete header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-green-400">
+        <div className="flex items-center gap-2 text-[#6B8E6B]">
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
@@ -235,7 +235,7 @@ const ResultsStep: React.FC<{
         {onExpandModal && findings.length > 0 && (
           <button
             onClick={onExpandModal}
-            className="flex items-center gap-1 px-2 py-1 text-xs text-[#c5a47e] hover:bg-white/10 rounded transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs text-[#6B8E6B] hover:bg-[#EDF5F0] rounded transition-colors"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M21 11V3h-8l3.29 3.29-10 10L3 13v8h8l-3.29-3.29 10-10z" />
@@ -247,8 +247,8 @@ const ResultsStep: React.FC<{
 
       {/* Synthesis */}
       {synthesis && (
-        <div className="p-3 bg-white/5 rounded-lg">
-          <p className="text-white/80 text-sm leading-relaxed">
+        <div className="p-3 bg-[#EDF5F0] rounded-lg">
+          <p className="text-[#4A5D4A] text-sm leading-relaxed">
             {synthesis.slice(0, 300)}
             {synthesis.length > 300 ? '...' : ''}
           </p>
@@ -257,7 +257,7 @@ const ResultsStep: React.FC<{
 
       {/* Mind map */}
       <div className="mt-4">
-        <h4 className="text-xs uppercase tracking-wider text-white/50 mb-2">
+        <h4 className="text-xs uppercase tracking-wider text-[#8FA58F] mb-2">
           Research Map
         </h4>
         <ResearchMindMap
@@ -269,33 +269,33 @@ const ResultsStep: React.FC<{
 
       {/* Findings list with checkboxes */}
       <div className="mt-4">
-        <h4 className="text-xs uppercase tracking-wider text-white/50 mb-2">
+        <h4 className="text-xs uppercase tracking-wider text-[#8FA58F] mb-2">
           Select findings to add as notes ({selectedFindings.size}/{findings.length})
         </h4>
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {findings.map((finding) => (
             <label
               key={finding.id}
-              className={`flex items-start gap-2 p-2 rounded cursor-pointer transition-colors ${
+              className={`flex items-start gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
                 selectedFindings.has(finding.id)
-                  ? 'bg-[#c5a47e]/20'
-                  : 'bg-white/5 hover:bg-white/10'
+                  ? 'bg-[#6B8E6B]/20'
+                  : 'bg-[#EDF5F0] hover:bg-[#D4E5D4]'
               }`}
             >
               <input
                 type="checkbox"
                 checked={selectedFindings.has(finding.id)}
                 onChange={() => toggleFinding(finding.id)}
-                className="mt-1 accent-[#c5a47e]"
+                className="mt-1 accent-[#6B8E6B]"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <span>{finding.icon}</span>
-                  <span className="text-[#c5a47e] text-xs capitalize">
+                  <span className="text-[#6B8E6B] text-xs capitalize">
                     {finding.type}
                   </span>
                 </div>
-                <p className="text-white/80 text-sm line-clamp-2">
+                <p className="text-[#4A5D4A] text-sm line-clamp-2">
                   {finding.summary}
                 </p>
               </div>
@@ -309,8 +309,8 @@ const ResultsStep: React.FC<{
         <button
           onClick={handleCreateNotes}
           disabled={selectedFindings.size === 0}
-          className="flex-1 px-4 py-2 bg-[#c5a47e] text-black rounded-lg
-                     font-medium hover:bg-[#b8956e] transition-colors
+          className="flex-1 px-4 py-2 bg-[#6B8E6B] text-white rounded-lg
+                     font-medium hover:bg-[#5A7A5A] transition-colors
                      disabled:opacity-50 disabled:cursor-not-allowed
                      flex items-center justify-center gap-2"
         >
@@ -321,8 +321,8 @@ const ResultsStep: React.FC<{
         </button>
         <button
           onClick={onResearchMore}
-          className="px-4 py-2 bg-white/10 text-white rounded-lg
-                     hover:bg-white/20 transition-colors"
+          className="px-4 py-2 bg-[#EDF5F0] text-[#4A5D4A] rounded-lg
+                     hover:bg-[#D4E5D4] transition-colors"
         >
           Research More
         </button>
@@ -375,14 +375,14 @@ export const EnhancedModePanel: React.FC<EnhancedModePanelProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-lg">🔬</span>
-            <span className="font-medium text-white">Research Co-Pilot</span>
-            <span className="px-2 py-0.5 bg-[#c5a47e] text-black text-xs rounded-full">
+            <span className="font-medium text-[#1E2E1E]">Research Co-Pilot</span>
+            <span className="px-2 py-0.5 bg-[#6B8E6B] text-white text-xs rounded-full">
               Pro
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-white/50 hover:text-white"
+            className="text-[#8FA58F] hover:text-[#4A5D4A]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
@@ -391,17 +391,17 @@ export const EnhancedModePanel: React.FC<EnhancedModePanelProps> = ({
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <div className="w-20 h-20 mb-4 border-2 border-[#c5a47e] rounded-full flex items-center justify-center">
+          <div className="w-20 h-20 mb-4 border-2 border-[#6B8E6B] rounded-full flex items-center justify-center">
             <span className="text-4xl">🔬</span>
           </div>
-          <h3 className="text-white font-medium mb-2">
+          <h3 className="text-[#1E2E1E] font-medium mb-2">
             Upgrade to Pro for Enhanced Research
           </h3>
-          <p className="text-white/60 text-sm mb-4 max-w-xs">
+          <p className="text-[#8FA58F] text-sm mb-4 max-w-xs">
             Get real-time web search, X/Twitter trends, and AI-powered research
             synthesis with citations.
           </p>
-          <button className="px-6 py-2 bg-[#c5a47e] text-black rounded-lg font-medium hover:bg-[#b8956e]">
+          <button className="px-6 py-2 bg-[#6B8E6B] text-white rounded-lg font-medium hover:bg-[#5A7A5A]">
             Upgrade to Pro
           </button>
         </div>
@@ -412,17 +412,17 @@ export const EnhancedModePanel: React.FC<EnhancedModePanelProps> = ({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
+      <div className="flex items-center justify-between p-4 border-b border-[#D4E5D4]">
         <div className="flex items-center gap-2">
           <span className="text-lg">🔬</span>
-          <span className="font-medium text-white">Research Co-Pilot</span>
-          <span className="px-2 py-0.5 bg-[#c5a47e] text-black text-xs rounded-full">
+          <span className="font-medium text-[#1E2E1E]">Research Co-Pilot</span>
+          <span className="px-2 py-0.5 bg-[#6B8E6B] text-white text-xs rounded-full">
             Pro
           </span>
         </div>
         <button
           onClick={onClose}
-          className="text-white/50 hover:text-white"
+          className="text-[#8FA58F] hover:text-[#4A5D4A]"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />

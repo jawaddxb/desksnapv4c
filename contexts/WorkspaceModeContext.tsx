@@ -45,7 +45,7 @@ export type WorkspaceMode =
     }
   | { type: 'beautify' }
   | { type: 'sources'; preset: SourcesPreset; recipe: SourcesRecipe }
-  | { type: 'presenting'; previousMode: WorkspaceMode };
+  | { type: 'presenting'; previousMode: WorkspaceMode; mobile?: boolean };
 
 /**
  * Navigation options for rough draft mode.
@@ -71,6 +71,7 @@ export interface WorkspaceModeContextValue {
   isBeautify: boolean;
   isSources: boolean;
   isPresenting: boolean;
+  isMobilePresenting: boolean;
 
   /** Navigation actions */
   goToDashboard: () => void;
@@ -80,6 +81,7 @@ export interface WorkspaceModeContextValue {
   goToBeautify: () => void;
   goToSources: (preset: SourcesPreset, recipe: SourcesRecipe) => void;
   startPresenting: () => void;
+  startMobilePresenting: () => void;
   stopPresenting: () => void;
 
   /** History navigation */
@@ -133,6 +135,7 @@ export function WorkspaceModeProvider({
   const isBeautify = mode.type === 'beautify';
   const isSources = mode.type === 'sources';
   const isPresenting = mode.type === 'presenting';
+  const isMobilePresenting = mode.type === 'presenting' && mode.mobile === true;
 
   // Navigation actions
   const goToDashboard = useCallback(() => {
@@ -172,6 +175,15 @@ export function WorkspaceModeProvider({
       // Don't nest presenting modes
       if (current.type === 'presenting') return current;
       return { type: 'presenting', previousMode: current };
+    });
+  }, []);
+
+  // Mobile presenting - same as presenting but with mobile flag
+  const startMobilePresenting = useCallback(() => {
+    setMode(current => {
+      // Don't nest presenting modes
+      if (current.type === 'presenting') return current;
+      return { type: 'presenting', previousMode: current, mobile: true };
     });
   }, []);
 
@@ -235,6 +247,7 @@ export function WorkspaceModeProvider({
     isBeautify,
     isSources,
     isPresenting,
+    isMobilePresenting,
     goToDashboard,
     goToDeck,
     goToIdeation,
@@ -242,6 +255,7 @@ export function WorkspaceModeProvider({
     goToBeautify,
     goToSources,
     startPresenting,
+    startMobilePresenting,
     stopPresenting,
     goBack,
     canGoBack,
@@ -259,6 +273,7 @@ export function WorkspaceModeProvider({
     goToBeautify,
     goToSources,
     startPresenting,
+    startMobilePresenting,
     stopPresenting,
     goBack,
     getPresentationId,

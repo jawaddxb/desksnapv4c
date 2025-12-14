@@ -40,37 +40,37 @@ function getStageConfig(stage: JournalStage): { icon: React.ReactNode; color: st
     case 'analyzing':
       return {
         icon: <Search className="w-4 h-4" />,
-        color: 'text-blue-400 bg-blue-500/20',
+        color: 'text-blue-600 bg-blue-100',
         label: 'Analyzing',
       };
     case 'exploring':
       return {
         icon: <Lightbulb className="w-4 h-4" />,
-        color: 'text-amber-400 bg-amber-500/20',
+        color: 'text-amber-600 bg-amber-100',
         label: 'Exploring',
       };
     case 'deciding':
       return {
         icon: <GitBranch className="w-4 h-4" />,
-        color: 'text-purple-400 bg-purple-500/20',
+        color: 'text-purple-600 bg-purple-100',
         label: 'Deciding',
       };
     case 'creating':
       return {
         icon: <Paintbrush className="w-4 h-4" />,
-        color: 'text-green-400 bg-green-500/20',
+        color: 'text-green-600 bg-green-100',
         label: 'Creating',
       };
     case 'refining':
       return {
         icon: <Sparkles className="w-4 h-4" />,
-        color: 'text-pink-400 bg-pink-500/20',
+        color: 'text-pink-600 bg-pink-100',
         label: 'Refining',
       };
     default:
       return {
         icon: <HelpCircle className="w-4 h-4" />,
-        color: 'text-white/60 bg-white/10',
+        color: 'text-[#8FA58F] bg-[#EDF5F0]',
         label: stage,
       };
   }
@@ -93,7 +93,7 @@ const JournalEntryCard: React.FC<{
     <div className="relative">
       {/* Timeline connector */}
       {!isLast && (
-        <div className="absolute left-[18px] top-10 bottom-0 w-[2px] bg-white/10" />
+        <div className="absolute left-[18px] top-10 bottom-0 w-[2px] bg-[#D4E5D4]" />
       )}
 
       <div
@@ -113,36 +113,36 @@ const JournalEntryCard: React.FC<{
             <span className={`text-[10px] font-bold uppercase tracking-widest ${stageConfig.color.replace('bg-', 'text-').split(' ')[0]}`}>
               {stageConfig.label}
             </span>
-            <span className="text-[10px] text-white/30">
+            <span className="text-[10px] text-[#8FA58F]">
               {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
             {isCompact && (
               <span className="ml-auto">
                 {isExpanded ? (
-                  <ChevronDown className="w-3 h-3 text-white/40" />
+                  <ChevronDown className="w-3 h-3 text-[#8FA58F]" />
                 ) : (
-                  <ChevronRight className="w-3 h-3 text-white/40" />
+                  <ChevronRight className="w-3 h-3 text-[#8FA58F]" />
                 )}
               </span>
             )}
           </div>
 
-          <h4 className={`font-medium text-white ${isCompact ? 'text-sm' : 'text-base'} mb-2`}>
+          <h4 className={`font-medium text-[#1E2E1E] ${isCompact ? 'text-sm' : 'text-base'} mb-2`}>
             {entry.title}
           </h4>
 
           {(isExpanded || !isCompact) && (
             <>
-              <p className={`text-white/70 ${isCompact ? 'text-xs' : 'text-sm'} leading-relaxed mb-3`}>
+              <p className={`text-[#1E2E1E] opacity-70 ${isCompact ? 'text-xs' : 'text-sm'} leading-relaxed mb-3`}>
                 {entry.narrative}
               </p>
 
               {/* Decision badge */}
               {entry.decision && (
                 <div className="flex items-center gap-2 mb-2">
-                  <Check className="w-3 h-3 text-green-400" />
-                  <span className="text-xs text-white/60">Decision:</span>
-                  <span className="text-xs text-white font-medium px-2 py-0.5 bg-white/10 rounded">
+                  <Check className="w-3 h-3 text-green-600" />
+                  <span className="text-xs text-[#8FA58F]">Decision:</span>
+                  <span className="text-xs text-[#1E2E1E] font-medium px-2 py-0.5 bg-[#EDF5F0] rounded">
                     {entry.decision}
                   </span>
                 </div>
@@ -151,12 +151,12 @@ const JournalEntryCard: React.FC<{
               {/* Alternatives considered */}
               {entry.alternatives && entry.alternatives.length > 0 && (
                 <div className="mt-2">
-                  <span className="text-[10px] text-white/40 uppercase tracking-widest">Also considered:</span>
+                  <span className="text-[10px] text-[#8FA58F] uppercase tracking-widest">Also considered:</span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {entry.alternatives.map((alt, i) => (
                       <span
                         key={i}
-                        className="text-[10px] text-white/50 px-2 py-0.5 bg-white/5 rounded"
+                        className="text-[10px] text-[#8FA58F] px-2 py-0.5 bg-[#F5FAF7] rounded"
                       >
                         {alt}
                       </span>
@@ -168,14 +168,14 @@ const JournalEntryCard: React.FC<{
               {/* Confidence meter */}
               {entry.confidence !== undefined && (
                 <div className="mt-3 flex items-center gap-2">
-                  <span className="text-[10px] text-white/40">Confidence:</span>
-                  <div className="flex-1 max-w-[100px] h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <span className="text-[10px] text-[#8FA58F]">Confidence:</span>
+                  <div className="flex-1 max-w-[100px] h-1.5 bg-[#D4E5D4] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#c5a47e] rounded-full transition-all duration-300"
+                      className="h-full bg-[#6B8E6B] rounded-full transition-all duration-300"
                       style={{ width: `${entry.confidence}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-white/50">{entry.confidence}%</span>
+                  <span className="text-[10px] text-[#8FA58F]">{entry.confidence}%</span>
                 </div>
               )}
             </>
@@ -195,9 +195,9 @@ export const CreativeJournal: React.FC<CreativeJournalProps> = ({
   if (!journal.entries || journal.entries.length === 0) {
     return (
       <div className={`${variant === 'panel' ? 'p-4' : 'p-6'} text-center`}>
-        <BookOpen className="w-8 h-8 text-white/20 mx-auto mb-3" />
-        <p className="text-sm text-white/40">No journal entries yet</p>
-        <p className="text-xs text-white/30 mt-1">
+        <BookOpen className="w-8 h-8 text-[#D4E5D4] mx-auto mb-3" />
+        <p className="text-sm text-[#8FA58F]">No journal entries yet</p>
+        <p className="text-xs text-[#8FA58F] mt-1">
           The AI will document its creative process as it works
         </p>
       </div>
@@ -217,20 +217,20 @@ export const CreativeJournal: React.FC<CreativeJournalProps> = ({
     <div className={variant === 'full' ? '' : ''}>
       {/* Header */}
       <div
-        className={`flex items-center justify-between ${variant === 'panel' ? 'px-4 py-3' : 'px-6 py-4'} border-b border-white/10`}
+        className={`flex items-center justify-between ${variant === 'panel' ? 'px-4 py-3' : 'px-6 py-4'} border-b border-[#D4E5D4]`}
         onClick={variant === 'panel' && onToggleExpand ? onToggleExpand : undefined}
         style={variant === 'panel' ? { cursor: 'pointer' } : undefined}
       >
         <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-[#c5a47e]" />
-          <span className="text-sm font-bold text-white">Creative Director's Journal</span>
+          <BookOpen className="w-4 h-4 text-[#6B8E6B]" />
+          <span className="text-sm font-bold text-[#1E2E1E]">Creative Director's Journal</span>
         </div>
 
         {variant === 'panel' && onToggleExpand && (
           isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-white/40" />
+            <ChevronDown className="w-4 h-4 text-[#8FA58F]" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-white/40" />
+            <ChevronRight className="w-4 h-4 text-[#8FA58F]" />
           )
         )}
       </div>
@@ -239,7 +239,7 @@ export const CreativeJournal: React.FC<CreativeJournalProps> = ({
         <>
           {/* Progress indicator (for full and overlay views) */}
           {variant !== 'panel' && (
-            <div className="px-6 py-4 bg-black/30 border-b border-white/10">
+            <div className="px-6 py-4 bg-[#EDF5F0] border-b border-[#D4E5D4]">
               <div className="flex items-center justify-between">
                 {Object.entries(stageProgress).map(([stage, completed], idx, arr) => (
                   <React.Fragment key={stage}>
@@ -248,19 +248,19 @@ export const CreativeJournal: React.FC<CreativeJournalProps> = ({
                         className={`w-8 h-8 rounded-full flex items-center justify-center ${
                           completed
                             ? getStageConfig(stage as JournalStage).color
-                            : 'bg-white/5 text-white/30'
+                            : 'bg-[#F5FAF7] text-[#8FA58F]'
                         }`}
                       >
                         {getStageConfig(stage as JournalStage).icon}
                       </div>
-                      <span className={`text-[10px] mt-1 ${completed ? 'text-white/60' : 'text-white/30'}`}>
+                      <span className={`text-[10px] mt-1 ${completed ? 'text-[#1E2E1E]' : 'text-[#8FA58F]'}`}>
                         {getStageConfig(stage as JournalStage).label}
                       </span>
                     </div>
                     {idx < arr.length - 1 && (
-                      <div className="flex-1 h-[2px] bg-white/10 mx-2 mt-[-16px]">
+                      <div className="flex-1 h-[2px] bg-[#D4E5D4] mx-2 mt-[-16px]">
                         <div
-                          className="h-full bg-[#c5a47e] transition-all duration-500"
+                          className="h-full bg-[#6B8E6B] transition-all duration-500"
                           style={{ width: completed ? '100%' : '0%' }}
                         />
                       </div>
@@ -286,11 +286,11 @@ export const CreativeJournal: React.FC<CreativeJournalProps> = ({
           {/* Summary */}
           {journal.summary && (
             <div className={`${variant === 'panel' ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
-              <div className="p-4 bg-[#c5a47e]/10 border border-[#c5a47e]/30 rounded">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#c5a47e] block mb-2">
+              <div className="p-4 bg-[#EDF5F0] border border-[#6B8E6B] rounded">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B8E6B] block mb-2">
                   Summary
                 </span>
-                <p className="text-sm text-white/80 leading-relaxed">{journal.summary}</p>
+                <p className="text-sm text-[#1E2E1E] leading-relaxed">{journal.summary}</p>
               </div>
             </div>
           )}

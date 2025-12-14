@@ -53,14 +53,14 @@ interface CopilotPanelProps {
   researchSynthesis?: string;
 }
 
-// Stage descriptions (Studio Noir)
+// Stage descriptions (Bento Matcha)
 const STAGE_INFO: Record<IdeationStage, { label: string; color: string }> = {
-  discover: { label: 'Discovering', color: 'bg-white/10 text-white/70' },
-  expand: { label: 'Expanding', color: 'bg-white/10 text-white/70' },
-  structure: { label: 'Structuring', color: 'bg-[#c5a47e]/20 text-[#c5a47e]' },
-  ready: { label: 'Ready to Build', color: 'bg-[#c5a47e]/20 text-[#c5a47e]' },
-  review: { label: 'Review & Build', color: 'bg-[#c5a47e] text-black' },
-  'style-preview': { label: 'Choose Style', color: 'bg-[#c5a47e] text-black' },
+  discover: { label: 'Discovering', color: 'bg-[#EDF5F0] text-[#4A5D4A]' },
+  expand: { label: 'Expanding', color: 'bg-[#EDF5F0] text-[#4A5D4A]' },
+  structure: { label: 'Structuring', color: 'bg-[#6B8E6B]/20 text-[#6B8E6B]' },
+  ready: { label: 'Ready to Build', color: 'bg-[#6B8E6B]/20 text-[#6B8E6B]' },
+  review: { label: 'Review & Build', color: 'bg-[#6B8E6B] text-white' },
+  'style-preview': { label: 'Choose Style', color: 'bg-[#6B8E6B] text-white' },
 };
 
 // TypeScript types for Web Speech API
@@ -329,7 +329,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   // Render Enhanced Mode panel when active
   if (enhancedMode && onResearch && onCreateNotesFromFindings) {
     return (
-      <div className="flex flex-col h-full bg-[#111111] border-l border-white/10">
+      <div className="flex flex-col h-full bg-white border-l border-[#D4E5D4]">
         <EnhancedModePanel
           isActive={enhancedMode}
           topic={topic}
@@ -347,18 +347,18 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#111111] border-l border-white/10">
+    <div className="flex flex-col h-full bg-white border-l border-[#D4E5D4]">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#D4E5D4] bg-[#F5FAF7]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 border border-[#c5a47e] flex items-center justify-center">
-            <svg className="w-4 h-4 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
+          <div className="w-8 h-8 border border-[#6B8E6B] rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
             </svg>
           </div>
           <div>
-            <h3 className="font-bold text-white uppercase tracking-wide text-sm">Ideation Copilot</h3>
-            <span className={`text-xs px-2 py-0.5 uppercase tracking-widest ${stageInfo.color}`}>
+            <h3 className="font-bold text-[#1E2E1E] uppercase tracking-wide text-sm">Ideation Copilot</h3>
+            <span className={`text-xs px-2 py-0.5 rounded uppercase tracking-widest ${stageInfo.color}`}>
               {stageInfo.label}
             </span>
           </div>
@@ -368,8 +368,8 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
         {stage === 'ready' && onBuildDeck && (
           <button
             onClick={onBuildDeck}
-            className="px-4 py-2 bg-[#c5a47e] text-black
-                       font-bold text-xs uppercase tracking-wider hover:bg-white transition-colors
+            className="px-4 py-2 bg-[#6B8E6B] text-white rounded-md
+                       font-bold text-xs uppercase tracking-wider hover:bg-[#5A7A5A] transition-colors
                        flex items-center gap-2"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -383,8 +383,8 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
         {stage === 'review' && onConfirmBuild && (
           <button
             onClick={onConfirmBuild}
-            className="px-4 py-2 bg-[#c5a47e] text-black
-                       font-bold text-xs uppercase tracking-wider hover:bg-white transition-colors
+            className="px-4 py-2 bg-[#6B8E6B] text-white rounded-md
+                       font-bold text-xs uppercase tracking-wider hover:bg-[#5A7A5A] transition-colors
                        flex items-center gap-2 animate-pulse"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -397,29 +397,29 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
 
       {/* Enhanced Mode Toggle - shows in expand stage */}
       {(stage === 'expand' || stage === 'discover') && onResearch && (
-        <div className="flex p-2 border-b border-white/10 bg-black/50">
+        <div className="flex p-2 border-b border-[#D4E5D4] bg-[#F5FAF7]">
           <button
             onClick={() => setEnhancedMode(false)}
-            className={`flex-1 py-2 text-xs uppercase tracking-wider font-medium transition-colors ${
+            className={`flex-1 py-2 text-xs uppercase tracking-wider font-medium rounded-md transition-colors ${
               !enhancedMode
-                ? 'bg-white/10 text-white'
-                : 'bg-transparent text-white/50 hover:text-white/70'
+                ? 'bg-white text-[#1E2E1E] border border-[#D4E5D4]'
+                : 'bg-transparent text-[#8FA58F] hover:text-[#4A5D4A]'
             }`}
           >
             Standard
           </button>
           <button
             onClick={() => setEnhancedMode(true)}
-            className={`flex-1 py-2 text-xs uppercase tracking-wider font-medium transition-colors flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 text-xs uppercase tracking-wider font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 ${
               enhancedMode
-                ? 'bg-[#c5a47e] text-black'
-                : 'bg-transparent text-white/50 hover:text-white/70'
+                ? 'bg-[#6B8E6B] text-white'
+                : 'bg-transparent text-[#8FA58F] hover:text-[#4A5D4A]'
             }`}
           >
             <span>🔬</span>
             Enhanced
             {!isPremium && (
-              <span className="text-[10px] px-1 py-0.5 bg-black/20 rounded">Pro</span>
+              <span className="text-[10px] px-1 py-0.5 bg-white/20 rounded">Pro</span>
             )}
           </button>
         </div>
@@ -432,10 +432,10 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
 
       {/* Completion UI - shows when autonomous ideation is complete */}
       {completionQuestion && !isThinking && (
-        <div className="p-4 bg-gradient-to-b from-black/50 to-transparent border-b border-white/10">
-          <p className="text-white mb-4 text-sm">{completionQuestion.question}</p>
+        <div className="p-4 bg-[#F5FAF7] border-b border-[#D4E5D4]">
+          <p className="text-[#1E2E1E] mb-4 text-sm">{completionQuestion.question}</p>
 
-          {/* Primary actions - solid gold buttons */}
+          {/* Primary actions - solid green buttons */}
           <div className="flex gap-2 mb-3">
             {completionQuestion.primaryActions.map((action) => {
               const isDirectBuild = action.toLowerCase().includes('build the deck');
@@ -452,8 +452,8 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
                       onBuildDeck();
                     }
                   }}
-                  className="flex-1 px-4 py-3 bg-[#c5a47e] text-black font-bold
-                             text-xs uppercase tracking-wider hover:bg-white transition-colors"
+                  className="flex-1 px-4 py-3 bg-[#6B8E6B] text-white font-bold rounded-md
+                             text-xs uppercase tracking-wider hover:bg-[#5A7A5A] transition-colors"
                 >
                   {action}
                 </button>
@@ -467,8 +467,8 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
               <button
                 key={option}
                 onClick={() => onSendMessage(option)}
-                className="px-3 py-1.5 border border-white/20 text-white/70
-                           text-xs hover:border-[#c5a47e] hover:text-[#c5a47e] transition-colors"
+                className="px-3 py-1.5 border border-[#D4E5D4] text-[#4A5D4A] rounded-md
+                           text-xs hover:border-[#6B8E6B] hover:text-[#6B8E6B] transition-colors"
               >
                 {option}
               </button>
@@ -482,13 +482,13 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
         {/* Welcome message with starter pills */}
         {messages.length === 0 && !isThinking && (
           <div className="text-center py-6">
-            <div className="w-16 h-16 mx-auto mb-4 border border-[#c5a47e] flex items-center justify-center">
-              <svg className="w-8 h-8 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
+            <div className="w-16 h-16 mx-auto mb-4 border border-[#6B8E6B] rounded-lg flex items-center justify-center">
+              <svg className="w-8 h-8 text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
               </svg>
             </div>
-            <p className="font-bold text-white mb-1 uppercase tracking-wide">What would you like to present about?</p>
-            <p className="text-sm text-white/50 mb-5">Choose a starting point, type, or talk about your idea</p>
+            <p className="font-bold text-[#1E2E1E] mb-1 uppercase tracking-wide">What would you like to present about?</p>
+            <p className="text-sm text-[#8FA58F] mb-5">Choose a starting point, type, or talk about your idea</p>
             <div className="flex flex-wrap justify-center gap-2 mb-4">
               {[
                 "A product or service",
@@ -499,8 +499,8 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
                 <button
                   key={idx}
                   onClick={() => onSendMessage(option)}
-                  className="px-4 py-2 bg-transparent border border-white/20 text-sm
-                             text-white/70 hover:border-[#c5a47e] hover:text-[#c5a47e]
+                  className="px-4 py-2 bg-transparent border border-[#D4E5D4] text-sm rounded-md
+                             text-[#4A5D4A] hover:border-[#6B8E6B] hover:text-[#6B8E6B]
                              transition-all"
                 >
                   {option}
@@ -510,8 +510,8 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
             {/* Voice brainstorm option */}
             <button
               onClick={toggleVoiceRecording}
-              className="mt-2 px-5 py-2.5 bg-[#c5a47e] text-black
-                         text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors
+              className="mt-2 px-5 py-2.5 bg-[#6B8E6B] text-white rounded-md
+                         text-xs font-bold uppercase tracking-wider hover:bg-[#5A7A5A] transition-colors
                          flex items-center gap-2 mx-auto"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -519,7 +519,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
               </svg>
               Talk about my idea
             </button>
-            <p className="text-xs text-white/30 mt-3">Speak for 1-2 minutes and I'll extract the key points</p>
+            <p className="text-xs text-[#8FA58F] mt-3">Speak for 1-2 minutes and I'll extract the key points</p>
           </div>
         )}
 
@@ -530,12 +530,12 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
             className={`flex ${msg.role === MessageRole.USER ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[85%] px-4 py-2 ${
+              className={`max-w-[85%] px-4 py-2 rounded-lg ${
                 msg.role === MessageRole.USER
-                  ? 'bg-[#c5a47e] text-black'
+                  ? 'bg-[#6B8E6B]/20 text-[#1E2E1E]'
                   : msg.role === MessageRole.SYSTEM
-                  ? 'bg-white/5 text-white/50 text-sm italic'
-                  : 'bg-white/10 text-white'
+                  ? 'bg-[#F5FAF7] text-[#8FA58F] text-sm italic'
+                  : 'bg-[#F5FAF7] text-[#1E2E1E] border border-[#D4E5D4]'
               }`}
             >
               <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -546,14 +546,14 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
         {/* Thinking indicator */}
         {isThinking && (
           <div className="flex justify-start">
-            <div className="bg-white/10 px-4 py-3">
+            <div className="bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg px-4 py-3">
               <div className="flex items-center gap-2">
                 <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-[#c5a47e] animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 bg-[#c5a47e] animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 bg-[#c5a47e] animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="w-2 h-2 bg-[#6B8E6B] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-2 h-2 bg-[#6B8E6B] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-2 h-2 bg-[#6B8E6B] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
-                <span className="text-sm text-white/50 uppercase tracking-wider">Thinking...</span>
+                <span className="text-sm text-[#8FA58F] uppercase tracking-wider">Thinking...</span>
               </div>
             </div>
           </div>
@@ -563,8 +563,8 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
         {askUserQuestion && !isThinking && (
           <div className="flex justify-start">
             <div className="max-w-[85%]">
-              <div className="bg-white/10 px-4 py-2 mb-2">
-                <p className="text-white">{askUserQuestion.question}</p>
+              <div className="bg-[#F5FAF7] border border-[#D4E5D4] rounded-lg px-4 py-2 mb-2">
+                <p className="text-[#1E2E1E]">{askUserQuestion.question}</p>
               </div>
               {askUserQuestion.options && askUserQuestion.options.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -572,8 +572,8 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
                     <button
                       key={idx}
                       onClick={() => handleOptionClick(option)}
-                      className="px-3 py-1.5 bg-transparent border border-white/20 text-sm
-                                 text-white/70 hover:border-[#c5a47e] hover:text-[#c5a47e] transition-colors"
+                      className="px-3 py-1.5 bg-transparent border border-[#D4E5D4] text-sm rounded-md
+                                 text-[#4A5D4A] hover:border-[#6B8E6B] hover:text-[#6B8E6B] transition-colors"
                     >
                       {option}
                     </button>
@@ -604,16 +604,16 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
       )}
 
       {/* Input area */}
-      <div className="p-4 border-t border-white/10 bg-black">
+      <div className="p-4 border-t border-[#D4E5D4] bg-[#F5FAF7]">
         <div className="flex items-end gap-2">
           {/* Microphone button */}
           <button
             onClick={toggleVoiceRecording}
             disabled={isThinking}
-            className={`p-3 transition-all ${
+            className={`p-3 rounded-md transition-all ${
               isRecording
                 ? 'bg-red-500 text-white animate-pulse'
-                : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-[#c5a47e]'
+                : 'bg-[#EDF5F0] text-[#8FA58F] hover:bg-[#D4E5D4] hover:text-[#6B8E6B]'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
             title={isRecording ? 'Stop recording' : 'Start voice input'}
           >
@@ -637,10 +637,10 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
               }
               disabled={isThinking}
               rows={1}
-              className={`w-full px-4 py-3 bg-[#111111] border text-white placeholder-white/30
-                         resize-none focus:outline-none focus:ring-1 focus:ring-[#c5a47e] focus:border-[#c5a47e]
+              className={`w-full px-4 py-3 bg-white border rounded-md text-[#1E2E1E] placeholder-[#8FA58F]
+                         resize-none focus:outline-none focus:ring-2 focus:ring-[#6B8E6B]/20 focus:border-[#6B8E6B]
                          disabled:opacity-50 disabled:cursor-not-allowed ${
-                           isRecording ? 'border-red-500/50 bg-red-900/20' : 'border-white/20'
+                           isRecording ? 'border-red-500/50 bg-red-50' : 'border-[#D4E5D4]'
                          }`}
               style={{ minHeight: '48px', maxHeight: '120px' }}
             />
@@ -648,7 +648,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
           <button
             onClick={handleSend}
             disabled={!input.trim() || isThinking}
-            className="p-3 bg-[#c5a47e] text-black hover:bg-white
+            className="p-3 bg-[#6B8E6B] text-white rounded-md hover:bg-[#5A7A5A]
                        disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -656,7 +656,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
             </svg>
           </button>
         </div>
-        <p className="text-xs text-white/30 mt-2 text-center">
+        <p className="text-xs text-[#8FA58F] mt-2 text-center">
           {isRecording ? 'Click the mic again to stop, then edit or send' : 'Press Enter to send, Shift+Enter for new line, or use the mic'}
         </p>
       </div>

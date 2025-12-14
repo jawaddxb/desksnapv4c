@@ -22,40 +22,66 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <style>
-      /* Studio Noir Design System */
+      /* Bento Matcha Design System */
       :root {
-        --noir-black: #000000;
-        --noir-white: #ffffff;
-        --noir-gold: #c5a47e;
-        --noir-surface: #111111;
-        --noir-border: #333333;
-        --noir-muted: #999999;
-        --noir-dimmed: #666666;
+        /* Colors */
+        --bento-bg: #F5FAF7;
+        --bento-surface: #FFFFFF;
+        --bento-surface-hover: #EDF5F0;
+        --bento-accent: #6B8E6B;
+        --bento-accent-hover: #5A7A5A;
+        --bento-accent-fg: #FFFFFF;
+        --bento-text: #1E2E1E;
+        --bento-text-secondary: #4A5D4A;
+        --bento-text-muted: #8FA58F;
+        --bento-border: #D4E5D4;
+        --bento-border-hover: #C0D6C0;
+
+        /* Typography */
+        --bento-font: 'Inter', sans-serif;
+        --bento-font-size: 15px;
+        --bento-line-height: 1.7;
+        --bento-letter-spacing: 0.01em;
+        --bento-heading-weight: 500;
+        --bento-body-weight: 400;
+
+        /* Layout */
+        --bento-radius-sm: 4px;
+        --bento-radius-md: 6px;
+        --bento-radius-lg: 8px;
+        --bento-shadow-card: 0 4px 24px rgba(107,142,107,0.06);
+        --bento-shadow-card-hover: 0 8px 32px rgba(107,142,107,0.1);
+        --bento-padding-card: 32px;
+        --bento-padding-container: 48px;
+        --bento-gap: 16px;
       }
       body {
-        font-family: 'DM Sans', sans-serif;
-        background-color: #000000; /* Studio Noir Black */
-        color: #ffffff; /* Studio Noir White */
+        font-family: var(--bento-font);
+        background-color: var(--bento-bg);
+        color: var(--bento-text);
+        font-size: var(--bento-font-size);
+        line-height: var(--bento-line-height);
+        letter-spacing: var(--bento-letter-spacing);
       }
       h1, h2, h3, h4, h5, h6 {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: var(--bento-font);
+        font-weight: var(--bento-heading-weight);
+        letter-spacing: 0.04em;
       }
-      /* Custom Scrollbar - Studio Noir */
+      /* Custom Scrollbar - Bento Matcha */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #000000;
-        border-left: 1px solid #333333;
+        background: var(--bento-bg);
       }
       ::-webkit-scrollbar-thumb {
-        background: #333333;
-        border: 2px solid #000000;
-        border-radius: 0;
+        background: var(--bento-border);
+        border-radius: var(--bento-radius-sm);
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #c5a47e; /* Gold on hover */
+        background: var(--bento-accent);
       }
 
       @media print {

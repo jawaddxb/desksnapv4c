@@ -219,20 +219,20 @@ export function ThumbnailGenerator() {
   // ============ Render ============
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#F5FAF7] text-[#1E2E1E]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-white/10">
+      <header className="sticky top-0 z-50 bg-[#F5FAF7]/90 backdrop-blur-sm border-b border-[#D4E5D4]">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               to="/debug"
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 hover:bg-[#D4E5D4] rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
               <h1 className="text-lg font-bold">Thumbnail Generator</h1>
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-[#8FA58F]">
                 Generate preview thumbnails for themes and archetypes
               </p>
             </div>
@@ -242,7 +242,7 @@ export function ThumbnailGenerator() {
             <button
               onClick={() => setShowPreview(!showPreview)}
               className={`p-2 rounded-lg transition-colors ${
-                showPreview ? 'bg-[#c5a47e] text-black' : 'hover:bg-white/10'
+                showPreview ? 'bg-[#6B8E6B] text-white' : 'hover:bg-[#D4E5D4] text-[#1E2E1E]'
               }`}
               title={showPreview ? 'Hide preview' : 'Show preview'}
             >
@@ -259,8 +259,8 @@ export function ThumbnailGenerator() {
             onClick={() => setMode('themes')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               mode === 'themes'
-                ? 'bg-[#c5a47e] text-black'
-                : 'bg-white/10 hover:bg-white/20'
+                ? 'bg-[#6B8E6B] text-white'
+                : 'bg-white hover:bg-[#D4E5D4] border border-[#D4E5D4] text-[#1E2E1E]'
             }`}
           >
             <ImageIcon className="w-4 h-4 inline mr-2" />
@@ -270,8 +270,8 @@ export function ThumbnailGenerator() {
             onClick={() => setMode('archetypes')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               mode === 'archetypes'
-                ? 'bg-[#c5a47e] text-black'
-                : 'bg-white/10 hover:bg-white/20'
+                ? 'bg-[#6B8E6B] text-white'
+                : 'bg-white hover:bg-[#D4E5D4] border border-[#D4E5D4] text-[#1E2E1E]'
             }`}
           >
             <Package className="w-4 h-4 inline mr-2" />
@@ -280,11 +280,11 @@ export function ThumbnailGenerator() {
         </div>
 
         {/* Controls */}
-        <div className="bg-white/5 rounded-xl p-6 mb-8">
+        <div className="bg-white rounded-xl p-6 mb-8 border border-[#D4E5D4]">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="font-bold">Batch Generation</h2>
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-[#8FA58F]">
                 Generate all {mode === 'themes' ? 'theme' : 'archetype'} thumbnails at once
               </p>
             </div>
@@ -301,7 +301,7 @@ export function ThumbnailGenerator() {
                 <button
                   onClick={generateAll}
                   disabled={status === 'generating'}
-                  className="px-4 py-2 bg-[#c5a47e] text-black rounded-lg font-medium hover:bg-[#d4b38f] transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-[#6B8E6B] text-white rounded-lg font-medium hover:bg-[#5A7A5A] transition-colors disabled:opacity-50"
                 >
                   <RefreshCw className="w-4 h-4 inline mr-2" />
                   Generate All
@@ -324,17 +324,17 @@ export function ThumbnailGenerator() {
           {status === 'generating' && (
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-white/70">
+                <span className="text-[#1E2E1E]">
                   <Loader2 className="w-4 h-4 inline mr-2 animate-spin" />
                   Generating: {progress.current || '...'}
                 </span>
-                <span className="text-white/50">
+                <span className="text-[#8FA58F]">
                   {progress.completed} / {progress.total}
                 </span>
               </div>
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-2 bg-[#D4E5D4] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#c5a47e] transition-all duration-300"
+                  className="h-full bg-[#6B8E6B] transition-all duration-300"
                   style={{ width: `${(progress.completed / progress.total) * 100}%` }}
                 />
               </div>
@@ -343,18 +343,18 @@ export function ThumbnailGenerator() {
 
           {/* Status */}
           {status === 'complete' && (
-            <div className="flex items-center gap-2 text-green-400">
+            <div className="flex items-center gap-2 text-green-700">
               <CheckCircle className="w-5 h-5" />
               <span>Generation complete! {generatedBlobs.length} thumbnails ready.</span>
             </div>
           )}
 
           {status === 'error' && progress.errors.length > 0 && (
-            <div className="flex items-start gap-2 text-amber-400">
+            <div className="flex items-start gap-2 text-amber-600">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
                 <span>Completed with {progress.errors.length} errors:</span>
-                <div className="text-sm text-white/50 mt-1">
+                <div className="text-sm text-[#8FA58F] mt-1">
                   {progress.errors.join(', ')}
                 </div>
               </div>
@@ -373,7 +373,7 @@ export function ThumbnailGenerator() {
             return (
               <div
                 key={id}
-                className="group relative bg-white/5 rounded-lg overflow-hidden hover:bg-white/10 transition-colors"
+                className="group relative bg-white rounded-lg overflow-hidden hover:bg-[#F5FAF7] transition-colors border border-[#D4E5D4]"
               >
                 {/* Preview */}
                 <div
@@ -406,15 +406,15 @@ export function ThumbnailGenerator() {
                   {/* Generated indicator */}
                   {hasGenerated && (
                     <div className="absolute top-2 right-2">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <CheckCircle className="w-4 h-4 text-green-600" />
                     </div>
                   )}
 
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#1E2E1E]/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button
                       onClick={() => downloadSingle(id)}
-                      className="px-3 py-1.5 bg-[#c5a47e] text-black rounded text-sm font-medium"
+                      className="px-3 py-1.5 bg-[#6B8E6B] text-white rounded text-sm font-medium hover:bg-[#5A7A5A] transition-colors"
                     >
                       <Download className="w-3 h-3 inline mr-1" />
                       Generate
@@ -426,7 +426,7 @@ export function ThumbnailGenerator() {
                 <div className="p-2">
                   <div className="text-xs font-medium truncate">{id}</div>
                   {mode === 'themes' && (
-                    <div className="text-[10px] text-white/40 truncate">{theme.description}</div>
+                    <div className="text-[10px] text-[#8FA58F] truncate">{theme.description}</div>
                   )}
                 </div>
               </div>

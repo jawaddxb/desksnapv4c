@@ -9,10 +9,10 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses: Record<CardVariant, string> = {
-  default: 'bg-[#1a1a1a] border border-white/10',
-  interactive: 'bg-[#1a1a1a] border border-white/10 hover:border-[#c5a47e]/50 cursor-pointer',
-  selected: 'bg-[#1a1a1a] border border-[#c5a47e] ring-2 ring-[#c5a47e]/20',
-  ghost: 'bg-transparent border border-white/10 hover:border-white/20',
+  default: 'bg-white border border-[#D4E5D4] shadow-[0_4px_24px_rgba(107,142,107,0.06)]',
+  interactive: 'bg-white border border-[#D4E5D4] shadow-[0_4px_24px_rgba(107,142,107,0.06)] hover:border-[#6B8E6B]/50 hover:shadow-[0_8px_32px_rgba(107,142,107,0.1)] cursor-pointer',
+  selected: 'bg-white border border-[#6B8E6B] ring-2 ring-[#6B8E6B]/20 shadow-[0_8px_32px_rgba(107,142,107,0.1)]',
+  ghost: 'bg-transparent border border-[#D4E5D4] hover:border-[#C0D6C0]',
 };
 
 const paddingClasses: Record<'none' | 'sm' | 'md' | 'lg', string> = {
@@ -33,7 +33,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     },
     ref
   ) => {
-    const baseClasses = 'transition-all duration-150 overflow-hidden';
+    const baseClasses = 'transition-all duration-150 overflow-hidden rounded-lg';
 
     const combinedClasses = [
       baseClasses,
@@ -63,7 +63,7 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className = '', children, ...props }, ref) => (
     <div
       ref={ref}
-      className={`px-5 py-4 border-b border-white/10 ${className}`}
+      className={`px-5 py-4 border-b border-[#D4E5D4] ${className}`}
       {...props}
     >
       {children}
@@ -95,7 +95,7 @@ export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className = '', children, ...props }, ref) => (
     <div
       ref={ref}
-      className={`px-5 py-4 border-t border-white/10 ${className}`}
+      className={`px-5 py-4 border-t border-[#D4E5D4] ${className}`}
       {...props}
     >
       {children}
@@ -117,17 +117,17 @@ export const EmptyCard = forwardRef<HTMLDivElement, EmptyCardProps>(
   ({ icon, title, description, action, className = '', ...props }, ref) => (
     <div
       ref={ref}
-      className={`border border-dashed border-white/20 p-20 text-center flex flex-col items-center justify-center bg-black/50 ${className}`}
+      className={`border border-dashed border-[#D4E5D4] p-20 text-center flex flex-col items-center justify-center bg-[#F5FAF7] rounded-lg ${className}`}
       {...props}
     >
       {icon && (
-        <div className="w-16 h-16 bg-white/5 flex items-center justify-center mb-6">
+        <div className="w-16 h-16 bg-[#6B8E6B]/10 rounded-lg flex items-center justify-center mb-6">
           {icon}
         </div>
       )}
-      <h3 className="text-xl font-light text-white mb-2">{title}</h3>
+      <h3 className="text-xl font-medium text-[#1E2E1E] mb-2">{title}</h3>
       {description && (
-        <p className="text-white/60 mb-8 max-w-md mx-auto">{description}</p>
+        <p className="text-[#4A5D4A] mb-8 max-w-md mx-auto">{description}</p>
       )}
       {action}
     </div>

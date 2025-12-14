@@ -75,19 +75,19 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       // Default error UI
       return (
-        <div className="flex flex-col items-center justify-center p-8 bg-black/5 rounded-lg border border-red-500/20">
+        <div className="flex flex-col items-center justify-center p-8 bg-[#EDF5F0] rounded-lg border border-red-500/20">
           <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
           <h3 className="text-lg font-semibold text-red-600 mb-2">
             Something went wrong
           </h3>
-          <p className="text-sm text-gray-600 text-center max-w-md mb-4">
-            {name && <span className="block text-xs text-gray-400 mb-1">[{name}]</span>}
+          <p className="text-sm text-[#4A5D4A] text-center max-w-md mb-4">
+            {name && <span className="block text-xs text-[#8FA58F] mb-1">[{name}]</span>}
             {error?.message || 'An unexpected error occurred'}
           </p>
           {showRetry && (
             <button
               onClick={this.handleRetry}
-              className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#6B8E6B] text-white rounded hover:bg-[#5A7A5A] transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Try Again

@@ -74,6 +74,7 @@ export function DeckViewCoordinator({
   onViewSourceIdeation,
   onViewSourceRoughDraft,
   onStartPresenting,
+  onStartMobilePresenting,
 }: DeckViewCoordinatorProps) {
   const {
     inputValue,
@@ -164,7 +165,7 @@ export function DeckViewCoordinator({
 
       {/* MAIN STAGE AREA */}
       <div
-        className="flex-1 bg-[#111111] flex flex-col relative overflow-hidden min-w-0"
+        className="flex-1 bg-white flex flex-col relative overflow-hidden min-w-0"
         style={{ backgroundColor: currentPresentation ? activeTheme.colors.background : '#fafafa' }}
       >
         {/* HEADER */}
@@ -181,6 +182,7 @@ export function DeckViewCoordinator({
           onRegenerateAllImages={actions.regenerateAllImages}
           onRemixDeck={actions.remixDeck}
           setIsPresenting={onStartPresenting}
+          setIsMobilePresenting={onStartMobilePresenting}
           onSave={actions.saveDeck}
           onClose={actions.closeDeck}
           onClone={onCloneCurrentDeck}

@@ -523,34 +523,34 @@ Return ONLY a JSON object with the enhanced content in this exact format:
   };
 
   return (
-    <div className="flex h-screen w-full bg-black">
+    <div className="flex h-screen w-full bg-[#F5FAF7]">
       {/* Main Canvas Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="h-14 bg-black border-b border-white/10 flex items-center justify-between px-4 z-20">
+        <div className="h-14 bg-white border-b border-[#D4E5D4] flex items-center justify-between px-4 z-20">
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
-              className="p-2 hover:bg-white/5 transition-colors duration-200"
+              className="p-2 hover:bg-[#EDF5F0] rounded-md transition-colors duration-200"
             >
-              <svg className="w-5 h-5 text-white/60 hover:text-[#c5a47e] transition-colors" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="w-5 h-5 text-[#8FA58F] hover:text-[#6B8E6B] transition-colors" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
               </svg>
             </button>
             {/* Icon container - matches ThemePreviewPanel */}
-            <div className="w-8 h-8 border border-[#c5a47e] flex items-center justify-center">
-              <svg className="w-4 h-4 text-[#c5a47e]" viewBox="0 0 24 24" fill="currentColor">
+            <div className="w-8 h-8 border border-[#6B8E6B] rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
               </svg>
             </div>
             <div>
-              <h1 className="font-bold text-white uppercase tracking-wide">{topic}</h1>
+              <h1 className="font-bold text-[#1E2E1E] uppercase tracking-wide">{topic}</h1>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-white/40 uppercase tracking-widest">
+                <span className="text-xs text-[#8FA58F] uppercase tracking-widest">
                   {getPhaseLabel()}
                 </span>
                 {(phase !== 'complete' || isLoadingExisting) && (
-                  <div className="w-3 h-3 border border-[#c5a47e] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3 h-3 border border-[#6B8E6B] border-t-transparent rounded-full animate-spin" />
                 )}
               </div>
             </div>
@@ -558,27 +558,27 @@ Return ONLY a JSON object with the enhanced content in this exact format:
 
           <div className="flex items-center gap-3">
             {/* Stats */}
-            <div className="flex items-center gap-4 text-xs text-white/50">
+            <div className="flex items-center gap-4 text-xs text-[#8FA58F]">
               <span>{slides.length} slides</span>
               {approvedSlides > 0 && (
-                <span className="text-[#c5a47e]">{approvedSlides} approved</span>
+                <span className="text-[#6B8E6B]">{approvedSlides} approved</span>
               )}
               {isSaving && (
-                <span className="flex items-center gap-1 text-white/30">
-                  <div className="w-2 h-2 border border-white/30 border-t-transparent rounded-full animate-spin" />
+                <span className="flex items-center gap-1 text-[#8FA58F]">
+                  <div className="w-2 h-2 border border-[#8FA58F] border-t-transparent rounded-full animate-spin" />
                   Saving...
                 </span>
               )}
               {persistedDraft && !isSaving && (
-                <span className="text-green-400/60">Saved</span>
+                <span className="text-[#6B8E6B]">Saved</span>
               )}
             </div>
 
             {/* Narrative toggle */}
             <button
               onClick={() => setIsNarrativePanelOpen(!isNarrativePanelOpen)}
-              className={`p-2 transition-colors ${
-                isNarrativePanelOpen ? 'bg-[#c5a47e]/20 text-[#c5a47e]' : 'hover:bg-white/5 text-white/60'
+              className={`p-2 rounded-md transition-colors ${
+                isNarrativePanelOpen ? 'bg-[#6B8E6B]/10 text-[#6B8E6B]' : 'hover:bg-[#EDF5F0] text-[#8FA58F]'
               }`}
               title={isNarrativePanelOpen ? 'Hide agent activity' : 'Show agent activity'}
             >
@@ -591,9 +591,9 @@ Return ONLY a JSON object with the enhanced content in this exact format:
 
         {/* Progress bar - enhanced with gradient */}
         {phase !== 'complete' && totalSlides > 0 && (
-          <div className="h-1.5 bg-white/5 overflow-hidden">
+          <div className="h-1.5 bg-[#EDF5F0] overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-[#c5a47e] to-[#d4b896] transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-[#6B8E6B] to-[#5A7A5A] transition-all duration-500 ease-out"
               style={{ width: `${(completedSlides / totalSlides) * 100}%` }}
             />
           </div>
@@ -604,16 +604,16 @@ Return ONLY a JSON object with the enhanced content in this exact format:
           {error ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center max-w-md">
-                <div className="w-16 h-16 mx-auto mb-4 border border-red-500/50 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 border border-red-500/50 rounded-lg flex items-center justify-center">
                   <svg className="w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
                   </svg>
                 </div>
-                <p className="text-white mb-2 font-bold uppercase tracking-wide">Generation Failed</p>
-                <p className="text-white/50 text-sm mb-4">{error}</p>
+                <p className="text-[#1E2E1E] mb-2 font-bold uppercase tracking-wide">Generation Failed</p>
+                <p className="text-[#8FA58F] text-sm mb-4">{error}</p>
                 <button
                   onClick={onBack}
-                  className="px-4 py-2 bg-[#c5a47e] text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-colors"
+                  className="px-4 py-2 bg-[#6B8E6B] text-white rounded-md font-bold text-xs uppercase tracking-wider hover:bg-[#5A7A5A] transition-colors"
                 >
                   Go Back
                 </button>
@@ -622,14 +622,14 @@ Return ONLY a JSON object with the enhanced content in this exact format:
           ) : slides.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 border border-[#c5a47e] flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#c5a47e]/10 to-transparent animate-pulse" />
-                  <svg className="w-8 h-8 text-[#c5a47e] relative z-10" viewBox="0 0 24 24" fill="currentColor">
+                <div className="w-16 h-16 mx-auto mb-4 border border-[#6B8E6B] rounded-lg flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#6B8E6B]/10 to-transparent animate-pulse" />
+                  <svg className="w-8 h-8 text-[#6B8E6B] relative z-10" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
                   </svg>
                 </div>
-                <p className="text-white/60 uppercase tracking-widest text-sm font-bold">Generating slides...</p>
-                <p className="text-white/30 text-xs mt-2 uppercase tracking-wider">Preparing your presentation</p>
+                <p className="text-[#4A5D4A] uppercase tracking-widest text-sm font-bold">Generating slides...</p>
+                <p className="text-[#8FA58F] text-xs mt-2 uppercase tracking-wider">Preparing your presentation</p>
               </div>
             </div>
           ) : (
@@ -656,19 +656,19 @@ Return ONLY a JSON object with the enhanced content in this exact format:
         </div>
 
         {/* Bottom Toolbar */}
-        <div className="h-16 bg-black border-t border-white/10 flex items-center justify-between px-4">
+        <div className="h-16 bg-white border-t border-[#D4E5D4] flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <button
               onClick={onDiscard}
-              className="px-4 py-2.5 border border-white/20 text-white/60 text-xs font-bold uppercase tracking-wider
-                         hover:border-[#c5a47e]/50 hover:text-white transition-all duration-200"
+              className="px-4 py-2.5 border border-[#D4E5D4] text-[#8FA58F] rounded-md text-xs font-bold uppercase tracking-wider
+                         hover:border-[#6B8E6B]/50 hover:text-[#1E2E1E] transition-all duration-200"
             >
               Discard
             </button>
             <button
               onClick={onBack}
-              className="px-4 py-2.5 border border-white/20 text-white/60 text-xs font-bold uppercase tracking-wider
-                         hover:border-[#c5a47e]/50 hover:text-white transition-all duration-200"
+              className="px-4 py-2.5 border border-[#D4E5D4] text-[#8FA58F] rounded-md text-xs font-bold uppercase tracking-wider
+                         hover:border-[#6B8E6B]/50 hover:text-[#1E2E1E] transition-all duration-200"
             >
               Back to {source === 'ideation' ? 'Ideation' : 'Copilot'}
             </button>
@@ -679,8 +679,8 @@ Return ONLY a JSON object with the enhanced content in this exact format:
               <button
                 onClick={handleApproveAll}
                 disabled={slides.length === 0}
-                className="px-6 py-2 bg-[#c5a47e] text-black font-bold text-xs uppercase tracking-wider
-                           hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+                className="px-6 py-2 bg-[#6B8E6B] text-white rounded-md font-bold text-xs uppercase tracking-wider
+                           hover:bg-[#5A7A5A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                            flex items-center gap-2"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">

@@ -128,35 +128,35 @@ const COLUMN_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-// Default color scheme
-const DEFAULT_COLOR = 'bg-gradient-to-b from-[#141414] to-[#111111] border-white/25 text-white/70';
+// Default color scheme - Bento Matcha
+const DEFAULT_COLOR = 'bg-white border-[#D4E5D4] text-[#4A5D4A]';
 
-// Colors for specific column types
+// Colors for specific column types - Bento Matcha palette
 const COLUMN_COLORS: Record<string, string> = {
-  // Pitch columns (first and last get gold accent)
-  Hook: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
-  Problem: 'bg-gradient-to-b from-[#141414] to-[#111111] border-white/30 text-white/70',
-  Solution: 'bg-gradient-to-b from-[#151513] to-[#111111] border-[#c5a47e]/60 text-[#c5a47e]',
-  Proof: 'bg-gradient-to-b from-[#131313] to-[#111111] border-white/20 text-white/60',
-  CTA: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
+  // Pitch columns (first and last get green accent)
+  Hook: 'bg-white border-[#6B8E6B] text-[#6B8E6B]',
+  Problem: 'bg-white border-[#D4E5D4] text-[#4A5D4A]',
+  Solution: 'bg-[#F5FAF7] border-[#6B8E6B]/60 text-[#6B8E6B]',
+  Proof: 'bg-white border-[#D4E5D4] text-[#8FA58F]',
+  CTA: 'bg-white border-[#6B8E6B] text-[#6B8E6B]',
   // Training columns
-  Objective: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
-  Concept: 'bg-gradient-to-b from-[#141414] to-[#111111] border-white/30 text-white/70',
-  Example: 'bg-gradient-to-b from-[#151513] to-[#111111] border-[#c5a47e]/60 text-[#c5a47e]',
-  Practice: 'bg-gradient-to-b from-[#131313] to-[#111111] border-white/20 text-white/60',
-  Review: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
+  Objective: 'bg-white border-[#6B8E6B] text-[#6B8E6B]',
+  Concept: 'bg-white border-[#D4E5D4] text-[#4A5D4A]',
+  Example: 'bg-[#F5FAF7] border-[#6B8E6B]/60 text-[#6B8E6B]',
+  Practice: 'bg-white border-[#D4E5D4] text-[#8FA58F]',
+  Review: 'bg-white border-[#6B8E6B] text-[#6B8E6B]',
   // Explainer columns
-  What: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
-  Why: 'bg-gradient-to-b from-[#141414] to-[#111111] border-white/30 text-white/70',
-  How: 'bg-gradient-to-b from-[#151513] to-[#111111] border-[#c5a47e]/60 text-[#c5a47e]',
-  Examples: 'bg-gradient-to-b from-[#131313] to-[#111111] border-white/20 text-white/60',
-  Summary: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
+  What: 'bg-white border-[#6B8E6B] text-[#6B8E6B]',
+  Why: 'bg-white border-[#D4E5D4] text-[#4A5D4A]',
+  How: 'bg-[#F5FAF7] border-[#6B8E6B]/60 text-[#6B8E6B]',
+  Examples: 'bg-white border-[#D4E5D4] text-[#8FA58F]',
+  Summary: 'bg-white border-[#6B8E6B] text-[#6B8E6B]',
   // Brief columns
-  Context: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
-  'Key Points': 'bg-gradient-to-b from-[#141414] to-[#111111] border-white/30 text-white/70',
-  Analysis: 'bg-gradient-to-b from-[#151513] to-[#111111] border-[#c5a47e]/60 text-[#c5a47e]',
-  Implications: 'bg-gradient-to-b from-[#131313] to-[#111111] border-white/20 text-white/60',
-  Actions: 'bg-gradient-to-b from-[#161616] to-[#111111] border-[#c5a47e] text-[#c5a47e]',
+  Context: 'bg-white border-[#6B8E6B] text-[#6B8E6B]',
+  'Key Points': 'bg-white border-[#D4E5D4] text-[#4A5D4A]',
+  Analysis: 'bg-[#F5FAF7] border-[#6B8E6B]/60 text-[#6B8E6B]',
+  Implications: 'bg-white border-[#D4E5D4] text-[#8FA58F]',
+  Actions: 'bg-white border-[#6B8E6B] text-[#6B8E6B]',
 };
 
 // Descriptions for specific columns
@@ -203,17 +203,17 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   return (
     <div
       className={`
-        relative px-3 py-2 border text-center
+        relative px-3 py-2 border rounded-lg text-center
         transition-all duration-200 ease-out
         ${colorClasses}
-        ${isActive ? 'ring-1 ring-[#c5a47e] bg-[#c5a47e]/[0.08]' : ''}
+        ${isActive ? 'ring-1 ring-[#6B8E6B] bg-[#6B8E6B]/[0.08]' : ''}
       `}
     >
       {/* Completion indicator dot */}
       {noteCount > 0 && (
         <div className="absolute -top-1 -right-1 w-3 h-3">
-          <div className="w-full h-full bg-[#c5a47e]/30 rounded-full" />
-          <div className="absolute inset-0.5 bg-[#c5a47e] rounded-full" />
+          <div className="w-full h-full bg-[#6B8E6B]/30 rounded-full" />
+          <div className="absolute inset-0.5 bg-[#6B8E6B] rounded-full" />
         </div>
       )}
 
@@ -223,7 +223,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
           {name}
         </span>
         {noteCount > 0 && (
-          <span className="text-xs px-1.5 py-0.5 bg-white/10">
+          <span className="text-xs px-1.5 py-0.5 bg-[#EDF5F0] rounded">
             {noteCount}
           </span>
         )}
@@ -231,9 +231,9 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
       <p className="text-xs opacity-50">{description}</p>
 
       {/* Progress bar at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5">
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#EDF5F0] rounded-b-lg overflow-hidden">
         <div
-          className="h-full bg-[#c5a47e]/40 transition-all duration-300"
+          className="h-full bg-[#6B8E6B]/40 transition-all duration-300"
           style={{ width: `${fillPercentage}%` }}
         />
       </div>

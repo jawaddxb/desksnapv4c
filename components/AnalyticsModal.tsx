@@ -33,21 +33,21 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ presentation, on
     };
 
     return (
-        <div className="fixed inset-0 z-[1100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-            <div className="bg-white w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[1100] bg-[#1E2E1E]/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+            <div className="bg-white w-full max-w-4xl h-[80vh] rounded-lg shadow-[0_8px_32px_rgba(107,142,107,0.15)] overflow-hidden flex flex-col border border-[#D4E5D4]" onClick={e => e.stopPropagation()}>
                 {/* Header */}
-                <div className="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
+                <div className="p-6 border-b border-[#D4E5D4] flex justify-between items-center bg-[#F5FAF7]">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-[#6B8E6B]/10 text-[#6B8E6B] flex items-center justify-center">
                             <Activity className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-zinc-900">Engagement Analytics</h2>
-                            <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold">Rehearsal & Presentation Insights</p>
+                            <h2 className="text-xl font-bold text-[#1E2E1E]">Engagement Analytics</h2>
+                            <p className="text-xs text-[#8FA58F] uppercase tracking-widest font-bold">Rehearsal & Presentation Insights</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
-                        <X className="w-6 h-6 text-zinc-400" />
+                    <button onClick={onClose} className="p-2 hover:bg-[#EDF5F0] rounded-lg transition-colors">
+                        <X className="w-6 h-6 text-[#8FA58F]" />
                     </button>
                 </div>
 
@@ -61,11 +61,11 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ presentation, on
                     </div>
                     
                     {/* Pro Tip Box */}
-                    <div className="mb-10 p-4 bg-indigo-50 border border-indigo-100 rounded-lg flex items-start gap-3">
-                        <Share2 className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
+                    <div className="mb-10 p-4 bg-[#6B8E6B]/5 border border-[#6B8E6B]/20 rounded-lg flex items-start gap-3">
+                        <Share2 className="w-5 h-5 text-[#6B8E6B] mt-0.5 flex-shrink-0" />
                         <div>
-                            <h4 className="text-sm font-bold text-indigo-900">Sharing Stats</h4>
-                            <p className="text-sm text-indigo-700 leading-relaxed">
+                            <h4 className="text-sm font-bold text-[#1E2E1E]">Sharing Stats</h4>
+                            <p className="text-sm text-[#4A5D4A] leading-relaxed">
                                 Analytics are recorded locally. To see how others view your deck, ask them to send the deck file back to you after they view it. Their session data will be included in the file.
                             </p>
                         </div>
@@ -75,27 +75,27 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ presentation, on
                     {totalSessions > 0 ? (
                         <div className="mb-12">
                             <div className="flex items-center gap-2 mb-6">
-                                <BarChart3 className="w-5 h-5 text-indigo-600" />
-                                <h3 className="font-bold text-zinc-900">Engagement Heatmap (Time per Slide)</h3>
+                                <BarChart3 className="w-5 h-5 text-[#6B8E6B]" />
+                                <h3 className="font-bold text-[#1E2E1E]">Engagement Heatmap (Time per Slide)</h3>
                             </div>
                             <div className="space-y-3">
                                 {presentation.slides.map((slide, idx) => {
                                     const duration = slideAggregates[slide.id] || 0;
                                     const percentage = maxSlideDuration > 0 ? (duration / maxSlideDuration) * 100 : 0;
-                                    
+
                                     return (
                                         <div key={slide.id} className="flex items-center gap-4">
-                                            <div className="w-8 text-xs font-bold text-zinc-400 text-right">{idx + 1}</div>
-                                            <div className="flex-1 relative h-10 bg-zinc-100 rounded-lg overflow-hidden group">
+                                            <div className="w-8 text-xs font-bold text-[#8FA58F] text-right">{idx + 1}</div>
+                                            <div className="flex-1 relative h-10 bg-[#EDF5F0] rounded-lg overflow-hidden group">
                                                 {/* Bar */}
-                                                <div 
-                                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg transition-all duration-500 opacity-90 group-hover:opacity-100" 
+                                                <div
+                                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#6B8E6B] to-[#5A7A5A] rounded-lg transition-all duration-500 opacity-90 group-hover:opacity-100"
                                                     style={{ width: `${Math.max(percentage, 1)}%` }}
                                                 />
                                                 {/* Label */}
                                                 <div className="absolute inset-0 flex items-center justify-between px-4 z-10 pointer-events-none">
-                                                    <span className="text-xs font-medium text-zinc-700 truncate max-w-[70%] group-hover:text-zinc-900 transition-colors mix-blend-difference text-white">{slide.title}</span>
-                                                    <span className="text-xs font-bold text-zinc-500 group-hover:text-zinc-900 mix-blend-difference text-white/80">{formatTime(duration)}</span>
+                                                    <span className="text-xs font-medium text-[#1E2E1E] truncate max-w-[70%] group-hover:text-[#1E2E1E] transition-colors mix-blend-difference text-white">{slide.title}</span>
+                                                    <span className="text-xs font-bold text-[#4A5D4A] group-hover:text-[#1E2E1E] mix-blend-difference text-white/80">{formatTime(duration)}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -104,27 +104,27 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ presentation, on
                             </div>
                         </div>
                     ) : (
-                        <div className="text-center py-20 bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
-                            <Activity className="w-12 h-12 text-zinc-300 mx-auto mb-4" />
-                            <h3 className="text-zinc-900 font-bold">No Data Recorded</h3>
-                            <p className="text-zinc-500 text-sm">Present this deck to start collecting rehearsal analytics.</p>
+                        <div className="text-center py-20 bg-[#F5FAF7] rounded-lg border border-dashed border-[#D4E5D4]">
+                            <Activity className="w-12 h-12 text-[#D4E5D4] mx-auto mb-4" />
+                            <h3 className="text-[#1E2E1E] font-bold">No Data Recorded</h3>
+                            <p className="text-[#8FA58F] text-sm">Present this deck to start collecting rehearsal analytics.</p>
                         </div>
                     )}
 
                     {/* Recent Sessions List */}
                     {totalSessions > 0 && (
                          <div>
-                            <h3 className="font-bold text-zinc-900 mb-4">Recent Sessions</h3>
-                            <div className="border border-zinc-200 rounded-xl overflow-hidden">
+                            <h3 className="font-bold text-[#1E2E1E] mb-4">Recent Sessions</h3>
+                            <div className="border border-[#D4E5D4] rounded-lg overflow-hidden">
                                 <table className="w-full text-sm text-left">
-                                    <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-500 text-xs uppercase font-bold tracking-wider">
+                                    <thead className="bg-[#F5FAF7] border-b border-[#D4E5D4] text-[#8FA58F] text-xs uppercase font-bold tracking-wider">
                                         <tr>
                                             <th className="px-6 py-3">Date</th>
                                             <th className="px-6 py-3">Duration</th>
                                             <th className="px-6 py-3">Focus Slide</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-zinc-100">
+                                    <tbody className="divide-y divide-[#EDF5F0]">
                                         {[...sessions].reverse().slice(0, 5).map((session) => {
                                             // Find slide with max duration in this session
                                             let maxId = '';
@@ -136,10 +136,10 @@ export const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ presentation, on
                                             const focusSlide = presentation.slides.find(s => s.id === maxId);
 
                                             return (
-                                                <tr key={session.id} className="hover:bg-zinc-50 transition-colors">
-                                                    <td className="px-6 py-4 font-medium text-zinc-900">{new Date(session.timestamp).toLocaleDateString()} <span className="text-zinc-400 font-normal">{new Date(session.timestamp).toLocaleTimeString()}</span></td>
+                                                <tr key={session.id} className="hover:bg-[#F5FAF7] transition-colors">
+                                                    <td className="px-6 py-4 font-medium text-[#1E2E1E]">{new Date(session.timestamp).toLocaleDateString()} <span className="text-[#8FA58F] font-normal">{new Date(session.timestamp).toLocaleTimeString()}</span></td>
                                                     <td className="px-6 py-4">{formatTime(session.totalDuration)}</td>
-                                                    <td className="px-6 py-4 text-zinc-600 truncate max-w-xs">{focusSlide?.title || 'N/A'}</td>
+                                                    <td className="px-6 py-4 text-[#4A5D4A] truncate max-w-xs">{focusSlide?.title || 'N/A'}</td>
                                                 </tr>
                                             );
                                         })}

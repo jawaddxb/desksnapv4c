@@ -187,29 +187,29 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
   const renderUpload = () => (
     <div className="flex-1 flex flex-col items-center justify-center p-8">
       <div
-        className="w-full max-w-xl aspect-video border-2 border-dashed border-white/30 rounded-lg flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-[#c5a47e] hover:bg-white/5 transition-all"
+        className="w-full max-w-xl aspect-video border-2 border-dashed border-[#D4E5D4] rounded-lg flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-[#6B8E6B] hover:bg-[#EDF5F0] transition-all"
         onClick={() => fileInputRef.current?.click()}
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
         {session?.status === 'parsing' || session?.status === 'analyzing' ? (
           <>
-            <Loader2 className="w-12 h-12 text-[#c5a47e] animate-spin" />
-            <p className="text-white/80 text-lg">
+            <Loader2 className="w-12 h-12 text-[#6B8E6B] animate-spin" />
+            <p className="text-[#1E2E1E] text-lg">
               {session.status === 'parsing' ? 'Extracting slides...' : 'Analyzing deck...'}
             </p>
-            <div className="w-48 h-2 bg-white/10 rounded-full overflow-hidden">
+            <div className="w-48 h-2 bg-[#D4E5D4] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#c5a47e] transition-all duration-300"
+                className="h-full bg-[#6B8E6B] transition-all duration-300"
                 style={{ width: `${session.progress}%` }}
               />
             </div>
           </>
         ) : (
           <>
-            <Upload className="w-12 h-12 text-white/60" />
-            <p className="text-white/80 text-lg">Drop your ugly PPTX here</p>
-            <p className="text-white/40 text-sm">or click to browse</p>
+            <Upload className="w-12 h-12 text-[#8FA58F]" />
+            <p className="text-[#1E2E1E] text-lg">Drop your ugly PPTX here</p>
+            <p className="text-[#8FA58F] text-sm">or click to browse</p>
           </>
         )}
       </div>
@@ -248,11 +248,11 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
         {/* Header with overall score */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-white">{session.fileName}</h2>
-            <p className="text-white/60">{session.slides.length} slides analyzed</p>
+            <h2 className="text-2xl font-bold text-[#1E2E1E]">{session.fileName}</h2>
+            <p className="text-[#8FA58F]">{session.slides.length} slides analyzed</p>
           </div>
           <div className="text-right">
-            <p className="text-white/60 text-sm uppercase tracking-wide">Mess Score</p>
+            <p className="text-[#8FA58F] text-sm uppercase tracking-wide">Mess Score</p>
             <p className={`text-4xl font-bold ${getScoreColor(session.overallMessScore)}`}>
               {Math.round(session.overallMessScore)}
             </p>
@@ -265,16 +265,16 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
             {session.slides.map((slide, index) => (
               <div
                 key={slide.id}
-                className="bg-white/5 border border-white/10 rounded-lg p-3 hover:border-[#c5a47e]/50 transition-all"
+                className="bg-white border border-[#D4E5D4] rounded-lg p-3 hover:border-[#6B8E6B] transition-all"
               >
                 {/* Slide preview placeholder */}
-                <div className="aspect-video bg-black/30 rounded mb-2 flex items-center justify-center text-white/40 text-sm">
+                <div className="aspect-video bg-[#F5FAF7] rounded-lg mb-2 flex items-center justify-center text-[#8FA58F] text-sm">
                   Slide {index + 1}
                 </div>
 
                 {/* Slide info */}
                 <div className="flex items-center justify-between">
-                  <span className="text-white/60 text-xs uppercase">{slide.type}</span>
+                  <span className="text-[#8FA58F] text-xs uppercase">{slide.type}</span>
                   <span className={`text-sm font-medium ${getScoreColor(slide.messScore)}`}>
                     {Math.round(slide.messScore)}
                   </span>
@@ -282,7 +282,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
 
                 {/* Issues preview */}
                 {slide.messIssues.length > 0 && (
-                  <p className="text-white/40 text-xs mt-1 truncate">
+                  <p className="text-[#8FA58F] text-xs mt-1 truncate">
                     {slide.messIssues[0]}
                   </p>
                 )}
@@ -295,7 +295,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
         <div className="mt-6 flex justify-end">
           <button
             onClick={() => setStep('configure')}
-            className="flex items-center gap-2 bg-[#c5a47e] hover:bg-[#b8956f] text-black px-6 py-3 font-bold uppercase tracking-wide text-sm transition-all"
+            className="flex items-center gap-2 bg-[#6B8E6B] hover:bg-[#5A7A5A] text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all"
           >
             Choose Style
             <ChevronRight className="w-4 h-4" />
@@ -309,7 +309,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
     <div className="flex-1 flex flex-col p-8 overflow-hidden">
       {/* Style Pack Selection */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-white mb-4">Choose Your Style</h2>
+        <h2 className="text-xl font-bold text-[#1E2E1E] mb-4">Choose Your Style</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {STYLE_PACKS.map((pack) => {
             const Icon = ICON_MAP[pack.icon] || Sparkles;
@@ -322,22 +322,22 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
                 onClick={() => setSelectedPack(pack)}
                 className={`p-4 rounded-lg border-2 text-left transition-all ${
                   isSelected
-                    ? 'border-[#c5a47e] bg-[#c5a47e]/10'
-                    : 'border-white/10 bg-white/5 hover:border-white/30'
+                    ? 'border-[#6B8E6B] bg-[#EDF5F0]'
+                    : 'border-[#D4E5D4] bg-white hover:border-[#6B8E6B]'
                 }`}
               >
                 <div className="flex items-center gap-3 mb-2">
                   <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: theme?.colors.accent || '#c5a47e' }}
+                    style={{ backgroundColor: theme?.colors.accent || '#6B8E6B' }}
                   >
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{pack.name}</p>
+                    <p className="text-[#1E2E1E] font-medium">{pack.name}</p>
                   </div>
                 </div>
-                <p className="text-white/50 text-sm">{pack.description}</p>
+                <p className="text-[#8FA58F] text-sm">{pack.description}</p>
               </button>
             );
           })}
@@ -346,7 +346,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
 
       {/* Intensity Selection */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-white mb-4">Transformation Intensity</h2>
+        <h2 className="text-xl font-bold text-[#1E2E1E] mb-4">Transformation Intensity</h2>
         <div className="flex gap-4">
           {[
             { id: 'cleanup', name: 'Clean Up', icon: Sparkles, desc: 'Fix typography & alignment' },
@@ -358,13 +358,13 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
               onClick={() => setIntensity(id as TransformIntensity)}
               className={`flex-1 p-4 rounded-lg border-2 text-left transition-all ${
                 intensity === id
-                  ? 'border-[#c5a47e] bg-[#c5a47e]/10'
-                  : 'border-white/10 bg-white/5 hover:border-white/30'
+                  ? 'border-[#6B8E6B] bg-[#EDF5F0]'
+                  : 'border-[#D4E5D4] bg-white hover:border-[#6B8E6B]'
               }`}
             >
-              <IntIcon className={`w-6 h-6 mb-2 ${intensity === id ? 'text-[#c5a47e]' : 'text-white/60'}`} />
-              <p className="text-white font-medium">{name}</p>
-              <p className="text-white/50 text-sm">{desc}</p>
+              <IntIcon className={`w-6 h-6 mb-2 ${intensity === id ? 'text-[#6B8E6B]' : 'text-[#8FA58F]'}`} />
+              <p className="text-[#1E2E1E] font-medium">{name}</p>
+              <p className="text-[#8FA58F] text-sm">{desc}</p>
             </button>
           ))}
         </div>
@@ -374,14 +374,14 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
       <div className="mt-auto flex justify-between">
         <button
           onClick={() => setStep('analyze')}
-          className="flex items-center gap-2 text-white/60 hover:text-white px-4 py-2 transition-all"
+          className="flex items-center gap-2 text-[#8FA58F] hover:text-[#1E2E1E] px-4 py-2 transition-all"
         >
           <ChevronLeft className="w-4 h-4" />
           Back
         </button>
         <button
           onClick={handleTransform}
-          className="flex items-center gap-2 bg-[#c5a47e] hover:bg-[#b8956f] text-black px-6 py-3 font-bold uppercase tracking-wide text-sm transition-all"
+          className="flex items-center gap-2 bg-[#6B8E6B] hover:bg-[#5A7A5A] text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all"
         >
           Transform
           <Wand2 className="w-4 h-4" />
@@ -392,9 +392,9 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
 
   const renderTransform = () => (
     <div className="flex-1 flex flex-col items-center justify-center p-8">
-      <Loader2 className="w-16 h-16 text-[#c5a47e] animate-spin mb-6" />
-      <h2 className="text-2xl font-bold text-white mb-2">Transforming Your Deck</h2>
-      <p className="text-white/60">Applying {selectedPack.name} style with {intensity} intensity...</p>
+      <Loader2 className="w-16 h-16 text-[#6B8E6B] animate-spin mb-6" />
+      <h2 className="text-2xl font-bold text-[#1E2E1E] mb-2">Transforming Your Deck</h2>
+      <p className="text-[#8FA58F]">Applying {selectedPack.name} style with {intensity} intensity...</p>
     </div>
   );
 
@@ -409,8 +409,8 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-white">Before & After</h2>
-            <p className="text-white/60">
+            <h2 className="text-2xl font-bold text-[#1E2E1E]">Before & After</h2>
+            <p className="text-[#8FA58F]">
               Slide {currentSlideIndex + 1} of {transformedSlides.length}
             </p>
           </div>
@@ -418,7 +418,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
             <button
               onClick={() => setCurrentSlideIndex(Math.max(0, currentSlideIndex - 1))}
               disabled={currentSlideIndex === 0}
-              className="p-2 text-white/60 hover:text-white disabled:opacity-30 transition-all"
+              className="p-2 text-[#8FA58F] hover:text-[#1E2E1E] disabled:opacity-30 transition-all"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -427,7 +427,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
                 setCurrentSlideIndex(Math.min(transformedSlides.length - 1, currentSlideIndex + 1))
               }
               disabled={currentSlideIndex === transformedSlides.length - 1}
-              className="p-2 text-white/60 hover:text-white disabled:opacity-30 transition-all"
+              className="p-2 text-[#8FA58F] hover:text-[#1E2E1E] disabled:opacity-30 transition-all"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -449,10 +449,10 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
             <button
               key={index}
               onClick={() => setCurrentSlideIndex(index)}
-              className={`w-16 h-10 rounded border-2 flex-shrink-0 flex items-center justify-center text-xs transition-all ${
+              className={`w-16 h-10 rounded-lg border-2 flex-shrink-0 flex items-center justify-center text-xs transition-all ${
                 index === currentSlideIndex
-                  ? 'border-[#c5a47e] bg-[#c5a47e]/20 text-white'
-                  : 'border-white/10 bg-white/5 text-white/60 hover:border-white/30'
+                  ? 'border-[#6B8E6B] bg-[#EDF5F0] text-[#1E2E1E]'
+                  : 'border-[#D4E5D4] bg-white text-[#8FA58F] hover:border-[#6B8E6B]'
               }`}
             >
               {index + 1}
@@ -464,7 +464,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
         <div className="mt-6 flex justify-between">
           <button
             onClick={() => setStep('configure')}
-            className="flex items-center gap-2 text-white/60 hover:text-white px-4 py-2 transition-all"
+            className="flex items-center gap-2 text-[#8FA58F] hover:text-[#1E2E1E] px-4 py-2 transition-all"
           >
             <RefreshCw className="w-4 h-4" />
             Try Different Style
@@ -472,7 +472,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
           <div className="flex gap-3">
             <button
               onClick={handleComplete}
-              className="flex items-center gap-2 bg-[#c5a47e] hover:bg-[#b8956f] text-black px-6 py-3 font-bold uppercase tracking-wide text-sm transition-all"
+              className="flex items-center gap-2 bg-[#6B8E6B] hover:bg-[#5A7A5A] text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all"
             >
               <CheckCircle2 className="w-4 h-4" />
               Save to Library
@@ -488,12 +488,12 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0a] z-50 flex flex-col">
+    <div className="fixed inset-0 bg-[#F5FAF7] z-50 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#D4E5D4]">
         <div className="flex items-center gap-3">
-          <Wand2 className="w-6 h-6 text-[#c5a47e]" />
-          <h1 className="text-lg font-bold text-white uppercase tracking-wide">
+          <Wand2 className="w-6 h-6 text-[#6B8E6B]" />
+          <h1 className="text-lg font-bold text-[#1E2E1E] uppercase tracking-wide">
             Make My Deck Beautiful
           </h1>
         </div>
@@ -502,14 +502,14 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
         <div className="flex items-center gap-2">
           {(['upload', 'analyze', 'configure', 'review'] as const).map((s, i) => (
             <React.Fragment key={s}>
-              {i > 0 && <div className="w-8 h-px bg-white/20" />}
+              {i > 0 && <div className="w-8 h-px bg-[#D4E5D4]" />}
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
                   step === s
-                    ? 'bg-[#c5a47e] text-black'
+                    ? 'bg-[#6B8E6B] text-white'
                     : ['upload', 'analyze', 'configure', 'review'].indexOf(step) > i
-                    ? 'bg-[#c5a47e]/30 text-[#c5a47e]'
-                    : 'bg-white/10 text-white/40'
+                    ? 'bg-[#EDF5F0] text-[#6B8E6B]'
+                    : 'bg-white text-[#8FA58F]'
                 }`}
               >
                 {i + 1}
@@ -520,7 +520,7 @@ export const BeautifyWizard: React.FC<BeautifyWizardProps> = ({ onClose, onCompl
 
         <button
           onClick={onClose}
-          className="p-2 text-white/60 hover:text-white transition-all"
+          className="p-2 text-[#8FA58F] hover:text-[#1E2E1E] transition-all"
         >
           <X className="w-5 h-5" />
         </button>

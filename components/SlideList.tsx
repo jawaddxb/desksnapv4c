@@ -18,10 +18,10 @@ export const SlideList: React.FC<SlideListProps> = ({
     viewMode, activeWabiSabiLayout
 }) => {
     return (
-        <div className="flex flex-col flex-1 h-full min-h-0 overflow-hidden animate-in fade-in duration-150 bg-black">
-            <div className="h-full overflow-y-auto p-4 bg-black">
+        <div className="flex flex-col flex-1 h-full min-h-0 overflow-hidden animate-in fade-in duration-150 bg-[#EDF5F0]">
+            <div className="h-full overflow-y-auto p-4 bg-[#EDF5F0]">
                 <div className="flex items-center justify-between mb-4 px-1 flex-none">
-                    <div className="flex items-center gap-2"><Grid3X3 className="w-4 h-4 text-white/40" strokeWidth={2.5} /><h3 className="text-xs font-bold uppercase tracking-widest text-white/40">Deck Overview</h3></div>
+                    <div className="flex items-center gap-2"><Grid3X3 className="w-4 h-4 text-[#6B8E6B]" strokeWidth={2.5} /><h3 className="text-xs font-bold uppercase tracking-widest text-[#8FA58F]">Deck Overview</h3></div>
                 </div>
                 {/* Compact grid layout for smaller thumbnails */}
                 <div className="flex flex-wrap gap-2 pb-20">

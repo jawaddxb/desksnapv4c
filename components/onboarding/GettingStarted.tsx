@@ -53,21 +53,21 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
   const canDismiss = completedCount > 0;
 
   return (
-    <div className="mb-8 bg-[#0a0a0a] border border-white/10 overflow-hidden">
+    <div className="mb-8 bg-white border border-[#D4E5D4] rounded-lg overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-[#D4E5D4] flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-white">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-[#1E2E1E]">
             Getting Started
           </h2>
-          <span className="text-xs text-white/40">
+          <span className="text-xs text-[#8FA58F]">
             {completedCount} of {totalSteps} complete
           </span>
         </div>
         {canDismiss && (
           <button
             onClick={onDismiss}
-            className="p-1 text-white/30 hover:text-white/60 transition-colors duration-150"
+            className="p-1 text-[#8FA58F] hover:text-[#4A5D4A] transition-colors duration-150"
             aria-label="Dismiss getting started"
           >
             <X className="w-4 h-4" />
@@ -76,9 +76,9 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-white/5">
+      <div className="h-1 bg-[#D4E5D4]">
         <div
-          className="h-full bg-[#c5a47e] transition-all duration-500 ease-out"
+          className="h-full bg-[#6B8E6B] transition-all duration-500 ease-out"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -94,18 +94,18 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
                 key={item.id}
                 onClick={() => !isCompleted && onStepClick(item.id)}
                 disabled={isCompleted}
-                className={`group p-4 text-left transition-all duration-150 flex items-start gap-3 ${
+                className={`group p-4 text-left transition-all duration-150 flex items-start gap-3 rounded-lg ${
                   isCompleted
-                    ? 'bg-[#c5a47e]/10 border border-[#c5a47e]/20 cursor-default'
-                    : 'bg-black border border-white/10 hover:border-white/30 hover:bg-white/5 cursor-pointer'
+                    ? 'bg-[#6B8E6B]/10 border border-[#6B8E6B]/20 cursor-default'
+                    : 'bg-[#F5FAF7] border border-[#D4E5D4] hover:border-[#6B8E6B]/40 hover:bg-[#EDF5F0] cursor-pointer'
                 }`}
               >
                 {/* Checkbox/Icon */}
                 <div
-                  className={`w-8 h-8 flex-shrink-0 flex items-center justify-center transition-all duration-150 ${
+                  className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded transition-all duration-150 ${
                     isCompleted
-                      ? 'bg-[#c5a47e] text-black'
-                      : 'bg-white/5 text-white/40 group-hover:bg-white/10 group-hover:text-white/60'
+                      ? 'bg-[#6B8E6B] text-white'
+                      : 'bg-[#6B8E6B]/10 text-[#8FA58F] group-hover:bg-[#6B8E6B]/15 group-hover:text-[#6B8E6B]'
                   }`}
                 >
                   {isCompleted ? (
@@ -120,15 +120,15 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
                   <h3
                     className={`text-sm font-medium mb-0.5 transition-colors duration-150 ${
                       isCompleted
-                        ? 'text-[#c5a47e] line-through'
-                        : 'text-white group-hover:text-white'
+                        ? 'text-[#6B8E6B] line-through'
+                        : 'text-[#1E2E1E] group-hover:text-[#1E2E1E]'
                     }`}
                   >
                     {item.title}
                   </h3>
                   <p
                     className={`text-xs transition-colors duration-150 ${
-                      isCompleted ? 'text-white/30' : 'text-white/40'
+                      isCompleted ? 'text-[#8FA58F]' : 'text-[#8FA58F]'
                     }`}
                   >
                     {item.description}
@@ -137,7 +137,7 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
 
                 {/* Arrow for incomplete items */}
                 {!isCompleted && (
-                  <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-white/40 flex-shrink-0 mt-2 transition-colors duration-150" />
+                  <ArrowRight className="w-4 h-4 text-[#8FA58F] group-hover:text-[#6B8E6B] flex-shrink-0 mt-2 transition-colors duration-150" />
                 )}
               </button>
             );

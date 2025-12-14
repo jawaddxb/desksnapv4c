@@ -40,7 +40,7 @@ export function PresentationModeOverlay({
       {/* Close Button */}
       <button
         onClick={onExit}
-        className="absolute top-6 right-6 z-[1000] p-3 bg-black/70 hover:bg-[#c5a47e] text-white hover:text-black backdrop-blur-md transition-all duration-150 cursor-pointer shadow-lg"
+        className="absolute top-6 right-6 z-[1000] p-3 bg-[#4A5D4A]/80 hover:bg-[#6B8E6B] text-white backdrop-blur-md transition-all duration-150 cursor-pointer shadow-lg rounded-lg"
       >
         <X className="w-6 h-6" />
       </button>
@@ -49,7 +49,7 @@ export function PresentationModeOverlay({
       {!isFirstSlide && (
         <button
           onClick={onPreviousSlide}
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/30 hover:bg-black/70 text-white/50 hover:text-white backdrop-blur-sm transition-all duration-150 cursor-pointer"
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-[#4A5D4A]/30 hover:bg-[#4A5D4A]/70 text-white/50 hover:text-white backdrop-blur-sm transition-all duration-150 cursor-pointer rounded-lg"
         >
           <ChevronLeft className="w-10 h-10" strokeWidth={1.5} />
         </button>
@@ -59,14 +59,14 @@ export function PresentationModeOverlay({
       {!isLastSlide && (
         <button
           onClick={onNextSlide}
-          className="absolute right-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-black/30 hover:bg-black/70 text-white/50 hover:text-white backdrop-blur-sm transition-all duration-150 cursor-pointer"
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-[1000] p-4 bg-[#4A5D4A]/30 hover:bg-[#4A5D4A]/70 text-white/50 hover:text-white backdrop-blur-sm transition-all duration-150 cursor-pointer rounded-lg"
         >
           <ChevronRight className="w-10 h-10" strokeWidth={1.5} />
         </button>
       )}
 
       {/* Slide Counter */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] px-4 py-1.5 bg-black/70 backdrop-blur-md text-white/80 text-[10px] font-bold uppercase tracking-widest pointer-events-none border border-white/10">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] px-4 py-1.5 bg-[#4A5D4A]/80 backdrop-blur-md text-white/90 text-[10px] font-bold uppercase tracking-widest pointer-events-none border border-[#6B8E6B]/30 rounded-md">
         {activeSlideIndex + 1} / {totalSlides}
       </div>
     </>

@@ -105,21 +105,21 @@ function SlideAgentCard({ slideIndex, slideTitle, logs, onCopyPrompt }: SlideAge
   };
 
   return (
-    <div className="bg-white/5 rounded-lg overflow-hidden">
+    <div className="bg-[#EDF5F0] rounded-lg overflow-hidden border border-[#D4E5D4]">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#D4E5D4] transition-colors text-[#1E2E1E]"
       >
         <div className="flex items-center gap-3">
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-white/50" />
+            <ChevronDown className="w-4 h-4 text-[#8FA58F]" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-white/50" />
+            <ChevronRight className="w-4 h-4 text-[#8FA58F]" />
           )}
           <span className="font-medium">Slide {slideIndex + 1}</span>
           {slideTitle && (
-            <span className="text-white/50 text-sm truncate max-w-[200px]">
+            <span className="text-[#8FA58F] text-sm truncate max-w-[200px]">
               {slideTitle}
             </span>
           )}
@@ -149,7 +149,7 @@ function SlideAgentCard({ slideIndex, slideTitle, logs, onCopyPrompt }: SlideAge
           </span>
 
           {/* Iterations */}
-          <span className="text-white/50 text-xs">
+          <span className="text-[#8FA58F] text-xs">
             {summary.iterations} iter{summary.iterations !== 1 ? 's' : ''}
           </span>
         </div>
@@ -157,13 +157,13 @@ function SlideAgentCard({ slideIndex, slideTitle, logs, onCopyPrompt }: SlideAge
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="border-t border-white/10 p-4 space-y-4">
+        <div className="border-t border-[#D4E5D4] p-4 space-y-4">
           {/* Score Progression */}
           {summary.wasRefined && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-white/50">Score:</span>
+              <span className="text-[#8FA58F]">Score:</span>
               <span className={getScoreColor(summary.initialScore)}>{summary.initialScore}</span>
-              <span className="text-white/30">→</span>
+              <span className="text-[#8FA58F]">→</span>
               <span className={getScoreColor(summary.finalScore)}>{summary.finalScore}</span>
               <span className="text-green-400">
                 (+{summary.finalScore - summary.initialScore})
@@ -180,25 +180,25 @@ function SlideAgentCard({ slideIndex, slideTitle, logs, onCopyPrompt }: SlideAge
 
           {/* Final Prompt */}
           {summary.finalPrompt && (
-            <div className="mt-4 p-3 bg-white/5 rounded-lg">
+            <div className="mt-4 p-3 bg-white rounded-lg border border-[#D4E5D4]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#c5a47e]">Final Prompt</span>
+                <span className="text-sm font-medium text-[#6B8E6B]">Final Prompt</span>
                 <button
                   onClick={() => copyToClipboard(summary.finalPrompt)}
-                  className="p-1 hover:bg-white/10 rounded transition-colors"
+                  className="p-1 hover:bg-[#D4E5D4] rounded transition-colors text-[#1E2E1E]"
                   title="Copy prompt"
                 >
                   <Copy className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-sm text-white/70 font-mono break-words">
+              <p className="text-sm text-[#1E2E1E] font-mono break-words">
                 {summary.finalPrompt}
               </p>
             </div>
           )}
 
           {/* Timing */}
-          <div className="text-xs text-white/40 flex items-center gap-1">
+          <div className="text-xs text-[#8FA58F] flex items-center gap-1">
             <RefreshCw className="w-3 h-3" />
             {summary.totalDurationMs}ms total
           </div>
@@ -259,9 +259,9 @@ function LogEntry({ log, onCopy }: LogEntryProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className={`font-medium ${color}`}>{label}</span>
-            <span className="text-white/30 text-xs">iter {log.iteration}</span>
+            <span className="text-[#8FA58F] text-xs">iter {log.iteration}</span>
             {log.durationMs && (
-              <span className="text-white/30 text-xs">{log.durationMs}ms</span>
+              <span className="text-[#8FA58F] text-xs">{log.durationMs}ms</span>
             )}
           </div>
 
@@ -287,14 +287,14 @@ function LogEntry({ log, onCopy }: LogEntryProps) {
 
           {/* Rewrite reasoning inline */}
           {log.action === 'rewrite' && log.reasoning && (
-            <p className="text-white/50 text-xs mt-1 truncate">
+            <p className="text-[#8FA58F] text-xs mt-1 truncate">
               {log.reasoning}
             </p>
           )}
         </div>
 
         <ChevronRight
-          className={`w-4 h-4 text-white/30 transition-transform ${
+          className={`w-4 h-4 text-[#8FA58F] transition-transform ${
             showDetails ? 'rotate-90' : ''
           }`}
         />
@@ -302,19 +302,19 @@ function LogEntry({ log, onCopy }: LogEntryProps) {
 
       {/* Expanded Details */}
       {showDetails && (
-        <div className="ml-6 mt-2 p-3 bg-white/5 rounded-lg space-y-3">
+        <div className="ml-6 mt-2 p-3 bg-white rounded-lg space-y-3 border border-[#D4E5D4]">
           {/* Input */}
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-white/50 text-xs mb-1">Input:</span>
+              <span className="text-[#8FA58F] text-xs mb-1">Input:</span>
               <button
                 onClick={() => onCopy(log.input)}
-                className="p-1 hover:bg-white/10 rounded"
+                className="p-1 hover:bg-[#D4E5D4] rounded text-[#1E2E1E]"
               >
                 <Copy className="w-3 h-3" />
               </button>
             </div>
-            <p className="text-xs font-mono text-white/70 break-words">
+            <p className="text-xs font-mono text-[#1E2E1E] break-words">
               {log.input.substring(0, 200)}
               {log.input.length > 200 && '...'}
             </p>
@@ -323,8 +323,8 @@ function LogEntry({ log, onCopy }: LogEntryProps) {
           {/* Validation Issues */}
           {validationResult && validationResult.issues.length > 0 && (
             <div>
-              <span className="text-white/50 text-xs mb-1 block">Issues:</span>
-              <ul className="text-xs text-red-400/80 space-y-1">
+              <span className="text-[#8FA58F] text-xs mb-1 block">Issues:</span>
+              <ul className="text-xs text-red-600 space-y-1">
                 {validationResult.issues.map((issue, i) => (
                   <li key={i} className="flex items-start gap-1">
                     <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
@@ -338,8 +338,8 @@ function LogEntry({ log, onCopy }: LogEntryProps) {
           {/* Validation Suggestions */}
           {validationResult && validationResult.suggestions.length > 0 && (
             <div>
-              <span className="text-white/50 text-xs mb-1 block">Suggestions:</span>
-              <ul className="text-xs text-blue-400/80 space-y-1">
+              <span className="text-[#8FA58F] text-xs mb-1 block">Suggestions:</span>
+              <ul className="text-xs text-blue-600 space-y-1">
                 {validationResult.suggestions.map((suggestion, i) => (
                   <li key={i}>• {suggestion}</li>
                 ))}
@@ -351,15 +351,15 @@ function LogEntry({ log, onCopy }: LogEntryProps) {
           {log.action === 'rewrite' && (
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-white/50 text-xs mb-1">Rewritten:</span>
+                <span className="text-[#8FA58F] text-xs mb-1">Rewritten:</span>
                 <button
                   onClick={() => onCopy(log.output)}
-                  className="p-1 hover:bg-white/10 rounded"
+                  className="p-1 hover:bg-[#D4E5D4] rounded text-[#1E2E1E]"
                 >
                   <Copy className="w-3 h-3" />
                 </button>
               </div>
-              <p className="text-xs font-mono text-green-400/80 break-words">
+              <p className="text-xs font-mono text-green-600 break-words">
                 {log.output}
               </p>
             </div>
@@ -368,8 +368,8 @@ function LogEntry({ log, onCopy }: LogEntryProps) {
           {/* Reasoning */}
           {log.reasoning && log.action !== 'rewrite' && (
             <div>
-              <span className="text-white/50 text-xs mb-1 block">Reasoning:</span>
-              <p className="text-xs text-white/70">{log.reasoning}</p>
+              <span className="text-[#8FA58F] text-xs mb-1 block">Reasoning:</span>
+              <p className="text-xs text-[#1E2E1E]">{log.reasoning}</p>
             </div>
           )}
         </div>
@@ -424,9 +424,9 @@ export function ImageAgentDebugPanel({
 
   if (agentLogs.length === 0) {
     return (
-      <div className="text-center py-12 text-white/50">
+      <div className="text-center py-12 text-[#8FA58F]">
         <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-30" />
-        <h3 className="text-lg font-medium mb-2">No Agent Logs</h3>
+        <h3 className="text-lg font-medium mb-2 text-[#1E2E1E]">No Agent Logs</h3>
         <p className="text-sm">
           Generate images for a presentation to see the agent's reasoning here.
         </p>
@@ -438,41 +438,41 @@ export function ImageAgentDebugPanel({
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-bold flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-[#c5a47e]" />
+        <h2 className="text-lg font-bold flex items-center gap-2 text-[#1E2E1E]">
+          <Sparkles className="w-5 h-5 text-[#6B8E6B]" />
           Image Agent Inspector
         </h2>
         {presentationTopic && (
-          <p className="text-sm text-white/50 mt-1">Topic: {presentationTopic}</p>
+          <p className="text-sm text-[#8FA58F] mt-1">Topic: {presentationTopic}</p>
         )}
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-white/5 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-[#c5a47e]">{stats.totalSlides}</div>
-          <div className="text-xs text-white/50">Slides</div>
+        <div className="bg-white rounded-lg p-3 text-center border border-[#D4E5D4]">
+          <div className="text-2xl font-bold text-[#6B8E6B]">{stats.totalSlides}</div>
+          <div className="text-xs text-[#8FA58F]">Slides</div>
         </div>
-        <div className="bg-white/5 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-green-400">{stats.passedSlides}</div>
-          <div className="text-xs text-white/50">Passed</div>
+        <div className="bg-white rounded-lg p-3 text-center border border-[#D4E5D4]">
+          <div className="text-2xl font-bold text-green-600">{stats.passedSlides}</div>
+          <div className="text-xs text-[#8FA58F]">Passed</div>
         </div>
-        <div className="bg-white/5 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-amber-400">{stats.refinedSlides}</div>
-          <div className="text-xs text-white/50">Refined</div>
+        <div className="bg-white rounded-lg p-3 text-center border border-[#D4E5D4]">
+          <div className="text-2xl font-bold text-amber-600">{stats.refinedSlides}</div>
+          <div className="text-xs text-[#8FA58F]">Refined</div>
         </div>
-        <div className="bg-white/5 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-white/70">
+        <div className="bg-white rounded-lg p-3 text-center border border-[#D4E5D4]">
+          <div className="text-2xl font-bold text-[#1E2E1E]">
             {(stats.totalDuration / 1000).toFixed(1)}s
           </div>
-          <div className="text-xs text-white/50">Duration</div>
+          <div className="text-xs text-[#8FA58F]">Duration</div>
         </div>
       </div>
 
       {/* Global Logs (Keywords) */}
       {globalLogs.length > 0 && (
-        <div className="bg-white/5 rounded-lg p-4">
-          <h3 className="text-sm font-medium mb-2 text-purple-400 flex items-center gap-2">
+        <div className="bg-white rounded-lg p-4 border border-[#D4E5D4]">
+          <h3 className="text-sm font-medium mb-2 text-purple-600 flex items-center gap-2">
             <Sparkles className="w-4 h-4" />
             Topic Keywords
           </h3>
@@ -483,20 +483,20 @@ export function ImageAgentDebugPanel({
                 return (
                   <div key={idx} className="text-sm space-y-2">
                     <div>
-                      <span className="text-white/50">Keywords:</span>{' '}
-                      <span className="text-white/80">
+                      <span className="text-[#8FA58F]">Keywords:</span>{' '}
+                      <span className="text-[#1E2E1E]">
                         {keywords.keywords?.join(', ')}
                       </span>
                     </div>
                     <div>
-                      <span className="text-white/50">Visual Subjects:</span>{' '}
-                      <span className="text-white/80">
+                      <span className="text-[#8FA58F]">Visual Subjects:</span>{' '}
+                      <span className="text-[#1E2E1E]">
                         {keywords.visualSubjects?.join(', ')}
                       </span>
                     </div>
                     <div>
-                      <span className="text-white/50">Avoid:</span>{' '}
-                      <span className="text-red-400/70">
+                      <span className="text-[#8FA58F]">Avoid:</span>{' '}
+                      <span className="text-red-600">
                         {keywords.avoidTerms?.join(', ')}
                       </span>
                     </div>

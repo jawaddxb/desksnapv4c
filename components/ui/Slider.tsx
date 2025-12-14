@@ -51,7 +51,7 @@ export const Slider: React.FC<SliderProps> = ({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <span className={`text-[10px] text-zinc-500 ${labelWidth}`}>
+      <span className={`text-[10px] text-[#4A5D4A] ${labelWidth}`}>
         {label}
       </span>
       <input
@@ -63,11 +63,11 @@ export const Slider: React.FC<SliderProps> = ({
         onChange={handleChange}
         disabled={disabled}
         className={`
-          flex-1 h-1 bg-zinc-200 rounded-full appearance-none cursor-pointer accent-zinc-900
+          flex-1 h-1 bg-[#D4E5D4] rounded-full appearance-none cursor-pointer accent-[#6B8E6B]
           ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       />
-      <span className={`text-[10px] text-zinc-400 text-right ${valueWidth}`}>
+      <span className={`text-[10px] text-[#8FA58F] text-right ${valueWidth}`}>
         {formatValue(value)}
       </span>
     </div>
