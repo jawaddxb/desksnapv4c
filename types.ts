@@ -44,12 +44,9 @@ export interface ThemeContentStyle {
   bulletSize?: number;           // 6-14px
   bulletColor?: 'accent' | 'text' | 'secondary';
   itemSpacing?: number;          // gap between items (8-20)
-  itemPadding?: string;          // e.g., "8px 16px"
-  itemBackground?: 'accent' | 'none';  // 'accent' = 15% opacity accent
-  itemBorderRadius?: string;     // "full", "8px", "0"
-  leftAccentBorder?: boolean;    // accent-colored left border
-  leftBorderWidth?: number;      // width of left border (2-4px)
   numberedSuffix?: '.' | ')' | '';
+  // Container visual preset (replaces itemPadding, itemBackground, itemBorderRadius)
+  visualPreset?: ContentItemVisualPreset;
 }
 
 // Style override types for editing
@@ -218,7 +215,8 @@ export interface PresentationPlanResponse {
   themeId: string;
   slides: {
     title: string;
-    bulletPoints: string[];
+    bulletPoints?: string[];  // Legacy format
+    contentBlocks?: ContentBlock[];  // Rich content blocks (preferred)
     speakerNotes: string;
     imageVisualDescription: string;
     layoutType: LayoutType;
@@ -253,8 +251,6 @@ export interface Theme {
   imageStyle: string;
   // Content/bullet styling (theme-driven variety)
   contentStyle?: ThemeContentStyle;
-  // Default visual preset for content items (theme-level default)
-  contentItemVisualPreset?: ContentItemVisualPreset;
 }
 
 export type GenerationMode = 'concise' | 'balanced' | 'detailed' | 'verbatim';

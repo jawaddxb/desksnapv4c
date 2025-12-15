@@ -1,26 +1,24 @@
 import type { ThemeContentStyle } from '@/types';
 
 /**
- * Content style presets for theme-driven bullet variety.
- * Each theme can reference a preset or define custom styling.
+ * Content style presets for theme-driven variety.
+ * Combines bullet styling with container visual presets.
  */
 export const CONTENT_STYLE_PRESETS = {
-  // Minimal: Small dots, clean spacing
+  // Minimal: Small dots, clean spacing, no container
   minimal: {
     bulletStyle: 'dot',
     bulletSize: 6,
     bulletColor: 'secondary',
     itemSpacing: 12,
+    visualPreset: 'minimal',
   } satisfies ThemeContentStyle,
 
-  // Modern: Dashes with left accent border
+  // Modern: Sharp left-accent containers
   modern: {
-    bulletStyle: 'dash',
-    bulletSize: 12,
-    bulletColor: 'accent',
+    bulletStyle: 'none',
     itemSpacing: 16,
-    leftAccentBorder: true,
-    leftBorderWidth: 2,
+    visualPreset: 'sharp',
   } satisfies ThemeContentStyle,
 
   // Numbered: Auto-numbered list style
@@ -29,23 +27,37 @@ export const CONTENT_STYLE_PRESETS = {
     bulletColor: 'accent',
     itemSpacing: 16,
     numberedSuffix: '.',
+    visualPreset: 'minimal',
   } satisfies ThemeContentStyle,
 
-  // Statement: Pill-shaped backgrounds (current behavior, refined)
+  // Statement: Pill-shaped containers
   statement: {
     bulletStyle: 'none',
-    itemBackground: 'accent',
-    itemPadding: '12px 24px',
-    itemBorderRadius: 'full',
     itemSpacing: 8,
+    visualPreset: 'pill',
   } satisfies ThemeContentStyle,
 
-  // Elegant: Diamond markers with generous spacing
+  // Card: Elevated card containers
+  card: {
+    bulletStyle: 'none',
+    itemSpacing: 12,
+    visualPreset: 'card',
+  } satisfies ThemeContentStyle,
+
+  // Glass: Modern glass morphism
+  glass: {
+    bulletStyle: 'none',
+    itemSpacing: 12,
+    visualPreset: 'glass',
+  } satisfies ThemeContentStyle,
+
+  // Elegant: Diamond markers with underline
   elegant: {
     bulletStyle: 'diamond',
     bulletSize: 8,
     bulletColor: 'accent',
     itemSpacing: 20,
+    visualPreset: 'underline',
   } satisfies ThemeContentStyle,
 
   // Technical: Square markers, compact
@@ -54,6 +66,7 @@ export const CONTENT_STYLE_PRESETS = {
     bulletSize: 8,
     bulletColor: 'text',
     itemSpacing: 12,
+    visualPreset: 'minimal',
   } satisfies ThemeContentStyle,
 
   // Checklist: Checkmark markers
@@ -62,6 +75,7 @@ export const CONTENT_STYLE_PRESETS = {
     bulletSize: 14,
     bulletColor: 'accent',
     itemSpacing: 12,
+    visualPreset: 'minimal',
   } satisfies ThemeContentStyle,
 
   // Arrow: Arrow/chevron markers
@@ -70,14 +84,7 @@ export const CONTENT_STYLE_PRESETS = {
     bulletSize: 10,
     bulletColor: 'accent',
     itemSpacing: 14,
-  } satisfies ThemeContentStyle,
-
-  // Circle: Outlined circles
-  circle: {
-    bulletStyle: 'circle',
-    bulletSize: 10,
-    bulletColor: 'accent',
-    itemSpacing: 14,
+    visualPreset: 'minimal',
   } satisfies ThemeContentStyle,
 } as const;
 

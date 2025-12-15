@@ -3,6 +3,7 @@ import React, { useRef, useState, useMemo } from 'react';
 import { Presentation } from '@/types';
 import { IdeationSession, DeckRecipe } from '@/types/ideation';
 import { RoughDraft } from '@/types/roughDraft';
+import { AgentId } from '@/types/agents';
 import { THEMES } from '@/config/themes';
 import { WabiSabiStage } from './WabiSabiStage';
 import {
@@ -12,9 +13,11 @@ import {
 import { AnalyticsModal } from './AnalyticsModal';
 import { RecipeSelector } from './sources/RecipeSelector';
 import { FeatureCards } from './dashboard/FeatureCards';
+import { AgentSquadSection } from './dashboard/AgentSquadSection';
 import { GettingStarted } from './onboarding/GettingStarted';
 import { useOnboarding, OnboardingStep } from '@/hooks/useOnboarding';
 import { UnifiedCreateModal } from './create-flow';
+import { TrainMySquadModal } from './TrainMySquad';
 
 type WorkItemType = 'deck' | 'draft' | 'ideation';
 type FilterType = 'all' | WorkItemType;
@@ -233,6 +236,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [recipeSelectorOpen, setRecipeSelectorOpen] = useState(false);
   const [pendingPreset, setPendingPreset] = useState<'video' | 'web' | 'mixed'>('video');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [trainSquadOpen, setTrainSquadOpen] = useState(false);
+  const [selectedAgentForTraining, setSelectedAgentForTraining] = useState<AgentId | undefined>();
+
+  // Handler for opening Train My Squad modal
+  const handleOpenTrainSquad = (agentId?: AgentId) => {
+    setSelectedAgentForTraining(agentId);
+    setTrainSquadOpen(true);
+  };
 
   // Onboarding
   const {
@@ -413,6 +424,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
         isGenerating={isGeneratingDeck}
       />
 
+      {/* Train My Squad Modal */}
+      <TrainMySquadModal
+        isOpen={trainSquadOpen}
+        onClose={() => setTrainSquadOpen(false)}
+        initialAgentId={selectedAgentForTraining}
+      />
+
       <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
 
       <div className="max-w-7xl mx-auto">
@@ -425,6 +443,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
           onBeautify={onBeautify}
           onImport={handleImportClick}
         />
+
+        {/* My Agent Squad Section */}
+        <AgentSquadSection onOpenTrainSquad={handleOpenTrainSquad} />
 
         {/* Getting Started Checklist */}
         {onboardingLoaded && showChecklist && (

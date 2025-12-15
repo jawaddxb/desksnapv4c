@@ -44,11 +44,11 @@ export interface AgentTeamMember {
  * Static configuration for all 5 agents
  */
 export const AGENT_TEAM: AgentConfig[] = [
-  { id: 'scout', name: 'Scout', tagline: 'Finding the facts', avatar: '/agents/scout.png', color: '#4A90A4' },
-  { id: 'sage', name: 'Sage', tagline: 'Structuring your message', avatar: '/agents/sage.png', color: '#6B8E6B' },
-  { id: 'aria', name: 'Aria', tagline: 'Crafting your story', avatar: '/agents/aria.png', color: '#C9A962' },
-  { id: 'nova', name: 'Nova', tagline: 'Making your vision real', avatar: '/agents/nova.png', color: '#A78BFA' },
-  { id: 'coach', name: 'Coach', tagline: 'Polishing for impact', avatar: '/agents/coach.png', color: '#D4854A' },
+  { id: 'scout', name: 'Scout', tagline: 'Finding the facts', avatar: '/images/Scout---Explorer.svg', color: '#4A90A4' },
+  { id: 'sage', name: 'Sage', tagline: 'Structuring your message', avatar: '/images/Sage---architect.svg', color: '#6B8E6B' },
+  { id: 'aria', name: 'Aria', tagline: 'Crafting your story', avatar: '/images/Aria.svg', color: '#C9A962' },
+  { id: 'nova', name: 'Nova', tagline: 'Making your vision real', avatar: '/images/Nova---Painter.svg', color: '#A78BFA' },
+  { id: 'coach', name: 'Coach', tagline: 'Polishing for impact', avatar: '/images/Coach---Coach.svg', color: '#D4854A' },
 ];
 
 /**
@@ -56,6 +56,28 @@ export const AGENT_TEAM: AgentConfig[] = [
  */
 export const getAgentConfig = (id: AgentId): AgentConfig | undefined =>
   AGENT_TEAM.find(agent => agent.id === id);
+
+/**
+ * Role titles for each agent (for Dashboard display)
+ */
+export const AGENT_ROLES: Record<AgentId, string> = {
+  scout: 'Research Specialist',
+  sage: 'Design Architect',
+  aria: 'Content Writer',
+  nova: 'Visual Designer',
+  coach: 'Quality Advisor',
+};
+
+/**
+ * Example tasks each agent excels at (for Dashboard display)
+ */
+export const AGENT_EXAMPLES: Record<AgentId, string[]> = {
+  scout: ['Find market statistics', 'Search trending topics', 'Gather expert quotes'],
+  sage: ['Select perfect theme', 'Choose optimal layouts', 'Match topic to style'],
+  aria: ['Write compelling headlines', 'Structure narrative arc', 'Add speaker notes'],
+  nova: ['Generate custom images', 'Validate visual prompts', 'Apply theme aesthetics'],
+  coach: ['Review content clarity', 'Check audience fit', 'Suggest improvements'],
+};
 
 // ============ Agent Action Types ============
 

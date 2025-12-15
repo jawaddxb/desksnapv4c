@@ -2,6 +2,7 @@
 import { THEMES } from '../config/themes';
 import { Type } from "@google/genai";
 import { GenerationMode } from '@/types';
+import { BLOCK_EXAMPLES } from './contentBlockPrompts';
 
 // --- HELPERS ---
 
@@ -73,10 +74,21 @@ Layout Options: 'split', 'full-bleed', 'statement', 'gallery', 'card', 'horizont
 Step 5: CONSTRUCT SLIDES
 For each slide, provide:
 - title
-- bulletPoints (3-4 max)
+- contentBlocks (rich content array - see below)
 - speakerNotes
 - layoutType & alignment
 - imageVisualDescription (MASTER-LEVEL GENERATIVE PROMPT).
+
+**Content Blocks (IMPORTANT):**
+Use contentBlocks instead of bulletPoints for richer presentations:
+- bullets: ${BLOCK_EXAMPLES.bullets}
+- statistic: ${BLOCK_EXAMPLES.statistic}
+- quote: ${BLOCK_EXAMPLES.quote}
+- chart: ${BLOCK_EXAMPLES.chart}
+- paragraph: ${BLOCK_EXAMPLES.paragraph}
+
+*Chart Rule*: When presenting data, metrics, or comparisons, USE CHARTS. Generate realistic data.
+*Mix Rule*: Vary block types across slides for visual interest.
 
 Use this **Layered Formula** for images:
 1. [Subject] The core object/scene tailored to the Art Direction.
@@ -98,7 +110,38 @@ export const PRESENTATION_SCHEMA = {
           type: Type.OBJECT,
           properties: {
             title: { type: Type.STRING },
-            bulletPoints: { type: Type.ARRAY, items: { type: Type.STRING } },
+            bulletPoints: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Legacy format - use contentBlocks instead" },
+            contentBlocks: {
+                type: Type.ARRAY,
+                description: "Rich content blocks (bullets, statistics, charts, quotes). Prefer this over bulletPoints.",
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        type: { type: Type.STRING, enum: ['paragraph', 'bullets', 'numbered', 'quote', 'statistic', 'chart'] },
+                        // Paragraph/Quote/Callout
+                        text: { type: Type.STRING },
+                        // Bullets/Numbered
+                        items: { type: Type.ARRAY, items: { type: Type.STRING } },
+                        // Quote
+                        attribution: { type: Type.STRING },
+                        // Statistic
+                        value: { type: Type.STRING },
+                        label: { type: Type.STRING },
+                        trend: { type: Type.STRING, enum: ['up', 'down', 'neutral'] },
+                        // Chart
+                        chartType: { type: Type.STRING, enum: ['bar', 'line', 'pie', 'donut'] },
+                        data: {
+                            type: Type.OBJECT,
+                            properties: {
+                                labels: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                values: { type: Type.ARRAY, items: { type: Type.NUMBER } }
+                            }
+                        },
+                        title: { type: Type.STRING }
+                    },
+                    required: ["type"]
+                }
+            },
             speakerNotes: { type: Type.STRING },
             imageVisualDescription: { type: Type.STRING, description: "A comma-separated complex image prompt describing the SUBJECT only" },
             layoutType: {
@@ -112,7 +155,7 @@ export const PRESENTATION_SCHEMA = {
                 description: "Content alignment for organic flow"
             }
           },
-          required: ["title", "bulletPoints", "speakerNotes", "imageVisualDescription", "layoutType", "alignment"]
+          required: ["title", "contentBlocks", "speakerNotes", "imageVisualDescription", "layoutType", "alignment"]
         }
       }
     },

@@ -49,11 +49,17 @@ import {
 // Agent activity context for agent logs
 import { useAgentActivitySafe } from '@/contexts/AgentActivityContext';
 
+// Agent customization hook
+import { useAgentSteps } from '@/hooks/useAgentSteps';
+
 export const useDeck = () => {
   const queryClient = useQueryClient();
 
   // Agent activity context for activity display (safe - returns null if no provider)
   const agentContext = useAgentActivitySafe();
+
+  // Agent customization (Train My Squad)
+  const { getAgentSteps } = useAgentSteps();
 
   // ============ Query-Based State ============
 
@@ -302,9 +308,13 @@ export const useDeck = () => {
       // Phase 1: Scout (research) - real web search for facts and statistics
       agentContext?.actions.updateAgentStatus('scout', 'working', 'Researching your topic...');
 
+      // Get custom steps for Scout from Train My Squad
+      const { customSteps: scoutCustomSteps } = getAgentSteps('scout');
+
       let researchContext: ResearchContext | undefined;
       try {
         const scoutResult = await runScoutAgent(topic, {
+          customSteps: scoutCustomSteps,
           onProgress: (message) => {
             agentContext?.actions.updateAgentStatus('scout', 'working', message);
           },

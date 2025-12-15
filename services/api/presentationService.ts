@@ -7,6 +7,7 @@
 
 import { api } from './apiClient';
 import { Presentation, Slide } from '@/types';
+import { ContentBlock } from '@/types/contentBlocks';
 
 // ============ Backend Types (snake_case) ============
 
@@ -16,6 +17,7 @@ interface BackendSlide {
   position: number;
   title: string | null;
   content: string[] | null;
+  content_blocks: ContentBlock[] | null;  // Rich content blocks (charts, stats, etc.)
   speaker_notes: string | null;
   image_prompt: string | null;
   image_url: string | null;
@@ -63,6 +65,7 @@ interface ExportedPresentation {
     id: string;
     title: string | null;
     content: string[];
+    contentBlocks?: ContentBlock[];  // Rich content blocks
     speakerNotes: string | null;
     imagePrompt: string | null;
     imageUrl: string | null;
@@ -82,6 +85,7 @@ const backendSlideToFrontend = (slide: BackendSlide): Slide => ({
   id: slide.id,
   title: slide.title || '',
   content: slide.content || [],
+  contentBlocks: slide.content_blocks || undefined,  // Rich content blocks
   speakerNotes: slide.speaker_notes || '',
   imagePrompt: slide.image_prompt || '',
   imageUrl: slide.image_url || undefined,
@@ -111,6 +115,7 @@ const frontendSlideToBackend = (slide: Slide, position: number) => ({
   position,
   title: slide.title || null,
   content: slide.content || [],
+  content_blocks: slide.contentBlocks || null,  // Rich content blocks
   speaker_notes: slide.speakerNotes || null,
   image_prompt: slide.imagePrompt || null,
   image_url: slide.imageUrl || null,
@@ -149,6 +154,7 @@ const exportedToFrontend = (exported: ExportedPresentation): Presentation => ({
     id: slide.id,
     title: slide.title || '',
     content: slide.content || [],
+    contentBlocks: slide.contentBlocks || undefined,  // Rich content blocks
     speakerNotes: slide.speakerNotes || '',
     imagePrompt: slide.imagePrompt || '',
     imageUrl: slide.imageUrl || undefined,
@@ -250,6 +256,7 @@ export const importPresentation = async (data: {
   slides: Array<{
     title?: string;
     content?: string[];
+    contentBlocks?: ContentBlock[];  // Rich content blocks
     speakerNotes?: string;
     imagePrompt?: string;
     imageUrl?: string;
@@ -292,6 +299,7 @@ export const addSlide = async (
     position,
     title: slide.title || null,
     content: slide.content || [],
+    content_blocks: slide.contentBlocks || null,  // Rich content blocks
     speaker_notes: slide.speakerNotes || null,
     image_prompt: slide.imagePrompt || null,
     image_url: slide.imageUrl || null,
@@ -320,6 +328,7 @@ export const updateSlide = async (
 
   if (updates.title !== undefined) backendUpdates.title = updates.title;
   if (updates.content !== undefined) backendUpdates.content = updates.content;
+  if (updates.contentBlocks !== undefined) backendUpdates.content_blocks = updates.contentBlocks;
   if (updates.speakerNotes !== undefined) backendUpdates.speaker_notes = updates.speakerNotes;
   if (updates.imagePrompt !== undefined) backendUpdates.image_prompt = updates.imagePrompt;
   if (updates.imageUrl !== undefined) backendUpdates.image_url = updates.imageUrl;

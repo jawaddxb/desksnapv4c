@@ -16,13 +16,23 @@ import { AgentAvatar } from '@/components/AgentTeamPanel';
 interface TrainMySquadModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Pre-select an agent when opening from Dashboard card */
+  initialAgentId?: AgentId;
 }
 
 export const TrainMySquadModal: React.FC<TrainMySquadModalProps> = ({
   isOpen,
   onClose,
+  initialAgentId,
 }) => {
-  const [selectedAgent, setSelectedAgent] = useState<AgentId>('scout');
+  const [selectedAgent, setSelectedAgent] = useState<AgentId>(initialAgentId || 'scout');
+
+  // Update selected agent when initialAgentId changes (modal reopens with different agent)
+  React.useEffect(() => {
+    if (initialAgentId && isOpen) {
+      setSelectedAgent(initialAgentId);
+    }
+  }, [initialAgentId, isOpen]);
   const [newStep, setNewStep] = useState('');
   const { getAgentSteps, addStep, removeStep } = useAgentSteps();
 

@@ -17,26 +17,29 @@ npm run preview    # Preview production build
 
 ## Environment Setup
 
-Create `.env.local` with your Gemini API key:
+Create `.env.local` with your API configuration:
 ```
 GEMINI_API_KEY=your_key_here
+VITE_API_URL=http://localhost:8000
 ```
+
+**Important:** A backend API server must be running at the configured `VITE_API_URL` (default: `http://localhost:8000`). The frontend requires the backend for all persistence operations.
 
 ## Architecture
 
 ### Core Flow
 1. User enters topic in `ChatInterface` component
-2. `useDeck` hook calls `geminiService.generatePresentationPlan()` to create slide structure
+2. `useDeck` hook calls `presentationPlanService.generatePresentationPlan()` to create slide structure
 3. Gemini AI selects theme and generates content with image prompts
 4. Images are generated asynchronously via `generateSlideImage()` using Gemini image models
-5. Presentations are persisted to IndexedDB via `storageService`
+5. Presentations are persisted via backend API (`services/api/presentationService.ts`)
 
 ### Key Files
 
 - `App.tsx` - Main application shell, presentation mode, analytics tracking
 - `hooks/useDeck.ts` - Core state management hook for presentations (create, save, load, delete, image generation)
-- `services/geminiService.ts` - Gemini AI integration for content and image generation
-- `services/storageService.ts` - IndexedDB persistence layer
+- `services/presentationPlanService.ts` - Gemini AI integration for content generation
+- `services/api/presentationService.ts` - API client for backend persistence
 - `types.ts` - TypeScript interfaces (Slide, Presentation, Theme, Message)
 - `lib/themes.ts` - 30+ visual themes with colors, fonts, and image style prompts
 - `lib/prompts.ts` - AI prompt templates and JSON schema for structured output
@@ -59,8 +62,13 @@ Presentation {
 }
 
 Slide {
-  id, title, content[], speakerNotes, imagePrompt, imageUrl,
+  id, title, content[], contentBlocks[], speakerNotes, imagePrompt, imageUrl,
   layoutType, alignment, fontScale, layoutVariant
+}
+
+ContentBlock (discriminated union) {
+  type: 'paragraph' | 'bullets' | 'numbered' | 'quote' | 'statistic' | 'chart' | 'callout' | 'diagram'
+  // Type-specific fields: text, items[], value, label, chartType, data, etc.
 }
 ```
 

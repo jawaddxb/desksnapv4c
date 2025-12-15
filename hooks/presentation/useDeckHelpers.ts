@@ -6,10 +6,12 @@
  */
 
 import { Slide, Presentation } from '@/types';
+import { ContentBlock } from '@/types/contentBlocks';
 
 export interface SlidePlan {
   title: string;
-  bulletPoints: string[];
+  bulletPoints?: string[];  // Legacy format
+  contentBlocks?: ContentBlock[];  // Rich content blocks (preferred)
   speakerNotes: string;
   imageVisualDescription: string;
   layoutType: string;
@@ -26,12 +28,14 @@ export interface PresentationPlan {
 
 /**
  * Create slides from a plan.
+ * Supports both legacy bulletPoints and new contentBlocks format.
  */
 export function createSlidesFromPlan(slides: SlidePlan[]): Slide[] {
   return slides.map((s, i) => ({
     id: `slide-${i}`,
     title: s.title,
-    content: s.bulletPoints,
+    content: s.bulletPoints || [],  // Legacy fallback
+    contentBlocks: s.contentBlocks,  // Rich content blocks
     speakerNotes: s.speakerNotes,
     imagePrompt: s.imageVisualDescription,
     imageUrl: s.existingImageUrl,

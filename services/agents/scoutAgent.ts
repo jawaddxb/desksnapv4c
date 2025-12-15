@@ -29,6 +29,8 @@ export interface ScoutOptions {
   includeXSearch?: boolean;
   /** Include competitor analysis */
   includeCompetitors?: boolean;
+  /** Custom research steps from Train My Squad */
+  customSteps?: string[];
   /** Progress callback */
   onProgress?: (message: string) => void;
 }
@@ -82,8 +84,13 @@ export async function runScoutAgent(
   topic: string,
   options: ScoutOptions = {}
 ): Promise<ScoutOutput> {
-  const { onProgress, includeXSearch = true, includeCompetitors = true } = options;
+  const { onProgress, includeXSearch = true, includeCompetitors = true, customSteps = [] } = options;
   const searchQuery = extractSearchQuery(topic);
+
+  // Build enhanced query with custom steps
+  const customContext = customSteps.length > 0
+    ? `. Also: ${customSteps.join(', ')}`
+    : '';
 
   onProgress?.('Searching for relevant data...');
 
@@ -98,7 +105,9 @@ export async function runScoutAgent(
         includeCompetitors,
       };
 
-      const research = await performGrokResearch(searchQuery, preferences);
+      // Enhance search query with custom steps
+      const enhancedQuery = searchQuery + customContext;
+      const research = await performGrokResearch(enhancedQuery, preferences);
 
       return {
         findings: research.findings,
@@ -113,10 +122,13 @@ export async function runScoutAgent(
   // Fallback to Gemini-based research
   onProgress?.('Analyzing topic...');
 
-  const results = await performResearch(
-    searchQuery,
-    `Find key statistics, market data, and expert insights for a presentation about: ${topic}`
-  );
+  // Build research prompt with custom steps
+  const basePrompt = `Find key statistics, market data, and expert insights for a presentation about: ${topic}`;
+  const fullPrompt = customSteps.length > 0
+    ? `${basePrompt}. Additionally: ${customSteps.join('; ')}`
+    : basePrompt;
+
+  const results = await performResearch(searchQuery, fullPrompt);
 
   return {
     findings: webResultsToFindings(results),

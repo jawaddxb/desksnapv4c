@@ -1,0 +1,252 @@
+{
+  "id": "test-charts-001",
+  "lastModified": 1734278400000,
+  "topic": "Q3 2024 Sales Performance Review",
+  "visualStyle": "Corporate minimal photography with clean backgrounds",
+  "themeId": "executive",
+  "wabiSabiLayout": "Editorial",
+  "viewMode": "standard",
+  "analytics": [],
+  "slides": [
+    {
+      "id": "slide-0",
+      "title": "Q3 2024 Performance Overview",
+      "content": [],
+      "contentBlocks": [
+        {
+          "type": "statistic",
+          "value": "$4.2M",
+          "label": "Total Revenue",
+          "trend": "up"
+        },
+        {
+          "type": "statistic",
+          "value": "23%",
+          "label": "Year-over-Year Growth",
+          "trend": "up"
+        },
+        {
+          "type": "statistic",
+          "value": "847",
+          "label": "New Customers Acquired",
+          "trend": "up"
+        }
+      ],
+      "speakerNotes": "Opening slide with key metrics to set the stage",
+      "imagePrompt": "Modern office with growth charts on screens",
+      "imageUrl": "",
+      "isImageLoading": false,
+      "layoutType": "split",
+      "alignment": "left",
+      "fontScale": "auto",
+      "layoutVariant": 100
+    },
+    {
+      "id": "slide-1",
+      "title": "Revenue by Quarter",
+      "content": [],
+      "contentBlocks": [
+        {
+          "type": "chart",
+          "chartType": "bar",
+          "title": "Quarterly Revenue ($M)",
+          "data": {
+            "labels": ["Q1", "Q2", "Q3", "Q4 (Proj)"],
+            "values": [3.1, 3.5, 4.2, 4.8]
+          }
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Q3 exceeded targets by 12%",
+            "Enterprise segment drove 60% of growth",
+            "Q4 projection based on current pipeline"
+          ]
+        }
+      ],
+      "speakerNotes": "Bar chart showing quarterly progression",
+      "imagePrompt": "Business growth concept with upward arrows",
+      "imageUrl": "",
+      "isImageLoading": false,
+      "layoutType": "split",
+      "alignment": "left",
+      "fontScale": "auto",
+      "layoutVariant": 200
+    },
+    {
+      "id": "slide-2",
+      "title": "Market Share Distribution",
+      "content": [],
+      "contentBlocks": [
+        {
+          "type": "chart",
+          "chartType": "pie",
+          "title": "Revenue by Segment",
+          "data": {
+            "labels": ["Enterprise", "Mid-Market", "SMB", "Startup"],
+            "values": [45, 28, 18, 9]
+          }
+        }
+      ],
+      "speakerNotes": "Pie chart showing market segment breakdown",
+      "imagePrompt": "Diverse business team in meeting",
+      "imageUrl": "",
+      "isImageLoading": false,
+      "layoutType": "split",
+      "alignment": "right",
+      "fontScale": "auto",
+      "layoutVariant": 300
+    },
+    {
+      "id": "slide-3",
+      "title": "Customer Growth Trend",
+      "content": [],
+      "contentBlocks": [
+        {
+          "type": "chart",
+          "chartType": "line",
+          "title": "Monthly Active Customers",
+          "data": {
+            "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+            "values": [1200, 1350, 1420, 1580, 1720, 1890, 2100, 2340, 2580]
+          }
+        },
+        {
+          "type": "statistic",
+          "value": "115%",
+          "label": "Customer Retention Rate",
+          "trend": "up"
+        }
+      ],
+      "speakerNotes": "Line chart showing customer growth trajectory",
+      "imagePrompt": "Happy customers using product",
+      "imageUrl": "",
+      "isImageLoading": false,
+      "layoutType": "split",
+      "alignment": "left",
+      "fontScale": "auto",
+      "layoutVariant": 400
+    },
+    {
+      "id": "slide-4",
+      "title": "Product Mix Analysis",
+      "content": [],
+      "contentBlocks": [
+        {
+          "type": "chart",
+          "chartType": "donut",
+          "title": "Revenue by Product Line",
+          "data": {
+            "labels": ["Core Platform", "Add-ons", "Services", "Training"],
+            "values": [52, 23, 17, 8]
+          }
+        },
+        {
+          "type": "callout",
+          "text": "Add-ons revenue grew 45% this quarter - our upsell strategy is working!",
+          "variant": "success"
+        }
+      ],
+      "speakerNotes": "Donut chart with callout highlighting success",
+      "imagePrompt": "Product showcase with modern UI",
+      "imageUrl": "",
+      "isImageLoading": false,
+      "layoutType": "split",
+      "alignment": "right",
+      "fontScale": "auto",
+      "layoutVariant": 500
+    },
+    {
+      "id": "slide-5",
+      "title": "Regional Performance",
+      "content": [],
+      "contentBlocks": [
+        {
+          "type": "chart",
+          "chartType": "bar",
+          "title": "Revenue by Region ($M)",
+          "data": {
+            "labels": ["North America", "Europe", "APAC", "LATAM"],
+            "values": [2.1, 1.2, 0.6, 0.3]
+          }
+        },
+        {
+          "type": "quote",
+          "text": "Our APAC expansion is ahead of schedule, with 3 new enterprise deals closing in Q4.",
+          "attribution": "Sarah Chen, VP of Sales"
+        }
+      ],
+      "speakerNotes": "Regional breakdown with executive quote",
+      "imagePrompt": "Global business with world map",
+      "imageUrl": "",
+      "isImageLoading": false,
+      "layoutType": "split",
+      "alignment": "left",
+      "fontScale": "auto",
+      "layoutVariant": 600
+    },
+    {
+      "id": "slide-6",
+      "title": "Key Takeaways",
+      "content": [],
+      "contentBlocks": [
+        {
+          "type": "numbered",
+          "items": [
+            "Revenue growth exceeded expectations at 23% YoY",
+            "Enterprise segment remains our strongest performer",
+            "Customer acquisition costs decreased by 15%",
+            "APAC expansion on track for Q4 acceleration"
+          ]
+        },
+        {
+          "type": "callout",
+          "text": "Q4 Focus: Double down on enterprise upsells and APAC market penetration",
+          "variant": "tip"
+        }
+      ],
+      "speakerNotes": "Summary slide with action items",
+      "imagePrompt": "Team celebrating success",
+      "imageUrl": "",
+      "isImageLoading": false,
+      "layoutType": "statement",
+      "alignment": "center",
+      "fontScale": "auto",
+      "layoutVariant": 700
+    },
+    {
+      "id": "slide-7",
+      "title": "Mixed Content Demo",
+      "content": [],
+      "contentBlocks": [
+        {
+          "type": "paragraph",
+          "text": "This slide demonstrates all content block types working together. The new content block system enables rich, varied presentations that go beyond simple bullet points."
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Charts for data visualization",
+            "Statistics for key metrics",
+            "Quotes for testimonials",
+            "Callouts for emphasis"
+          ]
+        },
+        {
+          "type": "statistic",
+          "value": "8",
+          "label": "Content Block Types Supported",
+          "trend": "neutral"
+        }
+      ],
+      "speakerNotes": "Demo slide showing mixed content types",
+      "imagePrompt": "Creative design workspace",
+      "imageUrl": "",
+      "isImageLoading": false,
+      "layoutType": "split",
+      "alignment": "left",
+      "fontScale": "auto",
+      "layoutVariant": 800
+    }
+  ]
+}

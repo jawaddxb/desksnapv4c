@@ -1,10 +1,6 @@
 import React from 'react';
 import type { Theme, ContentType, ContentItemVisualPreset } from '@/types';
-import {
-  resolveContentItemStyle,
-  getEffectivePreset,
-  presetHasVisibleContainer,
-} from '@/config/contentItemStyles';
+import { getPresetStyle, presetShowsBullet, getEffectivePreset } from '@/config/contentItemStyles';
 import { BulletRenderer } from './BulletRenderer';
 
 interface ContentItemProps {
@@ -13,16 +9,14 @@ interface ContentItemProps {
   contentType: ContentType;
   index: number;
   isStatement?: boolean;
-  /** Slide-level override for visual preset */
   visualPreset?: ContentItemVisualPreset;
 }
 
 /**
- * Wraps each content item with theme-appropriate styling.
+ * Content item wrapper with preset-based styling.
  *
- * Uses the Content Item Visual Preset system for styling:
- * - Priority: slide override > theme default > layout-based fallback
- * - Presets: pill, card, sharp, glass, underline, solid, minimal
+ * Single responsibility: Apply visual preset styling to content items.
+ * Styling logic lives in contentItemStyles.ts (DRY).
  */
 export const ContentItem: React.FC<ContentItemProps> = ({
   children,
@@ -32,39 +26,19 @@ export const ContentItem: React.FC<ContentItemProps> = ({
   isStatement = false,
   visualPreset,
 }) => {
-  // Resolve effective preset: slide > theme > fallback
-  const effectivePreset = getEffectivePreset(
+  // Resolve preset: slide > theme.contentStyle > layout default
+  const preset = getEffectivePreset(
     visualPreset,
-    theme.contentItemVisualPreset,
+    theme.contentStyle,
     isStatement
   );
 
-  // Get resolved CSS styles for the preset
-  const containerStyle = resolveContentItemStyle(effectivePreset, theme);
-
-  // Quotes always get left border accent (override preset)
-  const isQuotes = contentType === 'quotes';
-  if (isQuotes && !containerStyle.borderLeft) {
-    containerStyle.borderLeft = `3px solid ${theme.colors.accent}`;
-    // Ensure some background for quotes
-    if (containerStyle.backgroundColor === 'transparent') {
-      containerStyle.backgroundColor = `${theme.colors.accent}08`;
-    }
-  }
-
-  // Hide bullets when container has visible styling (pill, card, etc.)
-  // or when explicitly plain content type
-  const hasVisibleContainer = presetHasVisibleContainer(effectivePreset);
-  const showBullet = !hasVisibleContainer && contentType !== 'plain';
+  // Get styles and bullet visibility from preset
+  const containerStyle = getPresetStyle(preset, theme);
+  const showBullet = presetShowsBullet(preset) && contentType !== 'plain';
 
   return (
-    <div
-      className="flex items-start gap-3 group w-full shrink-0"
-      style={{
-        marginBottom: 0, // Spacing handled by parent gap
-      }}
-    >
-      {/* Bullet marker */}
+    <div className="flex items-start gap-3 w-full shrink-0">
       {showBullet && (
         <BulletRenderer
           theme={theme}
@@ -72,14 +46,11 @@ export const ContentItem: React.FC<ContentItemProps> = ({
           index={index}
         />
       )}
-
-      {/* Content wrapper with preset styling */}
       <div
         className="flex-1 relative"
         style={{
           ...containerStyle,
-          // Smooth transition for hover states
-          transition: 'background-color 0.15s ease, box-shadow 0.15s ease',
+          transition: 'background-color 0.15s ease',
         }}
       >
         {children}

@@ -7,11 +7,12 @@
  * Follows existing patterns from AgentActivityPanel.
  */
 
-import React from 'react';
-import { ChevronDown, ChevronUp, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown, ChevronUp, Users, Settings2 } from 'lucide-react';
 import { useAgentTeam } from '@/contexts/AgentActivityContext';
 import { AGENT_TEAM, AgentId, getAgentConfig } from '@/types/agents';
 import { AgentAvatar } from './AgentAvatar';
+import { TrainMySquadModal } from '@/components/TrainMySquad';
 
 interface AgentTeamPanelProps {
   /** Compact mode shows only avatars */
@@ -25,7 +26,8 @@ export const AgentTeamPanel: React.FC<AgentTeamPanelProps> = ({
   className = '',
 }) => {
   const { team, activeAgentId, isTeamActive } = useAgentTeam();
-  const [isExpanded, setIsExpanded] = React.useState(!compact);
+  const [isExpanded, setIsExpanded] = useState(!compact);
+  const [showTrainModal, setShowTrainModal] = useState(false);
 
   // Don't render if team is not active
   if (!isTeamActive) return null;
@@ -64,18 +66,30 @@ export const AgentTeamPanel: React.FC<AgentTeamPanelProps> = ({
           </div>
         </div>
 
-        {!compact && (
+        <div className="flex items-center gap-1">
+          {/* Train My Squad button */}
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() => setShowTrainModal(true)}
             className="p-1.5 hover:bg-[#EDF5F0] rounded-md transition-colors"
+            title="Train My Squad"
           >
-            {isExpanded ? (
-              <ChevronUp className="w-4 h-4 text-[#8FA58F]" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-[#8FA58F]" />
-            )}
+            <Settings2 className="w-4 h-4 text-[#8FA58F]" />
           </button>
-        )}
+
+          {/* Expand/Collapse button */}
+          {!compact && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-1.5 hover:bg-[#EDF5F0] rounded-md transition-colors"
+            >
+              {isExpanded ? (
+                <ChevronUp className="w-4 h-4 text-[#8FA58F]" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-[#8FA58F]" />
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Agent Avatars Row */}
@@ -131,6 +145,12 @@ export const AgentTeamPanel: React.FC<AgentTeamPanelProps> = ({
           </div>
         </>
       )}
+
+      {/* Train My Squad Modal */}
+      <TrainMySquadModal
+        isOpen={showTrainModal}
+        onClose={() => setShowTrainModal(false)}
+      />
     </div>
   );
 };
