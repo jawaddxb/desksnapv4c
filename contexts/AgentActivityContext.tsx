@@ -37,7 +37,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
-import { AgentLog } from '@/types/agents';
+import { AgentLog, AgentId, AgentStatus, AgentTeamMember, AGENT_TEAM } from '@/types/agents';
 
 // ============ Types ============
 
@@ -62,6 +62,16 @@ export interface AgentActivityState {
   agentSlides: SlideInfo[];
   /** Generated image URLs by slide index */
   generatedImages: Map<number, string>;
+
+  // ========================================
+  // CONCERN C: Agent Team State
+  // ========================================
+  /** Agent team members and their current state */
+  agentTeam: Map<AgentId, AgentTeamMember>;
+  /** Currently active agent (if any) */
+  activeAgentId: AgentId | null;
+  /** Whether the team panel should be visible */
+  isTeamActive: boolean;
 }
 
 export interface AgentActivityActions {
@@ -83,6 +93,22 @@ export interface AgentActivityActions {
   recordGeneratedImage: (slideIndex: number, imageUrl: string) => void;
   /** Clear all generated images */
   clearGeneratedImages: () => void;
+
+  // ========================================
+  // CONCERN C: Agent Team Actions
+  // ========================================
+  /** Initialize the agent team (reset all to idle) */
+  initAgentTeam: () => void;
+  /** Update a specific agent's status and message */
+  updateAgentStatus: (agentId: AgentId, status: AgentStatus, message?: string) => void;
+  /** Set the output for a specific agent */
+  setAgentOutput: (agentId: AgentId, output: unknown) => void;
+  /** Set the currently active agent */
+  setActiveAgent: (agentId: AgentId | null) => void;
+  /** Clear the agent team state */
+  clearAgentTeam: () => void;
+  /** Show/hide the team panel */
+  setTeamActive: (active: boolean) => void;
 }
 
 export interface AgentActivityContextValue extends AgentActivityState {
@@ -99,6 +125,15 @@ export interface AgentActivityProviderProps {
   children: ReactNode;
 }
 
+/** Helper to create initial team state */
+const createInitialTeamState = (): Map<AgentId, AgentTeamMember> => {
+  const team = new Map<AgentId, AgentTeamMember>();
+  AGENT_TEAM.forEach(config => {
+    team.set(config.id, { id: config.id, status: 'idle' });
+  });
+  return team;
+};
+
 export const AgentActivityProvider: React.FC<AgentActivityProviderProps> = ({ children }) => {
   // ========================================
   // CONCERN A: Persistent Agent Logs
@@ -114,6 +149,13 @@ export const AgentActivityProvider: React.FC<AgentActivityProviderProps> = ({ ch
   const [agentCompletedSlides, setAgentCompletedSlides] = useState(0);
   const [agentSlides, setAgentSlides] = useState<SlideInfo[]>([]);
   const [generatedImages, setGeneratedImages] = useState<Map<number, string>>(new Map());
+
+  // ========================================
+  // CONCERN C: Agent Team State
+  // ========================================
+  const [agentTeam, setAgentTeam] = useState<Map<AgentId, AgentTeamMember>>(createInitialTeamState);
+  const [activeAgentId, setActiveAgentId] = useState<AgentId | null>(null);
+  const [isTeamActive, setIsTeamActive] = useState(false);
 
   // ========================================
   // CONCERN A: Agent Logs Actions
@@ -184,30 +226,112 @@ export const AgentActivityProvider: React.FC<AgentActivityProviderProps> = ({ ch
     setGeneratedImages(new Map());
   }, []);
 
+  // ========================================
+  // CONCERN C: Agent Team Actions
+  // ========================================
+  const initAgentTeam = useCallback(() => {
+    setAgentTeam(createInitialTeamState());
+    setActiveAgentId(null);
+    setIsTeamActive(true);
+  }, []);
+
+  const updateAgentStatus = useCallback((agentId: AgentId, status: AgentStatus, message?: string) => {
+    setAgentTeam(prev => {
+      const next = new Map(prev);
+      const member = next.get(agentId);
+      if (member) {
+        next.set(agentId, {
+          ...member,
+          status,
+          message,
+          ...(status === 'working' ? { startedAt: Date.now() } : {}),
+          ...(status === 'done' || status === 'error' ? { completedAt: Date.now() } : {}),
+        });
+      }
+      return next;
+    });
+    // Auto-set active agent when working
+    if (status === 'working') {
+      setActiveAgentId(agentId);
+    } else if (status === 'done' || status === 'error') {
+      setActiveAgentId(null);
+    }
+  }, []);
+
+  const setAgentOutput = useCallback((agentId: AgentId, output: unknown) => {
+    setAgentTeam(prev => {
+      const next = new Map(prev);
+      const member = next.get(agentId);
+      if (member) {
+        next.set(agentId, { ...member, output });
+      }
+      return next;
+    });
+  }, []);
+
+  const setActiveAgent = useCallback((agentId: AgentId | null) => {
+    setActiveAgentId(agentId);
+  }, []);
+
+  const clearAgentTeam = useCallback(() => {
+    setAgentTeam(createInitialTeamState());
+    setActiveAgentId(null);
+    setIsTeamActive(false);
+  }, []);
+
+  const setTeamActive = useCallback((active: boolean) => {
+    setIsTeamActive(active);
+  }, []);
+
   // Memoize actions
   const actions = useMemo<AgentActivityActions>(() => ({
+    // Concern A: Agent Logs
     setAgentLogs,
     getAgentLogs,
     clearAgentLogs,
+    // Concern B: Real-time Progress
     setCurrentActivity,
     startAgentProcessing,
     updateAgentProgress,
     stopAgentProcessing,
     recordGeneratedImage,
     clearGeneratedImages,
-  }), [setAgentLogs, getAgentLogs, clearAgentLogs, setCurrentActivity, startAgentProcessing, updateAgentProgress, stopAgentProcessing, recordGeneratedImage, clearGeneratedImages]);
+    // Concern C: Agent Team
+    initAgentTeam,
+    updateAgentStatus,
+    setAgentOutput,
+    setActiveAgent,
+    clearAgentTeam,
+    setTeamActive,
+  }), [
+    setAgentLogs, getAgentLogs, clearAgentLogs,
+    setCurrentActivity, startAgentProcessing, updateAgentProgress, stopAgentProcessing, recordGeneratedImage, clearGeneratedImages,
+    initAgentTeam, updateAgentStatus, setAgentOutput, setActiveAgent, clearAgentTeam, setTeamActive,
+  ]);
 
   // Memoize context value
   const value = useMemo<AgentActivityContextValue>(() => ({
+    // Concern A: Agent Logs
     agentLogs,
+    // Concern B: Real-time Progress
     currentAgentActivity,
     isAgentActive,
     agentTotalSlides,
     agentCompletedSlides,
     agentSlides,
     generatedImages,
+    // Concern C: Agent Team
+    agentTeam,
+    activeAgentId,
+    isTeamActive,
+    // Actions
     actions,
-  }), [agentLogs, currentAgentActivity, isAgentActive, agentTotalSlides, agentCompletedSlides, agentSlides, generatedImages, actions]);
+  }), [
+    agentLogs,
+    currentAgentActivity, isAgentActive, agentTotalSlides, agentCompletedSlides, agentSlides, generatedImages,
+    agentTeam, activeAgentId, isTeamActive,
+    actions,
+  ]);
 
   return (
     <AgentActivityContext.Provider value={value}>
@@ -244,6 +368,26 @@ export const useAgentActivitySafe = (): AgentActivityContextValue | null => {
 export const useIsAgentActive = (): boolean => {
   const context = useContext(AgentActivityContext);
   return context?.isAgentActive ?? false;
+};
+
+/**
+ * Check if the agent team panel should be visible.
+ */
+export const useIsTeamActive = (): boolean => {
+  const context = useContext(AgentActivityContext);
+  return context?.isTeamActive ?? false;
+};
+
+/**
+ * Get the agent team state for display.
+ */
+export const useAgentTeam = () => {
+  const context = useContext(AgentActivityContext);
+  return {
+    team: context?.agentTeam ?? new Map(),
+    activeAgentId: context?.activeAgentId ?? null,
+    isTeamActive: context?.isTeamActive ?? false,
+  };
 };
 
 export default AgentActivityContext;

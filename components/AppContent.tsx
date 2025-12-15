@@ -112,13 +112,14 @@ export function AppContent() {
     onRecordSession: actions.recordSession,
   });
 
-  // Keyboard navigation hook
+  // Keyboard navigation hook (includes Cmd+Enter to start presentation)
   const { goToNextSlide, goToPreviousSlide } = useKeyboardNavigation({
     isPresenting,
     presentation: currentPresentation,
     activeSlideIndex,
     setActiveSlideIndex,
     onExitPresentation: stopPresenting,
+    onStartPresentation: startPresenting,
   });
 
   // Preload fonts

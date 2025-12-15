@@ -12,13 +12,13 @@ import { generateId } from '@/utils/idGenerator';
 export const COLUMNS = ['Hook', 'Problem', 'Solution', 'Proof', 'CTA'] as const;
 export type ColumnName = typeof COLUMNS[number];
 
-// Note colors for visual categorization (Studio Noir palette with subtle gradients)
+// Note colors for visual categorization (Bento Matcha palette - sage green theme)
 export const NOTE_COLORS = {
-  yellow: 'bg-gradient-to-br from-[#1f1f1f] to-[#1a1a1a] border-[#c5a47e] text-white',      // User ideas (gold accent)
-  blue: 'bg-gradient-to-br from-[#141414] to-[#111111] border-white/25 text-white',          // AI suggestions
-  green: 'bg-gradient-to-br from-[#1a1a18] to-[#1a1a1a] border-[#c5a47e]/50 text-white',     // Research findings
-  pink: 'bg-gradient-to-br from-[#151515] to-[#111111] border-white/35 text-white',          // Questions/unknowns
-  purple: 'bg-gradient-to-br from-[#0f0f0f] to-[#0a0a0a] border-[#c5a47e] text-white',       // Key insights (gold accent)
+  yellow: 'bg-gradient-to-br from-[#F5FAF7] to-[#EDF5F0] border-[#6B8E6B] text-[#1E2E1E]',      // User ideas (sage accent)
+  blue: 'bg-gradient-to-br from-[#EDF5F0] to-[#E5F0E8] border-[#8FA58F] text-[#1E2E1E]',        // AI suggestions
+  green: 'bg-gradient-to-br from-[#D4E5D4] to-[#C8DCC8] border-[#6B8E6B] text-[#1E2E1E]',       // Research findings
+  pink: 'bg-gradient-to-br from-[#F5FAF7] to-[#EDF5F0] border-[#A8C0A8] text-[#1E2E1E]',        // Questions/unknowns
+  purple: 'bg-gradient-to-br from-[#6B8E6B]/20 to-[#5A7A5A]/15 border-[#5A7A5A] text-[#1E2E1E]', // Key insights (deep sage)
 } as const;
 
 export type NoteColor = keyof typeof NOTE_COLORS;

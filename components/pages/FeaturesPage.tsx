@@ -3,7 +3,7 @@
  *
  * Detailed features breakdown organized by stage.
  * Ideate → Rough Draft → Final Polish
- * Studio Noir aesthetic - black, white, gold.
+ * Bento Matcha aesthetic - sage, white, green.
  */
 
 import React from 'react';
@@ -28,8 +28,7 @@ import {
   Image,
   ArrowRight,
 } from 'lucide-react';
-import { LandingNavbar } from '../landing/LandingNavbar';
-import { FooterSection } from '../landing/FooterSection';
+import { Navbar, Footer } from '../homepage-variants/shared';
 
 interface FeaturesPageProps {
   onAuth: (mode: 'login' | 'register') => void;
@@ -148,20 +147,20 @@ const crossCuttingFeatures = [
 
 export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
   return (
-    <div className="min-h-screen bg-black text-white">
-      <LandingNavbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
+    <div className="min-h-screen bg-[#F5FAF7] text-[#1E2E1E]">
+      <Navbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
 
       <main className="pt-32">
         {/* Page Header */}
         <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-24">
           <div className="max-w-3xl">
-            <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#6B8E6B] mb-4 block">
               Features
             </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-8">
               Everything you need to build decks that matter.
             </h1>
-            <p className="text-xl text-white/60 leading-relaxed">
+            <p className="text-xl text-[#4A5D4A] leading-relaxed">
               Ideation tools, research agents, an adaptive design system, and a knowledge layer that grows with you.
             </p>
           </div>
@@ -175,14 +174,14 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
             <section
               key={stage.id}
               id={stage.id}
-              className={`py-24 ${stageIndex % 2 === 0 ? 'bg-black' : 'bg-[#111111]'}`}
+              className={`py-24 ${stageIndex % 2 === 0 ? 'bg-[#F5FAF7]' : 'bg-white'}`}
             >
               <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 {/* Stage Header */}
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="flex items-center gap-2 px-3 py-1 border border-[#c5a47e]/30 bg-[#c5a47e]/10">
-                    <StageIcon className="w-4 h-4 text-[#c5a47e]" />
-                    <span className="text-xs uppercase tracking-[0.15em] text-[#c5a47e]">
+                  <div className="flex items-center gap-2 px-3 py-1 border border-[#6B8E6B]/30 bg-[#6B8E6B]/10">
+                    <StageIcon className="w-4 h-4 text-[#6B8E6B]" />
+                    <span className="text-xs uppercase tracking-[0.15em] text-[#6B8E6B]">
                       {stage.stageLabel}: {stage.stageName}
                     </span>
                   </div>
@@ -192,26 +191,26 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
                   {stage.headline}
                 </h2>
 
-                <p className="text-xl text-white/60 leading-relaxed mb-16 max-w-3xl">
+                <p className="text-xl text-[#4A5D4A] leading-relaxed mb-16 max-w-3xl">
                   {stage.description}
                 </p>
 
                 {/* Feature Grid */}
-                <div className="grid md:grid-cols-2 gap-px bg-white/10">
+                <div className="grid md:grid-cols-2 gap-6">
                   {stage.features.map((feature, i) => {
                     const FeatureIcon = feature.icon;
                     return (
                       <div
                         key={i}
-                        className={`p-8 ${stageIndex % 2 === 0 ? 'bg-black' : 'bg-[#111111]'} hover:bg-white/5 transition-colors`}
+                        className="p-8 bg-white border border-[#D4E5D4] shadow-[0_4px_24px_rgba(107,142,107,0.08)] hover:shadow-[0_8px_32px_rgba(107,142,107,0.12)] transition-shadow"
                       >
-                        <div className="w-10 h-10 border border-white/20 flex items-center justify-center mb-6">
-                          <FeatureIcon className="w-5 h-5 text-[#c5a47e]" />
+                        <div className="w-10 h-10 bg-[#6B8E6B]/10 flex items-center justify-center mb-6">
+                          <FeatureIcon className="w-5 h-5 text-[#6B8E6B]" />
                         </div>
                         <h3 className="text-xl font-light mb-3">
                           {feature.title}
                         </h3>
-                        <p className="text-white/60 leading-relaxed">
+                        <p className="text-[#4A5D4A] leading-relaxed">
                           {feature.description}
                         </p>
                       </div>
@@ -224,10 +223,10 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
         })}
 
         {/* Cross-Cutting Features */}
-        <section className="py-24 border-t border-white/10">
+        <section className="py-24 border-t border-[#D4E5D4]">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="max-w-2xl mb-16">
-              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#6B8E6B] mb-4 block">
                 Across All Stages
               </span>
               <h2 className="text-4xl md:text-5xl font-light">
@@ -239,14 +238,14 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
               {crossCuttingFeatures.map((feature, i) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={i} className="p-8 border border-white/10">
-                    <div className="w-12 h-12 border border-white/20 flex items-center justify-center mb-6">
-                      <Icon className="w-6 h-6 text-[#c5a47e]" />
+                  <div key={i} className="p-8 bg-white border border-[#D4E5D4] shadow-[0_4px_24px_rgba(107,142,107,0.08)]">
+                    <div className="w-12 h-12 bg-[#6B8E6B]/10 flex items-center justify-center mb-6">
+                      <Icon className="w-6 h-6 text-[#6B8E6B]" />
                     </div>
                     <h3 className="text-xl font-light mb-3">
                       {feature.title}
                     </h3>
-                    <p className="text-white/60 leading-relaxed">
+                    <p className="text-[#4A5D4A] leading-relaxed">
                       {feature.description}
                     </p>
                   </div>
@@ -257,14 +256,14 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
         </section>
 
         {/* Philosophy Callout */}
-        <section className="py-24 bg-[#111111]">
+        <section className="py-24 bg-[#EDF5F0]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <p className="text-2xl md:text-3xl text-white/80 leading-relaxed italic mb-8">
+            <p className="text-2xl md:text-3xl text-[#1E2E1E]/80 leading-relaxed italic mb-8">
               "Done beats perfect. But thinking beats rushing."
             </p>
             <Link
               to="/about"
-              className="inline-flex items-center gap-2 text-[#c5a47e] hover:text-white transition-colors group"
+              className="inline-flex items-center gap-2 text-[#6B8E6B] hover:text-[#1E2E1E] transition-colors group"
             >
               Learn about our philosophy
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -273,17 +272,17 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
         </section>
 
         {/* CTA */}
-        <section className="py-24 border-t border-white/10">
+        <section className="py-24 border-t border-[#D4E5D4]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
             <h2 className="text-4xl md:text-5xl font-light mb-6">
               Ready to think differently?
             </h2>
-            <p className="text-xl text-white/60 mb-10">
+            <p className="text-xl text-[#4A5D4A] mb-10">
               Start with ideation. End with a deck you believe in.
             </p>
             <button
               onClick={() => onAuth('register')}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-medium hover:bg-[#c5a47e] transition-colors"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#6B8E6B] text-white font-medium hover:bg-[#1E2E1E] transition-colors"
             >
               Start creating
               <ArrowRight className="w-4 h-4" />
@@ -292,7 +291,7 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({ onAuth }) => {
         </section>
       </main>
 
-      <FooterSection />
+      <Footer />
     </div>
   );
 };

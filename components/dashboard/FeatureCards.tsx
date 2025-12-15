@@ -166,8 +166,8 @@ export const FeatureCards: React.FC<FeatureCardsProps> = ({
         {onIdeate && (
           <PrimaryCard
             icon={<Lightbulb className="w-6 h-6" />}
-            title="Guided Journey"
-            subtitle="Help me explore ideas"
+            title="Ideation"
+            subtitle="Guided brainstorming journey"
             description="Brainstorm and structure your thoughts before building. Perfect for when you need to develop your concept first."
             onClick={onIdeate}
             variant="secondary"

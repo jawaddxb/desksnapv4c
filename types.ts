@@ -34,6 +34,10 @@ export type ContentType = typeof CONTENT_TYPES[number];
 export const BULLET_STYLES = ['dot', 'dash', 'arrow', 'check', 'square', 'circle', 'diamond', 'number', 'none'] as const;
 export type BulletStyle = typeof BULLET_STYLES[number];
 
+// Content item visual presets (container styling for content items)
+export const CONTENT_ITEM_VISUAL_PRESETS = ['pill', 'card', 'sharp', 'glass', 'underline', 'solid', 'minimal'] as const;
+export type ContentItemVisualPreset = typeof CONTENT_ITEM_VISUAL_PRESETS[number];
+
 // Theme content styling configuration
 export interface ThemeContentStyle {
   bulletStyle: BulletStyle;
@@ -121,6 +125,12 @@ export interface SlideLayout {
 }
 
 /**
+ * Overlay style for full-bleed layouts.
+ * Controls gradient intensity over background images.
+ */
+export type OverlayStyle = 'standard' | 'soft' | 'none';
+
+/**
  * Style overrides for fine-grained visual control.
  */
 export interface SlideStyles {
@@ -132,6 +142,8 @@ export interface SlideStyles {
   };
   imageStyles?: ImageStyleOverride;
   contentItemStyles?: Record<number, ContentItemStyle>; // Per-item content styles
+  overlayStyle?: OverlayStyle; // Gradient overlay style for full-bleed layouts
+  contentItemVisualPreset?: ContentItemVisualPreset; // Visual style for content items (slide override)
 }
 
 /**
@@ -241,6 +253,8 @@ export interface Theme {
   imageStyle: string;
   // Content/bullet styling (theme-driven variety)
   contentStyle?: ThemeContentStyle;
+  // Default visual preset for content items (theme-level default)
+  contentItemVisualPreset?: ContentItemVisualPreset;
 }
 
 export type GenerationMode = 'concise' | 'balanced' | 'detailed' | 'verbatim';

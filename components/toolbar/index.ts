@@ -24,3 +24,17 @@ export type { ImagePromptMenuProps } from './ImagePromptMenu';
 
 export { ContentTypeSelector } from './ContentTypeSelector';
 export type { default as ContentTypeSelectorProps } from './ContentTypeSelector';
+
+export { ToolbarDropdown } from './ToolbarDropdown';
+export type { DropdownOption } from './ToolbarDropdown';
+
+export { LayoutDropdown } from './LayoutDropdown';
+
+export { LayoutPreviewThumbnail } from './LayoutPreviewThumbnail';
+
+export { AlignmentDropdown } from './AlignmentDropdown';
+
+export { AIActionsBar } from './AIActionsBar';
+
+export { TextRefinementPopover } from './TextRefinementPopover';
+export type { TextRefinementPopoverProps } from './TextRefinementPopover';

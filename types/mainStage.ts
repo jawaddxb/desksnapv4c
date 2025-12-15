@@ -64,6 +64,8 @@ export interface DeckOperationsProps {
   onDeleteDeck?: (id: string) => void;
   onCloneDeck?: (id: string) => void;
   onCreateDeck?: () => void;
+  onCreateDeckWithTopic?: (topic: string) => Promise<void>;
+  isGeneratingDeck?: boolean;
   onImport?: (file: File) => void;
 }
 

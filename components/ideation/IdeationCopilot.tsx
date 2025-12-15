@@ -353,6 +353,13 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
     setIsResearchModalOpen(false);
   }, []);
 
+  // Handle closing ideation - ensure session is saved before closing
+  const handleClose = useCallback(async () => {
+    const sessionId = ideation.session?.id;
+    await ideation.closeSession(); // Force save before closing
+    onClose?.(sessionId);
+  }, [ideation, onClose]);
+
   // Handle "Research More" from modal
   const handleResearchMore = useCallback(() => {
     setIsResearchModalOpen(false);
@@ -405,7 +412,7 @@ export const IdeationCopilot: React.FC<IdeationCopilotProps> = ({
         <div className="flex items-center gap-3">
           {onClose && (
             <button
-              onClick={() => onClose(ideation.session?.id)}
+              onClick={handleClose}
               className="p-2 hover:bg-[#EDF5F0] rounded-md transition-colors"
             >
               <svg className="w-5 h-5 text-[#8FA58F] hover:text-[#6B8E6B]" viewBox="0 0 24 24" fill="currentColor">

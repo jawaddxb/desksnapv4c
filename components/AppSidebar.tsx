@@ -3,7 +3,7 @@ import React from 'react';
 import { Presentation, Message, GenerationMode } from '@/types';
 import { IdeationSession } from '@/types/ideation';
 import { RoughDraft } from '@/types/roughDraft';
-import { Sparkles, Clock, ArrowRight, FileText, Lightbulb } from 'lucide-react';
+import { Sparkles, Clock, Lightbulb } from 'lucide-react';
 import { ChatInterface } from './ChatInterface';
 import { SlideList } from './SlideList';
 import { VersionHistoryPanel } from './VersionHistoryPanel';
@@ -43,7 +43,6 @@ interface AppSidebarProps {
     onViewSourceRoughDraft?: (id: string) => void;
     // Workspace navigation props
     onIdeate?: () => void;
-    onGoToDashboard?: () => void;
     ideationsCount?: number;
     roughDraftsCount?: number;
 }
@@ -75,7 +74,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     onViewSourceIdeation,
     onViewSourceRoughDraft,
     onIdeate,
-    onGoToDashboard,
     ideationsCount = 0,
     roughDraftsCount = 0,
 }) => {
@@ -238,28 +236,17 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     </ExpandableSection>
 
                     {/* Quick Actions - Bottom of sidebar */}
-                    <div className="border-t border-[#D4E5D4] p-3 bg-white">
-                        <div className="flex gap-2">
-                            {onIdeate && (
-                                <button
-                                    onClick={onIdeate}
-                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#6B8E6B]/10 border border-[#6B8E6B]/20 rounded-md text-xs text-[#6B8E6B] hover:bg-[#6B8E6B]/20 transition-colors"
-                                >
-                                    <Lightbulb className="w-4 h-4" />
-                                    New Idea
-                                </button>
-                            )}
-                            {onGoToDashboard && (
-                                <button
-                                    onClick={onGoToDashboard}
-                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#EDF5F0] border border-[#D4E5D4] rounded-md text-xs text-[#4A5D4A] hover:text-[#1E2E1E] hover:border-[#C0D6C0] transition-colors"
-                                >
-                                    <FileText className="w-4 h-4" />
-                                    Dashboard
-                                </button>
-                            )}
+                    {onIdeate && (
+                        <div className="border-t border-[#D4E5D4] p-3 bg-white">
+                            <button
+                                onClick={onIdeate}
+                                className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#6B8E6B]/10 border border-[#6B8E6B]/20 rounded-md text-xs text-[#6B8E6B] hover:bg-[#6B8E6B]/20 transition-colors"
+                            >
+                                <Lightbulb className="w-4 h-4" />
+                                New Idea
+                            </button>
                         </div>
-                    </div>
+                    )}
                 </div>
             )}
         </div>

@@ -3,9 +3,11 @@
  *
  * Dropdown menu for editing image prompts with AI suggestions.
  * Opens from the main toolbar.
+ *
+ * DRY: Uses useImagePromptEditor hook for shared logic
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Image as ImageIcon,
   X,
@@ -19,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Slide, Presentation } from '@/types';
 import { IconButton } from '../ui/IconButton';
+import { useImagePromptEditor } from '@/hooks/useImagePromptEditor';
 
 export interface ImagePromptMenuProps {
   /** Current slide */
@@ -44,62 +47,33 @@ export const ImagePromptMenu: React.FC<ImagePromptMenuProps> = ({
   onGenerateSuggestions,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [editedPrompt, setEditedPrompt] = useState(slide.imagePrompt);
-  const [showAesthetic, setShowAesthetic] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
-  // Sync local prompt with slide when it changes externally
-  useEffect(() => {
-    setEditedPrompt(slide.imagePrompt);
-  }, [slide.imagePrompt]);
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
 
-  const isDirty = editedPrompt !== slide.imagePrompt;
-
-  const handleApply = () => {
-    if (isDirty) {
-      onUpdateSlide({ imagePrompt: editedPrompt });
-    }
-  };
-
-  const handleApplyAndRegenerate = () => {
-    if (isDirty) {
-      onUpdateSlide({ imagePrompt: editedPrompt });
-    }
-    // Small delay to ensure state updates before regeneration
-    setTimeout(() => {
-      onRegenerateImage?.();
-      handleClose();
-    }, 50);
-  };
-
-  const handleSuggestionSelect = (suggestion: string) => {
-    setEditedPrompt(suggestion);
-    onUpdateSlide({ imagePrompt: suggestion });
-  };
-
-  const handleGenerateSuggestions = async () => {
-    if (!onGenerateSuggestions) return;
-
-    setIsLoadingSuggestions(true);
-    try {
-      const newSuggestions = await onGenerateSuggestions();
-      setSuggestions(newSuggestions);
-    } catch (error) {
-      console.error('Failed to generate suggestions:', error);
-    } finally {
-      setIsLoadingSuggestions(false);
-    }
-  };
-
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength) + '...';
-  };
+  // DRY: Use shared hook for prompt editing logic
+  const {
+    editedPrompt,
+    setEditedPrompt,
+    showAesthetic,
+    setShowAesthetic,
+    suggestions,
+    isLoadingSuggestions,
+    isDirty,
+    handleApply,
+    handleApplyAndRegenerate,
+    handleSuggestionSelect,
+    handleGenerateSuggestions,
+    truncateText,
+  } = useImagePromptEditor({
+    slide,
+    presentation,
+    onUpdateSlide,
+    onRegenerateImage,
+    onGenerateSuggestions,
+    onAfterRegenerate: handleClose,
+  });
 
   return (
     <div className="relative">

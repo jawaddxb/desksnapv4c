@@ -7,7 +7,10 @@ import {
   Sparkles, Settings2
 } from 'lucide-react';
 import { IMAGE_STYLES } from '@/config/imageStyles';
-import { analyzeTopicForDefaults, getThemeDisplayName } from '@/lib/smartDefaults';
+import { useSmartDefaults } from '@/hooks/useSmartDefaults';
+import { getThemeDisplayName } from '@/lib/smartDefaults';
+import { AgentTeamPanel } from '@/components/AgentTeamPanel';
+import { useIsTeamActive } from '@/contexts/AgentActivityContext';
 
 interface ChatInterfaceProps {
   mode: 'sidebar' | 'modal';
@@ -46,24 +49,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 }) => {
   // Smart defaults state
   const [showCustomize, setShowCustomize] = useState(false);
-  const [smartDefaults, setSmartDefaults] = useState<ReturnType<typeof analyzeTopicForDefaults> | null>(null);
 
-  // Analyze input for smart defaults (debounced)
-  useEffect(() => {
-    if (!currentPresentation && inputValue.trim().length > 10) {
-      const timeoutId = setTimeout(() => {
-        const defaults = analyzeTopicForDefaults(inputValue);
-        setSmartDefaults(defaults);
-        // Auto-apply smart defaults if not customizing
-        if (!showCustomize) {
-          setGenerationMode(defaults.density);
-        }
-      }, 500);
-      return () => clearTimeout(timeoutId);
-    } else if (inputValue.trim().length <= 10) {
-      setSmartDefaults(null);
-    }
-  }, [inputValue, currentPresentation, showCustomize]);
+  // Agent team active state (for showing team panel vs spinner)
+  const isTeamActive = useIsTeamActive();
+
+  // DRY: Use shared smart defaults hook
+  const { smartDefaults, hasConfidentDefaults } = useSmartDefaults(inputValue, {
+    onModeChange: showCustomize ? undefined : setGenerationMode,
+    skip: !!currentPresentation,
+  });
 
   return (
     <>
@@ -122,19 +116,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         ))}
 
         {isGenerating && (
-          <div className="flex justify-start">
-            <div className="bg-white border border-[#D4E5D4] rounded-lg px-4 py-3 flex items-center gap-3">
-              <RefreshCw className="w-4 h-4 text-[#6B8E6B] animate-spin" />
-              <span className="text-xs text-[#4A5D4A]">Creating your presentation...</span>
+          isTeamActive ? (
+            <AgentTeamPanel className="mx-auto max-w-sm" />
+          ) : (
+            <div className="flex justify-start">
+              <div className="bg-white border border-[#D4E5D4] rounded-lg px-4 py-3 flex items-center gap-3">
+                <RefreshCw className="w-4 h-4 text-[#6B8E6B] animate-spin" />
+                <span className="text-xs text-[#4A5D4A]">Creating your presentation...</span>
+              </div>
             </div>
-          </div>
+          )
         )}
       </div>
 
       {/* Input area */}
       <div className="flex-none p-4 border-t border-[#D4E5D4] bg-white">
         {/* Smart defaults indicator - only show when we have defaults */}
-        {!currentPresentation && !isGenerating && smartDefaults && smartDefaults.confidence > 0.3 && (
+        {!currentPresentation && !isGenerating && hasConfidentDefaults && smartDefaults && (
           <div className="mb-3 p-3 bg-[#6B8E6B]/5 border border-[#6B8E6B]/20 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

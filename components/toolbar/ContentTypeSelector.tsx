@@ -2,11 +2,14 @@
  * ContentTypeSelector Component
  *
  * A dropdown selector for choosing content display type (bullets, numbered, checkmarks, etc.)
+ *
+ * DRY: Uses useClickOutside hook for click-outside detection
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { List, ListOrdered, CheckSquare, Quote, Type, ChevronDown } from 'lucide-react';
 import type { ContentType } from '@/types';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface ContentTypeSelectorProps {
   /** Current content type */
@@ -45,22 +48,9 @@ export const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
   const currentOption = CONTENT_TYPE_OPTIONS.find(opt => opt.value === currentType) || CONTENT_TYPE_OPTIONS[0];
   const CurrentIcon = currentOption.icon;
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
+  // DRY: Use shared hook for click-outside detection
+  const handleClose = useCallback(() => setIsOpen(false), []);
+  useClickOutside(dropdownRef, handleClose, isOpen);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -75,8 +65,8 @@ export const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
         className={`
           relative group flex items-center gap-1 px-2 h-9 rounded-lg transition-all duration-200
           ${isOpen
-            ? 'bg-zinc-900 text-white shadow-md'
-            : 'hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900'
+            ? 'bg-[#6B8E6B] text-white shadow-md'
+            : 'hover:bg-[#EDF5F0] text-[#8FA58F] hover:text-[#1E2E1E]'
           }
         `}
       >
@@ -90,10 +80,10 @@ export const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute bottom-full mb-2 left-0 bg-white rounded-xl shadow-xl border border-zinc-200 py-1 min-w-[180px] z-50"
+          className="absolute bottom-full mb-2 left-0 bg-white rounded-xl shadow-xl border border-[#D4E5D4] py-1 min-w-[180px] z-50"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="px-3 py-1.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+          <div className="px-3 py-1.5 text-[10px] font-semibold text-[#8FA58F] uppercase tracking-wider">
             Content Type
           </div>
           {CONTENT_TYPE_OPTIONS.map((option) => {
@@ -110,18 +100,18 @@ export const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
                 className={`
                   flex items-center gap-3 w-full px-3 py-2 text-left transition-colors
                   ${isActive
-                    ? 'bg-zinc-100 text-zinc-900'
-                    : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+                    ? 'bg-[#EDF5F0] text-[#1E2E1E]'
+                    : 'text-[#4A5D4A] hover:bg-[#F5FAF7] hover:text-[#1E2E1E]'
                   }
                 `}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-600' : ''}`} strokeWidth={2} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-[#6B8E6B]' : ''}`} strokeWidth={2} />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium">{option.label}</div>
-                  <div className="text-[10px] text-zinc-400 truncate">{option.description}</div>
+                  <div className="text-[10px] text-[#8FA58F] truncate">{option.description}</div>
                 </div>
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#6B8E6B]" />
                 )}
               </button>
             );

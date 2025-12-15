@@ -7,6 +7,7 @@ import { UserMenu } from './auth';
 import { RemixDialog } from './RemixDialog';
 import { StylePanel } from './shared/StylePanel';
 import { QRCodeModal } from './mobile';
+import { ViewModeToggle } from './header';
 
 interface AppHeaderProps {
     currentPresentation: Presentation | null;
@@ -81,22 +82,30 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                             {currentPresentation.topic}
                         </h2>
 
-                        {/* Save status */}
-                        <div className="flex items-center gap-2 px-2.5 py-1 bg-[#EDF5F0] rounded-md text-xs">
+                        {/* Save status - subtle inline */}
+                        <span className="text-xs text-[#8FA58F] flex items-center gap-1">
                             {saveStatus === 'saving' ? (
                                 <>
-                                    <Loader2 className="w-3 h-3 animate-spin text-[#8FA58F]" />
-                                    <span className="text-[#8FA58F]">Saving</span>
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                    <span>saving</span>
                                 </>
                             ) : saveStatus === 'saved' ? (
                                 <>
                                     <Cloud className="w-3 h-3 text-[#6B8E6B]" />
-                                    <span className="text-[#6B8E6B]">Saved</span>
+                                    <span className="text-[#6B8E6B]">saved</span>
                                 </>
                             ) : (
-                                <span className="text-[#8FA58F]">Ready</span>
+                                <span>·</span>
                             )}
-                        </div>
+                        </span>
+
+                        {/* View Mode Toggle - Structured/Organic */}
+                        <ViewModeToggle
+                            viewMode={viewMode}
+                            onSetViewMode={setViewMode}
+                            activeArchetype={activeWabiSabiLayout}
+                            onSetArchetype={onSetWabiSabiLayout}
+                        />
                     </>
                 ) : (
                     /* Logo when no presentation */
@@ -114,13 +123,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             </div>
 
             {/* Right side - Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
                 {currentPresentation && (
                     <>
                         {/* Style button - opens consolidated panel */}
                         <button
                             onClick={() => setIsStylePanelOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-[#EDF5F0] border border-[#D4E5D4] rounded-md text-sm text-[#4A5D4A] hover:text-[#1E2E1E] hover:border-[#6B8E6B]/30 transition-all duration-150"
+                            className="flex items-center gap-1.5 px-3 py-2 text-sm text-[#4A5D4A] hover:text-[#1E2E1E] hover:bg-[#EDF5F0] rounded-md transition-all duration-150"
                         >
                             <Palette className="w-4 h-4" />
                             <span className="hidden sm:inline">Style</span>
@@ -128,16 +137,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                             <span className="hidden md:inline text-[#8FA58F] text-xs">{activeTheme.name}</span>
                         </button>
 
-                        {/* Divider */}
-                        <div className="h-5 w-px bg-[#D4E5D4] mx-1" />
-
-                        {/* Action buttons */}
-                        <div className="flex items-center gap-1">
+                        {/* Action buttons - tight group */}
+                        <div className="flex items-center gap-0.5">
                             {/* Present button */}
                             <button
                                 onClick={() => setIsPresenting(true)}
                                 className="p-2.5 rounded-md text-[#8FA58F] hover:text-[#6B8E6B] hover:bg-[#EDF5F0] transition-colors duration-150"
-                                title="Start Presentation"
+                                title="Start Presentation (⌘+Enter)"
                             >
                                 <Play className="w-5 h-5" />
                             </button>

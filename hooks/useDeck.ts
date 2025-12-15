@@ -13,7 +13,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Presentation, Slide, Theme, GenerationMode, AnalyticsSession } from '@/types';
-import { generatePresentationPlan } from '@/services/presentationPlanService';
+import { generatePresentationPlan, ResearchContext } from '@/services/presentationPlanService';
+import { runScoutAgent, formatFindingsForPrompt } from '@/services/agents';
 import { ensureApiKeySelection } from '@/services/ensureApiKeySelection';
 import { THEMES } from '@/config/themes';
 import { IMAGE_STYLES } from '@/config/imageStyles';
@@ -194,6 +195,21 @@ export const useDeck = () => {
       agentContext?.actions.startAgentProcessing(totalSlides, slideInfo);
     },
     onAgentComplete: () => {
+      // Mark Nova as done when image generation completes
+      agentContext?.actions.updateAgentStatus('nova', 'done');
+
+      // Start Coach for final review phase
+      agentContext?.actions.updateAgentStatus('coach', 'working', 'Polishing for impact...');
+
+      // Coach completes quickly (quality review phase - placeholder for future)
+      setTimeout(() => {
+        agentContext?.actions.updateAgentStatus('coach', 'done');
+        // Clear team panel after a delay to show completion
+        setTimeout(() => {
+          agentContext?.actions.clearAgentTeam();
+        }, 2000);
+      }, 1500);
+
       agentContext?.actions.stopAgentProcessing();
     },
     // Wire image generation to activity context for thumbnail display
@@ -276,11 +292,55 @@ export const useDeck = () => {
     generationMode: GenerationMode = 'balanced'
   ): Promise<Slide[]> => {
     setIsGenerating(true);
+
+    // Initialize agent team panel (shows team during generation)
+    agentContext?.actions.initAgentTeam();
+
     try {
       await ensureApiKeySelection();
+
+      // Phase 1: Scout (research) - real web search for facts and statistics
+      agentContext?.actions.updateAgentStatus('scout', 'working', 'Researching your topic...');
+
+      let researchContext: ResearchContext | undefined;
+      try {
+        const scoutResult = await runScoutAgent(topic, {
+          onProgress: (message) => {
+            agentContext?.actions.updateAgentStatus('scout', 'working', message);
+          },
+        });
+
+        // Store Scout output for display
+        agentContext?.actions.setAgentOutput('scout', scoutResult);
+
+        // Format findings for content generation
+        if (scoutResult.findings.length > 0) {
+          researchContext = {
+            findings: formatFindingsForPrompt(scoutResult.findings),
+            summary: scoutResult.summary,
+          };
+        }
+      } catch (scoutError) {
+        console.warn('[Scout] Research failed, continuing without:', scoutError);
+      }
+
       const imageStyleToPass = imageStyleOverride.id !== 'auto' ? imageStyleOverride : undefined;
-      const plan = await generatePresentationPlan(topic, imageStyleToPass, generationMode);
+
+      // Phase 2: Sage (theme) + Aria (content) - theme selection and content generation
+      agentContext?.actions.updateAgentStatus('scout', 'done');
+      agentContext?.actions.updateAgentStatus('sage', 'working', 'Selecting the perfect theme...');
+
+      const plan = await generatePresentationPlan(topic, imageStyleToPass, generationMode, researchContext);
+
+      agentContext?.actions.updateAgentStatus('sage', 'done');
+      agentContext?.actions.updateAgentStatus('aria', 'working', 'Crafting your story...');
+
       const slides = createSlidesFromPlan(plan.slides);
+
+      agentContext?.actions.updateAgentStatus('aria', 'done');
+
+      // Phase 3: Nova (images) - will emit status updates via imageGen callbacks
+      agentContext?.actions.updateAgentStatus('nova', 'working', 'Making your vision real...');
 
       const savedDeck = await createDeckInternal({
         slides,
@@ -289,7 +349,13 @@ export const useDeck = () => {
         visualStyle: plan.visualStyle,
       });
 
+      // Note: Nova completes when image generation finishes (handled in imageGen callbacks)
+
       return savedDeck.slides;
+    } catch (error) {
+      // Mark current working agent as error
+      agentContext?.actions.clearAgentTeam();
+      throw error;
     } finally {
       setIsGenerating(false);
     }

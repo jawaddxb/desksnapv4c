@@ -2,14 +2,13 @@
  * SolutionsPage Component
  *
  * Dynamic solutions page for different audiences.
- * Studio Noir aesthetic - black, white, gold.
+ * Bento Matcha aesthetic - soft greens, white, natural tones.
  */
 
 import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { ArrowRight, Check, Rocket, GraduationCap, Palette, Users } from 'lucide-react';
-import { LandingNavbar } from '../landing/LandingNavbar';
-import { FooterSection } from '../landing/FooterSection';
+import { Navbar, Footer } from '../homepage-variants/shared';
 
 interface SolutionsPageProps {
   onAuth: (mode: 'login' | 'register') => void;
@@ -105,8 +104,8 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
   const Icon = solution.icon;
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <LandingNavbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
+    <div className="min-h-screen bg-[#F5FAF7] text-[#1E2E1E]">
+      <Navbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
 
       <main className="pt-32">
         {/* Hero Section */}
@@ -114,9 +113,9 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Content */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 border border-white/20 mb-8">
-                <Icon className="w-4 h-4 text-[#c5a47e]" />
-                <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 border border-[#D4E5D4] mb-8">
+                <Icon className="w-4 h-4 text-[#6B8E6B]" />
+                <span className="text-xs uppercase tracking-[0.2em] text-[#6B8E6B]">
                   For {solutionId.charAt(0).toUpperCase() + solutionId.slice(1)}
                 </span>
               </div>
@@ -125,13 +124,13 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
                 {solution.headline}
               </h1>
 
-              <p className="text-xl text-white/60 mb-10">
+              <p className="text-xl text-[#4A5D4A] mb-10">
                 {solution.subheadline}
               </p>
 
               <button
                 onClick={() => onAuth('register')}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-medium hover:bg-[#c5a47e] transition-colors group"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-[#6B8E6B] text-white font-medium hover:bg-[#5A7A5A] transition-colors group"
               >
                 {solution.cta}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -139,17 +138,17 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
             </div>
 
             {/* Visual */}
-            <div className="aspect-[4/3] bg-white/5 border border-white/10 flex items-center justify-center">
-              <Icon className="w-24 h-24 text-[#c5a47e] opacity-30" />
+            <div className="aspect-[4/3] bg-[#EDF5F0] border border-[#D4E5D4] flex items-center justify-center">
+              <Icon className="w-24 h-24 text-[#6B8E6B] opacity-30" />
             </div>
           </div>
         </section>
 
         {/* Pain Points */}
-        <section className="py-24 bg-[#111111]">
+        <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="mb-16">
-              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#6B8E6B] mb-4 block">
                 Sound Familiar?
               </span>
               <h2 className="text-4xl md:text-5xl font-light">
@@ -157,13 +156,13 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-px bg-white/10">
+            <div className="grid md:grid-cols-3 gap-6">
               {solution.painPoints.map((painPoint, index) => (
                 <div
                   key={index}
-                  className="bg-[#111111] p-8"
+                  className="bg-white p-8 border border-[#D4E5D4] shadow-[0_4px_24px_rgba(107,142,107,0.08)]"
                 >
-                  <p className="text-white/60 italic">"{painPoint}"</p>
+                  <p className="text-[#4A5D4A] italic">"{painPoint}"</p>
                 </div>
               ))}
             </div>
@@ -171,25 +170,25 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
         </section>
 
         {/* Solution */}
-        <section className="py-24 border-t border-white/10">
+        <section className="py-24 border-t border-[#D4E5D4]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#6B8E6B] mb-4 block">
               The Solution
             </span>
-            <p className="text-2xl md:text-3xl text-white/80 leading-relaxed mb-8">
+            <p className="text-2xl md:text-3xl text-[#1E2E1E] leading-relaxed mb-8">
               {solution.solution}
             </p>
-            <p className="text-lg text-[#c5a47e]">
+            <p className="text-lg text-[#6B8E6B]">
               {solution.socialProof}
             </p>
           </div>
         </section>
 
         {/* Features */}
-        <section className="py-24 bg-[#111111]">
+        <section className="py-24 bg-[#EDF5F0]">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="mb-16">
-              <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#6B8E6B] mb-4 block">
                 Features
               </span>
               <h2 className="text-4xl md:text-5xl font-light">
@@ -197,16 +196,16 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-px bg-white/10 max-w-3xl">
+            <div className="grid md:grid-cols-2 gap-6 max-w-3xl">
               {solution.features.map((feature, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-4 bg-[#111111] p-8"
+                  className="flex items-start gap-4 bg-white p-8 border border-[#D4E5D4] shadow-[0_4px_24px_rgba(107,142,107,0.08)]"
                 >
-                  <div className="w-5 h-5 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3 h-3 text-[#c5a47e]" />
+                  <div className="w-5 h-5 bg-[#6B8E6B]/10 border border-[#D4E5D4] flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-[#6B8E6B]" />
                   </div>
-                  <span className="text-white/60">{feature}</span>
+                  <span className="text-[#4A5D4A]">{feature}</span>
                 </div>
               ))}
             </div>
@@ -214,17 +213,17 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
         </section>
 
         {/* CTA */}
-        <section className="py-24 border-t border-white/10">
+        <section className="py-24 border-t border-[#D4E5D4]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
             <h2 className="text-4xl md:text-5xl font-light mb-6">
               Ready to Get Started?
             </h2>
-            <p className="text-xl text-white/60 mb-10">
+            <p className="text-xl text-[#4A5D4A] mb-10">
               Create your first presentation in minutes. Free forever for basic use.
             </p>
             <button
               onClick={() => onAuth('register')}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#c5a47e] text-black font-medium hover:bg-white transition-colors group"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#6B8E6B] text-white font-medium hover:bg-[#5A7A5A] transition-colors group"
             >
               {solution.cta}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -233,7 +232,7 @@ export const SolutionsPage: React.FC<SolutionsPageProps> = ({ onAuth }) => {
         </section>
       </main>
 
-      <FooterSection />
+      <Footer />
     </div>
   );
 };

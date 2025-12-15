@@ -23,3 +23,9 @@ export {
   type RoughDraftAgentOptions,
   type SlideContent,
 } from './roughDraftAgent';
+export {
+  runScoutAgent,
+  formatFindingsForPrompt,
+  type ScoutOutput,
+  type ScoutOptions,
+} from './scoutAgent';

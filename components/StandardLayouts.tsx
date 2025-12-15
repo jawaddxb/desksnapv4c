@@ -126,23 +126,55 @@ const SplitLayoutImpl: React.FC<LayoutProps> = ({ slide, theme, children, imageT
   );
 };
 
+// Helper to generate gradient based on overlay style
+// IMPORTANT: For full-bleed with images, we ALWAYS use dark overlays.
+// This ensures white text is readable regardless of image content.
+// Theme-tinted overlays don't work because images have unpredictable luminance.
+const getOverlayGradient = (
+  overlayStyle: 'standard' | 'soft' | 'none' | undefined,
+  isCenter: boolean,
+  isRight: boolean,
+  hasImage: boolean
+): string | undefined => {
+  const style = overlayStyle ?? 'standard';
+  if (style === 'none') return undefined;
+
+  const direction = isCenter ? 'to top' : `to ${isRight ? 'left' : 'right'}`;
+
+  // Always use dark overlay for image-backed layouts
+  // This creates a predictable dark surface for white text
+  const base = hasImage ? '#000000' : '#000000';
+
+  if (style === 'soft') {
+    // Softer fade (50% coverage) - still dark but more transparent
+    return isCenter
+      ? `linear-gradient(${direction}, ${base}CC 0%, ${base}66 60%, transparent 100%)`
+      : `linear-gradient(${direction}, ${base}CC 0%, ${base}80 50%, transparent 100%)`;
+  }
+
+  // Standard: deeper dark fade (70% coverage)
+  return isCenter
+    ? `linear-gradient(${direction}, ${base}E6 0%, ${base}B3 35%, ${base}66 60%, transparent 100%)`
+    : `linear-gradient(${direction}, ${base}E6 0%, ${base}B3 40%, ${base}66 65%, transparent 100%)`;
+};
+
 const FullBleedLayoutImpl: React.FC<LayoutProps> = ({ slide, theme, children, imageToolbar }) => {
   const isCenter = slide.alignment === 'center';
   const isRight = slide.alignment === 'right';
+  const hasImage = !!slide.imageUrl;
+  const overlayGradient = getOverlayGradient(slide.overlayStyle, isCenter, isRight, hasImage);
 
   return (
     <div className="relative w-full h-full overflow-hidden group">
       <div className="absolute inset-0 z-0 scale-105 group-hover:scale-100 transition-transform duration-1000">
         <ImageContainer slide={slide} theme={theme} toolbar={imageToolbar} />
       </div>
-      <div
-        className="absolute inset-0 z-10 pointer-events-none"
-        style={{
-          background: isCenter
-            ? `linear-gradient(to top, ${theme.colors.surface}F2 0%, ${theme.colors.surface}80 60%, transparent 100%)`
-            : `linear-gradient(to ${isRight ? 'left' : 'right'}, ${theme.colors.surface}F2 0%, ${theme.colors.surface}B3 50%, transparent 100%)`
-        }}
-      />
+      {overlayGradient && (
+        <div
+          className="absolute inset-0 z-10 pointer-events-none"
+          style={{ background: overlayGradient }}
+        />
+      )}
       <div className={`
         relative z-20 p-8 md:p-12 flex flex-col justify-center h-full overflow-hidden min-h-0 shrink-0 w-full
         ${isCenter ? 'items-center text-center mx-auto' : isRight ? 'items-end text-right ml-auto' : 'items-start text-left'}
@@ -157,10 +189,10 @@ const FullBleedLayoutImpl: React.FC<LayoutProps> = ({ slide, theme, children, im
 
 const StatementLayoutImpl: React.FC<LayoutProps> = ({ slide, theme, children, imageToolbar }) => (
   <div className="relative w-full h-full flex flex-col overflow-hidden">
-    <div className="flex-[2] p-8 md:p-12 flex flex-col justify-center items-center text-center relative z-20 bg-opacity-50 min-h-0 overflow-hidden shrink-0">
+    <div className="flex-[3] p-8 md:p-12 flex flex-col justify-end items-center text-center relative z-20 bg-opacity-50 min-h-0 overflow-hidden shrink-0 pb-6">
       {children}
     </div>
-    <div className="flex-1 relative border-t-2 min-h-[30%] shrink-0 group" style={{ borderColor: theme.colors.border }}>
+    <div className="flex-[2] relative border-t-2 min-h-[35%] shrink-0 group" style={{ borderColor: theme.colors.border }}>
       <ImageContainer slide={slide} theme={theme} toolbar={imageToolbar} />
       <div className="absolute inset-0 bg-gradient-to-t from-transparent to-black/5 pointer-events-none" />
     </div>

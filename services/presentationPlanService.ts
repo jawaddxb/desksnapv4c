@@ -26,6 +26,14 @@ export interface ImageStyleOverride {
 }
 
 /**
+ * Optional research context from Scout agent.
+ */
+export interface ResearchContext {
+  findings: string;
+  summary: string;
+}
+
+/**
  * Generate a complete presentation plan from a user prompt.
  *
  * Uses AI to select an appropriate theme, generate slide structure,
@@ -34,12 +42,14 @@ export interface ImageStyleOverride {
  * @param prompt - User's description of the presentation
  * @param imageStyle - Optional image style override
  * @param generationMode - Level of detail (concise, balanced, detailed, verbatim)
+ * @param researchContext - Optional research findings from Scout agent
  * @returns Structured presentation plan
  */
 export const generatePresentationPlan = async (
   prompt: string,
   imageStyle?: ImageStyleOverride,
-  generationMode: GenerationMode = 'balanced'
+  generationMode: GenerationMode = 'balanced',
+  researchContext?: ResearchContext
 ): Promise<PresentationPlanResponse> => {
   const ai = getAIClient();
 
@@ -57,6 +67,11 @@ export const generatePresentationPlan = async (
       ? `CRITICAL ART DIRECTION RULES (Subject Matter): ${imageStyle.subjectGuidance}`
       : `Determine the appropriate subject matter (people vs abstract vs illustration) based on the theme's aesthetic.`;
 
+  // Include research findings if available
+  const researchInstruction = researchContext?.findings
+    ? `\n\nRESEARCH FINDINGS (incorporate these facts into the content):\n${researchContext.findings}\n`
+    : '';
+
   // Use Flash for the logical planning
   const response = await ai.models.generateContent({
     model: getTextModel(),
@@ -69,7 +84,7 @@ export const generatePresentationPlan = async (
     ${themeOptions}
 
     User Request: "${prompt}"
-
+    ${researchInstruction}
     ${styleInstruction}
     ${subjectLogic}`,
     config: {

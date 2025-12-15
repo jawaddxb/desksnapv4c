@@ -18,7 +18,7 @@ import { DebugRoute, ThumbnailGenerator, ComponentShowcase, ImageAgentRoute } fr
 import { DesignShowcase } from './design-showcase/DesignShowcase';
 import { AuthModal } from './components/auth';
 import { ProtectedRoute, OfflineGate } from './components/routing';
-import { LandingPage } from './components/landing';
+import { ImmersiveLandingPage } from './components/homepage-variants/variant-5-immersive';
 import {
   FeaturesPage,
   PricingPage,
@@ -28,6 +28,7 @@ import {
 } from './components/pages';
 import { MobileViewRoute } from './components/mobile';
 import { PrototypeRouter } from './homepage-prototypes';
+import { HomepageVariants } from './components/homepage-variants';
 import { useRealtimeSync } from './hooks/useRealtimeSync';
 
 // ============ Realtime Sync Initializer ============
@@ -60,7 +61,7 @@ function AppRoutes() {
     <>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage onAuth={handleOpenAuth} />} />
+        <Route path="/" element={<ImmersiveLandingPage onAuth={handleOpenAuth} />} />
         <Route path="/features" element={<FeaturesPage onAuth={handleOpenAuth} />} />
         <Route path="/pricing" element={<PricingPage onAuth={handleOpenAuth} />} />
         <Route path="/about" element={<AboutPage onAuth={handleOpenAuth} />} />
@@ -69,6 +70,9 @@ function AppRoutes() {
 
         {/* Homepage Prototypes */}
         <Route path="/prototypes/*" element={<PrototypeRouter />} />
+
+        {/* Homepage Variants Preview */}
+        <Route path="/homepage-preview" element={<HomepageVariants onGetStarted={() => navigate('/app')} />} />
 
         {/* Debug Routes */}
         <Route path="/debug" element={<DebugRoute />} />
@@ -82,7 +86,7 @@ function AppRoutes() {
           path="/login"
           element={
             <AuthModalTrigger mode="login" onAuth={handleOpenAuth}>
-              <LandingPage onAuth={handleOpenAuth} />
+              <ImmersiveLandingPage onAuth={handleOpenAuth} />
             </AuthModalTrigger>
           }
         />
@@ -90,7 +94,7 @@ function AppRoutes() {
           path="/signup"
           element={
             <AuthModalTrigger mode="register" onAuth={handleOpenAuth}>
-              <LandingPage onAuth={handleOpenAuth} />
+              <ImmersiveLandingPage onAuth={handleOpenAuth} />
             </AuthModalTrigger>
           }
         />
@@ -111,7 +115,7 @@ function AppRoutes() {
         <Route path="/mobile/:presentationId" element={<MobileViewRoute />} />
 
         {/* Fallback */}
-        <Route path="*" element={<LandingPage onAuth={handleOpenAuth} />} />
+        <Route path="*" element={<ImmersiveLandingPage onAuth={handleOpenAuth} />} />
       </Routes>
 
       {/* Global Auth Modal */}

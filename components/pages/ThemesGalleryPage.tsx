@@ -2,13 +2,12 @@
  * ThemesGalleryPage Component
  *
  * Full theme gallery with category filtering.
- * Studio Noir aesthetic - black, white, gold.
+ * Bento Matcha aesthetic - soft greens, natural whites, organic tones.
  */
 
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { LandingNavbar } from '../landing/LandingNavbar';
-import { FooterSection } from '../landing/FooterSection';
+import { Navbar, Footer } from '../homepage-variants/shared';
 
 interface ThemesGalleryPageProps {
   onAuth: (mode: 'login' | 'register') => void;
@@ -104,20 +103,20 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
     : themeCategories;
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <LandingNavbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
+    <div className="min-h-screen bg-[#F5FAF7] text-[#1E2E1E]">
+      <Navbar onLogin={() => onAuth('login')} onSignup={() => onAuth('register')} />
 
       <main className="pt-32">
         {/* Page Header */}
         <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-16">
           <div className="text-center max-w-3xl mx-auto">
-            <span className="text-xs uppercase tracking-[0.2em] text-[#c5a47e] mb-4 block">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#6B8E6B] mb-4 block">
               Theme Gallery
             </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-6">
               60+ Ways to Tell Your Story
             </h1>
-            <p className="text-xl text-white/60">
+            <p className="text-xl text-[#4A5D4A]">
               Not templates. Design systems. Each archetype adapts to your content
               while maintaining visual coherence.
             </p>
@@ -131,8 +130,8 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
               onClick={() => setActiveCategory(null)}
               className={`px-4 py-2 text-sm transition-colors ${
                 activeCategory === null
-                  ? 'bg-white text-black'
-                  : 'text-white/60 border border-white/20 hover:border-[#c5a47e] hover:text-[#c5a47e]'
+                  ? 'bg-[#6B8E6B] text-white border-[#6B8E6B]'
+                  : 'bg-white border border-[#D4E5D4] text-[#4A5D4A] hover:border-[#6B8E6B]'
               }`}
             >
               All Themes
@@ -143,8 +142,8 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-4 py-2 text-sm transition-colors ${
                   activeCategory === category.id
-                    ? 'bg-white text-black'
-                    : 'text-white/60 border border-white/20 hover:border-[#c5a47e] hover:text-[#c5a47e]'
+                    ? 'bg-[#6B8E6B] text-white border-[#6B8E6B]'
+                    : 'bg-white border border-[#D4E5D4] text-[#4A5D4A] hover:border-[#6B8E6B]'
                 }`}
               >
                 {category.name}
@@ -161,7 +160,7 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
                 <h2 className="text-3xl font-light mb-2">
                   {category.name}
                 </h2>
-                <p className="text-white/40">{category.description}</p>
+                <p className="text-[#8FA58F]">{category.description}</p>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1">
@@ -191,18 +190,18 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
 
                     {/* Hover Overlay */}
                     <div
-                      className={`absolute inset-0 bg-black/90 flex flex-col justify-center items-center p-4 transition-opacity duration-150 ${
+                      className={`absolute inset-0 bg-white border border-[#D4E5D4] shadow-[0_12px_48px_rgba(107,142,107,0.12)] flex flex-col justify-center items-center p-4 transition-opacity duration-150 ${
                         hoveredTheme === theme.id ? 'opacity-100' : 'opacity-0'
                       }`}
                     >
-                      <h3 className="text-lg font-light mb-3">
+                      <h3 className="text-lg font-light mb-3 text-[#1E2E1E]">
                         {theme.name}
                       </h3>
                       <div className="flex items-center gap-2">
                         {theme.colors.map((color, i) => (
                           <div
                             key={i}
-                            className="w-4 h-4 border border-white/20"
+                            className="w-4 h-4 border border-[#D4E5D4]"
                             style={{ backgroundColor: color }}
                           />
                         ))}
@@ -216,17 +215,17 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
         ))}
 
         {/* CTA */}
-        <section className="py-24 bg-[#111111]">
+        <section className="py-24 bg-[#EDF5F0]">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-4xl md:text-5xl font-light mb-6">
+            <h2 className="text-4xl md:text-5xl font-light mb-6 text-[#1E2E1E]">
               Find Your Visual Voice
             </h2>
-            <p className="text-xl text-white/60 mb-10">
+            <p className="text-xl text-[#4A5D4A] mb-10">
               Try any archetype free. No credit card required.
             </p>
             <button
               onClick={() => onAuth('register')}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#c5a47e] text-black font-medium hover:bg-white transition-colors group"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-[#6B8E6B] text-white font-medium hover:bg-white hover:text-[#1E2E1E] hover:border hover:border-[#6B8E6B] transition-colors group"
             >
               Start Creating Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -235,7 +234,7 @@ export const ThemesGalleryPage: React.FC<ThemesGalleryPageProps> = ({ onAuth }) 
         </section>
       </main>
 
-      <FooterSection />
+      <Footer />
     </div>
   );
 };

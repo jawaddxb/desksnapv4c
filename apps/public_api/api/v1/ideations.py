@@ -111,6 +111,7 @@ def list_sessions(
 
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
+    pages = (total + page_size - 1) // page_size if page_size > 0 else 0
 
     # Manually serialize to ensure notes are properly included
     # (Pydantic v2 model_validate may not handle SQLAlchemy relationships correctly)
@@ -124,6 +125,7 @@ def list_sessions(
         total=total,
         page=page,
         page_size=page_size,
+        pages=pages,
     )
 
 

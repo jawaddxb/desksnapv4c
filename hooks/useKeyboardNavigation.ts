@@ -19,6 +19,8 @@ export interface UseKeyboardNavigationOptions {
   setActiveSlideIndex: (index: number) => void;
   /** Callback to exit presentation mode */
   onExitPresentation: () => void;
+  /** Callback to start presentation mode (Cmd+Enter) */
+  onStartPresentation?: () => void;
 }
 
 export interface UseKeyboardNavigationReturn {
@@ -34,6 +36,7 @@ export function useKeyboardNavigation({
   activeSlideIndex,
   setActiveSlideIndex,
   onExitPresentation,
+  onStartPresentation,
 }: UseKeyboardNavigationOptions): UseKeyboardNavigationReturn {
 
   const goToNextSlide = () => {
@@ -48,6 +51,23 @@ export function useKeyboardNavigation({
     }
   };
 
+  // Handle Cmd+Enter to start presentation (when not presenting)
+  useEffect(() => {
+    if (isPresenting || !presentation || !onStartPresentation) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux)
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        onStartPresentation();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPresenting, presentation, onStartPresentation]);
+
+  // Handle presentation mode navigation
   useEffect(() => {
     if (!isPresenting || !presentation) return;
 

@@ -14,6 +14,7 @@ import { RecipeSelector } from './sources/RecipeSelector';
 import { FeatureCards } from './dashboard/FeatureCards';
 import { GettingStarted } from './onboarding/GettingStarted';
 import { useOnboarding, OnboardingStep } from '@/hooks/useOnboarding';
+import { UnifiedCreateModal } from './create-flow';
 
 type WorkItemType = 'deck' | 'draft' | 'ideation';
 type FilterType = 'all' | WorkItemType;
@@ -39,6 +40,8 @@ interface DashboardProps {
   onDelete: (id: string) => void;
   onClone?: (id: string) => void;
   onCreateNew: () => void;
+  onCreateDeckWithTopic?: (topic: string) => Promise<void>;
+  isGeneratingDeck?: boolean;
   onImport: (file: File) => void;
   onIdeate?: () => void;
   onOpenSources?: (preset: 'video' | 'web' | 'mixed', recipe: DeckRecipe) => void;
@@ -209,6 +212,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onDelete,
   onClone,
   onCreateNew,
+  onCreateDeckWithTopic,
+  isGeneratingDeck = false,
   onImport,
   onIdeate,
   onOpenSources,
@@ -224,9 +229,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [analyticsDeck, setAnalyticsDeck] = useState<Presentation | null>(null);
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('deck');
   const [recipeSelectorOpen, setRecipeSelectorOpen] = useState(false);
   const [pendingPreset, setPendingPreset] = useState<'video' | 'web' | 'mixed'>('video');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Onboarding
   const {
@@ -273,7 +279,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         id: ideation.id,
         type: 'ideation',
         title: ideation.topic,
-        lastModified: ideation.updatedAt,
+        lastModified: ideation.lastModified,
         noteCount: ideation.notes?.length || 0,
         data: ideation,
       });
@@ -334,7 +340,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const handleCreateNew = () => {
     markStepComplete('create_deck');
-    onCreateNew();
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateDeck = async (topic: string) => {
+    if (onCreateDeckWithTopic) {
+      // Use new topic-aware callback, keep modal open during generation
+      await onCreateDeckWithTopic(topic);
+      setIsCreateModalOpen(false);
+    } else {
+      // Fallback to legacy behavior
+      setIsCreateModalOpen(false);
+      onCreateNew();
+    }
   };
 
   const handleIdeate = () => {
@@ -383,6 +401,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
         onSelect={handleRecipeSelect}
         onClose={() => setRecipeSelectorOpen(false)}
         preset={pendingPreset}
+      />
+
+      {/* Unified Create Modal */}
+      <UnifiedCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => !isGeneratingDeck && setIsCreateModalOpen(false)}
+        onCreateDeck={handleCreateDeck}
+        onIdeate={handleIdeate}
+        onOpenSources={() => handleOpenRecipeSelector('web')}
+        isGenerating={isGeneratingDeck}
       />
 
       <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />

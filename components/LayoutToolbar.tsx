@@ -133,7 +133,7 @@ export const LayoutToolbar: React.FC<LayoutToolbarProps> = ({
   return (
     <div
       ref={toolbarRef}
-      className={`absolute bottom-8 left-1/2 z-[200] flex flex-col items-center gap-3 opacity-0 group-hover/stage:opacity-100 transition-opacity duration-500 ${isDragging ? 'cursor-grabbing' : ''}`}
+      className={`absolute bottom-8 left-1/2 z-[200] flex flex-col items-center gap-3 opacity-90 hover:opacity-100 transition-opacity duration-200 ${isDragging ? 'cursor-grabbing' : ''}`}
       style={dragStyle}
     >
       {/* Selection indicator badge - only in wabi-sabi mode with selection */}

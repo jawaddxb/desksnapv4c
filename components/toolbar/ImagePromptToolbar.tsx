@@ -3,9 +3,12 @@
  *
  * Floating toolbar for editing image prompts on slides.
  * Shows aesthetic (locked) and subject (editable) with AI suggestions.
+ *
+ * DRY: Uses useImagePromptEditor hook for shared logic
+ * DRY: Uses useClickOutside hook for click-outside detection
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   Image as ImageIcon,
   X,
@@ -18,6 +21,8 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { Slide, Presentation } from '@/types';
+import { useImagePromptEditor } from '@/hooks/useImagePromptEditor';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 export interface ImagePromptToolbarProps {
   /** Current slide */
@@ -43,74 +48,33 @@ export const ImagePromptToolbar: React.FC<ImagePromptToolbarProps> = ({
   onGenerateSuggestions,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [editedPrompt, setEditedPrompt] = useState(slide.imagePrompt);
-  const [showAesthetic, setShowAesthetic] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Sync local prompt with slide when it changes externally
-  useEffect(() => {
-    setEditedPrompt(slide.imagePrompt);
-  }, [slide.imagePrompt]);
+  // DRY: Use shared hook for prompt editing logic
+  const {
+    editedPrompt,
+    setEditedPrompt,
+    showAesthetic,
+    setShowAesthetic,
+    suggestions,
+    isLoadingSuggestions,
+    isDirty,
+    handleApply,
+    handleApplyAndRegenerate,
+    handleSuggestionSelect,
+    handleGenerateSuggestions,
+    truncateText,
+  } = useImagePromptEditor({
+    slide,
+    presentation,
+    onUpdateSlide,
+    onRegenerateImage,
+    onGenerateSuggestions,
+  });
 
-  // Click outside handler
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
-        setIsExpanded(false);
-      }
-    };
-
-    if (isExpanded) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isExpanded]);
-
-  const isDirty = editedPrompt !== slide.imagePrompt;
-
-  const handleApply = () => {
-    if (isDirty) {
-      onUpdateSlide({ imagePrompt: editedPrompt });
-    }
-  };
-
-  const handleApplyAndRegenerate = () => {
-    if (isDirty) {
-      onUpdateSlide({ imagePrompt: editedPrompt });
-    }
-    // Small delay to ensure state updates before regeneration
-    setTimeout(() => {
-      onRegenerateImage();
-    }, 50);
-  };
-
-  const handleSuggestionSelect = (suggestion: string) => {
-    setEditedPrompt(suggestion);
-    onUpdateSlide({ imagePrompt: suggestion });
-  };
-
-  const handleGenerateSuggestions = async () => {
-    if (!onGenerateSuggestions) return;
-
-    setIsLoadingSuggestions(true);
-    try {
-      const newSuggestions = await onGenerateSuggestions();
-      setSuggestions(newSuggestions);
-    } catch (error) {
-      console.error('Failed to generate suggestions:', error);
-    } finally {
-      setIsLoadingSuggestions(false);
-    }
-  };
-
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength) + '...';
-  };
+  // DRY: Use shared hook for click-outside detection
+  const handleClose = useCallback(() => setIsExpanded(false), []);
+  useClickOutside(panelRef, handleClose, isExpanded);
 
   return (
     <div ref={panelRef} className="absolute bottom-4 right-4 z-[200]">

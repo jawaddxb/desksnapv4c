@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Slide, Theme, ContentType } from '@/types';
 import { SmartText } from './SmartText';
 import { applyFontScale } from '@/lib/textPresets';
 import { ContentItem } from './content';
 import { DEFAULT_CONTENT_STYLE } from '@/config/contentStyles';
 import { ContentBlockRenderer, hasContentBlocks } from '@/components/content-blocks';
+import { getVisualOutput } from '@/lib/visualProfiles';
 
 interface SlideContentEditorProps {
     slide: Slide;
@@ -29,6 +30,17 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
     // Style overrides from slide data
     const titleStyle = slide.textStyles?.title;
     const contentStyle = slide.textStyles?.content;
+
+    // Get text colors from the visual profiling engine
+    // Profile-based approach: classifies composition and applies validated parameters
+    const visualOutput = useMemo(() => {
+        return getVisualOutput(slide, theme);
+    }, [slide.layoutType, slide.imageUrl, slide.alignment, slide.overlayStyle, theme]);
+
+    const textColors = {
+        title: visualOutput.titleColor,
+        content: visualOutput.contentColor,
+    };
 
     const updateTitle = (newTitle: string) => onUpdateSlide?.({ title: newTitle });
     const updateContent = (index: number, newText: string) => {
@@ -60,7 +72,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
             className={`p-0 ${extraClassName}`}
             style={{
                 fontFamily: theme.fonts.heading,
-                color: theme.colors.text,
+                color: textColors.title,
                 textTransform: theme.layout.headingTransform as any,
             }}
         />
@@ -112,7 +124,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                         className="font-bold bg-transparent outline-none p-0"
                         style={{
                             fontFamily: theme.fonts.heading,
-                            color: theme.colors.text,
+                            color: textColors.title,
                             textTransform: theme.layout.headingTransform as any,
                         }}
                     />
@@ -130,7 +142,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                                 fontStyle={contentStyle?.fontStyle}
                                 textAlign={contentStyle?.textAlign}
                                 className="font-medium opacity-90 bg-transparent outline-none p-0"
-                                style={{ fontFamily: theme.fonts.body, color: theme.colors.secondary }}
+                                style={{ fontFamily: theme.fonts.body, color: textColors.content }}
                             />
                         </div>
                     ))}
@@ -161,7 +173,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                     className={`p-0 ${isFullBleed ? 'drop-shadow-lg' : ''} ${isStatement || (isFullBleed && isCenter) ? 'text-center' : ''} ${(isFullBleed && isRight) ? 'text-right' : ''}`}
                     style={{
                         fontFamily: theme.fonts.heading,
-                        color: theme.colors.text,
+                        color: textColors.title,
                         textTransform: theme.layout.headingTransform as any,
                         textShadow: isFullBleed && theme.id !== 'neoBrutalist' ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
                     }}
@@ -187,6 +199,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                             contentType={contentType}
                             index={idx}
                             isStatement={isStatement}
+                            visualPreset={slide.contentItemVisualPreset}
                         >
                             <SmartText
                                 value={point}
@@ -200,7 +213,7 @@ export const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slide, t
                                 className={`bg-transparent outline-none w-full p-0 ${isStatement ? 'text-center' : ''}`}
                                 style={{
                                     fontFamily: theme.fonts.body,
-                                    color: isStatement ? theme.colors.text : theme.colors.secondary,
+                                    color: isStatement ? textColors.title : textColors.content,
                                 }}
                             />
                         </ContentItem>

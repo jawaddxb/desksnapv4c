@@ -1,6 +1,10 @@
 import React from 'react';
-import type { Theme, ContentType, ThemeContentStyle } from '@/types';
-import { DEFAULT_CONTENT_STYLE } from '@/config/contentStyles';
+import type { Theme, ContentType, ContentItemVisualPreset } from '@/types';
+import {
+  resolveContentItemStyle,
+  getEffectivePreset,
+  presetHasVisibleContainer,
+} from '@/config/contentItemStyles';
 import { BulletRenderer } from './BulletRenderer';
 
 interface ContentItemProps {
@@ -9,83 +13,16 @@ interface ContentItemProps {
   contentType: ContentType;
   index: number;
   isStatement?: boolean;
-}
-
-/**
- * Resolves background color based on theme settings.
- */
-function resolveBackground(
-  style: ThemeContentStyle,
-  theme: Theme,
-  contentType: ContentType,
-  isStatement: boolean
-): string {
-  // Quotes get a special subtle background
-  if (contentType === 'quotes') {
-    return `${theme.colors.accent}10`; // 10% opacity accent
-  }
-
-  // Statement layout or explicit accent background
-  if (isStatement || style.itemBackground === 'accent') {
-    return `${theme.colors.accent}15`; // 15% opacity accent
-  }
-
-  return 'transparent';
-}
-
-/**
- * Resolves border radius based on style settings.
- */
-function resolveBorderRadius(
-  style: ThemeContentStyle,
-  contentType: ContentType,
-  isStatement: boolean
-): string {
-  if (style.itemBorderRadius) {
-    return style.itemBorderRadius === 'full' ? '9999px' : style.itemBorderRadius;
-  }
-
-  // Statement layout defaults to pill shape
-  if (isStatement) {
-    return '9999px';
-  }
-
-  // Quotes get subtle rounded corners
-  if (contentType === 'quotes') {
-    return '8px';
-  }
-
-  return '0';
-}
-
-/**
- * Resolves padding based on style settings and content type.
- */
-function resolvePadding(
-  style: ThemeContentStyle,
-  contentType: ContentType,
-  isStatement: boolean
-): string {
-  if (style.itemPadding) {
-    return style.itemPadding;
-  }
-
-  // Statement layout has pill padding
-  if (isStatement) {
-    return '12px 24px';
-  }
-
-  // Quotes have left padding for the border
-  if (contentType === 'quotes') {
-    return '8px 16px';
-  }
-
-  return '0';
+  /** Slide-level override for visual preset */
+  visualPreset?: ContentItemVisualPreset;
 }
 
 /**
  * Wraps each content item with theme-appropriate styling.
- * Handles backgrounds, padding, borders, and bullet rendering.
+ *
+ * Uses the Content Item Visual Preset system for styling:
+ * - Priority: slide override > theme default > layout-based fallback
+ * - Presets: pill, card, sharp, glass, underline, solid, minimal
  */
 export const ContentItem: React.FC<ContentItemProps> = ({
   children,
@@ -93,19 +30,32 @@ export const ContentItem: React.FC<ContentItemProps> = ({
   contentType,
   index,
   isStatement = false,
+  visualPreset,
 }) => {
-  const style = theme.contentStyle || DEFAULT_CONTENT_STYLE;
+  // Resolve effective preset: slide > theme > fallback
+  const effectivePreset = getEffectivePreset(
+    visualPreset,
+    theme.contentItemVisualPreset,
+    isStatement
+  );
 
-  const background = resolveBackground(style, theme, contentType, isStatement);
-  const borderRadius = resolveBorderRadius(style, contentType, isStatement);
-  const padding = resolvePadding(style, contentType, isStatement);
+  // Get resolved CSS styles for the preset
+  const containerStyle = resolveContentItemStyle(effectivePreset, theme);
 
-  // Determine if we should show a left accent border
-  const showLeftBorder = style.leftAccentBorder || contentType === 'quotes';
-  const leftBorderWidth = style.leftBorderWidth ?? 3;
+  // Quotes always get left border accent (override preset)
+  const isQuotes = contentType === 'quotes';
+  if (isQuotes && !containerStyle.borderLeft) {
+    containerStyle.borderLeft = `3px solid ${theme.colors.accent}`;
+    // Ensure some background for quotes
+    if (containerStyle.backgroundColor === 'transparent') {
+      containerStyle.backgroundColor = `${theme.colors.accent}08`;
+    }
+  }
 
-  // For statement layout with accent background, don't show separate bullets
-  const showBullet = !isStatement && contentType !== 'plain' && style.bulletStyle !== 'none';
+  // Hide bullets when container has visible styling (pill, card, etc.)
+  // or when explicitly plain content type
+  const hasVisibleContainer = presetHasVisibleContainer(effectivePreset);
+  const showBullet = !hasVisibleContainer && contentType !== 'plain';
 
   return (
     <div
@@ -123,16 +73,13 @@ export const ContentItem: React.FC<ContentItemProps> = ({
         />
       )}
 
-      {/* Content wrapper with styling */}
+      {/* Content wrapper with preset styling */}
       <div
         className="flex-1 relative"
         style={{
-          backgroundColor: background,
-          borderRadius,
-          padding,
-          borderLeft: showLeftBorder ? `${leftBorderWidth}px solid ${theme.colors.accent}` : undefined,
-          // Smooth transition for hover states (if added later)
-          transition: 'background-color 0.15s ease',
+          ...containerStyle,
+          // Smooth transition for hover states
+          transition: 'background-color 0.15s ease, box-shadow 0.15s ease',
         }}
       >
         {children}

@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { Theme } from '@/types';
 import { CURATED_FONT_PAIRINGS } from '@/lib/fonts';
 import { ThemePicker } from './ThemePicker';
-import {
-  X, Palette, Type, Layout, ChevronDown, Check,
-  Sparkles, Search
-} from 'lucide-react';
+import { X, Palette, Type, Check, Search } from 'lucide-react';
 
 interface StylePanelProps {
   isOpen: boolean;
@@ -17,26 +14,22 @@ interface StylePanelProps {
   onApplyTypography?: (headingFont: string, bodyFont: string) => void;
   onSetViewMode: (mode: 'standard' | 'wabi-sabi') => void;
   onSetWabiSabiLayout: (layout: string) => void;
-  onRegenerateAllImages: () => void;
 }
 
-type TabType = 'theme' | 'typography' | 'layout';
+type TabType = 'theme' | 'typography';
 
 /**
- * Unified Style Panel - Consolidates theme, typography, and layout controls
- * into a single, organized panel accessible from the header
+ * Style Panel - Theme and typography controls
+ * accessible from the header. Layout controls are now in the main toolbar.
  */
 export const StylePanel: React.FC<StylePanelProps> = ({
   isOpen,
   onClose,
   activeTheme,
-  viewMode,
-  activeWabiSabiLayout,
   onApplyTheme,
   onApplyTypography,
-  onSetViewMode,
-  onSetWabiSabiLayout,
-  onRegenerateAllImages,
+  // Layout props kept for backward compatibility but no longer used here
+  // viewMode, activeWabiSabiLayout, onSetViewMode, onSetWabiSabiLayout
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('theme');
   const [customHeading, setCustomHeading] = useState('');
@@ -48,7 +41,6 @@ export const StylePanel: React.FC<StylePanelProps> = ({
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
     { id: 'theme', label: 'Theme', icon: <Palette className="w-4 h-4" /> },
     { id: 'typography', label: 'Type', icon: <Type className="w-4 h-4" /> },
-    { id: 'layout', label: 'Layout', icon: <Layout className="w-4 h-4" /> },
   ];
 
   const handleApplyCustomFonts = () => {
@@ -223,101 +215,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
             </div>
           )}
 
-          {/* Layout Tab */}
-          {activeTab === 'layout' && (
-            <div className="space-y-6">
-              <p className="text-xs text-[#8FA58F]">
-                Choose how your slides are structured. Different layouts suit different content types.
-              </p>
-
-              {/* View Mode Selection */}
-              <div>
-                <label className="block text-xs text-[#8FA58F] mb-3">Layout Style</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => onSetViewMode('standard')}
-                    className={`
-                      p-4 rounded-lg border text-left transition-all duration-200
-                      ${viewMode === 'standard'
-                        ? 'bg-[#EDF5F0] border-[#6B8E6B] text-[#1E2E1E]'
-                        : 'bg-[#F5FAF7] border-[#D4E5D4] text-[#8FA58F] hover:border-[#6B8E6B]'
-                      }
-                    `}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <Layout className="w-4 h-4" />
-                      <span className="text-sm font-medium">Structured</span>
-                    </div>
-                    <p className="text-xs text-[#8FA58F]">
-                      Clean, predictable grid layouts
-                    </p>
-                  </button>
-
-                  <button
-                    onClick={() => onSetViewMode('wabi-sabi')}
-                    className={`
-                      p-4 rounded-lg border text-left transition-all duration-200
-                      ${viewMode === 'wabi-sabi'
-                        ? 'bg-[#6B8E6B]/10 border-[#6B8E6B] text-[#1E2E1E]'
-                        : 'bg-[#F5FAF7] border-[#D4E5D4] text-[#8FA58F] hover:border-[#6B8E6B]'
-                      }
-                    `}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="w-4 h-4" />
-                      <span className="text-sm font-medium">Organic</span>
-                    </div>
-                    <p className="text-xs text-[#8FA58F]">
-                      Artistic, generative compositions
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-              {/* Archetype selector (only in organic mode) */}
-              {viewMode === 'wabi-sabi' && (
-                <div>
-                  <label className="block text-xs text-[#8FA58F] mb-3">Visual Archetype</label>
-                  <div className="relative">
-                    <select
-                      value={activeWabiSabiLayout}
-                      onChange={(e) => onSetWabiSabiLayout(e.target.value)}
-                      className="w-full p-3 bg-[#F5FAF7] border border-[#D4E5D4] rounded text-sm text-[#1E2E1E] focus:border-[#6B8E6B] focus:outline-none appearance-none cursor-pointer"
-                    >
-                      {/* Common archetypes - can be expanded */}
-                      <option value="Editorial">Editorial</option>
-                      <option value="Constructivist">Constructivist</option>
-                      <option value="Brutalist">Brutalist</option>
-                      <option value="Kinetic">Kinetic</option>
-                      <option value="Minimalist">Minimalist</option>
-                      <option value="Deconstructed">Deconstructed</option>
-                      <option value="Retro">Retro</option>
-                      <option value="Geometric">Geometric</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-3.5 w-4 h-4 text-[#8FA58F] pointer-events-none" />
-                  </div>
-                  <p className="mt-2 text-xs text-[#8FA58F]">
-                    Each archetype creates a unique visual language for your slides.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="border-t border-[#D4E5D4] p-4 bg-[#F5FAF7]">
-          <button
-            onClick={() => {
-              onRegenerateAllImages();
-              onClose();
-            }}
-            className="w-full py-3 bg-[#6B8E6B] text-white font-medium text-sm rounded flex items-center justify-center gap-2 hover:bg-[#5A7A5A] transition-colors duration-150"
-          >
-            <Sparkles className="w-4 h-4" />
-            Apply Style to All Slides
-          </button>
-        </div>
       </div>
     </>
   );
