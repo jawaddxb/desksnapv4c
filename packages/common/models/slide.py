@@ -43,6 +43,11 @@ class Slide(BaseModel):
         nullable=True,
         default=list,
     )
+    # Rich content blocks (charts, statistics, quotes, etc.)
+    content_blocks: Mapped[dict | None] = mapped_column(
+        JSONB,
+        nullable=True,
+    )
     speaker_notes: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,

@@ -13,6 +13,7 @@ import { ScrollIndicator } from './ScrollIndicator';
 import { HeroSection } from './HeroSection';
 import { ProblemSection } from './ProblemSection';
 import { ProcessSection } from './ProcessSection';
+import { DeskSquadSection } from './DeskSquadSection';
 import { TestimonialsSection } from './TestimonialsSection';
 import { CTASection } from './CTASection';
 
@@ -100,6 +101,7 @@ export default function Variant5Immersive({ onAuth, onGetStarted }: Variant5Imme
         <HeroSection onGetStarted={handleSignup} />
         <ProblemSection />
         <ProcessSection />
+        <DeskSquadSection />
         <TestimonialsSection />
         <CTASection onGetStarted={handleSignup} />
       </main>

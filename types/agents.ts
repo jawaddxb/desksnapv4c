@@ -79,6 +79,64 @@ export const AGENT_EXAMPLES: Record<AgentId, string[]> = {
   coach: ['Review content clarity', 'Check audience fit', 'Suggest improvements'],
 };
 
+/**
+ * Extended agent content for landing page showcase
+ */
+export interface AgentExtendedContent {
+  personality: string[];
+  capabilities: string[];
+  collaborates: { agentId: AgentId; description: string }[];
+  valueProp: string;
+}
+
+export const AGENT_EXTENDED: Record<AgentId, AgentExtendedContent> = {
+  scout: {
+    personality: ['Endlessly curious', 'Data-driven', 'Thorough researcher', 'Detail-oriented'],
+    capabilities: ['Web research & fact-finding', 'Trending topic analysis', 'Expert quote extraction', 'Statistical data gathering'],
+    collaborates: [
+      { agentId: 'sage', description: 'Passes verified research to structure the narrative' },
+      { agentId: 'aria', description: 'Provides compelling quotes and statistics for storytelling' },
+    ],
+    valueProp: 'Scout eliminates hours of research by finding relevant facts, trends, and expert insights. Just describe your topic and let Scout do the digging.',
+  },
+  sage: {
+    personality: ['Strategic thinker', 'Pattern recognizer', 'Aesthetically minded', 'Structure enthusiast'],
+    capabilities: ['Theme selection & matching', 'Layout optimization', 'Visual hierarchy planning', 'Slide flow structuring'],
+    collaborates: [
+      { agentId: 'scout', description: 'Receives research to inform structural decisions' },
+      { agentId: 'nova', description: 'Guides visual design direction and theme application' },
+    ],
+    valueProp: 'Sage ensures your presentation has the right visual foundation. From choosing the perfect theme to structuring your story arc, Sage builds the blueprint.',
+  },
+  aria: {
+    personality: ['Creative wordsmith', 'Empathetic storyteller', 'Persuasive communicator', 'Narrative-driven'],
+    capabilities: ['Headline crafting', 'Narrative arc development', 'Speaker notes generation', 'Tone adaptation'],
+    collaborates: [
+      { agentId: 'scout', description: 'Transforms research into compelling narratives' },
+      { agentId: 'coach', description: 'Refines content based on quality feedback' },
+    ],
+    valueProp: 'Aria transforms your ideas into a compelling story. From punchy headlines to flowing narratives, Aria makes your message resonate with any audience.',
+  },
+  nova: {
+    personality: ['Visually imaginative', 'Detail-oriented artist', 'Trend-aware', 'Aesthetically bold'],
+    capabilities: ['AI image generation', 'Visual prompt optimization', 'Theme aesthetic enforcement', 'Image-text harmony'],
+    collaborates: [
+      { agentId: 'sage', description: 'Implements design direction and theme choices' },
+      { agentId: 'aria', description: 'Creates visuals that complement the narrative' },
+    ],
+    valueProp: 'Nova brings your slides to life with custom AI-generated imagery. No more hunting for stock photos - Nova creates visuals that perfectly match your message.',
+  },
+  coach: {
+    personality: ['Constructive critic', 'Audience advocate', 'Excellence-driven', 'Supportive mentor'],
+    capabilities: ['Content clarity review', 'Audience fit assessment', 'Improvement suggestions', 'Consistency checking'],
+    collaborates: [
+      { agentId: 'aria', description: 'Provides feedback to strengthen messaging' },
+      { agentId: 'sage', description: 'Validates structural choices for impact' },
+    ],
+    valueProp: 'Coach is your quality assurance partner. Before you present, Coach reviews everything - ensuring clarity, consistency, and maximum impact for your audience.',
+  },
+};
+
 // ============ Agent Action Types ============
 
 /**

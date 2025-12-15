@@ -18,6 +18,7 @@ from packages.common.schemas.presentation import SlideCreate, SlideImport
 
 # Field mapping: frontend camelCase -> backend snake_case
 FRONTEND_TO_DB_SLIDE = {
+    "contentBlocks": "content_blocks",
     "speakerNotes": "speaker_notes",
     "imagePrompt": "image_prompt",
     "imageUrl": "image_url",
@@ -94,6 +95,7 @@ def create_slide_from_data(
         position=slide_data.position if slide_data.position is not None else position,
         title=slide_data.title,
         content=slide_data.content,
+        content_blocks=slide_data.content_blocks,
         speaker_notes=slide_data.speaker_notes,
         image_prompt=slide_data.image_prompt,
         image_url=slide_data.image_url,
@@ -126,6 +128,7 @@ def create_slide_from_import(
         position=position,
         title=slide_data.title,
         content=slide_data.content,
+        content_blocks=slide_data.contentBlocks,
         speaker_notes=slide_data.speakerNotes,
         image_prompt=slide_data.imagePrompt,
         image_url=slide_data.imageUrl,
@@ -156,6 +159,7 @@ def duplicate_slide(
         position=source_slide.position,
         title=source_slide.title,
         content=source_slide.content,
+        content_blocks=source_slide.content_blocks,
         speaker_notes=source_slide.speaker_notes,
         image_prompt=source_slide.image_prompt,
         image_url=source_slide.image_url,
@@ -181,6 +185,7 @@ def slide_to_export_dict(slide: Slide) -> dict[str, Any]:
         "id": str(slide.id),
         "title": slide.title,
         "content": slide.content or [],
+        "contentBlocks": slide.content_blocks,
         "speakerNotes": slide.speaker_notes,
         "imagePrompt": slide.image_prompt,
         "imageUrl": slide.image_url,

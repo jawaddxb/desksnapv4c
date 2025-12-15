@@ -14,6 +14,7 @@ class SlideBase(BaseModel):
 
     title: str | None = None
     content: list | None = None
+    content_blocks: list | None = None  # Rich content blocks (charts, stats, etc.)
     speaker_notes: str | None = None
     image_prompt: str | None = None
     image_url: str | None = None
@@ -117,6 +118,7 @@ class SlideImport(BaseModel):
     id: str | None = None
     title: str | None = None
     content: list | None = None
+    contentBlocks: list | None = None  # Rich content blocks (charts, stats, etc.)
     speakerNotes: str | None = None
     imagePrompt: str | None = None
     imageUrl: str | None = None

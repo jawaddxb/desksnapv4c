@@ -80,6 +80,19 @@ Uses fallback strategy with multiple Gemini models:
 
 Image prompts combine the theme's `visualStyle` with slide-specific `imagePrompt`.
 
+### Backend Architecture
+
+The backend is a FastAPI Python application in `packages/`:
+- `packages/common/models/` - SQLAlchemy models (Presentation, Slide, User, etc.)
+- `packages/common/schemas/` - Pydantic request/response schemas
+- `packages/common/services/presentation_mappers.py` - Conversion helpers (camelCase ↔ snake_case)
+- `infra/alembic/` - Database migrations
+
+**Key patterns:**
+- Frontend uses camelCase (`contentBlocks`), backend uses snake_case (`content_blocks`)
+- JSONB columns for flexible content storage (`content`, `content_blocks`, `style_overrides`)
+- All persistence goes through `services/api/presentationService.ts` → backend API
+
 ### Styling
 
 - Tailwind CSS loaded via CDN in `index.html`

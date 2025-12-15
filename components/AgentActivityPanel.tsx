@@ -17,8 +17,12 @@ import {
   Clock,
 } from 'lucide-react';
 import { useAgentActivitySafe, SlideInfo } from '@/contexts/AgentActivityContext';
-import { AgentLog } from '@/types/agents';
+import { AgentLog, AGENT_TEAM, getAgentConfig } from '@/types/agents';
 import { PromptValidationResult } from '@/services/agents/types';
+
+// Agent color constants from the team
+const NOVA_COLOR = getAgentConfig('nova')?.color || '#A78BFA';  // Purple - Visual Designer
+const SAGE_COLOR = getAgentConfig('sage')?.color || '#6B8E6B';  // Green - Design Architect
 
 export interface AgentActivityPanelProps {
   className?: string;
@@ -187,9 +191,9 @@ export function AgentActivityPanel({ className }: AgentActivityPanelProps) {
       className={`fixed top-20 right-4 z-[150] w-[420px] bg-black/95 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] ${className}`}
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-amber-500/10 to-transparent shrink-0">
+      <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between shrink-0" style={{ background: `linear-gradient(to right, ${NOVA_COLOR}15, transparent)` }}>
         <div className="flex items-center gap-2">
-          <Brain className="w-4 h-4 text-amber-400 animate-pulse" />
+          <Brain className="w-4 h-4 animate-pulse" style={{ color: NOVA_COLOR }} />
           <span className="text-sm font-medium text-white">Agent Processing</span>
         </div>
         <div className="flex items-center gap-3">
@@ -208,8 +212,11 @@ export function AgentActivityPanel({ className }: AgentActivityPanelProps) {
       {/* Progress bar */}
       <div className="h-1.5 bg-white/5 shrink-0">
         <div
-          className="h-full bg-gradient-to-r from-amber-500 to-green-500 transition-all duration-500"
-          style={{ width: `${progressPercent}%` }}
+          className="h-full transition-all duration-500"
+          style={{
+            width: `${progressPercent}%`,
+            background: `linear-gradient(to right, ${NOVA_COLOR}, ${SAGE_COLOR})`
+          }}
         />
       </div>
 
@@ -257,9 +264,9 @@ const SlideCard = React.forwardRef<HTMLDivElement, SlideCardProps>(
         case 'validating':
         case 'rewriting':
         case 'generating':
-          return <RefreshCw className="w-4 h-4 text-amber-400 animate-spin" />;
+          return <RefreshCw className="w-4 h-4 animate-spin" style={{ color: NOVA_COLOR }} />;
         case 'complete':
-          return <CheckCircle className="w-4 h-4 text-green-400" />;
+          return <CheckCircle className="w-4 h-4" style={{ color: SAGE_COLOR }} />;
         case 'error':
           return <AlertTriangle className="w-4 h-4 text-red-400" />;
       }
@@ -277,13 +284,19 @@ const SlideCard = React.forwardRef<HTMLDivElement, SlideCardProps>(
         case 'rewriting':
         case 'generating':
           return (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 uppercase tracking-wider">
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider"
+              style={{ backgroundColor: `${NOVA_COLOR}33`, color: NOVA_COLOR }}
+            >
               {isActive ? 'Now' : 'Working'}
             </span>
           );
         case 'complete':
           return (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 uppercase tracking-wider">
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider"
+              style={{ backgroundColor: `${SAGE_COLOR}33`, color: SAGE_COLOR }}
+            >
               Done
             </span>
           );
@@ -296,17 +309,18 @@ const SlideCard = React.forwardRef<HTMLDivElement, SlideCardProps>(
       }
     };
 
-    const getBorderColor = () => {
-      if (isActive) return 'border-amber-500/50 ring-1 ring-amber-500/30';
-      if (slide.status === 'complete') return 'border-green-500/30';
-      if (slide.status === 'error') return 'border-red-500/30';
-      return 'border-white/10';
+    const getBorderStyle = () => {
+      if (isActive) return { borderColor: `${NOVA_COLOR}80`, boxShadow: `0 0 0 1px ${NOVA_COLOR}4D` };
+      if (slide.status === 'complete') return { borderColor: `${SAGE_COLOR}4D` };
+      if (slide.status === 'error') return { borderColor: 'rgba(239, 68, 68, 0.3)' };
+      return { borderColor: 'rgba(255, 255, 255, 0.1)' };
     };
 
     return (
       <div
         ref={ref}
-        className={`rounded-lg border ${getBorderColor()} bg-white/5 p-3 transition-all duration-300`}
+        className="rounded-lg border bg-white/5 p-3 transition-all duration-300"
+        style={getBorderStyle()}
       >
         {/* Main row: thumbnail + info + status */}
         <div className="flex gap-3">
@@ -321,7 +335,7 @@ const SlideCard = React.forwardRef<HTMLDivElement, SlideCardProps>(
             ) : (
               <div className="w-16 h-12 bg-white/10 rounded border border-white/5 flex items-center justify-center">
                 {slide.status === 'generating' ? (
-                  <RefreshCw className="w-4 h-4 text-amber-400 animate-spin" />
+                  <RefreshCw className="w-4 h-4 animate-spin" style={{ color: NOVA_COLOR }} />
                 ) : (
                   <ImageIcon className="w-4 h-4 text-white/20" />
                 )}
@@ -352,16 +366,16 @@ const SlideCard = React.forwardRef<HTMLDivElement, SlideCardProps>(
                 <span className="text-xs text-white/40">Score:</span>
                 <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-300 ${
-                      slide.validationScore >= 70 ? 'bg-green-500' : 'bg-amber-500'
-                    }`}
-                    style={{ width: `${slide.validationScore}%` }}
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${slide.validationScore}%`,
+                      backgroundColor: slide.validationScore >= 70 ? SAGE_COLOR : NOVA_COLOR
+                    }}
                   />
                 </div>
                 <span
-                  className={`text-xs font-medium ${
-                    slide.validationScore >= 70 ? 'text-green-400' : 'text-amber-400'
-                  }`}
+                  className="text-xs font-medium"
+                  style={{ color: slide.validationScore >= 70 ? SAGE_COLOR : NOVA_COLOR }}
                 >
                   {slide.validationScore}
                 </span>
@@ -372,7 +386,10 @@ const SlideCard = React.forwardRef<HTMLDivElement, SlideCardProps>(
             {slide.approvedPrompt && (
               <div className="text-xs">
                 <span className="text-white/40 block mb-1">Approved prompt:</span>
-                <p className="text-white/70 bg-green-500/10 border border-green-500/20 rounded p-2 line-clamp-3">
+                <p
+                  className="text-white/70 rounded p-2 line-clamp-3"
+                  style={{ backgroundColor: `${SAGE_COLOR}1A`, border: `1px solid ${SAGE_COLOR}33` }}
+                >
                   {slide.approvedPrompt}
                 </p>
               </div>
@@ -380,7 +397,7 @@ const SlideCard = React.forwardRef<HTMLDivElement, SlideCardProps>(
 
             {/* Rewrite indicator */}
             {slide.wasRewritten && slide.status === 'generating' && (
-              <p className="text-xs text-amber-400/80 flex items-center gap-1">
+              <p className="text-xs flex items-center gap-1" style={{ color: `${NOVA_COLOR}CC` }}>
                 <Sparkles className="w-3 h-3" />
                 Prompt was refined for better topic relevance
               </p>
