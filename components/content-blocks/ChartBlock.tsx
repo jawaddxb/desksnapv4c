@@ -29,6 +29,7 @@ export const ChartBlock: React.FC<BlockProps<ChartBlockType>> = ({
   block,
   theme,
   className = '',
+  fillContainer = false,
 }) => {
   const styles = getChartStyles(theme);
 
@@ -148,7 +149,13 @@ export const ChartBlock: React.FC<BlockProps<ChartBlockType>> = ({
   };
 
   return (
-    <div className={`${className}`} style={containerStyle}>
+    <div
+      className={`${className}`}
+      style={{
+        ...containerStyle,
+        ...(fillContainer ? { width: '100%', height: '100%', display: 'flex', flexDirection: 'column' } : {}),
+      }}
+    >
       {block.title && (
         <h4
           className="text-center mb-4 font-semibold"
@@ -160,7 +167,7 @@ export const ChartBlock: React.FC<BlockProps<ChartBlockType>> = ({
           {block.title}
         </h4>
       )}
-      <div className="w-full" style={{ height: 280 }}>
+      <div className="w-full" style={{ height: fillContainer ? '100%' : 280, flex: fillContainer ? 1 : undefined }}>
         <ResponsiveContainer width="100%" height="100%">
           {renderChart() || <div>Unsupported chart type</div>}
         </ResponsiveContainer>

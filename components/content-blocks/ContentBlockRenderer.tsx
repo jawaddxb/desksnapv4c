@@ -10,10 +10,11 @@
  * - DRY: All views use this single renderer
  */
 
-import React, { Suspense } from 'react';
-import { ContentBlock } from '@/types/contentBlocks';
+import React, { Suspense, useCallback } from 'react';
+import { ContentBlock, hasBlockPosition, BlockPosition } from '@/types/contentBlocks';
 import { Theme } from '@/types';
 import { BLOCK_REGISTRY, getBlockRenderer, isLazyBlock } from './registry';
+import { DraggableBlock } from './DraggableBlock';
 
 export interface ContentBlockRendererProps {
   /** Array of content blocks to render */
@@ -24,6 +25,8 @@ export interface ContentBlockRendererProps {
   readOnly?: boolean;
   /** Callback when a block is updated (edit mode only) */
   onUpdateBlock?: (index: number, updates: Partial<ContentBlock>) => void;
+  /** Callback when a block's position changes (drag/resize) */
+  onPositionChange?: (index: number, position: BlockPosition) => void;
   /** Additional CSS classes for the container */
   className?: string;
   /** Gap between blocks (default: 'md') */
@@ -74,17 +77,27 @@ const GAP_SIZES = {
   lg: 'gap-6',
 } as const;
 
+/** Min sizes for different block types */
+const MIN_SIZES: Record<string, { width: number; height: number }> = {
+  chart: { width: 150, height: 100 },
+  diagram: { width: 150, height: 100 },
+  statistic: { width: 100, height: 60 },
+  default: { width: 80, height: 40 },
+};
+
 /**
  * ContentBlockRenderer
  *
  * Renders an array of content blocks using the block registry.
  * Handles lazy loading for heavy components (charts, diagrams).
+ * Supports positioned blocks (drag/resize) alongside flow blocks.
  */
 export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({
   blocks,
   theme,
   readOnly = true,
   onUpdateBlock,
+  onPositionChange,
   className = '',
   gap = 'md',
 }) => {
@@ -92,7 +105,19 @@ export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({
     return null;
   }
 
-  const renderBlock = (block: ContentBlock, index: number) => {
+  // Separate blocks into flow (no position) and positioned
+  const flowBlocks: { block: ContentBlock; index: number }[] = [];
+  const positionedBlocks: { block: ContentBlock; index: number }[] = [];
+
+  blocks.forEach((block, index) => {
+    if (hasBlockPosition(block)) {
+      positionedBlocks.push({ block, index });
+    } else {
+      flowBlocks.push({ block, index });
+    }
+  });
+
+  const renderBlockContent = (block: ContentBlock, index: number, fillContainer = false) => {
     const Renderer = getBlockRenderer(block.type);
 
     if (!Renderer) {
@@ -117,6 +142,7 @@ export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({
         theme={theme}
         readOnly={readOnly}
         onUpdate={!readOnly ? handleUpdate : undefined}
+        fillContainer={fillContainer}
       />
     );
 
@@ -135,9 +161,45 @@ export const ContentBlockRenderer: React.FC<ContentBlockRendererProps> = ({
     return <React.Fragment key={index}>{blockElement}</React.Fragment>;
   };
 
+  const handlePositionChange = useCallback(
+    (index: number) => (position: BlockPosition) => {
+      onPositionChange?.(index, position);
+    },
+    [onPositionChange]
+  );
+
+  const getMinSize = (blockType: string) => MIN_SIZES[blockType] || MIN_SIZES.default;
+
   return (
-    <div className={`flex flex-col ${GAP_SIZES[gap]} ${className}`}>
-      {blocks.map(renderBlock)}
+    <div className={`relative ${className}`} style={{ minHeight: positionedBlocks.length > 0 ? '200px' : undefined }}>
+      {/* Flow-positioned blocks (normal flex layout) */}
+      {flowBlocks.length > 0 && (
+        <div className={`flex flex-col ${GAP_SIZES[gap]}`}>
+          {flowBlocks.map(({ block, index }) => renderBlockContent(block, index))}
+        </div>
+      )}
+
+      {/* Absolutely-positioned blocks (draggable/resizable) */}
+      {positionedBlocks.map(({ block, index }) => {
+        const position = (block as any).position as BlockPosition;
+        const minSize = getMinSize(block.type);
+
+        return (
+          <DraggableBlock
+            key={`positioned-${index}`}
+            blockId={`block-${index}`}
+            blockIndex={index}
+            position={position}
+            onPositionChange={handlePositionChange(index)}
+            readOnly={readOnly}
+            theme={theme}
+            minWidth={minSize.width}
+            minHeight={minSize.height}
+          >
+            {renderBlockContent(block, index, true)}
+          </DraggableBlock>
+        );
+      })}
     </div>
   );
 };

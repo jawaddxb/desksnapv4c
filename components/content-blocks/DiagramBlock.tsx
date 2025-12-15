@@ -23,6 +23,7 @@ export const DiagramBlock: React.FC<BlockProps<DiagramBlockType>> = ({
   block,
   theme,
   className = '',
+  fillContainer = false,
 }) => {
   const styles = getDiagramStyles(theme);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,14 +68,20 @@ export const DiagramBlock: React.FC<BlockProps<DiagramBlockType>> = ({
   }, [block.mermaid, styles]);
 
   return (
-    <div className={`${className}`}>
+    <div
+      className={`${className}`}
+      style={fillContainer ? { width: '100%', height: '100%', display: 'flex', flexDirection: 'column' } : undefined}
+    >
       <div
         ref={containerRef}
-        className="w-full flex justify-center items-center min-h-[200px] p-4 rounded-lg"
+        className="w-full flex justify-center items-center p-4 rounded-lg"
         style={{
           background: styles.surface,
           border: `1px solid ${styles.border}`,
           borderRadius: styles.radius,
+          minHeight: fillContainer ? undefined : 200,
+          flex: fillContainer ? 1 : undefined,
+          height: fillContainer ? '100%' : undefined,
         }}
       >
         {error ? (

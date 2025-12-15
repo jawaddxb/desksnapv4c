@@ -16,6 +16,7 @@ export const StatisticBlock: React.FC<BlockProps<StatisticBlockType>> = ({
   readOnly = true,
   onUpdate,
   className = '',
+  fillContainer = false,
 }) => {
   const styles = getStatisticStyles(theme);
   const trendColor = getTrendColor(styles, block.trend);
@@ -39,7 +40,10 @@ export const StatisticBlock: React.FC<BlockProps<StatisticBlockType>> = ({
       : Minus;
 
   return (
-    <div className={`flex flex-col items-start ${className}`}>
+    <div
+      className={`flex flex-col items-start ${fillContainer ? 'justify-center' : ''} ${className}`}
+      style={fillContainer ? { width: '100%', height: '100%' } : undefined}
+    >
       <div className="flex items-center gap-3">
         {!readOnly && onUpdate ? (
           <input

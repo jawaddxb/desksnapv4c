@@ -1,4 +1,4 @@
-import { ContentBlock } from './types/contentBlocks';
+import { ContentBlock, BlockPosition } from './types/contentBlocks';
 
 // Layout type constants (single source of truth)
 export const LAYOUT_TYPES = ['split', 'full-bleed', 'statement', 'gallery', 'card', 'horizontal', 'magazine'] as const;
@@ -141,6 +141,7 @@ export interface SlideStyles {
   contentItemStyles?: Record<number, ContentItemStyle>; // Per-item content styles
   overlayStyle?: OverlayStyle; // Gradient overlay style for full-bleed layouts
   contentItemVisualPreset?: ContentItemVisualPreset; // Visual style for content items (slide override)
+  imagePosition?: BlockPosition; // Position for draggable/resizable slide image
 }
 
 /**

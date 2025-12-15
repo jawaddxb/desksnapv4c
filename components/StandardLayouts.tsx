@@ -5,9 +5,12 @@
  * All 7 layout types share common infrastructure via the Layout component.
  */
 
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Slide, Theme, ImageStyleOverride } from '@/types';
+import { BlockPosition } from '@/types/contentBlocks';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
+import { Rnd } from 'react-rnd';
+import { useSelectionSafe } from '@/contexts/SelectionContext';
 
 // ============ Types ============
 
@@ -48,16 +51,159 @@ interface ImageContainerProps {
   className?: string;
   style?: React.CSSProperties;
   toolbar?: React.ReactNode;
+  readOnly?: boolean;
+  onImagePositionChange?: (position: BlockPosition) => void;
 }
 
-export const ImageContainer = ({ slide, theme, className = "", style = {}, toolbar }: ImageContainerProps) => {
+export const ImageContainer = ({
+  slide,
+  theme,
+  className = "",
+  style = {},
+  toolbar,
+  readOnly = true,
+  onImagePositionChange,
+}: ImageContainerProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const selectionContext = useSelectionSafe();
   const imageStyles = slide.imageStyles;
   const opacity = imageStyles?.opacity ?? 1;
   const objectFit = imageStyles?.objectFit ?? 'cover';
   const filterStyle = getImageFilterStyle(imageStyles);
+  const imagePosition = slide.imagePosition;
+
+  const isSelected =
+    selectionContext?.selection.type === 'image' &&
+    selectionContext?.selection.elementId === slide.id;
+
+  const handleSelect = useCallback(
+    (e: React.MouseEvent) => {
+      if (readOnly) return;
+      e.stopPropagation();
+      selectionContext?.setSelection('image', slide.id);
+    },
+    [readOnly, selectionContext, slide.id]
+  );
+
+  const handleDragStop = useCallback(
+    (_e: unknown, d: { x: number; y: number }) => {
+      const container = containerRef.current;
+      if (!container || !onImagePositionChange || !imagePosition) return;
+
+      const containerWidth = container.offsetWidth;
+      const containerHeight = container.offsetHeight;
+
+      onImagePositionChange({
+        ...imagePosition,
+        x: (d.x / containerWidth) * 100,
+        y: (d.y / containerHeight) * 100,
+      });
+    },
+    [imagePosition, onImagePositionChange]
+  );
+
+  const handleResizeStop = useCallback(
+    (
+      _e: unknown,
+      _direction: unknown,
+      ref: HTMLElement,
+      _delta: unknown,
+      pos: { x: number; y: number }
+    ) => {
+      const container = containerRef.current;
+      if (!container || !onImagePositionChange) return;
+
+      const containerWidth = container.offsetWidth;
+      const containerHeight = container.offsetHeight;
+
+      onImagePositionChange({
+        x: (pos.x / containerWidth) * 100,
+        y: (pos.y / containerHeight) * 100,
+        width: (ref.offsetWidth / containerWidth) * 100,
+        height: (ref.offsetHeight / containerHeight) * 100,
+      });
+    },
+    [onImagePositionChange]
+  );
+
+  // Render draggable image if position is set
+  const renderImage = () => {
+    if (!slide.imageUrl) {
+      return (
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ background: theme.colors.surface, opacity: 0.1 }}
+        >
+          <ImageIcon className="w-12 h-12" />
+        </div>
+      );
+    }
+
+    const imgElement = (
+      <img
+        src={slide.imageUrl}
+        alt="Slide visual"
+        className="w-full h-full"
+        style={{
+          objectFit: imagePosition ? 'cover' : objectFit,
+          opacity,
+          ...filterStyle,
+        }}
+      />
+    );
+
+    // If image has custom position, make it draggable
+    if (imagePosition && !readOnly) {
+      const container = containerRef.current;
+      const containerWidth = container?.offsetWidth || 400;
+      const containerHeight = container?.offsetHeight || 300;
+
+      return (
+        <Rnd
+          position={{
+            x: (imagePosition.x / 100) * containerWidth,
+            y: (imagePosition.y / 100) * containerHeight,
+          }}
+          size={{
+            width: (imagePosition.width / 100) * containerWidth,
+            height: (imagePosition.height / 100) * containerHeight,
+          }}
+          onDragStop={handleDragStop}
+          onResizeStop={handleResizeStop}
+          minWidth={80}
+          minHeight={80}
+          bounds="parent"
+          disableDragging={!isSelected}
+          enableResizing={isSelected}
+          onClick={handleSelect}
+          style={{
+            outline: isSelected ? `2px solid ${theme.colors.accent}` : 'none',
+            outlineOffset: '2px',
+            cursor: readOnly ? 'default' : isSelected ? 'move' : 'pointer',
+            overflow: 'hidden',
+            borderRadius: theme.layout.radius,
+          }}
+        >
+          {imgElement}
+        </Rnd>
+      );
+    }
+
+    // Default: full-size image with hover effect
+    return (
+      <div
+        className="absolute inset-0 transition-transform duration-1000 ease-out hover:scale-105"
+        onClick={!readOnly ? handleSelect : undefined}
+        style={{ cursor: !readOnly ? 'pointer' : 'default' }}
+      >
+        {imgElement}
+      </div>
+    );
+  };
 
   return (
     <div
+      ref={containerRef}
       className={`relative overflow-hidden w-full h-full bg-zinc-100 ${className}`}
       style={style}
     >
@@ -69,24 +215,8 @@ export const ImageContainer = ({ slide, theme, className = "", style = {}, toolb
           </div>
           <div className="text-[10px] font-bold uppercase tracking-widest opacity-50" style={{ color: theme.colors.text }}>Generative Fill</div>
         </div>
-      ) : slide.imageUrl ? (
-        <img
-          src={slide.imageUrl}
-          alt="Slide visual"
-          className="absolute inset-0 w-full h-full transition-transform duration-1000 ease-out hover:scale-105"
-          style={{
-            objectFit,
-            opacity,
-            ...filterStyle,
-          }}
-        />
       ) : (
-        <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ background: theme.colors.surface, opacity: 0.1 }}
-        >
-          <ImageIcon className="w-12 h-12" />
-        </div>
+        renderImage()
       )}
 
       {theme.colors.backgroundPattern && !slide.isImageLoading && (

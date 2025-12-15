@@ -21,6 +21,8 @@ export interface BlockProps<T extends ContentBlock = ContentBlock> {
   onUpdate?: (updates: Partial<T>) => void;
   /** Additional CSS class name */
   className?: string;
+  /** When true, block fills its container (used in drag/resize mode) */
+  fillContainer?: boolean;
 }
 
 /**

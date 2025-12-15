@@ -46,6 +46,15 @@ export type CalloutVariant = typeof CALLOUT_VARIANTS[number];
 export const TREND_TYPES = ['up', 'down', 'neutral'] as const;
 export type TrendType = typeof TREND_TYPES[number];
 
+// ============ Block Position (for drag/resize) ============
+
+export interface BlockPosition {
+  x: number;      // percentage 0-100 relative to container
+  y: number;      // percentage 0-100 relative to container
+  width: number;  // percentage 0-100 relative to container
+  height: number; // percentage 0-100 relative to container
+}
+
 // ============ Content Block Union ============
 
 /**
@@ -67,22 +76,26 @@ export type ContentBlock =
 export interface ParagraphBlock {
   type: 'paragraph';
   text: string;
+  position?: BlockPosition;
 }
 
 export interface BulletsBlock {
   type: 'bullets';
   items: string[];
+  position?: BlockPosition;
 }
 
 export interface NumberedBlock {
   type: 'numbered';
   items: string[];
+  position?: BlockPosition;
 }
 
 export interface QuoteBlock {
   type: 'quote';
   text: string;
   attribution?: string;
+  position?: BlockPosition;
 }
 
 export interface StatisticBlock {
@@ -90,12 +103,14 @@ export interface StatisticBlock {
   value: string;
   label: string;
   trend?: TrendType;
+  position?: BlockPosition;
 }
 
 export interface CalloutBlock {
   type: 'callout';
   text: string;
   variant: CalloutVariant;
+  position?: BlockPosition;
 }
 
 export interface ChartBlock {
@@ -103,12 +118,14 @@ export interface ChartBlock {
   chartType: ChartType;
   data: ChartData;
   title?: string;
+  position?: BlockPosition;
 }
 
 export interface DiagramBlock {
   type: 'diagram';
   mermaid: string;
   caption?: string;
+  position?: BlockPosition;
 }
 
 // ============ Type Guards ============
@@ -136,6 +153,9 @@ export const isChartBlock = (block: ContentBlock): block is ChartBlock =>
 
 export const isDiagramBlock = (block: ContentBlock): block is DiagramBlock =>
   block.type === 'diagram';
+
+export const hasBlockPosition = (block: ContentBlock): boolean =>
+  'position' in block && block.position !== undefined;
 
 // ============ Utility Functions ============
 
