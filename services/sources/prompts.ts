@@ -101,8 +101,13 @@ ${columnList}
   };
 
   const sourcesContext = session.sources?.length
-    ? `\n\nCurrent sources:\n${session.sources.map(s => `- [${s.id}] ${s.type}: ${s.url} (${s.status})`).join('\n')}`
-    : '\n\nNo sources added yet. Ask the user for YouTube URLs or web page links.';
+    ? `\n\nCurrent sources:\n${session.sources.map(s => {
+        if (s.type === 'doc') {
+          return `- [${s.id}] DOCUMENT: "${s.title}" (${s.status})${s.documentId ? ` [docId: ${s.documentId}]` : ''}`;
+        }
+        return `- [${s.id}] ${s.type}: ${s.url} (${s.status})`;
+      }).join('\n')}`
+    : '\n\nNo sources added yet. Ask the user for YouTube URLs, web page links, or select documents from the library.';
 
   const notesContext = session.notes.length
     ? `\n\nExtracted notes:\n${session.notes.map(n => `- [${columns[n.column] || 'Unknown'}] ${n.content}`).join('\n')}`

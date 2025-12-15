@@ -32,7 +32,9 @@ import { TopicPillsPanel } from './TopicPillsPanel';
 import { DraftSetupOverlay } from '@/components/shared/DraftSetupOverlay';
 import { useDraftSetup } from '@/hooks/useDraftSetup';
 import { ContentDensity } from '@/lib/contentBlockPrompts';
-import { Plus, ArrowLeft, Video, Globe, Link, Bot } from 'lucide-react';
+import { Plus, ArrowLeft, Video, Globe, Link, Bot, FileText } from 'lucide-react';
+import { DocumentSourcePicker } from './DocumentSourcePicker';
+import type { Document } from '@/types/documents';
 
 interface SourcesWizardProps {
   /** Preset mode: 'video' for VideoDeck, 'web' for Research & Present */
@@ -76,6 +78,7 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
   // URL input state
   const [urlInput, setUrlInput] = useState('');
   const [dragOver, setDragOver] = useState(false);
+  const [showDocumentPicker, setShowDocumentPicker] = useState(false);
 
   // Draft setup state (DRY: replaces 3 useState calls with reusable hook)
   const draftSetup = useDraftSetup();
@@ -173,6 +176,51 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
       setUrlInput('');
     }
   }, [urlInput, handleAddSource]);
+
+  // Handle adding documents as sources
+  const handleAddDocuments = useCallback(async (docs: Document[]) => {
+    // Create session if not persisted yet
+    if (!isSessionPersisted && !persistingRef.current) {
+      persistingRef.current = true;
+      try {
+        const savedSession = await createIdeationSession(session);
+        setSession(prev => ({ ...prev, id: savedSession.id }));
+        setIsSessionPersisted(true);
+        queryClient.invalidateQueries({ queryKey: ideationKeys.lists() });
+      } catch (error) {
+        console.error('[SourcesWizard] Failed to create session:', error);
+      } finally {
+        persistingRef.current = false;
+      }
+    }
+
+    // Add each document as a source
+    for (const doc of docs) {
+      const message = `Add this document as reference: "${doc.title || doc.fileName}" (${doc.tokenCount} tokens)`;
+      await handleSendMessage(message);
+
+      // Create the source directly since agent may not have document context
+      const newSource: Source = {
+        id: generateId('source'),
+        type: 'doc',
+        url: '', // Documents don't have URLs
+        title: doc.title || doc.fileName,
+        status: 'ingested', // Already processed
+        documentId: doc.id,
+        createdAt: Date.now(),
+        metadata: {
+          author: doc.fileName,
+          description: `${doc.fileType.toUpperCase()} document with ${doc.tokenCount} tokens`,
+        },
+      };
+
+      setSession(prev => ({
+        ...prev,
+        sources: [...(prev.sources || []), newSource],
+        lastModified: Date.now(),
+      }));
+    }
+  }, [session, isSessionPersisted, queryClient, handleSendMessage]);
 
   // Handle paste in URL input
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -508,9 +556,18 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
                 </button>
               </div>
             </div>
-            <p className="mt-2 text-xs text-[#8FA58F]">
-              {preset === 'video' ? 'Paste YouTube links to extract knowledge' : 'Add URLs to analyze and extract insights'}
-            </p>
+            <div className="mt-2 flex items-center justify-between">
+              <p className="text-xs text-[#8FA58F]">
+                {preset === 'video' ? 'Paste YouTube links to extract knowledge' : 'Add URLs to analyze and extract insights'}
+              </p>
+              <button
+                onClick={() => setShowDocumentPicker(true)}
+                className="flex items-center gap-1.5 px-2 py-1 text-xs text-[#6B8E6B] hover:bg-[#EDF5F0] transition-colors rounded"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                From Library
+              </button>
+            </div>
           </form>
 
           {/* Collapsible Sources List */}
@@ -656,6 +713,15 @@ export const SourcesWizard: React.FC<SourcesWizardProps> = ({
         isLoading={false}
         draftOnly={true}
       />
+
+      {/* Document Source Picker Modal */}
+      {showDocumentPicker && (
+        <DocumentSourcePicker
+          onSelect={handleAddDocuments}
+          onClose={() => setShowDocumentPicker(false)}
+          multiple={true}
+        />
+      )}
     </div>
   );
 };

@@ -41,6 +41,7 @@ async def presentation_websocket(
     # Authenticate the WebSocket connection
     user = await authenticate_websocket(websocket, token)
     if not user:
+        await websocket.accept()  # Must accept before closing to send close code
         await websocket.close(code=4001, reason="Unauthorized")
         return
 

@@ -1,13 +1,14 @@
 /**
  * Sources Agent Extraction
  *
- * Video and web content extraction helpers.
+ * Video, web, and document content extraction helpers.
  */
 
 import { getAIClient } from '../aiClient';
 import { scrapeUrl, parseMarkdownToSections, isFirecrawlAvailable } from '../firecrawlService';
 import { getTextModel } from '@/config';
 import { TranscriptSegment } from '@/types/ideation';
+import { getDocument } from '../api/documentService';
 
 /**
  * Extract transcript from YouTube video using Gemini's native video understanding.
@@ -166,4 +167,104 @@ Return ONLY valid JSON.`,
     }
     throw new Error(`Failed to extract web content: ${errorMsg}`);
   }
+}
+
+/**
+ * Extract content from an uploaded document
+ * Fetches the already-extracted text from the backend.
+ */
+export async function extractDocumentContent(documentId: string): Promise<{
+  title: string;
+  content: string;
+  fileType: string;
+  tokenCount: number;
+  sections: Array<{ heading: string; content: string }>;
+}> {
+  try {
+    console.log(`[extractDocumentContent] Fetching document: ${documentId}`);
+
+    const doc = await getDocument(documentId);
+
+    if (!doc.extractedText) {
+      throw new Error('Document has no extracted text. It may still be processing.');
+    }
+
+    // Parse the text into sections (simple splitting by double newlines or headers)
+    const sections = parseTextToSections(doc.extractedText);
+
+    console.log(`[extractDocumentContent] Success: ${doc.fileName} (${sections.length} sections)`);
+
+    return {
+      title: doc.title || doc.fileName,
+      content: doc.extractedText,
+      fileType: doc.fileType,
+      tokenCount: doc.tokenCount,
+      sections,
+    };
+  } catch (error) {
+    console.error('[extractDocumentContent] Error:', error);
+    throw new Error(`Failed to extract document content: ${error}`);
+  }
+}
+
+/**
+ * Parse plain text into sections based on markdown headers or paragraph breaks.
+ */
+function parseTextToSections(text: string): Array<{ heading: string; content: string }> {
+  const sections: Array<{ heading: string; content: string }> = [];
+
+  // Try to split by markdown headers
+  const headerPattern = /^#{1,3}\s+(.+)$/gm;
+  let lastIndex = 0;
+  let currentHeading = 'Introduction';
+  let match;
+
+  while ((match = headerPattern.exec(text)) !== null) {
+    // Save content before this header
+    if (match.index > lastIndex) {
+      const content = text.slice(lastIndex, match.index).trim();
+      if (content) {
+        sections.push({ heading: currentHeading, content });
+      }
+    }
+    currentHeading = match[1];
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining content
+  const remaining = text.slice(lastIndex).trim();
+  if (remaining) {
+    sections.push({ heading: currentHeading, content: remaining });
+  }
+
+  // If no headers found, split by paragraphs
+  if (sections.length === 0) {
+    const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+    if (paragraphs.length > 0) {
+      // Group paragraphs into sections of ~500 words
+      let currentContent = '';
+      let sectionIndex = 1;
+
+      for (const para of paragraphs) {
+        currentContent += para + '\n\n';
+        if (currentContent.split(/\s+/).length > 500) {
+          sections.push({
+            heading: `Section ${sectionIndex}`,
+            content: currentContent.trim(),
+          });
+          currentContent = '';
+          sectionIndex++;
+        }
+      }
+
+      if (currentContent.trim()) {
+        sections.push({
+          heading: sectionIndex === 1 ? 'Content' : `Section ${sectionIndex}`,
+          content: currentContent.trim(),
+        });
+      }
+    }
+  }
+
+  return sections.length > 0 ? sections : [{ heading: 'Content', content: text }];
 }

@@ -12,9 +12,11 @@ from packages.common.models.ideation import (
     IdeaNote,
     NoteConnection,
     IdeationJournalEntry,
+    ideation_session_documents,
 )
 from packages.common.models.rough_draft import RoughDraft, RoughDraftSlide
 from packages.common.models.beautify import BeautifySession
+from packages.common.models.document import Document
 
 __all__ = [
     "Base",
@@ -28,7 +30,9 @@ __all__ = [
     "IdeaNote",
     "NoteConnection",
     "IdeationJournalEntry",
+    "ideation_session_documents",
     "RoughDraft",
     "RoughDraftSlide",
     "BeautifySession",
+    "Document",
 ]

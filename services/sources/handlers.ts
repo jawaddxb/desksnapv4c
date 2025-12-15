@@ -15,7 +15,7 @@ import {
   getRecipeColumns,
 } from '@/types/ideation';
 import { extractComprehensiveContent } from '../firecrawlService';
-import { extractYouTubeTranscript } from './extraction';
+import { extractYouTubeTranscript, extractDocumentContent } from './extraction';
 import { categorizeContentWithAI, extractUniqueThemes, extractUniqueTypes } from './categorization';
 import { formatTime, getColumnIndex } from './utils';
 import { ComprehensiveExtractionResult } from './types';
@@ -641,4 +641,129 @@ export async function handleMarkReady(
     sourceCount: session.sources?.length || 0,
     message: 'Ready to build deck!',
   };
+}
+
+// ============================================
+// DOCUMENT EXTRACTION HANDLER
+// ============================================
+
+export async function handleExtractDocumentContent(
+  getSession: () => IdeationSession,
+  args: Record<string, unknown>,
+  updateSession: (updates: Partial<IdeationSession>) => void,
+  addNote: (note: IdeaNote) => void,
+  recipe?: DeckRecipe
+): Promise<unknown> {
+  const session = getSession();
+  const sourceId = args.sourceId as string;
+  const documentId = args.documentId as string;
+  const source = session.sources?.find(s => s.id === sourceId);
+
+  if (!source) {
+    return { success: false, error: 'Source not found' };
+  }
+
+  if (source.type !== 'doc') {
+    return { success: false, error: 'Source is not a document' };
+  }
+
+  try {
+    // Update source status to ingesting
+    const currentSession = getSession();
+    const sources = currentSession.sources?.map(s =>
+      s.id === sourceId ? { ...s, status: 'ingesting' as const } : s
+    );
+    updateSession({ sources });
+
+    // Extract document content
+    console.log('[handleExtractDocumentContent] Extracting document content...');
+    const docContent = await extractDocumentContent(documentId);
+    console.log(`[handleExtractDocumentContent] Extracted ${docContent.tokenCount} tokens from ${docContent.title}`);
+
+    // Use AI to categorize content into structured notes
+    console.log('[handleExtractDocumentContent] Categorizing content with AI...');
+    const comprehensiveContent = {
+      title: docContent.title,
+      author: '',
+      description: `${docContent.fileType.toUpperCase()} document`,
+      sections: docContent.sections,
+      fullMarkdown: docContent.content,
+      wordCount: docContent.content.split(/\s+/).length,
+    };
+
+    const categorizedNotes = await categorizeContentWithAI(comprehensiveContent, recipe);
+    console.log(`[handleExtractDocumentContent] Categorized into ${categorizedNotes.length} notes`);
+
+    // Create notes for each piece of content
+    const columns = getRecipeColumns(recipe);
+    for (const catNote of categorizedNotes) {
+      const columnIndex = columns.findIndex(c =>
+        c.toLowerCase() === catNote.column.toLowerCase()
+      );
+      const note = createKnowledgeNote(
+        catNote.content,
+        columnIndex >= 0 ? columnIndex : 2,
+        'concept',
+        [{
+          sourceId,
+          excerpt: catNote.excerpt,
+          confidence: 0.9,
+        }],
+        {
+          theme: catNote.theme,
+          noteCategory: catNote.type,
+        }
+      );
+      addNote(note);
+    }
+
+    // Extract unique themes and types for UI
+    const detectedThemes = extractUniqueThemes(categorizedNotes);
+    const detectedTypes = extractUniqueTypes(categorizedNotes);
+
+    // Update source with extraction results
+    const latestSession = getSession();
+    const updatedSources = latestSession.sources?.map(s =>
+      s.id === sourceId
+        ? {
+            ...s,
+            status: 'ingested' as const,
+            title: docContent.title,
+            fullMarkdown: docContent.content,
+            detectedThemes,
+            detectedTypes,
+            metadata: {
+              ...s.metadata,
+              description: `${docContent.fileType.toUpperCase()} document with ${docContent.tokenCount} tokens`,
+            },
+          }
+        : s
+    );
+    updateSession({ sources: updatedSources });
+
+    const result: ComprehensiveExtractionResult = {
+      success: true,
+      noteCount: categorizedNotes.length,
+      themes: detectedThemes,
+      types: detectedTypes,
+      readyForPills: true,
+      title: docContent.title,
+      wordCount: comprehensiveContent.wordCount,
+    };
+
+    console.log('[handleExtractDocumentContent] Document extraction complete:', result);
+    return result;
+
+  } catch (error) {
+    console.error('[handleExtractDocumentContent] Error:', error);
+    const errorSession = getSession();
+    const sources = errorSession.sources?.map(s =>
+      s.id === sourceId
+        ? { ...s, status: 'error' as const, errorMessage: String(error) }
+        : s
+    );
+    updateSession({ sources });
+
+    return { success: false, error: String(error) };
+  }
 }

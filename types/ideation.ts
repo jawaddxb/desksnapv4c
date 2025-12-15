@@ -91,6 +91,8 @@ export interface Source {
   detectedThemes?: string[];         // e.g., "AI Trends", "Market Data"
   detectedTypes?: NoteCategory[];     // e.g., "statistic", "quote", "framework"
   fullMarkdown?: string;             // Complete extracted content
+  // Document reference (for type: 'doc')
+  documentId?: string;               // Links to uploaded document in library
 }
 
 /**

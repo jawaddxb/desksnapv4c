@@ -5,11 +5,22 @@ Models for the ideation/brainstorming system
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import String, Integer, Text, Boolean, ForeignKey, JSON
+from sqlalchemy import String, Integer, Text, Boolean, ForeignKey, JSON, Table, Column, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import func
 
-from packages.common.models.base import BaseModel
+from packages.common.models.base import Base, BaseModel
+
+
+# Association table for many-to-many relationship between IdeationSession and Document
+ideation_session_documents = Table(
+    "ideation_session_documents",
+    Base.metadata,
+    Column("session_id", UUID(as_uuid=True), ForeignKey("ideation_sessions.id", ondelete="CASCADE"), primary_key=True),
+    Column("document_id", UUID(as_uuid=True), ForeignKey("documents.id", ondelete="CASCADE"), primary_key=True),
+    Column("added_at", DateTime(timezone=True), server_default=func.now(), nullable=False),
+)
 
 
 class IdeationSession(BaseModel):
@@ -68,6 +79,11 @@ class IdeationSession(BaseModel):
     rough_drafts = relationship(
         "RoughDraft",
         back_populates="ideation_session",
+    )
+    documents = relationship(
+        "Document",
+        secondary=ideation_session_documents,
+        back_populates="ideation_sessions",
     )
 
 

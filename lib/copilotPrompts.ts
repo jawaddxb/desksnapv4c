@@ -105,15 +105,22 @@ export function buildSessionContext(session: IdeationSession): string {
     return `**${col}** (${notes.length} notes):\n${notes.map(n => `  - [${n.id}] ${n.content}`).join('\n')}`;
   }).filter(Boolean);
 
+  // Build document sources context
+  const docSources = session.sources?.filter(s => s.type === 'doc' && s.documentId) || [];
+  const documentContext = docSources.length > 0
+    ? `## Reference Documents:\n${docSources.map(s => `- "${s.title}" [docId: ${s.documentId}]`).join('\n')}\n\nUse these documents as reference material when creating notes. Cite specific passages when relevant.`
+    : '';
+
   const context = [
     `## Current Session: "${session.topic}"`,
     `Stage: ${session.stage}`,
     `Total notes: ${session.notes.length}`,
     '',
     notesByColumn.length > 0 ? '## Canvas State:\n' + notesByColumn.join('\n\n') : '## Canvas: Empty - time to add notes!',
+    documentContext,
   ];
 
-  return context.join('\n');
+  return context.filter(Boolean).join('\n');
 }
 
 /**

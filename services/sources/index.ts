@@ -25,7 +25,7 @@ export type { ComprehensiveExtractionResult, CategorizedNote } from './types';
 export { buildSourcesPrompt } from './prompts';
 export { createSourcesToolExecutor } from './toolExecutor';
 export { formatTime, extractVideoId, getColumnIndex } from './utils';
-export { extractYouTubeTranscript, extractWebPageContent } from './extraction';
+export { extractYouTubeTranscript, extractWebPageContent, extractDocumentContent } from './extraction';
 export { categorizeContentWithAI, extractUniqueThemes, extractUniqueTypes } from './categorization';
 
 /**

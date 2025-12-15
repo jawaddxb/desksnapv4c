@@ -91,6 +91,11 @@ class User(BaseModel):
         back_populates="owner",
         cascade="all, delete-orphan",
     )
+    documents = relationship(
+        "Document",
+        back_populates="owner",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self) -> str:
         return f"<User {self.email}>"

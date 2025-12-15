@@ -12,6 +12,7 @@ import {
   handleRemoveSource,
   handleExtractTranscript,
   handleExtractWebContent,
+  handleExtractDocumentContent,
   handleIdentifyChapters,
   handleExtractConcept,
   handleExtractFramework,
@@ -54,6 +55,9 @@ export function createSourcesToolExecutor(
 
       case 'extract_web_content':
         return handleExtractWebContent(getSession, args, updateSession, addNote, session.recipe);
+
+      case 'extract_document_content':
+        return handleExtractDocumentContent(getSession, args, updateSession, addNote, session.recipe);
 
       case 'identify_chapters':
         return handleIdentifyChapters(getSession, args, updateSession);
